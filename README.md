@@ -73,7 +73,7 @@ TODO: 開発完了後、画像を貼る
 
 ## ER 図
 
-![Entity Relationships](https://github.com/user-attachments/assets/5b44f7a5-bbc6-4719-b947-9d8bf2fac53d)
+![Entity Relationships](https://github.com/user-attachments/assets/fef130c8-ab01-4b51-9ba8-80c238427f12)
 
 ### テーブル一覧
 
