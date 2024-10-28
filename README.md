@@ -72,20 +72,20 @@ TODO: 開発完了後、画像を貼る
 
 ## ER 図
 
-![entity_relationships](https://github.com/user-attachments/assets/c681ba0e-b6a9-4ff8-84d0-a4a3e1e0c9b4)
+![241027_ER](https://github.com/user-attachments/assets/e226dd68-3bed-45a5-bc2e-b7925ae3d7d8)
 
 ### テーブル一覧
 
-| テーブル名       | 定義                                     |
-| ---------------- | ---------------------------------------- |
-| users            | ユーザー情報                             |
-| user_auth        | ユーザーの認証情報                       |
-| searches         | ユーザーの検索履歴                       |
-| locations        | 検索されたロケーション                   |
-| search_locations | ユーザーの検索履歴とロケーションを紐付け |
-| restaurants      | 店舗情報                                 |
-| categories       | 店舗カテゴリー                           |
-| favorites        | お気に入りをした店舗情報                 |
+| テーブル名            | 定義                     |
+| --------------------- | ------------------------ |
+| users                 | ユーザー情報             |
+| user_auth             | ユーザーの認証情報       |
+| search_histories      | ユーザーのエリア検索履歴 |
+| areas                 | 検索されたエリア         |
+| restaurants           | 店舗情報                 |
+| restaurant_categories | 店舗カテゴリ中間テーブル |
+| categories            | 店舗カテゴリー           |
+| favorites             | お気に入りをした店舗情報 |
 
 ## 画面遷移図
 
