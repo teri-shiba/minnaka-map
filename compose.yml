@@ -22,5 +22,15 @@ services:
       - db
     tty: true
     stdin_open: true
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "8000:3000"
+    tty: true
+    stdin_open: true
 volumes:
   postgres_data:
