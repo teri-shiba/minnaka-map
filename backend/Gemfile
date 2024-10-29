@@ -1,0 +1,18 @@
+source "https://rubygems.org"
+
+ruby "3.3.5"
+gem "rails", "~> 7.2.1", ">= 7.2.1.2"
+
+# postgreSQL
+gem "pg", "~> 1.1"
+
+# default gem
+gem "bootsnap", require: false
+gem "puma", ">= 5.0"
+gem "tzinfo-data", platforms: %i[ windows jruby ]
+
+# CORS
+gem "rack-cors"
+
+group :development, :test do
+end
