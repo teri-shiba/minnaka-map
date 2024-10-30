@@ -9,7 +9,7 @@ jobs:
       run:
         working-directory: backend
     services:
-      mysql:
+      postgres:
         image: postgres:16.4
         ports:
           - "5432:5432"
