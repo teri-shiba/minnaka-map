@@ -1,7 +1,7 @@
 test:
   adapter: postgresql
   encoding: utf8
-  username: postgres
+  username: user
   password: ${{ secrets.POSTGRES_PASSWORD }}
   host: 127.0.0.1
   database: app_test
