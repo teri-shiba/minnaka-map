@@ -9,7 +9,7 @@ jobs:
       run:
         working-directory: backend
     services:
-      localhost:
+      postgres:
         image: postgres:16.4
         env:
           POSTGRES_USER: user
@@ -18,7 +18,7 @@ jobs:
         ports:
           - "5432:5432"
         options: >-
-          --health-cmd "pg_isready -U user"
+          --health-cmd "pg_isready"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
@@ -49,9 +49,7 @@ jobs:
       - name: Database create and migrate
         run: |
           cp config/database.yml.ci config/database.yml
-          echo "Creating test database..."
           bundle exec rails db:create RAILS_ENV=test
-          echo "Migrating test database..."
           bundle exec rails db:migrate RAILS_ENV=test
 
       - name: Run rspec
