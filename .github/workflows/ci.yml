@@ -48,7 +48,7 @@ jobs:
 
       - name: Print Docker logs
         run: |
-          docker logs $(docker ps -q --filter "name=db")
+          docker compose logs $(docker ps -q --filter "name=db-1")
 
       - name: Database create and migrate
         run: |
