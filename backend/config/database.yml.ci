@@ -2,6 +2,6 @@ test:
   adapter: postgresql
   encoding: utf8
   username: user
-  password: password
-  host: db
+  password:
+  host: 127.0.0.1
   database: app_test
