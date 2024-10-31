@@ -1,7 +1,7 @@
 test:
   adapter: postgresql
   encoding: utf8
-  username: user
-  password: password
+  username: ${POSTGRES_USER}
+  password: ${POSTGRES_PASSWORD}
   host: localhost
   database: app_test
