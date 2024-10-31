@@ -1,7 +1,7 @@
 test:
   adapter: postgresql
   encoding: utf8
-  username: <%= ENV['POSTGRES_USER'] %>
-  password: <%= ENV['POSTGRES_PASSWORD'] %>
+  username: ${{ secrets.POSTGRES_USER }}
+  password: ${{ secrets.POSTGRES_PASSWORD }}
   host: localhost
   database: app_test
