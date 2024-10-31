@@ -49,7 +49,9 @@ jobs:
       - name: Database create and migrate
         run: |
           cp config/database.yml.ci config/database.yml
+          echo "Creating test database..."
           bundle exec rails db:create RAILS_ENV=test
+          echo "Migrating test database..."
           bundle exec rails db:migrate RAILS_ENV=test
 
       - name: Run rspec
