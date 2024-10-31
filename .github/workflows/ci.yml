@@ -12,9 +12,9 @@ jobs:
       db:
         image: postgres:16.4
         env:
-          POSTGRES_DB: app_test
           POSTGRES_USER: user
           POSTGRES_PASSWORD: password
+          POSTGRES_DB: app_test
         ports:
           - "5432:5432"
         options: >-
@@ -45,6 +45,23 @@ jobs:
         run: |
           gem install bundler
           bundle install --jobs 4 --retry 3 --path vendor/bundle
+
+      - name: Check PostgreSQL readiness
+        run: |
+          until pg_isready -h db -U user -d app_test; do
+            echo "Waiting for PostgreSQL to be ready..."
+            sleep 2
+          done
+
+      - name: Test database connection
+        run: |
+          apt-get update && apt-get install -y netcat
+          nc -zv db 5432
+
+      - name: Debug database connection
+        run: |
+          echo "Testing database connection..."
+          psql -h db -U user -d app_test -c '\l'
 
       - name: Database create and migrate
         run: |
