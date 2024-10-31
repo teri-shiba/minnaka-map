@@ -46,22 +46,9 @@ jobs:
           gem install bundler
           bundle install --jobs 4 --retry 3 --path vendor/bundle
 
-      - name: Check PostgreSQL readiness
+      - name: Print Docker logs
         run: |
-          until pg_isready -h db -U user -d app_test; do
-            echo "Waiting for PostgreSQL to be ready..."
-            sleep 2
-          done
-
-      - name: Test database connection
-        run: |
-          apt-get update && apt-get install -y netcat
-          nc -zv db 5432
-
-      - name: Debug database connection
-        run: |
-          echo "Testing database connection..."
-          psql -h db -U user -d app_test -c '\l'
+          docker logs $(docker ps -q --filter "name=db")
 
       - name: Database create and migrate
         run: |
