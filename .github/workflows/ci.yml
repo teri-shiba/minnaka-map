@@ -9,7 +9,7 @@ jobs:
       run:
         working-directory: backend
     services:
-      db:
+      localhost:
         image: postgres:16.4
         env:
           POSTGRES_USER: user
@@ -45,10 +45,6 @@ jobs:
         run: |
           gem install bundler
           bundle install --jobs 4 --retry 3 --path vendor/bundle
-
-      - name: Print Docker logs
-        run: |
-          docker compose logs $(docker ps -q --filter "name=db-1")
 
       - name: Database create and migrate
         run: |
