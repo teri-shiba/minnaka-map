@@ -3,5 +3,5 @@ test:
   encoding: utf8
   username: user
   password:
-  host: postgres
+  host: localhost
   database: app_test
