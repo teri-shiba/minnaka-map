@@ -84,6 +84,10 @@ GEM
     crass (1.0.6)
     date (3.3.4)
     diff-lcs (1.5.1)
+    dotenv (3.1.4)
+    dotenv-rails (3.1.4)
+      dotenv (= 3.1.4)
+      railties (>= 6.1)
     drb (2.2.1)
     erubi (1.13.0)
     faker (3.5.1)
@@ -251,6 +255,7 @@ PLATFORMS
 
 DEPENDENCIES
   bootsnap
+  dotenv-rails
   pg (~> 1.1)
   pry-byebug
   pry-doc
