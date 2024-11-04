@@ -2,6 +2,17 @@ import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
 
+interface NavItemProps {
+  title: string
+  href: string
+}
+
+const NAV_ITEMS: NavItemProps[] = [
+  { title: '利用規約', href: '/terms' },
+  { title: 'プライバシーポリシー', href: '/privacy' },
+  { title: 'お問い合わせ', href: 'https://forms.gle/K2vM7erf5y8eo8Nr9' },
+]
+
 export default function Footer() {
   return (
     <footer className="bg-background">
@@ -12,21 +23,15 @@ export default function Footer() {
           </Link>
           <nav>
             <ul className="flex flex-wrap justify-center sm:justify-end space-x-4 sm:space-x-6">
-              <li>
-                <Link href="/terms" className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors">
-                  利用規約
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors">
-                  プライバシーポリシー
-                </Link>
-              </li>
-              <li>
-                <Link href="https://forms.gle/K2vM7erf5y8eo8Nr9" className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors">
-                  お問い合わせ
-                </Link>
-              </li>
+              {NAV_ITEMS.map((item) => {
+                return (
+                  <li key={item.href}>
+                    <Link href={item.href} className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors">
+                      {item.title}
+                    </Link>
+                  </li>
+                )
+              })}
             </ul>
           </nav>
         </div>
