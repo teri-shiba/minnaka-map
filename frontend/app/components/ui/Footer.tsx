@@ -23,7 +23,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Link href="https://forms.gle/K2vM7erf5y8eo8Nr9" className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors">
                   お問い合わせ
                 </Link>
               </li>
