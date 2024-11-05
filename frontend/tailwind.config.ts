@@ -50,6 +50,9 @@ const config: Config = {
           4: 'var(--chart-4)',
           5: 'var(--chart-5)',
         },
+        aspectRatio: {
+          '4/3': '4 / 3',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
