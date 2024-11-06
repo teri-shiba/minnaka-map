@@ -4,10 +4,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import * as React from 'react'
+import Google from '../../../../../public/google.svg'
+import Line from '../../../../../public/line.svg'
 import { useMediaQuery } from '../../../../hooks/use-media-query'
 import { cn } from '../../../../lib/utils'
-import Google from '../../../../public/google.svg'
-import Line from '../../../../public/line.svg'
 import { Button } from '../../Button'
 import {
   Dialog,
