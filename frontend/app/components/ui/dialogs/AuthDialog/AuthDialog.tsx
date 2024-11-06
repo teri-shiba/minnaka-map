@@ -4,27 +4,27 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import * as React from 'react'
+import { useMediaQuery } from '../../../../hooks/use-media-query'
+import { cn } from '../../../../lib/utils'
 import Google from '../../../../public/google.svg'
 import Line from '../../../../public/line.svg'
-import { useMediaQuery } from '../../../hooks/use-media-query'
-import { cn } from '../../../lib/utils'
-import { Button } from '../../ui/Button'
+import { Button } from '../../Button'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../../ui/Dialog'
+} from '../../Dialog'
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from '../../ui/Drawer'
-import { Input } from '../../ui/Input'
-import { Label } from '../../ui/Label'
+} from '../../Drawer'
+import { Input } from '../../Input'
+import { Label } from '../../Label'
 
 export function AuthDialog() {
   const [open, setOpen] = useState(false)
