@@ -5,7 +5,7 @@ import {
   Card,
   CardContent,
   CardTitle,
-} from '../ui/Card'
+} from '../Card'
 
 export default function RestaurantCard() {
   return (
