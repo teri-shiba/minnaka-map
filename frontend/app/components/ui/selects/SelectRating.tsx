@@ -4,7 +4,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/Select'
+} from '../Select'
 
 interface CategoryProps {
   label: string
