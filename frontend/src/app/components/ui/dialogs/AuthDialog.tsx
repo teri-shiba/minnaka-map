@@ -8,23 +8,23 @@ import { useMediaQuery } from '~/hooks/use-media-query'
 import { cn } from '~/lib/utils'
 import Google from '~/public/google.svg'
 import Line from '~/public/line.svg'
-import { Button } from '../../Button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '../../Dialog'
+import { Button } from '../buttons/Button'
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from '../../Drawer'
-import { Input } from '../../Input'
-import { Label } from '../../Label'
+} from '../drawers/Drawer'
+import { Input } from '../forms/Input'
+import { Label } from '../forms/Label'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './Dialog'
 
 export function AuthDialog() {
   const [open, setOpen] = useState(false)
