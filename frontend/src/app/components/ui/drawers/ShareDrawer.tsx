@@ -45,7 +45,7 @@ export function ShareDrawer() {
             気になるお店をみんなにシェアしよう！
           </DialogDescription>
         </DrawerHeader>
-        <div className="grid grid-cols-2 gap-3 px-5">
+        <div className="grid grid-cols-2 gap-3">
           <Button variant="outline" className="flex items-center h-auto [&_svg]:size-6 py-3">
             <Line
               width={18}
