@@ -36,12 +36,12 @@ export function AuthDrawer() {
             />
           </DrawerTitle>
         </DrawerHeader>
-        <AuthForm className="px-4" />
+        <AuthForm />
         <div className="grid items-start gap-4 mt-4">
           <p className="text-sm text-gray-500 text-center mx-5 relative before:absolute before:top-1/2 before:left-0 before:w-full before:h-[1px] before:bg-gray-300 before:-z-10">
             <span className="inline-block bg-white px-4">OR</span>
           </p>
-          <div className="grid grid-cols-2 gap-3 px-5">
+          <div className="grid grid-cols-2 gap-3">
             <Button variant="outline" className="h-auto [&_svg]:size-6 py-3" aria-label="Google">
               <Google
                 width={24}
