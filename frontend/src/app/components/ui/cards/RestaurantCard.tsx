@@ -1,6 +1,6 @@
-import { Star } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { FaStar } from 'react-icons/fa'
 import {
   Card,
   CardContent,
@@ -25,10 +25,14 @@ export default function RestaurantCard() {
           <div className="flex space-x-2">
             <span className="text-sm">ジャンル</span>
             <span className="flex items-center space-x-1 text-sm">
-              <Star
+              {/* <Star
                 size={16}
                 fill="orange"
                 strokeWidth={0}
+              /> */}
+              <FaStar
+                size={16}
+                fill="orange"
               />
               <span>4.0</span>
             </span>
