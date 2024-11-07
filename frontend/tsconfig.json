@@ -8,7 +8,8 @@
     "moduleResolution": "bundler",
     "paths": {
       "~/*": ["./src/*"],
-      "~/public/*": ["./public/*"]
+      "~/public/*": ["./public/*"],
+      "~/hooks/*": ["./src/app/hooks/*"]
     },
     "resolveJsonModule": true,
     "allowJs": true,
