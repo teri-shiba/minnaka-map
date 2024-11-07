@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Footer from './components/layout/Footer'
 import Header from './components/layout/Header'
-import './globals.css'
+import './styles/globals.css'
 
 export const metadata: Metadata = {
   title: 'みんなかマップ',
