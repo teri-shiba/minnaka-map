@@ -33,7 +33,7 @@ export function LogoutDrawer() {
             ログアウトしますか？
           </DialogDescription>
         </DrawerHeader>
-        <div className="grid grid-cols-2 gap-3 px-5">
+        <div className="grid grid-cols-2 gap-3">
           <Button variant="outline" className="h-auto py-3">キャンセル</Button>
           <Button variant="destructive" className="h-auto py-3">
             ログアウト
