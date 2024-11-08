@@ -6,7 +6,12 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
     "moduleResolution": "bundler",
-    "paths": { "~/*": ["./src/*"] },
+    "paths": {
+      "~/*": ["./src/*"],
+      "~/public/*": ["./public/*"],
+      "~/hooks/*": ["./src/app/hooks/*"],
+      "~/lib/*": ["./src/app/lib/*"]
+    },
     "resolveJsonModule": true,
     "allowJs": true,
     "strict": true,
@@ -16,6 +21,12 @@
     "skipLibCheck": true,
     "plugins": [{ "name": "next" }]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "next.config.mjs"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "next.config.mjs"
+  ],
   "exclude": ["node_modules"]
 }
