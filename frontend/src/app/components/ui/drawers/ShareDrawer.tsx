@@ -1,5 +1,4 @@
 'use client'
-
 import Image from 'next/image'
 import { useState } from 'react'
 import * as React from 'react'
@@ -26,9 +25,8 @@ export function ShareDrawer() {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="link">
+        <Button variant="outline" size="icon" className="border-none bg-gray-300 rounded-full [&_svg]:size-6 hover:bg-white">
           <FiShare />
-          <span>シェアする</span>
         </Button>
       </DrawerTrigger>
       <DrawerContent className="mb-8">
