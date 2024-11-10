@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { FaStar } from 'react-icons/fa'
+import Liked from '../likes/Liked'
 import {
   Card,
   CardContent,
@@ -9,9 +10,12 @@ import {
 
 export default function RestaurantCard() {
   return (
-    <Link href="/">
-      <Card>
-        <div className="relative w-full h-auto sm:w-[140px] sm:h-[140px] rounded-md aspect-[4/3] sm:aspect-square overflow-hidden">
+    <Link href="/terms">
+      <Card className="sm:w-[498px] relative mb-4">
+        <div className="absolute top-1 sm:top-0 right-1 sm:right-0 z-50">
+          <Liked />
+        </div>
+        <div className="relative w-full h-auto sm:w-[140px] sm:h-[140px] rounded-lg aspect-[4/3] sm:aspect-square overflow-hidden">
           <Image
             src="/dummy-image.png"
             alt="image"
@@ -25,11 +29,6 @@ export default function RestaurantCard() {
           <div className="flex space-x-2">
             <span className="text-sm">ジャンル</span>
             <span className="flex items-center space-x-1 text-sm">
-              {/* <Star
-                size={16}
-                fill="orange"
-                strokeWidth={0}
-              /> */}
               <FaStar
                 size={16}
                 fill="orange"
