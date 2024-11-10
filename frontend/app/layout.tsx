@@ -15,10 +15,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="ja">
       <body>
         <Header />
-        <main className="px-5 sm:px-6">
+        <main>
           {children}
         </main>
         <Toaster richColors />
