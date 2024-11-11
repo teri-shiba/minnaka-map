@@ -22,7 +22,7 @@ export default function Terms() {
         <li className="my-2">本サービスにおいては、登録希望者が本規約に同意の上、運営者の定める方法によって利用登録を申請し、運営者がこれを承認することによって、利用登録が完了するものとします。</li>
         <li className="my-2">
           運営者は、利用登録の申請者に以下の事由があると判断した場合、利用登録の申請を承認しないことがあり、その理由については一切の開示義務を負わないものとします。
-          <ol className="text-sm sm:text-base list-disc ml-5">
+          <ol className="text-sm sm:text-base list-[lower-alpha] ml-5">
             <li className="my-2">利用登録の申請に際して虚偽の事項を届け出た場合</li>
             <li className="my-2">本規約に違反したことがある者からの申請である場合</li>
             <li className="my-2">その他、運営者が利用登録を相当でないと判断した場合</li>
@@ -68,7 +68,7 @@ export default function Terms() {
       <ol className="text-sm sm:text-base list-decimal pl-5 sm:pl-6">
         <li className="my-2">
           運営者は、以下のいずれかの事由があると判断した場合、利用者に事前に通知することなく本サービスの全部または一部の提供を停止または中断することができるものとします。
-          <ol className="text-sm sm:text-base list-disc ml-5">
+          <ol className="text-sm sm:text-base list-[lower-alpha] ml-5">
             <li className="my-2">本サービスにかかるコンピュータシステムの保守点検または更新を行う場合</li>
             <li className="my-2">地震、落雷、火災、停電または天災などの不可抗力により、本サービスの提供が困難となった場合</li>
             <li className="my-2">コンピュータまたは通信回線等が事故により停止した場合</li>
@@ -81,7 +81,7 @@ export default function Terms() {
       <ol className="text-sm sm:text-base list-decimal pl-5 sm:pl-6">
         <li className="my-2">
           運営者は、利用者が以下のいずれかに該当する場合には、事前の通知なく、利用者に対して、本サービスの全部もしくは一部の利用を制限し、または利用者としての登録を抹消することができるものとします。
-          <ol className="text-sm sm:text-base list-disc ml-5">
+          <ol className="text-sm sm:text-base list-[lower-alpha] ml-5">
             <li className="my-2">
               本規約のいずれかの条項に違反した場合
             </li>
@@ -115,7 +115,7 @@ export default function Terms() {
         <li className="my-2">
           運営者は以下の場合には、利用者の個別の同意を要せず、本規約を変更することができるものとします。
 
-          <ol className="text-sm sm:text-base list-disc ml-5">
+          <ol className="text-sm sm:text-base list-[lower-alpha] ml-5">
             <li className="my-2">本規約の変更が利用者の一般の利益に適合するとき。</li>
             <li className="my-2">本規約の変更が本サービス利用契約の目的に反せず、かつ、変更の必要性、変更後の内容の相当性その他の変更に係る事情に照らして合理的なものであるとき。</li>
           </ol>
