@@ -14,6 +14,9 @@ gem "tzinfo-data", platforms: %i[windows jruby]
 # CORS
 gem "rack-cors"
 
+# 環境変数管理
+gem "config"
+
 group :development, :test do
   gem "dotenv-rails"
   gem "pry-byebug"
