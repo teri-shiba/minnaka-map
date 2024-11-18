@@ -16,17 +16,17 @@ const NAV_ITEMS: NavItemProps[] = [
 export default function Footer() {
   return (
     <footer className="bg-background">
-      <div className="xl:container mx-auto px-5 sm:px-6 py-6">
-        <div className="flex flex-col sm:flex-row justify-between items-center">
+      <div className="mx-auto px-5 py-6 xl:container sm:px-6">
+        <div className="flex flex-col items-center justify-between sm:flex-row">
           <Link href="/" className="flex items-center space-x-2">
             <Image src="/logo.svg" alt="minnaka map" width={225} height={25} />
           </Link>
           <nav>
-            <ul className="flex flex-wrap justify-center sm:justify-end space-x-4 sm:space-x-6">
+            <ul className="flex flex-wrap justify-center space-x-4 sm:justify-end sm:space-x-6">
               {NAV_ITEMS.map((item) => {
                 return (
                   <li key={item.href}>
-                    <Link href={item.href} className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors">
+                    <Link href={item.href} className="text-xs text-muted-foreground transition-colors hover:text-primary sm:text-sm">
                       {item.title}
                     </Link>
                   </li>
