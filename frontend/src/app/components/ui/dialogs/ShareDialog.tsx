@@ -42,7 +42,7 @@ export function ShareDialog() {
           </DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" className="flex items-center h-auto [&_svg]:size-6 py-3">
+          <Button variant="outline" className="flex h-auto items-center py-3 [&_svg]:size-6">
             <Line
               width={18}
               height={18}
@@ -51,7 +51,7 @@ export function ShareDialog() {
             />
             <span>LINEでシェア</span>
           </Button>
-          <Button variant="outline" className="flex items-center h-auto [&_svg]:size-6 py-3">
+          <Button variant="outline" className="flex h-auto items-center py-3 [&_svg]:size-6">
             <IoMail
               width={18}
               height={18}

@@ -19,7 +19,7 @@ export function DeleteAccountDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="destructive" className="bg-white text-destructive border border-destructive">退会する</Button>
+        <Button variant="destructive" className="border border-destructive bg-white text-destructive">退会する</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[470px]">
         <DialogHeader className="flex flex-col space-y-3">
