@@ -37,12 +37,12 @@ export function AuthDrawer() {
           </DrawerTitle>
         </DrawerHeader>
         <AuthForm />
-        <div className="grid items-start gap-4 mt-4">
-          <p className="text-sm text-gray-500 text-center mx-5 relative before:absolute before:top-1/2 before:left-0 before:w-full before:h-[1px] before:bg-gray-300 before:-z-10">
+        <div className="mt-4 grid items-start gap-4">
+          <p className="relative mx-5 text-center text-sm text-gray-500 before:absolute before:left-0 before:top-1/2 before:-z-10 before:h-px before:w-full before:bg-gray-300">
             <span className="inline-block bg-white px-4">OR</span>
           </p>
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" className="h-auto [&_svg]:size-6 py-3" aria-label="Google">
+            <Button variant="outline" className="h-auto py-3 [&_svg]:size-6" aria-label="Google">
               <Google
                 width={24}
                 height={24}
@@ -50,7 +50,7 @@ export function AuthDrawer() {
                 style={{ display: 'block' }}
               />
             </Button>
-            <Button variant="outline" className="h-auto [&_svg]:size-6 py-3" aria-label="LINE">
+            <Button variant="outline" className="h-auto py-3 [&_svg]:size-6" aria-label="LINE">
               <Line
                 width={24}
                 height={24}
@@ -59,7 +59,7 @@ export function AuthDrawer() {
               />
             </Button>
           </div>
-          <Link href="#" className="inline-block mx-auto text-sm hover:text-blue-500 hover:underline">新規会員登録はこちら</Link>
+          <Link href="#" className="mx-auto inline-block text-sm hover:text-blue-500 hover:underline">新規会員登録はこちら</Link>
         </div>
       </DrawerContent>
     </Drawer>

@@ -25,7 +25,7 @@ export function ShareDrawer() {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="outline" size="icon" className="border-none bg-gray-300 rounded-full [&_svg]:size-6 hover:bg-white">
+        <Button variant="outline" size="icon" className="rounded-full border-none bg-gray-300 hover:bg-white [&_svg]:size-6">
           <FiShare />
         </Button>
       </DrawerTrigger>
@@ -44,7 +44,7 @@ export function ShareDrawer() {
           </DialogDescription>
         </DrawerHeader>
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" className="flex items-center h-auto [&_svg]:size-6 py-3">
+          <Button variant="outline" className="flex h-auto items-center py-3 [&_svg]:size-6">
             <Line
               width={18}
               height={18}
@@ -53,7 +53,7 @@ export function ShareDrawer() {
             />
             <span>LINEでシェア</span>
           </Button>
-          <Button variant="outline" className="flex items-center h-auto [&_svg]:size-6 py-3">
+          <Button variant="outline" className="flex h-auto items-center py-3 [&_svg]:size-6">
             <IoMail
               width={18}
               height={18}

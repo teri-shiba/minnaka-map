@@ -37,11 +37,11 @@ export function AuthDialog() {
           </DialogTitle>
         </DialogHeader>
         <AuthForm />
-        <p className="text-sm text-gray-500 text-center relative before:absolute before:top-1/2 before:left-0 before:w-full before:h-[1px] before:bg-gray-300 before:-z-10">
+        <p className="relative text-center text-sm text-gray-500 before:absolute before:left-0 before:top-1/2 before:-z-10 before:h-px before:w-full before:bg-gray-300">
           <span className="inline-block bg-white px-4">OR</span>
         </p>
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" className="h-auto [&_svg]:size-6 py-3" aria-label="Google">
+          <Button variant="outline" className="h-auto py-3 [&_svg]:size-6" aria-label="Google">
             <Google
               width={24}
               height={24}
@@ -49,7 +49,7 @@ export function AuthDialog() {
               style={{ display: 'block' }}
             />
           </Button>
-          <Button variant="outline" className="h-auto [&_svg]:size-6 py-3" aria-label="LINE">
+          <Button variant="outline" className="h-auto py-3 [&_svg]:size-6" aria-label="LINE">
             <Line
               width={24}
               height={24}
@@ -58,7 +58,7 @@ export function AuthDialog() {
             />
           </Button>
         </div>
-        <Link href="#" className="inline-block mx-auto text-sm hover:text-blue-500 hover:underline">新規会員登録はこちら</Link>
+        <Link href="#" className="mx-auto inline-block text-sm hover:text-blue-500 hover:underline">新規会員登録はこちら</Link>
       </DialogContent>
     </Dialog>
   )

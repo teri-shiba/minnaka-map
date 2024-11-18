@@ -11,11 +11,11 @@ import {
 export default function RestaurantCard() {
   return (
     <Link href="/terms">
-      <Card className="sm:w-[498px] relative mb-4">
-        <div className="absolute top-1 sm:top-0 right-1 sm:right-0 z-50">
+      <Card className="relative mb-4 sm:w-[498px]">
+        <div className="absolute right-1 top-1 z-50 sm:right-0 sm:top-0">
           <Liked />
         </div>
-        <div className="relative w-full h-auto sm:w-[140px] sm:h-[140px] rounded-lg aspect-[4/3] sm:aspect-square overflow-hidden">
+        <div className="relative aspect-[4/3] h-auto w-full overflow-hidden rounded-lg sm:aspect-square sm:size-[140px]">
           <Image
             src="/dummy-image.png"
             alt="image"
@@ -36,7 +36,7 @@ export default function RestaurantCard() {
               <span>4.0</span>
             </span>
           </div>
-          <p className="text-gray-500 text-sm">〒000-0000 東京都渋谷区渋谷 0-0-0</p>
+          <p className="text-sm text-gray-500">〒000-0000 東京都渋谷区渋谷 0-0-0</p>
         </CardContent>
       </Card>
     </Link>
