@@ -1,6 +1,5 @@
-import Image from 'next/image'
 import Link from 'next/link'
-import * as React from 'react'
+import Logo from '~/public/logo.svg'
 
 interface NavItemProps {
   title: string
@@ -19,7 +18,11 @@ export default function Footer() {
       <div className="mx-auto px-5 py-6 xl:container sm:px-6">
         <div className="flex flex-col items-center justify-between sm:flex-row">
           <Link href="/" className="flex items-center space-x-2">
-            <Image src="/logo.svg" alt="minnaka map" width={225} height={25} />
+            <Logo
+              width={220}
+              height={35}
+              style={{ display: 'block' }}
+            />
           </Link>
           <nav>
             <ul className="flex flex-wrap justify-center space-x-4 sm:justify-end sm:space-x-6">
