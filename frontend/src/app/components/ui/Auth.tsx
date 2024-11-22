@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { useMediaQuery } from '~/hooks/use-media-query'
+import { useMediaQuery } from '~/app/hooks/useMediaQuery'
 import { AuthDialog } from './dialogs/AuthDialog'
 
 import { AuthDrawer } from './drawers/AuthDrawer'
