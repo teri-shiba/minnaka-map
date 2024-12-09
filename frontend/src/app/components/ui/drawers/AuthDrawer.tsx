@@ -1,14 +1,14 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import * as React from 'react'
 import Google from '~/public/google.svg'
 import Line from '~/public/line.svg'
+import Mark from '~/public/mark.svg'
 import { Button } from '../buttons/Button'
 
-import AuthForm from '../forms/AuthForm'
+import AuthForm from '../forms/LoginForm'
 import {
   Drawer,
   DrawerContent,
@@ -28,12 +28,13 @@ export function AuthDrawer() {
       <DrawerContent className="mb-8">
         <DrawerHeader>
           <DrawerTitle className="mx-auto">
-            <Image
-              src="logo.svg"
-              alt="minnaka map"
-              width={230}
-              height={52}
-            />
+            <div className="flex items-center gap-2 py-1">
+              <Mark
+                width={22}
+                height={22}
+              />
+              <h2>ログイン</h2>
+            </div>
           </DrawerTitle>
         </DrawerHeader>
         <AuthForm />
