@@ -1,38 +1,20 @@
 'use client'
 import { useAtom } from 'jotai'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useAuth } from '~/app/hooks/useAuth'
 import { userStateAtom } from '~/app/lib/state/userStateAtom'
 import Logo from '~/public/logo.svg'
 import { Auth } from '../ui/Auth'
-import { LogoutDialog } from '../ui/dialogs/LogoutDialog'
+import UserMenu from '../ui/dropdownmenu/UserMenu'
 import { Skeleton } from '../ui/skeleton/skeleton'
 
 export default function Header() {
   const [user, setUser] = useAtom(userStateAtom)
   const [loading, setLoading] = useState(true)
+  const { checkLoginState } = useAuth()
 
-  useEffect(() => {
-    const accessToken = localStorage.getItem('access-token')
-    const client = localStorage.getItem('client')
-    const uid = localStorage.getItem('uid')
-
-    if (accessToken && client && uid) {
-      setUser(user => ({
-        ...user,
-        isSignedIn: true,
-      }))
-    }
-    else {
-      setUser({
-        id: 0,
-        name: '',
-        email: '',
-        isSignedIn: false,
-      })
-    }
-    setLoading(false)
-  }, [setUser])
+  checkLoginState({ setUser, setLoading })
 
   return (
     <header className="supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full backdrop-blur">
@@ -44,10 +26,12 @@ export default function Header() {
             style={{ display: 'block' }}
           />
         </Link>
-        {loading
-          ? <Skeleton className="h-[40px] w-[102px] rounded-full" />
-          : !user.isSignedIn ? <Auth /> : <LogoutDialog />}
-
+        { loading ?
+          <Skeleton className="h-[40px] w-[87px] rounded-full" /> :
+          (user.isSignedIn ?
+            <UserMenu /> : <Auth />
+          )
+        }
       </div>
     </header>
   )
