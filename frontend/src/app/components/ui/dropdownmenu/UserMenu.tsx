@@ -1,6 +1,7 @@
 import { FiHeart } from 'react-icons/fi'
 import { HiUser } from 'react-icons/hi2'
 import { LuLogOut, LuSettings } from 'react-icons/lu'
+import { useAuth } from '~/app/hooks/useAuth'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +10,12 @@ import {
 } from './DropdownMenu'
 
 export default function UserMenu() {
+  const { logout } = useAuth()
+
+  const onSubmit = () => {
+    logout()
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex size-10 items-center justify-center rounded-full border border-orange-900/10 bg-muted">
@@ -25,7 +32,7 @@ export default function UserMenu() {
           {' '}
           設定
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={onSubmit}>
           <LuLogOut className="size-4 text-slate-400" />
           {' '}
           ログアウト
