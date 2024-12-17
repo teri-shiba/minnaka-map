@@ -1,20 +1,21 @@
 'use client'
 import { useAtom } from 'jotai'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { useAuth } from '~/app/hooks/useAuth'
 import { userStateAtom } from '~/app/lib/state/userStateAtom'
 import Logo from '~/public/logo.svg'
 import { Auth } from '../ui/Auth'
 import UserMenu from '../ui/dropdownmenu/UserMenu'
-import { Skeleton } from '../ui/skeleton/skeleton'
+import { Skeleton } from '../ui/skeleton/Skeleton'
 
 export default function Header() {
-  const [user, setUser] = useAtom(userStateAtom)
-  const [loading, setLoading] = useState(true)
-  const { checkLoginState } = useAuth()
+  const [user] = useAtom(userStateAtom)
+  const { setUserData } = useAuth()
 
-  checkLoginState({ setUser, setLoading })
+  useEffect(() => {
+    setUserData()
+  }, [setUserData])
 
   return (
     <header className="supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full backdrop-blur">
@@ -26,12 +27,12 @@ export default function Header() {
             style={{ display: 'block' }}
           />
         </Link>
-        { loading ?
-          <Skeleton className="h-[40px] w-[87px] rounded-full" /> :
-          (user.isSignedIn ?
-            <UserMenu /> : <Auth />
-          )
-        }
+        { user.isLoading
+          ? <Skeleton className="h-[40px] w-[87px] rounded-full" />
+          : (user.isSignedIn
+              ? <UserMenu />
+              : <Auth />
+            )}
       </div>
     </header>
   )
