@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
-import { Toaster } from 'sonner'
 import Footer from './components/layout/Footer'
 import Header from './components/layout/Header'
+import { Toaster } from './components/ui/toasts/Toast'
 import './styles/globals.css'
 
 export const metadata: Metadata = {
