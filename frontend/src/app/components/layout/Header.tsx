@@ -1,21 +1,18 @@
 'use client'
-import { useAtom } from 'jotai'
 import Link from 'next/link'
-import { useEffect } from 'react'
-import { useAuth } from '~/app/hooks/useAuth'
-import { userStateAtom } from '~/app/lib/state/userStateAtom'
+import useUser from '~/app/hooks/useUser'
 import Logo from '~/public/logo.svg'
 import { Auth } from '../ui/Auth'
 import UserMenu from '../ui/dropdownmenu/UserMenu'
 import { Skeleton } from '../ui/skeleton/Skeleton'
 
 export default function Header() {
-  const [user] = useAtom(userStateAtom)
-  const { setUserData } = useAuth()
+  const { isLogin, isError, isLoading } = useUser()
 
-  useEffect(() => {
-    setUserData()
-  }, [setUserData])
+  if (isError) {
+    console.error('認証情報を取得できませんでした')
+    return null
+  }
 
   return (
     <header className="supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full backdrop-blur">
@@ -27,11 +24,11 @@ export default function Header() {
             style={{ display: 'block' }}
           />
         </Link>
-        { user.isLoading
+        { isLoading
           ? <Skeleton className="h-[40px] w-[87px] rounded-full" />
-          : (user.isSignedIn
-              ? <UserMenu />
-              : <Auth />
+          : (!isLogin
+              ? <Auth />
+              : <UserMenu />
             )}
       </div>
     </header>
