@@ -7,7 +7,6 @@ export default antfu(
     ignores: [],
   },
   {
-    files: ['src/app/components/**/*.tsx', 'src/app/hooks/**/*.tsx'],
     rules: {
       'node/prefer-global/process': 'off',
     },
