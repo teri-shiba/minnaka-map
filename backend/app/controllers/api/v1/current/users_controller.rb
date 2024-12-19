@@ -1,22 +1,15 @@
 class Api::V1::Current::UsersController < Api::V1::BaseController
-  before_action :authenticate_user!, except: :show
+  before_action :authenticate_user!, except: [:show_status]
 
   def show
-    if current_user
-      render json: {
-        id: current_user.id,
-        name: current_user.name,
-        email: current_user.email,
-        isSignedIn: true
-      }, status: :ok
-    else
-      render json: {
-        id: 0,
-        name: '',
-        email: '',
-        isSignedIn: false
-      }, status: :ok
-    end
+    render json: current_user, serializer: CurrentUserSerializer
   end
 
+  def show_status
+    if current_user
+      render json: current_user, serializer: CurrentUserSerializer
+    else
+      render json: {"login": false}, status: :ok
+    end
+  end
 end
