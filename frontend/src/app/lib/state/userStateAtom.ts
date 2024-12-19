@@ -5,7 +5,6 @@ interface userStateType {
   name: string
   email: string
   isSignedIn: boolean
-  isLoading: boolean
 }
 
 export const userStateAtom = atom<userStateType>({
@@ -13,5 +12,4 @@ export const userStateAtom = atom<userStateType>({
   name: '',
   email: '',
   isSignedIn: false,
-  isLoading: true,
 })
