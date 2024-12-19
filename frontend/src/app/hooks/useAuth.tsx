@@ -1,8 +1,7 @@
-import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import axios, { isAxiosError } from 'axios'
 import { useAtom } from 'jotai'
-import { useCallback } from 'react'
 import { toast } from 'sonner'
+import { useSWRConfig } from 'swr'
 import { userStateAtom } from '../lib/state/userStateAtom'
 
 function handleApiError(e: unknown, errorMessage: string) {
@@ -21,36 +20,32 @@ function isValidResponse(res: any) {
 }
 
 export function useAuth() {
+  const { mutate } = useSWRConfig()
   const [, setUser] = useAtom(userStateAtom)
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
 
-  const resetUserState = useCallback(() => {
+  const resetUserState = () => {
     setUser({
       id: 0,
       name: '',
       email: '',
       isSignedIn: false,
-      isLoading: false,
     })
-  }, [setUser])
+  }
 
-  const setUserData = useCallback(async () => {
+  const fetchUser = async () => {
     try {
       const res = await axios.get(`${baseURL}/current/user`, {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       })
 
-      if (res.data && res.data.isSignedIn) {
-        setUser({
-          ...res.data,
-          isSignedIn: true,
-          isLoading: false,
-        })
-      }
-      else {
-        resetUserState()
-      }
+      mutate(`${baseURL}/current/user/show_status`)
+
+      setUser({
+        ...res.data,
+        isSignedIn: true,
+      })
     }
     catch (e) {
       resetUserState()
@@ -59,9 +54,9 @@ export function useAuth() {
         handleApiError(e, 'ユーザー情報の取得に失敗しました')
       }
     }
-  }, [baseURL, setUser, resetUserState])
+  }
 
-  const login = async (data: { email: string, password: string }, router: AppRouterInstance) => {
+  const login = async (data: { email: string, password: string }) => {
     try {
       const payload = {
         email: data.email,
@@ -79,8 +74,7 @@ export function useAuth() {
         return
       }
 
-      setUserData()
-      router.refresh()
+      await fetchUser()
       toast.success('ログインに成功しました')
     }
     catch (e) {
@@ -100,6 +94,7 @@ export function useAuth() {
         return
       }
 
+      mutate(`${baseURL}/current/user/show_status`)
       resetUserState()
       toast.success('ログアウトしました')
     }
@@ -111,6 +106,6 @@ export function useAuth() {
   return {
     login,
     logout,
-    setUserData,
+    fetchUser,
   }
 }

@@ -8,7 +8,9 @@ Rails.application.routes.draw do
       }
 
       namespace :current do
-        resource :user, only: [:show]
+        resource :user, only: [:show] do
+          get :show_status, on: :member
+        end
       end
     end
   end
