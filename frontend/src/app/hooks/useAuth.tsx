@@ -20,9 +20,9 @@ function isValidResponse(res: any) {
 }
 
 export function useAuth() {
-  const { mutate } = useSWRConfig()
   const [, setUser] = useAtom(userStateAtom)
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+  const { mutate } = useSWRConfig()
 
   const resetUserState = () => {
     setUser({
@@ -30,6 +30,7 @@ export function useAuth() {
       name: '',
       email: '',
       isSignedIn: false,
+      isLoading: false,
     })
   }
 
@@ -40,11 +41,10 @@ export function useAuth() {
         withCredentials: true,
       })
 
-      mutate(`${baseURL}/current/user/show_status`)
-
       setUser({
         ...res.data,
         isSignedIn: true,
+        isLoading: false,
       })
     }
     catch (e) {

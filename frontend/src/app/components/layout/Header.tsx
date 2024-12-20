@@ -1,19 +1,14 @@
 'use client'
+import { useAtom } from 'jotai'
 import Link from 'next/link'
-import useUser from '~/app/hooks/useUser'
+import { userStateAtom } from '~/app/lib/state/userStateAtom'
 import Logo from '~/public/logo.svg'
 import { Auth } from '../ui/Auth'
 import UserMenu from '../ui/dropdownmenu/UserMenu'
 import { Skeleton } from '../ui/skeleton/Skeleton'
 
 export default function Header() {
-  const { isLogin, isError, isLoading } = useUser()
-
-  if (isError) {
-    console.error('認証情報を取得できませんでした')
-    return null
-  }
-
+  const [user] = useAtom(userStateAtom)
   return (
     <header className="supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full backdrop-blur">
       <div className="mx-auto flex h-16 items-center justify-between gap-4 px-5 xl:container md:px-6">
@@ -24,9 +19,9 @@ export default function Header() {
             style={{ display: 'block' }}
           />
         </Link>
-        { isLoading
+        { user.isLoading
           ? <Skeleton className="h-[40px] w-[87px] rounded-full" />
-          : (!isLogin
+          : (!user.isSignedIn
               ? <Auth />
               : <UserMenu />
             )}
