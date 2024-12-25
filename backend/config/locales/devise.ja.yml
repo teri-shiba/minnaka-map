@@ -46,7 +46,7 @@ ja:
       unconfirmed: メールアドレスの本人確認が必要です。
     mailer:
       confirmation_instructions:
-        action: メールアドレスの確認
+        action: メールアドレスの認証を完了する
         greeting: ようこそ、%{email}様！
         instruction: 次のリンクでメールアドレスの確認が完了します。
         subject: メールアドレス確認メール

@@ -2,4 +2,4 @@
 
 <p><%= t('.instruction') %></p>
 
-<p><%= link_to t('.action'), confirmation_url(@resource, {confirmation_token: @token, config: message['client-config'].to_s, redirect_url: message['redirect-url']}).html_safe %></p>
+<p><%= link_to t('.action'), "#{Settings.front_domain}/?confirmation_token=#{@token}", target: :_blank, rel: "noopener noreferrer" %></p>

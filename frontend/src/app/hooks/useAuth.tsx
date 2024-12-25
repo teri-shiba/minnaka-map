@@ -21,7 +21,8 @@ function isValidResponse(res: any) {
 
 export function useAuth() {
   const [, setUser] = useAtom(userStateAtom)
-  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+  const baseApiURL = process.env.NEXT_PUBLIC_API_BASE_URL
+  const baseFrontURL = process.env.NEXT_PUBLIC_FRONT_BASE_URL
   const { mutate } = useSWRConfig()
 
   const resetUserState = () => {
@@ -36,7 +37,7 @@ export function useAuth() {
 
   const fetchUser = async () => {
     try {
-      const res = await axios.get(`${baseURL}/current/user`, {
+      const res = await axios.get(`${baseApiURL}/current/user`, {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       })
@@ -63,7 +64,7 @@ export function useAuth() {
         password: data.password,
       }
 
-      const res = await axios.post(`${baseURL}/auth/sign_in`, payload, {
+      const res = await axios.post(`${baseApiURL}/auth/sign_in`, payload, {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       })
@@ -83,9 +84,36 @@ export function useAuth() {
     }
   }
 
+  const signup = async (data: { name: string, email: string, password: string }) => {
+    try {
+      const payload = {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        confirm_success_url: `${baseFrontURL}/`,
+      }
+
+      const res = await axios.post(`${baseApiURL}/auth`, payload, {
+        headers: { 'Content-Type': 'application/json' },
+      })
+
+      if (!isValidResponse(res)) {
+        resetUserState()
+        toast.error('1登録に失敗しました')
+        return
+      }
+
+      toast.success('認証メールをご確認ください')
+    }
+    catch (e) {
+      handleApiError(e, '登録に失敗しました')
+      resetUserState()
+    }
+  }
+
   const logout = async () => {
     try {
-      const res = await axios.delete(`${baseURL}/auth/sign_out`, {
+      const res = await axios.delete(`${baseApiURL}/auth/sign_out`, {
         withCredentials: true,
       })
 
@@ -94,7 +122,7 @@ export function useAuth() {
         return
       }
 
-      mutate(`${baseURL}/current/user/show_status`)
+      mutate(`${baseApiURL}/current/user/show_status`)
       resetUserState()
       toast.success('ログアウトしました')
     }
@@ -104,6 +132,7 @@ export function useAuth() {
   }
 
   return {
+    signup,
     login,
     logout,
     fetchUser,
