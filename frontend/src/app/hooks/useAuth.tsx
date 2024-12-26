@@ -99,7 +99,7 @@ export function useAuth() {
 
       if (!isValidResponse(res)) {
         resetUserState()
-        toast.error('1登録に失敗しました')
+        toast.error('登録に失敗しました')
         return
       }
 
