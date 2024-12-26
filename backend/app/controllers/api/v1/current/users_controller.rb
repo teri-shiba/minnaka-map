@@ -9,7 +9,7 @@ class Api::V1::Current::UsersController < Api::V1::BaseController
     if current_user
       render json: current_user, serializer: CurrentUserSerializer
     else
-      render json: {"login": false}, status: :ok
+      render json: { "login": false }, status: :ok
     end
   end
 end
