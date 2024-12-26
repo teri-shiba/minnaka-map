@@ -65,11 +65,10 @@ DeviseTokenAuth.setup do |config|
   # config.send_confirmation_email = true
 
   # setting cookie
-  config.cookie_enabled=true
-  config.cookie_attributes={
+  config.cookie_enabled = true
+  config.cookie_attributes = {
     httponly: true,
     secure: true,
-    same_site: :lax
+    same_site: :lax,
   }
-
 end
