@@ -1,23 +1,50 @@
 'use client'
-import useSWR from 'swr'
-import { fetcher } from './lib/utils'
+import type { AxiosError } from 'axios'
+import axios from 'axios'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useRef } from 'react'
+import { toast } from 'sonner'
 
 export default function Home() {
-  const url = 'http://localhost:3000/api/v1/health_check'
-  const { data, error, isLoading } = useSWR(url, fetcher)
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const hasRun = useRef(false)
 
-  if (error)
-    return <div>An error has occurred.</div>
-  if (isLoading)
-    return <div>Loading...</div>
+  useEffect(() => {
+    if (hasRun.current)
+      return
+    hasRun.current = true
+
+    if (searchParams.has('confirmation_token')) {
+      const confirmationToken = searchParams.get('confirmation_token')
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/confirmations`
+
+      axios.patch(url, { confirmation_token: confirmationToken })
+        .then(() => {
+          toast.success('メールアドレスの確認が完了しました')
+          router.replace('/')
+        })
+        .catch((e: AxiosError) => {
+          const status = e.response?.status
+          const message = '予期しないエラーが発生しました'
+
+          if (status === 404) {
+            toast.error('ユーザーが見つかりません')
+          }
+          else if (status === 400) {
+            toast.error('メールアドレスはすでに確認済みです')
+          }
+          else {
+            toast.error(message)
+          }
+        })
+    }
+    else {
+      toast.error('不正なアクセスです')
+    }
+  }, [router, searchParams])
 
   return (
-    <>
-      <div>Rails疎通確認</div>
-      <div>
-        レスポンスメッセージ：
-        {data.message}
-      </div>
-    </>
+    <div>Hello</div>
   )
 }
