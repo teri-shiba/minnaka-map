@@ -99,15 +99,30 @@ export function useAuth() {
 
       if (!isValidResponse(res)) {
         resetUserState()
-        toast.error('登録に失敗しました')
+        toast.error(`登録に失敗しました`)
         return
       }
 
       toast.success('認証メールをご確認ください')
     }
-    catch (e) {
-      handleApiError(e, '登録に失敗しました')
-      resetUserState()
+    catch (e) { // TODO: ネストしすぎているのでリファクタリング
+      if (isAxiosError(e) && e.response?.status) {
+        const status = e.response?.status
+        const errors = e.response?.data?.errors
+
+        if (status === 422 && errors) {
+          const fullMessages = errors.full_messages
+          if (fullMessages) {
+            fullMessages.forEach((message: string) => {
+              toast.error(message)
+            })
+          }
+        }
+        else {
+          toast.error('登録処理中にエラーが発生しました。')
+        }
+        resetUserState()
+      }
     }
   }
 
