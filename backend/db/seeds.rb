@@ -1,3 +1,10 @@
 ActiveRecord::Base.transaction do
-  UserAuth.create!(name: "テスト太郎", email: "test1@example.com", password: "lGP$AC354353K@hFcT,I", confirmed_at: Time.current)
+  user = User.create!(name: "テスト太郎")
+
+  UserAuth.create!(
+    email: "test1@example.com",
+    password: "lGP$AC354353K@hFcT,I",
+    confirmed_at: Time.current,
+    user_id: user.id,
+  )
 end
