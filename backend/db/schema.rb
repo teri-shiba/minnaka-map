@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_12_27_062703) do
+ActiveRecord::Schema[7.2].define(version: 2025_01_06_074526) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -26,9 +26,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_12_27_062703) do
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
     t.string "unconfirmed_email"
-    t.string "name"
-    t.string "nickname"
-    t.string "image"
     t.string "email"
     t.json "tokens"
     t.datetime "created_at", null: false
