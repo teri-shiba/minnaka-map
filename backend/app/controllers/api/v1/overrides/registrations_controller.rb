@@ -12,6 +12,6 @@ class Api::V1::Overrides::RegistrationsController < DeviseTokenAuth::Registratio
   private
 
   def sign_up_params
-    params.permit(:email, :password, :password_confirmation, :name, :user_id)
+    params.permit(:email, :password, :password_confirmation, :user_id)
   end
 end
