@@ -1,5 +1,4 @@
 class Api::V1::Auth::OmniauthCallbacksController < DeviseTokenAuth::OmniauthCallbacksController
-
   def omniauth_success
     get_resource_from_auth_hash
     set_token_on_resource
@@ -28,31 +27,30 @@ class Api::V1::Auth::OmniauthCallbacksController < DeviseTokenAuth::OmniauthCall
 
   private
 
-  def get_resource_from_auth_hash
-    @resource = resource_class.where(
-      uid: auth_hash['uid'],
-      provider: auth_hash['provider']
-    ).first_or_initialize
+    def get_resource_from_auth_hash
+      @resource = resource_class.where(
+        uid: auth_hash["uid"],
+        provider: auth_hash["provider"],
+      ).first_or_initialize
 
-    if @resource.new_record?
-      @oauth_registration = true
+      if @resource.new_record?
+        @oauth_registration = true
 
-      user = User.new(name: auth_hash['info']['name'])
-      user.save!
-      @resource.user = user
+        user = User.new(name: auth_hash["info"]["name"])
+        user.save!
+        @resource.user = user
 
-      @resource = UserAuth.new(
-        provider: auth_hash['provider'],
-        uid: auth_hash['uid'],
-        email: auth_hash['info']['email'],
-        password: set_random_password,
-        user: user
-      )
+        @resource = UserAuth.new(
+          provider: auth_hash["provider"],
+          uid: auth_hash["uid"],
+          email: auth_hash["info"]["email"],
+          password: set_random_password,
+          user: user,
+        )
+      end
+
+      assign_provider_attrs(@resource, auth_hash)
+
+      @resource
     end
-
-    assign_provider_attrs(@resource, auth_hash)
-
-    @resource
-  end
-
 end
