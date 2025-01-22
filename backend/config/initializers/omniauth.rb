@@ -1,3 +1,5 @@
+return if Rails.env.test?
+
 Rails.application.config.middleware.use OmniAuth::Builder do
   OmniAuth.config.logger = Rails.logger
   provider :google_oauth2,
