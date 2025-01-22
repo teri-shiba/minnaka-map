@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import * as React from 'react'
+
 import Google from '~/public/google.svg'
 import Line from '~/public/line.svg'
-
 import Mark from '~/public/mark.svg'
 import { Button } from '../buttons/Button'
 import LoginForm from '../forms/LoginForm'
@@ -20,6 +20,7 @@ import {
 export function AuthDialog() {
   const [open, setOpen] = useState(false)
   const [isLogin, setIsLogin] = useState(true)
+  const baseApiURL = process.env.NEXT_PUBLIC_API_BASE_URL
 
   const handleClick = () => {
     setIsLogin(!isLogin)
@@ -51,24 +52,27 @@ export function AuthDialog() {
           <span className="inline-block bg-white px-4">OR</span>
         </p>
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" className="h-auto py-3 [&_svg]:size-6" aria-label="Google">
+          <a href={`${baseApiURL}/auth/google_oauth2`} className="flex h-auto items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent [&_svg]:size-6" aria-label="Google">
             <Google
               width={24}
               height={24}
               fill="none"
-              style={{ display: 'block' }}
+              className="block"
             />
-          </Button>
-          <Button variant="outline" className="h-auto py-3 [&_svg]:size-6" aria-label="LINE">
+            {isLogin ? 'Googleでログイン' : 'Googleで登録'}
+          </a>
+          {/* LINEまだ実装していない */}
+          <a href={`${baseApiURL}/auth/line`} className="flex h-auto items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent [&_svg]:size-6" aria-label="Google">
             <Line
               width={24}
               height={24}
               fill="none"
-              style={{ display: 'block' }}
+              className="block"
             />
-          </Button>
+            {isLogin ? 'LINEでログイン' : 'LINEで登録'}
+          </a>
         </div>
-        <Button onClick={handleClick} className="mx-auto my-4 inline-block h-auto !bg-transparent py-0 text-sm font-normal text-foreground hover:text-blue-500 hover:underline">
+        <Button onClick={handleClick} className="mx-auto my-4 inline-block h-auto !bg-transparent py-0 text-sm font-bold text-foreground hover:text-blue-500 hover:underline">
           {isLogin ? '新規会員登録はこちら' : 'ログインはこちら'}
         </Button>
       </DialogContent>
