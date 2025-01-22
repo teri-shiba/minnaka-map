@@ -48,12 +48,6 @@ jobs:
           gem install bundler
           bundle install --jobs 4 --retry 3 --path vendor/bundle
 
-      - name: Debug credentials
-        run: |
-          bundle exec rails credentials:show --environment test
-        env:
-          RAILS_MASTER_KEY: ${{ secrets.RAILS_TEST_KEY }}
-
       - name: Database create and migrate
         run: |
           cp config/database.yml.ci config/database.yml
