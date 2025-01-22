@@ -1,6 +1,6 @@
 class Api::V1::Auth::OmniauthCallbacksController < DeviseTokenAuth::OmniauthCallbacksController
   def omniauth_success
-    get_resource_from_auth_hash
+    resource_from_auth_hash
     set_token_on_resource
     create_auth_params
 
@@ -27,7 +27,7 @@ class Api::V1::Auth::OmniauthCallbacksController < DeviseTokenAuth::OmniauthCall
 
   private
 
-    def get_resource_from_auth_hash
+    def resource_from_auth_hash
       @resource = resource_class.where(
         uid: auth_hash["uid"],
         provider: auth_hash["provider"],
