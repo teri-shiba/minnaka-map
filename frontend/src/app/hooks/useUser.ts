@@ -14,20 +14,13 @@ export default function useUser() {
         withCredentials: true,
       })
 
-      if (res.data.login !== false) {
-        setUser({
-          ...res.data,
-          isSignedIn: true,
-          isLoading: false,
-        })
+      const userData = {
+        ...res.data,
+        isSignedIn: res.data.login !== false,
+        isLoading: false,
       }
-      else {
-        setUser({
-          ...res.data,
-          isSignedIn: false,
-          isLoading: false,
-        })
-      }
+
+      setUser(userData)
       return res.data
     }
     catch (e) {
@@ -39,7 +32,7 @@ export default function useUser() {
   }
 
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
-  const { data, error, isLoading } = useSWR(`${baseURL}/current/user/show_status`, fetcher, { revalidateOnFocus: false })
+  const { data, error, isLoading } = useSWR(`${baseURL}/current/user/show_status`, fetcher, { revalidateOnFocus: false, errorRetryCount: 0 })
 
   return {
     isLogin: data?.login !== false,

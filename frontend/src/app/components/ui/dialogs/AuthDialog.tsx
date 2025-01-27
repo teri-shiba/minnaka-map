@@ -52,7 +52,7 @@ export function AuthDialog() {
           <span className="inline-block bg-white px-4">OR</span>
         </p>
         <div className="grid grid-cols-2 gap-3">
-          <a href={`${baseApiURL}/auth/google_oauth2`} className="flex h-auto items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent [&_svg]:size-6" aria-label="Google">
+          <a href={`${baseApiURL}/auth/google_oauth2`} className="flex h-auto items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent [&_svg]:size-6">
             <Google
               width={24}
               height={24}
@@ -61,8 +61,7 @@ export function AuthDialog() {
             />
             {isLogin ? 'Googleでログイン' : 'Googleで登録'}
           </a>
-          {/* LINEまだ実装していない */}
-          <a href={`${baseApiURL}/auth/line`} className="flex h-auto items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent [&_svg]:size-6" aria-label="Google">
+          <a href={`${baseApiURL}/auth/line`} className="flex h-auto items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent [&_svg]:size-6">
             <Line
               width={24}
               height={24}

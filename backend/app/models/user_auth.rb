@@ -8,7 +8,7 @@ class UserAuth < ApplicationRecord
          :rememberable,
          :validatable,
          :confirmable,
-         :omniauthable, omniauth_providers: [:google_oauth2]
+         :omniauthable, omniauth_providers: [:google_oauth2, :line]
 
   belongs_to :user, optional: true
 
