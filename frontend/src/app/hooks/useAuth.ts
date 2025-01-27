@@ -105,18 +105,14 @@ export function useAuth() {
 
       toast.success('認証メールをご確認ください')
     }
-    catch (e) { // TODO: ネストしすぎているのでリファクタリング
+    catch (e) {
       if (isAxiosError(e) && e.response?.status) {
         const status = e.response?.status
         const errors = e.response?.data?.errors
+        console.error(errors)
 
         if (status === 422 && errors) {
-          const fullMessages = errors.full_messages
-          if (fullMessages) {
-            fullMessages.forEach((message: string) => {
-              toast.error(message)
-            })
-          }
+          toast.error(errors.full_messages)
         }
         else {
           toast.error('登録処理中にエラーが発生しました。')
