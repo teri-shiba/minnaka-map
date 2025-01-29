@@ -1,5 +1,6 @@
+import Image from 'next/image'
 import Link from 'next/link'
-import Logo from '~/public/logo.svg'
+import logo from '~/public/logo.webp'
 
 interface NavItemProps {
   title: string
@@ -15,13 +16,15 @@ const NAV_ITEMS: NavItemProps[] = [
 export default function Footer() {
   return (
     <footer className="bg-background">
-      <div className="mx-auto px-5 py-6 xl:container sm:px-6">
+      <div className="mx-auto py-6 xl:container">
         <div className="flex flex-col items-center justify-between sm:flex-row">
           <Link href="/" className="flex items-center space-x-2">
-            <Logo
-              width={220}
-              height={35}
-              style={{ display: 'block' }}
+            <Image
+              alt="minnaka map"
+              src={logo}
+              width={224}
+              height={28}
+              className="block"
             />
           </Link>
           <nav>

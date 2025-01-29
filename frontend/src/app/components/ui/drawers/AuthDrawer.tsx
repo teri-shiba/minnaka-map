@@ -1,11 +1,12 @@
 'use client'
+import Image from 'next/image'
 
 import Link from 'next/link'
 import { useState } from 'react'
 import * as React from 'react'
 import Google from '~/public/icon_google.svg'
 import Line from '~/public/icon_line.svg'
-import Mark from '~/public/logo_mark.svg'
+import logoMark from '~/public/logo_mark.webp'
 import { Button } from '../buttons/Button'
 
 import AuthForm from '../forms/LoginForm'
@@ -29,9 +30,11 @@ export function AuthDrawer() {
         <DrawerHeader>
           <DrawerTitle className="mx-auto">
             <div className="flex items-center gap-2 py-1">
-              <Mark
-                width={22}
-                height={22}
+              <Image
+                alt="mark"
+                src={logoMark}
+                width={24}
+                height={24}
               />
               <h2>ログイン</h2>
             </div>
