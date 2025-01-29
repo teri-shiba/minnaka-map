@@ -5,7 +5,7 @@ import { useState } from 'react'
 import * as React from 'react'
 import { FiShare } from 'react-icons/fi'
 import { IoMail } from 'react-icons/io5'
-import Line from '~/public/line.svg'
+import Line from '~/public/icon_line.svg'
 import { Button } from '../buttons/Button'
 
 import {
