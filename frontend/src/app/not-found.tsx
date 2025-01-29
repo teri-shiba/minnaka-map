@@ -5,7 +5,7 @@ import { Button } from './components/ui/buttons/Button'
 
 export default function NotFound() {
   return (
-    <div className="mx-auto my-14 flex max-w-screen-lg flex-col items-center space-y-4 px-5">
+    <div className="mx-auto my-14 flex flex-col items-center space-y-4">
       <Image
         alt="Not Found"
         src={notFound}
