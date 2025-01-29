@@ -3,9 +3,9 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import * as React from 'react'
-import Google from '~/public/google.svg'
-import Line from '~/public/line.svg'
-import Mark from '~/public/mark.svg'
+import Google from '~/public/icon_google.svg'
+import Line from '~/public/icon_line.svg'
+import Mark from '~/public/logo_mark.svg'
 import { Button } from '../buttons/Button'
 
 import AuthForm from '../forms/LoginForm'
