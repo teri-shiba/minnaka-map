@@ -13,11 +13,11 @@
     --primary: #ff8f56;
     --primary-darker: #ff8f56;
     --primary-foreground: #ffffff;
-    --secondary: #fff8ec;
-    --secondary-foreground: #261d1a;
-    --muted: #fff8ec;
+    --secondary: #FFF8F2;
+    --secondary-foreground: #581206;
+    --muted: #FFF8F2;
     --muted-foreground: #B0B0B0;
-    --accent: #fff8ec;
+    --accent: #FFF8F2;
     --accent-foreground: #261d1a;
     --destructive: #FF5959;
     --destructive-foreground: #ffffff;
