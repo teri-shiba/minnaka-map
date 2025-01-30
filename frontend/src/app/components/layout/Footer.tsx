@@ -17,7 +17,7 @@ export default function Footer() {
   return (
     <footer className="bg-background">
       <div className="mx-auto py-6 xl:container">
-        <div className="flex flex-col items-center justify-between sm:flex-row">
+        <div className="flex flex-col items-center justify-between md:flex-row">
           <Link href="/" className="flex items-center space-x-2">
             <Image
               alt="minnaka map"
@@ -28,11 +28,11 @@ export default function Footer() {
             />
           </Link>
           <nav>
-            <ul className="flex flex-wrap justify-center space-x-4 sm:justify-end sm:space-x-6">
+            <ul className="flex flex-col justify-center md:flex-row md:justify-end md:space-x-6">
               {NAV_ITEMS.map((item) => {
                 return (
-                  <li key={item.href}>
-                    <Link href={item.href} className="text-xs text-muted-foreground transition-colors hover:text-primary sm:text-sm">
+                  <li key={item.href} className="text-center md:text-left">
+                    <Link href={item.href} className="text-xs text-muted-foreground transition-colors hover:text-primary md:text-sm">
                       {item.title}
                     </Link>
                   </li>

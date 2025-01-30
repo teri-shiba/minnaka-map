@@ -2,6 +2,7 @@
 import { useAtom } from 'jotai'
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { userStateAtom } from '~/app/lib/state/userStateAtom'
 import logo from '~/public/logo.webp'
 import logoMark from '~/public/logo_mark.webp'
@@ -11,31 +12,45 @@ import { Skeleton } from '../ui/skeleton/Skeleton'
 
 export default function Header() {
   const [user] = useAtom(userStateAtom)
+  const currentPath = usePathname()
+  const isHomePage = currentPath === '/'
+  const headerBgClass = isHomePage ? 'bg-secondary' : ''
+
+  let userStatusUI = null
+  if (user.isLoading) {
+    userStatusUI = (
+      <Skeleton className="h-[40px] w-[87px] rounded-full" />
+    )
+  }
+  else if (!user.isSignedIn) {
+    userStatusUI = <Auth />
+  }
+  else {
+    userStatusUI = <UserMenu />
+  }
+
   return (
-    <header className="supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full backdrop-blur">
+    <header className={`w-full ${headerBgClass}`}>
       <div className="mx-auto flex h-16 items-center justify-between gap-4 xl:container">
-        <Link href="/" className="flex items-center space-x-2">
+        <Link href="/" className="flex items-center">
           <Image
-            alt="minnaka map"
+            aria-label="Go to Home"
+            alt="logo"
             src={logo}
             width={224}
             height={28}
-            className="hidden sm:block"
+            className="hidden md:block"
           />
           <Image
-            alt="minnaka map"
+            aria-label="Go to Home"
+            alt="logo"
             src={logoMark}
             width={28}
             height={28}
-            className="block sm:hidden"
+            className="block md:hidden"
           />
         </Link>
-        { user.isLoading
-          ? <Skeleton className="h-[40px] w-[87px] rounded-full" />
-          : (!user.isSignedIn
-              ? <Auth />
-              : <UserMenu />
-            )}
+        {userStatusUI}
       </div>
     </header>
   )
