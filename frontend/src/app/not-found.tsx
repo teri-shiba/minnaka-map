@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { Button } from '~/components/ui/buttons/Button'
 import notFound from '~/public/image_not-found.webp'
-import { Button } from './components/ui/buttons/Button'
 
 export default function NotFound() {
   return (
