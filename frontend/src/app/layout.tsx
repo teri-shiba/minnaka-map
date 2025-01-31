@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import ClientAuthProvider from './components/layout/ClientAuthProvider'
+import ClientAuthProvider from '~/components/layout/ClientAuthProvider'
 import './styles/globals.css'
 
 export const metadata: Metadata = {
