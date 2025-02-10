@@ -10,6 +10,7 @@ import logo from '~/public/logo.webp'
 import mvPC from '~/public/mv_01_pc.webp'
 import mvSP from '~/public/mv_01_sp.webp'
 
+import { DesktopGuideCarousel } from './components/ui/carousels/DesktopGuideCarousel'
 import { MobileGuideCarousel } from './components/ui/carousels/MobileGuideCarousel'
 import useConfirmEmail from './hooks/useConfirmEmail'
 import useOAuthCallback from './hooks/useOAuthCallback'
@@ -62,16 +63,18 @@ export default function Home() {
         </div>
       </section>
       <section className="py-14 md:py-24">
-        <h2 className="mb-7 flex items-center justify-center text-center text-lg text-secondary-foreground sm:text-2xl md:mb-12">
-          <Image
-            alt="minnaka map"
-            src={logo}
-            width={170}
-            height={30}
-            className="w-44 sm:w-60"
-          />
-          <span className="pl-1">で、</span>
-          <span>集まろう！</span>
+        <h2 className="mb-7 text-center text-lg text-secondary-foreground sm:text-2xl md:mb-12">
+          <span className="inline-block align-text-bottom">
+            <Image
+              alt="minnaka map"
+              src={logo}
+              width={170}
+              height={30}
+              className="w-44 sm:w-60"
+            />
+          </span>
+          <span className="inline-block pl-1">で、</span>
+          <span className="inline-block">集まろう！</span>
         </h2>
         <div className="grid grid-cols-1 gap-7 md:grid-cols-3 md:gap-6">
           <div className="flex flex-col items-center justify-center">
@@ -129,6 +132,7 @@ export default function Home() {
       </section>
 
       <MobileGuideCarousel />
+      <DesktopGuideCarousel />
     </>
   )
 }
