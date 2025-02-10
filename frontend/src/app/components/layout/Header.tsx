@@ -31,7 +31,7 @@ export default function Header() {
 
   return (
     <header className={`w-full ${headerBgClass}`}>
-      <div className="mx-auto flex h-16 items-center justify-between gap-4 xl:container">
+      <div className="mx-auto flex h-16 max-w-screen-lg items-center justify-between gap-4 px-5">
         <Link href="/" className="flex items-center">
           <Image
             aria-label="Go to Home"

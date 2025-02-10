@@ -15,11 +15,11 @@ export default async function RootLayout({
   return (
     <html lang="ja">
       <body>
-        <div className="mx-auto max-w-screen-lg px-5">
-          <ClientAuthProvider>
-            {children}
-          </ClientAuthProvider>
-        </div>
+        <ClientAuthProvider>
+          {children}
+        </ClientAuthProvider>
+        {/* <div className="mx-auto max-w-screen-lg px-5">
+        </div> */}
       </body>
     </html>
   )

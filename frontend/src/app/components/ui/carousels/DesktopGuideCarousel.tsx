@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useAutoplay } from '~/app/hooks/useAutoplay'
 import { carouselData } from '~/app/lib/data/carouselData'
 import logo from '~/public/logo.webp'
+import { Section } from '../../layout/Section'
 
 export function DesktopGuideCarousel() {
   const [activeStep, setActiveStep] = useState(1)
@@ -25,24 +26,24 @@ export function DesktopGuideCarousel() {
   }, [startAutoPlay])
 
   return (
-    <section className="relative mb-24 hidden py-20 md:block">
-      <div className="absolute -left-1/4 top-0 h-full w-1/2 overflow-hidden rounded-[2rem] bg-secondary">
-        <Image
-          alt=""
-          src="/figure_01.webp"
-          width={630}
-          height={580}
-          className="absolute -left-1/3 -top-1/4"
-        />
-        <Image
-          alt=""
-          src="/figure_02.webp"
-          width={600}
-          height={600}
-          className="absolute -bottom-1/4 -right-1/3"
-        />
-      </div>
-      <div className="flex items-center justify-between">
+    <Section className="relative mb-24 hidden md:block">
+      <div className="relative flex items-center justify-between py-20">
+        <div className="absolute -left-1/4 top-0 h-full w-1/2 overflow-hidden rounded-[2rem] bg-secondary">
+          <Image
+            alt=""
+            src="/figure_01.webp"
+            width={630}
+            height={580}
+            className="absolute -left-1/3 -top-1/4"
+          />
+          <Image
+            alt=""
+            src="/figure_02.webp"
+            width={600}
+            height={600}
+            className="absolute -bottom-1/4 -right-1/3"
+          />
+        </div>
         <div className="w-1/2 text-center">
           <AnimatePresence mode="wait">
             <motion.div
@@ -107,6 +108,6 @@ export function DesktopGuideCarousel() {
           ))}
         </div>
       </div>
-    </section>
+    </Section>
   )
 }

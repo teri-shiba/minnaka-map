@@ -3,6 +3,7 @@ import Autoplay from 'embla-carousel-autoplay'
 import Image from 'next/image'
 import { carouselData } from '~/lib/data/carouselData'
 import logo from '~/public/logo.webp'
+import { Section } from '../../layout/Section'
 import { Card, CardContent } from '../cards/Card'
 import {
   Carousel,
@@ -24,7 +25,7 @@ const carouselPlugins = [
 
 export function MobileGuideCarousel() {
   return (
-    <section className="relative block py-8 before:absolute before:left-0 before:top-0 before:z-[-1] before:h-2/3 before:w-full before:rounded-2xl before:bg-secondary md:hidden">
+    <Section className="relative block py-8 before:absolute before:left-0 before:top-0 before:z-[-1] before:h-2/3 before:w-full before:rounded-2xl before:bg-secondary md:hidden">
       <h2 className="mb-7 text-center text-lg text-secondary-foreground sm:text-2xl md:mb-12">
         <span className="inline-block align-text-bottom">
           <Image
@@ -65,6 +66,6 @@ export function MobileGuideCarousel() {
           ))}
         </CarouselContent>
       </Carousel>
-    </section>
+    </Section>
   )
 }
