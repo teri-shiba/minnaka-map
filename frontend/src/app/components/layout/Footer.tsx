@@ -28,11 +28,11 @@ export default function Footer() {
             />
           </Link>
           <nav>
-            <ul className="flex flex-col justify-center md:flex-row md:justify-end md:space-x-6">
+            <ul className="mt-3 flex flex-wrap justify-center md:mt-0 md:justify-end">
               {NAV_ITEMS.map((item) => {
                 return (
                   <li key={item.href} className="text-center md:text-left">
-                    <Link href={item.href} className="text-xs text-muted-foreground transition-colors hover:text-primary md:text-sm">
+                    <Link href={item.href} className="p-2 text-xs text-muted-foreground transition-colors hover:text-primary md:px-4 md:py-2 md:text-sm">
                       {item.title}
                     </Link>
                   </li>
