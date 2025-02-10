@@ -16,7 +16,7 @@ const NAV_ITEMS: NavItemProps[] = [
 export default function Footer() {
   return (
     <footer className="bg-background">
-      <div className="mx-auto py-6 xl:container">
+      <div className="mx-auto max-w-screen-lg px-5 py-6">
         <div className="flex flex-col items-center justify-between md:flex-row">
           <Link href="/" className="flex items-center space-x-2">
             <Image

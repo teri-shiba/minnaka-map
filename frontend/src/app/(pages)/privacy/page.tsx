@@ -1,8 +1,9 @@
 import Link from 'next/link'
+import { Section } from '../../components/layout/Section'
 
 export default function Privacy() {
   return (
-    <>
+    <Section>
       <h1 className="py-6 text-center sm:py-11">プライバシーポリシー</h1>
       <p>本サービスは、利用者の個人情報の取扱いについて、以下のとおりプライバシーポリシー（以下「本ポリシー」といいます。）を定めます。</p>
       <h2 className="pb-2 pt-6 sm:pt-9 sm:text-xl">第1条（個人情報）</h2>
@@ -114,6 +115,6 @@ export default function Privacy() {
         からお願いいたします。
       </p>
 
-    </>
+    </Section>
   )
 }
