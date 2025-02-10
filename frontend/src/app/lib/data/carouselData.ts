@@ -1,4 +1,4 @@
-interface CarouselData {
+export interface CarouselData {
   id: number
   imageUrl: string
   title: string
