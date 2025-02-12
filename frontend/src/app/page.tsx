@@ -5,15 +5,7 @@ import { Button } from '~/components/ui/buttons/Button'
 import { DesktopGuideCarousel } from '~/components/ui/carousels/DesktopGuideCarousel'
 import { MobileGuideCarousel } from '~/components/ui/carousels/MobileGuideCarousel'
 
-// TODO：画像変数のインポートが多いので、まとめてインポートする構造に変更する
-import wavePC from '~/public/figure_wave_pc.webp'
-import waveSP from '~/public/figure_wave_sp.webp'
-import featureFriends from '~/public/image_feature_01.webp'
-import featureDate from '~/public/image_feature_02.webp'
-import featureBusiness from '~/public/image_feature_03.webp'
-import logo from '~/public/logo.webp'
-import mvPC from '~/public/mv_01_pc.webp'
-import mvSP from '~/public/mv_01_sp.webp'
+import { images } from '~/lib/image/images'
 
 import { Section } from './components/layout/Section'
 import useConfirmEmail from './hooks/useConfirmEmail'
@@ -32,12 +24,14 @@ export default function Home() {
               <span className="text-lg text-secondary-foreground sm:text-xl">みんなのまんなか</span>
               <Image
                 alt="minnaka map"
-                src={logo}
+                src={images.logo}
                 width={224}
                 height={28}
                 className=""
               />
             </h2>
+
+            {/* フォームはあとで実装 */}
 
             {/* フォームはあとで実装 */}
 
@@ -52,7 +46,7 @@ export default function Home() {
           <div>
             <Image
               alt="mv-pc"
-              src={mvPC}
+              src={images.mvPC}
               width={424}
               height={536}
               className="hidden md:block"
@@ -60,7 +54,7 @@ export default function Home() {
 
             <Image
               alt="mv-sp"
-              src={mvSP}
+              src={images.mvSP}
               width={264}
               height={184}
               className="block md:hidden"
@@ -72,14 +66,14 @@ export default function Home() {
       <div>
         <Image
           alt=""
-          src={wavePC}
+          src={images.wavePC}
           width={1280}
           height={96}
           className="hidden h-24 w-full md:block"
         />
         <Image
           alt=""
-          src={waveSP}
+          src={images.waveSP}
           width={393}
           height={48}
           className="block h-12 w-full md:hidden"
@@ -91,7 +85,7 @@ export default function Home() {
           <span className="inline-block align-text-bottom">
             <Image
               alt="minnaka map"
-              src={logo}
+              src={images.logo}
               width={170}
               height={30}
               className="w-44 sm:w-60"
@@ -104,7 +98,7 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center">
             <Image
               alt="featureFriends"
-              src={featureFriends}
+              src={images.featureFriends}
               width={170}
               height={150}
               className="mb-4"
@@ -121,7 +115,7 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center">
             <Image
               alt="featureDate"
-              src={featureDate}
+              src={images.featureDate}
               width={170}
               height={150}
               className="mb-4"
@@ -138,7 +132,7 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center">
             <Image
               alt="featureBusiness"
-              src={featureBusiness}
+              src={images.featureBusiness}
               width={170}
               height={150}
               className="mb-4"
