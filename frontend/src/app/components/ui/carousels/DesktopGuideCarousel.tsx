@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { useCallback, useEffect, useState } from 'react'
 import { useAutoplay } from '~/app/hooks/useAutoplay'
 import { carouselData } from '~/app/lib/data/carouselData'
-import logo from '~/public/logo.webp'
+import { images } from '~/lib/image/images'
 import { Section } from '../../layout/Section'
 
 export function DesktopGuideCarousel() {
@@ -69,7 +69,7 @@ export function DesktopGuideCarousel() {
             <span className="inline-block align-text-top">
               <Image
                 alt="minnaka map"
-                src={logo}
+                src={images.logo}
                 width={170}
                 height={30}
                 className="w-44 sm:w-60"

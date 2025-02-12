@@ -2,7 +2,7 @@ import type { EmblaOptionsType } from 'embla-carousel'
 import Autoplay from 'embla-carousel-autoplay'
 import Image from 'next/image'
 import { carouselData } from '~/lib/data/carouselData'
-import logo from '~/public/logo.webp'
+import { images } from '~/lib/image/images'
 import { Section } from '../../layout/Section'
 import { Card, CardContent } from '../cards/Card'
 import {
@@ -30,7 +30,7 @@ export function MobileGuideCarousel() {
         <span className="inline-block align-text-bottom">
           <Image
             alt="minnaka map"
-            src={logo}
+            src={images.logo}
             width={170}
             height={30}
             className="w-44 sm:w-60"
