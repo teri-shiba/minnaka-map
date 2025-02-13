@@ -62,6 +62,7 @@ export default function Home() {
           src={images.wavePC}
           width={1280}
           height={96}
+          priority
           className="hidden h-24 w-full md:block"
         />
         <Image
@@ -69,6 +70,7 @@ export default function Home() {
           src={images.waveSP}
           width={393}
           height={48}
+          priority
           className="block h-12 w-full md:hidden"
         />
       </div>
