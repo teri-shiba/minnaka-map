@@ -39,6 +39,7 @@ export default function Header() {
             src={logo}
             width={224}
             height={28}
+            priority
             className="hidden md:block"
           />
           <Image
@@ -47,6 +48,7 @@ export default function Header() {
             src={logoMark}
             width={28}
             height={28}
+            priority
             className="block md:hidden"
           />
         </Link>

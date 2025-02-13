@@ -1,13 +1,12 @@
 'use client'
 import Image from 'next/image'
-import { LuPlus } from 'react-icons/lu'
-import { Button } from '~/components/ui/buttons/Button'
+
 import { DesktopGuideCarousel } from '~/components/ui/carousels/DesktopGuideCarousel'
 import { MobileGuideCarousel } from '~/components/ui/carousels/MobileGuideCarousel'
 
 import { images } from '~/lib/image/images'
-
 import { Section } from './components/layout/Section'
+import { AreaSearchForm } from './components/ui/forms/AreaSearchForm'
 import useConfirmEmail from './hooks/useConfirmEmail'
 import useOAuthCallback from './hooks/useOAuthCallback'
 
@@ -18,37 +17,30 @@ export default function Home() {
   return (
     <>
       <Section className="bg-secondary py-12 md:py-4">
-        <div className="flex flex-col items-center justify-center md:flex-row md:justify-between">
-          <div>
-            <h2 className="text-center md:text-left">
-              <span className="text-lg text-secondary-foreground sm:text-xl">みんなのまんなか</span>
-              <Image
-                alt="minnaka map"
-                src={images.logo}
-                width={224}
-                height={28}
-                className=""
-              />
-            </h2>
+        <div className="grid md:grid-cols-2 md:gap-x-6">
+          <h2 className="order-1 mx-auto mb-6 text-center md:col-span-1 md:row-span-1 md:ml-0 md:mr-auto md:mt-auto md:text-left">
+            <span className="mb-1 inline-block text-lg text-secondary-foreground md:mb-2 md:text-xl">みんなのまんなか</span>
+            <Image
+              alt="minnaka map"
+              src={images.logo}
+              width={224}
+              height={28}
+              priority
+              className="block"
+            />
+          </h2>
 
-            {/* フォームはあとで実装 */}
-
-            {/* フォームはあとで実装 */}
-
-            <Button variant="link" className="text-secondary-foreground">
-              <LuPlus className="stroke-[3]" />
-              3人目を追加する
-            </Button>
-
-            <Button>検索する</Button>
+          <div className="order-3 md:col-span-1 md:row-span-1">
+            <AreaSearchForm />
           </div>
 
-          <div>
+          <div className="order-2 mx-auto md:order-1 md:col-span-1 md:row-span-2">
             <Image
               alt="mv-pc"
               src={images.mvPC}
               width={424}
               height={536}
+              priority
               className="hidden md:block"
             />
 
@@ -57,6 +49,7 @@ export default function Home() {
               src={images.mvSP}
               width={264}
               height={184}
+              priority
               className="block md:hidden"
             />
           </div>
@@ -88,6 +81,7 @@ export default function Home() {
               src={images.logo}
               width={170}
               height={30}
+              priority
               className="w-44 sm:w-60"
             />
           </span>
