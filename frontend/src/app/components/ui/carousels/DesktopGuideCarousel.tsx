@@ -72,6 +72,7 @@ export function DesktopGuideCarousel() {
                 src={images.logo}
                 width={170}
                 height={30}
+                priority
                 className="w-44 sm:w-60"
               />
             </span>
