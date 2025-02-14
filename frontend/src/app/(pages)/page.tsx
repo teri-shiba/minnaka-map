@@ -1,14 +1,14 @@
 'use client'
 import Image from 'next/image'
 
+import { Section } from '~/components/layout/Section'
 import { DesktopGuideCarousel } from '~/components/ui/carousels/DesktopGuideCarousel'
-import { MobileGuideCarousel } from '~/components/ui/carousels/MobileGuideCarousel'
 
+import { MobileGuideCarousel } from '~/components/ui/carousels/MobileGuideCarousel'
+import { AreaSearchForm } from '~/components/ui/forms/AreaSearchForm'
+import useConfirmEmail from '~/hooks/useConfirmEmail'
+import useOAuthCallback from '~/hooks/useOAuthCallback'
 import { images } from '~/lib/image/images'
-import { Section } from './components/layout/Section'
-import { AreaSearchForm } from './components/ui/forms/AreaSearchForm'
-import useConfirmEmail from './hooks/useConfirmEmail'
-import useOAuthCallback from './hooks/useOAuthCallback'
 
 export default function Home() {
   useOAuthCallback()
