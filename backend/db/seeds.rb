@@ -29,7 +29,7 @@ ActiveRecord::Base.transaction do
       "locality": "杉並区",
       "sublocality": "久我山４丁目１",
       "place_type": "station",
-      "prefecture_id": Prefecture.find_by(name: "東京都").id
+      "prefecture_id": Prefecture.find_by(name: "東京都").id,
     },
     {
       "place_id": "ChIJ4U2CgDl8ImAR9lPIgHwG8G0",
@@ -38,8 +38,8 @@ ActiveRecord::Base.transaction do
       "locality": "松戸市",
       "sublocality": "松戸",
       "place_type": "address",
-      "prefecture_id": Prefecture.find_by(name: "千葉県").id
-    }
+      "prefecture_id": Prefecture.find_by(name: "千葉県").id,
+    },
   ]
 
   locations.each do |location|
@@ -66,5 +66,4 @@ ActiveRecord::Base.transaction do
       location_id: Location.find_by(place_id: placeId).id,
     )
   end
-
 end
