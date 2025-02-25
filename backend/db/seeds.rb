@@ -20,4 +20,14 @@ ActiveRecord::Base.transaction do
   prefectures.each do |prefecture|
     Prefecture.create!(name: prefecture)
   end
+
+  Location.create!(
+    place_id: "ChIJm1vMbuPxGGARynXLPQyt-Dk",
+    latitude: 35.68838,
+    longitude: 139.59804,
+    locality: "杉並区",
+    sublocality: "久我山",
+    place_type: "address",
+    prefecture_id: Prefecture.find_by(name: "東京都").id,
+  )
 end
