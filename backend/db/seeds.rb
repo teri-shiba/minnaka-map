@@ -35,4 +35,8 @@ ActiveRecord::Base.transaction do
     name: "久我山駅",
     location_id: Location.find_by(place_id: "ChIJm1vMbuPxGGARynXLPQyt-Dk").id,
   )
+
+  SearchHistory.create!(
+    user_id: user.id,
+  )
 end
