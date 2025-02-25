@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_25_040910) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_25_055123) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -20,7 +20,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_25_040910) do
     t.decimal "longitude", precision: 10, scale: 5
     t.string "locality"
     t.string "sublocality"
-    t.string "place_type"
+    t.string "place_type", default: "address"
     t.bigint "prefecture_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
