@@ -21,15 +21,30 @@ ActiveRecord::Base.transaction do
     Prefecture.create!(name: prefecture)
   end
 
-  Location.create!(
-    place_id: "ChIJm1vMbuPxGGARynXLPQyt-Dk",
-    latitude: 35.688,
-    longitude: 139.59959,
-    locality: "杉並区",
-    sublocality: "久我山４丁目１",
-    place_type: "station",
-    prefecture_id: Prefecture.find_by(name: "東京都").id,
-  )
+  locations = [
+    {
+      "place_id": "ChIJm1vMbuPxGGARynXLPQyt-Dk",
+      "latitude": 35.688,
+      "longitude": 139.59959,
+      "locality": "杉並区",
+      "sublocality": "久我山４丁目１",
+      "place_type": "station",
+      "prefecture_id": Prefecture.find_by(name: "東京都").id
+    },
+    {
+      "place_id": "ChIJ4U2CgDl8ImAR9lPIgHwG8G0",
+      "latitude": 35.77829,
+      "longitude": 139.9021,
+      "locality": "松戸市",
+      "sublocality": "松戸",
+      "place_type": "address",
+      "prefecture_id": Prefecture.find_by(name: "千葉県").id
+    }
+  ]
+
+  locations.each do |location|
+    Location.create!(location)
+  end
 
   Station.create!(
     name: "久我山駅",
@@ -39,4 +54,17 @@ ActiveRecord::Base.transaction do
   SearchHistory.create!(
     user_id: user.id,
   )
+
+  placeIds = %w[
+    ChIJm1vMbuPxGGARynXLPQyt-Dk
+    ChIJ4U2CgDl8ImAR9lPIgHwG8G0
+  ]
+
+  placeIds.each do |placeId|
+    SearchHistoryStartLocation.create!(
+      search_history_id: SearchHistory.first.id,
+      location_id: Location.find_by(place_id: placeId).id,
+    )
+  end
+
 end
