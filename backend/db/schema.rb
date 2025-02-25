@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_25_022154) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_25_023401) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -38,6 +38,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_25_022154) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_search_histories_on_user_id"
+  end
+
+  create_table "search_history_start_locations", force: :cascade do |t|
+    t.bigint "location_id", null: false
+    t.bigint "search_history_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["location_id"], name: "index_search_history_start_locations_on_location_id"
+    t.index ["search_history_id"], name: "index_search_history_start_locations_on_search_history_id"
   end
 
   create_table "stations", force: :cascade do |t|
@@ -80,6 +89,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_25_022154) do
 
   add_foreign_key "locations", "prefectures"
   add_foreign_key "search_histories", "users"
+  add_foreign_key "search_history_start_locations", "locations"
+  add_foreign_key "search_history_start_locations", "search_histories"
   add_foreign_key "stations", "locations"
   add_foreign_key "user_auths", "users"
 end
