@@ -10,17 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_25_055123) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_25_055508) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "locations", force: :cascade do |t|
-    t.string "place_id"
-    t.decimal "latitude", precision: 10, scale: 5
-    t.decimal "longitude", precision: 10, scale: 5
-    t.string "locality"
-    t.string "sublocality"
-    t.string "place_type", default: "address"
+    t.string "place_id", null: false
+    t.decimal "latitude", precision: 10, scale: 5, null: false
+    t.decimal "longitude", precision: 10, scale: 5, null: false
+    t.string "locality", null: false
+    t.string "sublocality", null: false
+    t.string "place_type", default: "address", null: false
     t.bigint "prefecture_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
