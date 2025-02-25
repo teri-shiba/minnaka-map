@@ -23,11 +23,16 @@ ActiveRecord::Base.transaction do
 
   Location.create!(
     place_id: "ChIJm1vMbuPxGGARynXLPQyt-Dk",
-    latitude: 35.68838,
-    longitude: 139.59804,
+    latitude: 35.688,
+    longitude: 139.59959,
     locality: "杉並区",
-    sublocality: "久我山",
-    place_type: "address",
+    sublocality: "久我山４丁目１",
+    place_type: "station",
     prefecture_id: Prefecture.find_by(name: "東京都").id,
+  )
+
+  Station.create!(
+    name: "久我山駅",
+    location_id: Location.find_by(place_id: "ChIJm1vMbuPxGGARynXLPQyt-Dk").id,
   )
 end

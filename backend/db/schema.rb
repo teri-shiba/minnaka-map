@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_25_014342) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_25_015845) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -33,6 +33,14 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_25_014342) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "stations", force: :cascade do |t|
+    t.string "name"
+    t.bigint "location_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["location_id"], name: "index_stations_on_location_id"
+  end
+
   create_table "user_auths", force: :cascade do |t|
     t.string "provider", default: "email", null: false
     t.string "uid", default: "", null: false
@@ -49,7 +57,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_25_014342) do
     t.json "tokens"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
+    t.bigint "user_id"
     t.index ["confirmation_token"], name: "index_user_auths_on_confirmation_token", unique: true
     t.index ["email"], name: "index_user_auths_on_email", unique: true
     t.index ["reset_password_token"], name: "index_user_auths_on_reset_password_token", unique: true
@@ -64,5 +72,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_25_014342) do
   end
 
   add_foreign_key "locations", "prefectures"
+  add_foreign_key "stations", "locations"
   add_foreign_key "user_auths", "users"
 end
