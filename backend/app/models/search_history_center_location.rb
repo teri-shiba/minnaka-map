@@ -1,4 +1,4 @@
-class SearchHistoryCenterLocation < ApplicationRecord
+class SearchHistoryCenterStation < ApplicationRecord
   belongs_to :search_history
-  belongs_to :location
+  belongs_to :station
 end
