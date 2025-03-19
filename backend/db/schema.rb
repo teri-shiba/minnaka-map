@@ -41,10 +41,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_18_060800) do
 
   create_table "stations", force: :cascade do |t|
     t.string "name", null: false
-    t.decimal "latitude", precision: 10, scale: 5, null: false
-    t.decimal "longitude", precision: 10, scale: 5, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "latitude", precision: 10, scale: 5, null: false
+    t.decimal "longitude", precision: 10, scale: 5, null: false
   end
 
   create_table "user_auths", force: :cascade do |t|
