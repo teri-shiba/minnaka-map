@@ -1,23 +1,23 @@
 'use client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useFieldArray, useForm } from 'react-hook-form'
-
-import { areaFormSchema } from '~/app/lib/shemas/areaSearchSchema'
-
-import type { AreaFormValues } from '~/app/types'
+import { toast } from 'sonner'
+import { areaFormSchema, type AreaFormValues } from '~/app/lib/shemas/areaSearchSchema'
 import { Button } from '~/components/ui/buttons/Button'
-
-import { Input } from '~/components/ui/forms/Input'
+import Autocomplete from '../autocomplete/Autocomplete'
 import { AddFormButton } from '../buttons/AddFormButton'
 import { RemoveFormButton } from '../buttons/RemoveFormButton'
-
 import { ResetFormButton } from '../buttons/ResetFormButton'
 import { Form, FormControl, FormField, FormItem } from './Form'
 
-export function AreaSearchForm() {
+const MAX_AREA_FIELDS = 6
+const MAX_REQUIRED_FIELDS = 2
+
+export default function AreaSearchForm() {
   const form = useForm<AreaFormValues>({
     resolver: zodResolver(areaFormSchema),
     defaultValues: {
+      // TODO: データの返り値に緯度経度を含めること（現在: value.area.areaValue）
       area: [{ areaValue: '' }, { areaValue: '' }],
     },
   })
@@ -27,8 +27,24 @@ export function AreaSearchForm() {
     control: form.control,
   })
 
-  const onSubmit = () => {
-    // TODO:フォーム送信後の実装(引数 -> value: AreaFormValues)
+  const onSubmit = async (value: AreaFormValues) => {
+    try {
+      // TODO: データの返り値に緯度経度を含めること（現在: value.area.areaValue）
+      console.log('value:', value)
+    }
+    catch (e) {
+      console.error('フォーム送信エラー:', e)
+      toast.error('フォームの送信に失敗しました')
+    }
+  }
+
+  const renderFieldAction = (index: number, value: string) => {
+    if (index >= MAX_REQUIRED_FIELDS) {
+      return value
+        ? <ResetFormButton index={index} form={form} />
+        : <RemoveFormButton index={index} remove={remove} />
+    }
+    return value ? <ResetFormButton index={index} form={form} /> : null
   }
 
   return (
@@ -41,24 +57,19 @@ export function AreaSearchForm() {
                 <FormField
                   key={field.id}
                   control={form.control}
-                  name={`area.${index}`}
+                  name={`area.${index}.areaValue`}
                   render={({ field }) => (
                     <FormItem className="relative">
                       <FormControl>
-                        <Input
-                          placeholder={`${index + 1}人目の出発地点`}
+                        <Autocomplete
                           {...field}
-                          value={field.value.areaValue}
-                          onChange={e => field.onChange({ areaValue: e.target.value })}
-                          className="h-12 py-2 pl-3 pr-8"
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder={`${index + 1}人目の出発地点`}
                         />
                       </FormControl>
 
-                      { index >= 2
-                        ? field.value.areaValue
-                          ? <ResetFormButton index={index} form={form} />
-                          : <RemoveFormButton index={index} remove={remove} />
-                        : field.value.areaValue && <ResetFormButton index={index} form={form} />}
+                      {renderFieldAction(index, field.value)}
 
                     </FormItem>
                   )}
@@ -67,7 +78,7 @@ export function AreaSearchForm() {
             )
           })}
 
-          {fields.length < 6 && (
+          {fields.length < MAX_AREA_FIELDS && (
             <AddFormButton append={append} fields={fields} />
           )}
         </div>
