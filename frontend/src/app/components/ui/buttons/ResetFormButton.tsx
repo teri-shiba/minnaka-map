@@ -1,7 +1,7 @@
 import type { UseFormReturn } from 'react-hook-form'
-import { LuX } from 'react-icons/lu'
-
 import type { AreaFormValues } from '~/app/types'
+
+import { LuX } from 'react-icons/lu'
 import { Button } from './Button'
 
 interface ResetFormButtonProps {
