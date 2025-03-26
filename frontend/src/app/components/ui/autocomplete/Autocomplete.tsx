@@ -1,10 +1,17 @@
 'use client'
+import type { FormEvent } from 'react'
 import type { StationProps } from '~/app/types/station'
-import { CommandEmpty, CommandList } from 'cmdk'
-import { type FormEvent, useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useLocalStorage } from '~/app/hooks/useLocalStorage'
 import useSearchStation from '~/app/hooks/useSearchStation'
-import { Command, CommandGroup, CommandInput, CommandItem } from '../command/Command'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '../command/Command'
 
 interface AutocompleteProps {
   value: string
