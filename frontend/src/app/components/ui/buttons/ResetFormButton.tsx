@@ -1,6 +1,5 @@
 import type { UseFormReturn } from 'react-hook-form'
-import type { AreaFormValues } from '~/app/types'
-
+import type { AreaFormValues } from '~/app/lib/shemas/areaSearchSchema'
 import { LuX } from 'react-icons/lu'
 import { Button } from './Button'
 
