@@ -61,7 +61,8 @@ function Carousel({ ref, orientation = 'horizontal', opts, setApi, plugins, clas
       api.off('select', callback)
       api.off('reInit', callback)
     }
-  }, () => api?.canScrollPrev() ?? false)
+  }, () => api?.canScrollPrev() ?? false, () => false)
+
   const canScrollNext = React.useSyncExternalStore((callback) => {
     if (!api)
       return () => {}
@@ -73,7 +74,7 @@ function Carousel({ ref, orientation = 'horizontal', opts, setApi, plugins, clas
       api.off('select', callback)
       api.off('reInit', callback)
     }
-  }, () => api?.canScrollNext() ?? false)
+  }, () => api?.canScrollNext() ?? false, () => false)
 
   const scrollPrev = React.useCallback(() => {
     api?.scrollPrev()
