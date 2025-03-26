@@ -7,10 +7,7 @@ import * as React from 'react'
 import { Dialog, DialogContent } from '~/components/ui/dialogs/Dialog'
 import { cn } from '~/lib/utils'
 
-const Command = React.memo(React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive>
->(({ className, ...props }, ref) => (
+const Command = React.memo(({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive> & { ref?: React.RefObject<HTMLDivElement> }) => (
   <CommandPrimitive
     ref={ref}
     className={cn(
@@ -19,7 +16,7 @@ const Command = React.memo(React.forwardRef<
     )}
     {...props}
   />
-)))
+))
 Command.displayName = CommandPrimitive.displayName
 
 const CommandDialog = React.memo(({ children, ...props }: DialogProps) => {
@@ -34,10 +31,7 @@ const CommandDialog = React.memo(({ children, ...props }: DialogProps) => {
   )
 })
 
-const CommandInput = React.memo(React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, ...props }, ref) => (
+const CommandInput = React.memo(({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & { ref?: React.RefObject<HTMLInputElement> }) => (
   <div className="flex items-center px-3" cmdk-input-wrapper="">
     <CommandPrimitive.Input
       ref={ref}
@@ -48,40 +42,31 @@ const CommandInput = React.memo(React.forwardRef<
       {...props}
     />
   </div>
-)))
+))
 
 CommandInput.displayName = CommandPrimitive.Input.displayName
 
-const CommandList = React.memo(React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.List>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
->(({ className, ...props }, ref) => (
+const CommandList = React.memo(({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.List> & { ref?: React.RefObject<HTMLDivElement> }) => (
   <CommandPrimitive.List
     ref={ref}
     className={cn('max-h-[300px] overflow-y-auto overflow-x-hidden', className)}
     {...props}
   />
-)))
+))
 
 CommandList.displayName = CommandPrimitive.List.displayName
 
-const CommandEmpty = React.memo(React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Empty>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
->((props, ref) => (
+const CommandEmpty = React.memo(({ ref, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty> & { ref?: React.RefObject<HTMLDivElement> }) => (
   <CommandPrimitive.Empty
     ref={ref}
     className="py-6 text-center text-sm"
     {...props}
   />
-)))
+))
 
 CommandEmpty.displayName = CommandPrimitive.Empty.displayName
 
-const CommandGroup = React.memo(React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Group>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Group>
->(({ className, ...props }, ref) => (
+const CommandGroup = React.memo(({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Group> & { ref?: React.RefObject<HTMLDivElement> }) => (
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
@@ -90,28 +75,21 @@ const CommandGroup = React.memo(React.forwardRef<
     )}
     {...props}
   />
-),
 ))
 
 CommandGroup.displayName = CommandPrimitive.Group.displayName
 
-const CommandSeparator = React.memo(React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Separator>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Separator>
->(({ className, ...props }, ref) => (
+const CommandSeparator = React.memo(({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Separator> & { ref?: React.RefObject<HTMLDivElement> }) => (
   <CommandPrimitive.Separator
     ref={ref}
     className={cn('-mx-1 h-px bg-border', className)}
     {...props}
   />
-)))
+))
 
 CommandSeparator.displayName = CommandPrimitive.Separator.displayName
 
-const CommandItem = React.memo(React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
->(({ className, ...props }, ref) => (
+const CommandItem = React.memo(({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item> & { ref?: React.RefObject<HTMLDivElement> }) => (
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
@@ -120,7 +98,7 @@ const CommandItem = React.memo(React.forwardRef<
     )}
     {...props}
   />
-)))
+))
 
 CommandItem.displayName = CommandPrimitive.Item.displayName
 
