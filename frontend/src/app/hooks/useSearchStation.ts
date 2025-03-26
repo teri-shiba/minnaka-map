@@ -8,7 +8,7 @@ export default function useSearchStation(query: string) {
   const deboucedQuery = useDebounce(query.trim(), 300)
   const baseApiURL = process.env.NEXT_PUBLIC_API_BASE_URL
   const { data, error, isLoading } = useSWR(
-    deboucedQuery ? `${baseApiURL}/stations?q=${query}` : null,
+    deboucedQuery ? `${baseApiURL}/stations?q=${deboucedQuery}` : null,
     fetcher,
     {
       dedupingInterval: 500,
