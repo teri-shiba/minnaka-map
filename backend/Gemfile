@@ -33,6 +33,9 @@ gem "active_model_serializers"
 gem "omniauth-google-oauth2"
 gem "omniauth-line"
 
+# かな・ローマ字追加
+gem 'miyabi'
+
 group :development, :test do
   gem "factory_bot_rails"
   gem "faker"
