@@ -39,7 +39,7 @@ export default function Autocomplete({
   }, [])
 
   const handleBlur = useCallback(() => {
-    if (!isSelected && value === '') {
+    if (!isSelected && value !== '') {
       onChange('')
     }
     setIsFocused(false)
