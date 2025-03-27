@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_03_18_060800) do
+ActiveRecord::Schema[7.2].define(version: 2025_03_27_073831) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -45,6 +45,11 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_18_060800) do
     t.datetime "updated_at", null: false
     t.decimal "latitude", precision: 10, scale: 5, null: false
     t.decimal "longitude", precision: 10, scale: 5, null: false
+    t.string "name_hiragana"
+    t.string "name_romaji"
+    t.index ["name"], name: "index_stations_on_name"
+    t.index ["name_hiragana"], name: "index_stations_on_name_hiragana"
+    t.index ["name_romaji"], name: "index_stations_on_name_romaji"
   end
 
   create_table "user_auths", force: :cascade do |t|
