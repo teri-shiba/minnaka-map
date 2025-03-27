@@ -1,14 +1,15 @@
 'use client'
+import type { AreaFormValues } from '~/app/lib/shemas/areaSearchSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { areaFormSchema, type AreaFormValues } from '~/app/lib/shemas/areaSearchSchema'
+import { areaFormSchema } from '~/app/lib/shemas/areaSearchSchema'
 import { Button } from '~/components/ui/buttons/Button'
 import Autocomplete from '../autocomplete/Autocomplete'
 import { AddFormButton } from '../buttons/AddFormButton'
 import { RemoveFormButton } from '../buttons/RemoveFormButton'
 import { ResetFormButton } from '../buttons/ResetFormButton'
-import { Form, FormControl, FormField, FormItem } from './Form'
+import { Form, FormControl, FormField, FormItem, FormMessage } from './Form'
 
 const MAX_AREA_FIELDS = 6
 const MAX_REQUIRED_FIELDS = 2
@@ -20,7 +21,11 @@ export default function AreaSearchForm() {
       // TODO: データの返り値に緯度経度を含めること（現在: value.area.areaValue）
       area: [{ areaValue: '' }, { areaValue: '' }],
     },
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
   })
+
+  console.log('Form errors:', form.formState.errors)
 
   const { fields, append, remove } = useFieldArray({
     name: 'area',
@@ -38,6 +43,27 @@ export default function AreaSearchForm() {
     }
   }
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    form.handleSubmit((data) => {
+      onSubmit(data)
+    })(e)
+
+    setTimeout(() => {
+      const errors = form.formState.errors
+
+      if (errors.area) {
+        if('root' in errors.area && errors.area.root?.message) {
+          toast.error(errors.area.root.message)
+        }
+        else if (errors.area.message) {
+          toast.error(errors.area.message)
+        }
+      }
+    }, 0)
+  }
+
   const renderFieldAction = (index: number, value: string) => {
     if (index >= MAX_REQUIRED_FIELDS) {
       return value
@@ -49,7 +75,8 @@ export default function AreaSearchForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit} noValidate>
+
         <div className="mb-6 md:grid md:grid-flow-col md:grid-cols-2 md:grid-rows-3 md:gap-x-6 md:gap-y-3">
           {fields.map((field, index) => {
             return (
@@ -65,12 +92,10 @@ export default function AreaSearchForm() {
                           {...field}
                           value={field.value}
                           onChange={field.onChange}
-                          placeholder={`${index + 1}人目の出発地点`}
+                          placeholder={`${index + 1}人目の出発駅`}
                         />
                       </FormControl>
-
                       {renderFieldAction(index, field.value)}
-
                     </FormItem>
                   )}
                 />
