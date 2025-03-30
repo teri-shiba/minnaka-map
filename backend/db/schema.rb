@@ -10,9 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_03_27_073831) do
+ActiveRecord::Schema[7.2].define(version: 2025_03_30_060903) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "operators", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "alias_name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_operators_on_name", unique: true
+  end
 
   create_table "search_histories", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -47,9 +55,13 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_27_073831) do
     t.decimal "longitude", precision: 10, scale: 5, null: false
     t.string "name_hiragana"
     t.string "name_romaji"
+    t.string "group_code", null: false
+    t.bigint "operator_id"
+    t.index ["name", "group_code"], name: "index_stations_on_name_and_group_code", unique: true
     t.index ["name"], name: "index_stations_on_name"
     t.index ["name_hiragana"], name: "index_stations_on_name_hiragana"
     t.index ["name_romaji"], name: "index_stations_on_name_romaji"
+    t.index ["operator_id"], name: "index_stations_on_operator_id"
   end
 
   create_table "user_auths", force: :cascade do |t|
@@ -87,5 +99,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_27_073831) do
   add_foreign_key "search_history_center_stations", "stations"
   add_foreign_key "search_history_start_stations", "search_histories"
   add_foreign_key "search_history_start_stations", "stations"
+  add_foreign_key "stations", "operators"
   add_foreign_key "user_auths", "users"
 end
