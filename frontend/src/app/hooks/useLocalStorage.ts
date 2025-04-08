@@ -1,8 +1,14 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-export function useLocalStorage<T>(key: string, initialValue: T) {
+export function useLocalStorage<T>(
+  key: string,
+  initialValue: T,
+  options?: {
+    refreshOnFocus?: boolean
+  },
+) {
   const [storedValue, setStoredValue] = useState<T>(() => {
     if (typeof window === 'undefined') {
       return initialValue
@@ -17,6 +23,23 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       return initialValue
     }
   })
+
+  const refreshValue = useCallback(() => {
+    if (typeof window == 'undefined') {
+      return
+    }
+
+    try {
+      const item = window.localStorage.getItem(key)
+      if (item) {
+        const parsedItem = JSON.parse(item)
+        setStoredValue(parsedItem)
+      }
+    }
+    catch (e) {
+      console.error(`ローカルストレージの読み込みエラー: ${key}`, e)
+    }
+  }, [key])
 
   const setValue = useCallback((value: T | ((val: T) => T)) => {
     try {
@@ -39,5 +62,39 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     }
   }, [key, storedValue])
 
-  return [storedValue, setValue] as const
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === key && e.newValue !== null) {
+        try {
+          const newValue = JSON.parse(e.newValue)
+          setStoredValue(newValue)
+        }
+        catch (e) {
+          console.error(`ストレージ変更イベントの解析エラー: ${key}`, e)
+        }
+      }
+    }
+
+    const handleWindowFocus = () => {
+      if (options?.refreshOnFocus) {
+        refreshValue()
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+
+    if (options?.refreshOnFocus) {
+      window.addEventListener('focus', handleWindowFocus)
+    }
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+
+      if (options?.refreshOnFocus) {
+        window.removeEventListener('focus', handleWindowFocus)
+      }
+    }
+  }, [key, options?.refreshOnFocus, refreshValue])
+
+  return [storedValue, setValue, refreshValue] as const
 }
