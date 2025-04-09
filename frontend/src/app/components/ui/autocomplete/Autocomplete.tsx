@@ -1,7 +1,7 @@
 'use client'
 import type { FormEvent } from 'react'
 import type { StationProps } from '~/app/types/station'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useLocalStorage } from '~/app/hooks/useLocalStorage'
 import useSearchStation from '~/app/hooks/useSearchStation'
 import {
@@ -19,6 +19,11 @@ interface AutocompleteProps {
   onChange: (value: string) => void
 }
 
+interface SavedStation {
+  id: number
+  name: string
+}
+
 export default function Autocomplete({
   value,
   placeholder,
@@ -26,8 +31,12 @@ export default function Autocomplete({
 }: AutocompleteProps) {
   const [isFocused, setIsFocused] = useState<boolean>(false)
   const [isSelected, setIsSelected] = useState<boolean>(false)
-  const [recentStations, setRecentStations] = useLocalStorage<string[]>('recentStations', [])
-  const { stations } = useSearchStation(value)
+  const [recentStations, setRecentStations, refreshRecentStations] = useLocalStorage<SavedStation[]>(
+    'recentStations',
+    [],
+    { refreshOnFocus: true },
+  )
+  const { stations, isLoading, isError } = useSearchStation(value)
 
   const handleInputChange = useCallback((e: FormEvent<HTMLInputElement>) => {
     onChange(e.currentTarget.value)
@@ -36,7 +45,8 @@ export default function Autocomplete({
 
   const handleFocus = useCallback(() => {
     setIsFocused(true)
-  }, [])
+    refreshRecentStations()
+  }, [refreshRecentStations])
 
   const handleBlur = useCallback(() => {
     if (!isSelected && value !== '') {
@@ -46,24 +56,35 @@ export default function Autocomplete({
     setIsSelected(false)
   }, [isSelected, onChange, value])
 
-  const handleSelect = useCallback((stationName: string) => {
+  const handleSelect = useCallback((station: StationProps) => {
     setIsSelected(true)
-    onChange(stationName)
+    onChange(station.name)
 
-    setRecentStations(prev =>
-      [stationName, ...prev.filter(s => s !== stationName)].slice(0, 5),
-    )
+    setRecentStations((prev) => {
+      const filtered = prev.filter(s => s.id !== station.id)
+      return [{ id: station.id, name: station.name }, ...filtered].slice(0, 5)
+    })
   }, [onChange, setRecentStations])
 
-  const matchedRecent = recentStations.filter(
-    name => name.includes(value),
-  )
+  const matchedRecent = useMemo(() => {
+    if (!value.trim()) {
+      return recentStations
+    }
 
-  const filteredStations = stations.filter(
-    (station: StationProps) => !recentStations.includes(station.name),
-  )
+    return recentStations.filter((saved) =>
+      stations.some((station: StationProps) => station.id === saved.id)
+    )
+  }, [recentStations, stations])
 
-  const showSuggestions = isFocused && !isSelected && recentStations.length > 0
+  const filteredStations = useMemo(() => {
+    return stations.filter(
+      (station: StationProps) => !recentStations.some(s => s.id === station.id)
+    )
+  }, [stations, recentStations])
+
+  const showSuggestions = isFocused && !isSelected && (
+    filteredStations.length > 0 || matchedRecent.length > 0
+  )
 
   return (
     <div>
@@ -80,18 +101,36 @@ export default function Autocomplete({
           className="h-12"
         />
 
+        {/* {isLoading && (
+          <CommandList
+            className="absolute -left-px top-full z-10 mt-2 box-content w-full rounded-md border border-input bg-white"
+          >
+            <CommandEmpty className="p-2 text-center text-sm">
+              ローディング中
+            </CommandEmpty>
+          </CommandList>
+        )}
+        {isError && (
+          <CommandList
+            className="absolute -left-px top-full z-10 mt-2 box-content w-full rounded-md border border-input bg-white"
+          >
+            <CommandEmpty className="p-2 text-center text-sm">
+              エラー発生
+            </CommandEmpty>
+          </CommandList>
+        )} */}
+
         {showSuggestions && (
           <CommandList
             className="absolute -left-px top-full z-10 mt-2 box-content w-full rounded-md border border-input bg-white"
           >
-
             {(filteredStations.length > 0) && (
               <CommandGroup heading="駅候補">
                 {filteredStations.map((station: StationProps) => (
                   <CommandItem
                     key={station.id}
                     onMouseDown={e => e.preventDefault()}
-                    onSelect={() => handleSelect(station.name)}
+                    onSelect={() => handleSelect(station)}
                     className="cursor-pointer hover:bg-secondary"
                   >
                     {station.name}
@@ -102,14 +141,14 @@ export default function Autocomplete({
 
             {matchedRecent.length > 0 && (
               <CommandGroup heading="過去に検索した場所">
-                {matchedRecent.map(name => (
+                {matchedRecent.map(station => (
                   <CommandItem
-                    key={name}
+                    key={station.id}
                     onMouseDown={e => e.preventDefault()}
-                    onSelect={() => handleSelect(name)}
+                    onSelect={() => handleSelect(station as StationProps)}
                     className="cursor-pointer hover:bg-secondary"
                   >
-                    {name}
+                    {station.name}
                   </CommandItem>
                 ))}
               </CommandGroup>
@@ -120,7 +159,6 @@ export default function Autocomplete({
                 入力候補がありません
               </CommandEmpty>
             )}
-
           </CommandList>
         )}
       </Command>
