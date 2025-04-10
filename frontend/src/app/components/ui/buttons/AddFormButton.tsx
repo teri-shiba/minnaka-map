@@ -1,5 +1,5 @@
 import type { FieldArrayWithId, UseFieldArrayAppend } from 'react-hook-form'
-import type { AreaFormValues } from '~/app/lib/shemas/areaSearchSchema'
+import type { AreaFormValues } from '~/app/lib/schemas/areaSearchSchema'
 import { LuPlus } from 'react-icons/lu'
 import { Button } from './Button'
 
