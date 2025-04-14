@@ -5,7 +5,7 @@ class UserAuth < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable, :confirmable
 
-  belongs_to :user, optional: true
+  belongs_to :user
 
   def self.add_permitted_params
     [:name]
