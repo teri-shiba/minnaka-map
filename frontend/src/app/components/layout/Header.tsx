@@ -1,15 +1,30 @@
-import Image from 'next/image'
+'use client'
+import { useAtom } from 'jotai'
 import Link from 'next/link'
-import { Button } from '../ui/buttons/Button'
+import { userStateAtom } from '~/app/lib/state/userStateAtom'
+import Logo from '~/public/logo.svg'
+import { Auth } from '../ui/Auth'
+import UserMenu from '../ui/dropdownmenu/UserMenu'
+import { Skeleton } from '../ui/skeleton/Skeleton'
 
 export default function Header() {
+  const [user] = useAtom(userStateAtom)
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="xl:container flex gap-4 h-16 items-center justify-between px-5 md:px-6 mx-auto">
+    <header className="supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full backdrop-blur">
+      <div className="mx-auto flex h-16 items-center justify-between gap-4 px-5 xl:container md:px-6">
         <Link href="/" className="flex items-center space-x-2">
-          <Image src="/logo.svg" alt="minnaka map" width={225} height={25} />
+          <Logo
+            width={220}
+            height={35}
+            style={{ display: 'block' }}
+          />
         </Link>
-        <Button variant="round">ログイン</Button>
+        { user.isLoading
+          ? <Skeleton className="h-[40px] w-[87px] rounded-full" />
+          : (!user.isSignedIn
+              ? <Auth />
+              : <UserMenu />
+            )}
       </div>
     </header>
   )
