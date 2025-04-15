@@ -1,14 +1,13 @@
 'use client'
 
-import Link from 'next/link'
 import { useState } from 'react'
 import * as React from 'react'
 import Google from '~/public/google.svg'
 import Line from '~/public/line.svg'
 import Mark from '~/public/mark.svg'
 import { Button } from '../buttons/Button'
-
-import AuthForm from '../forms/LoginForm'
+import LoginForm from '../forms/LoginForm'
+import SignUpForm from '../forms/SignUpForm'
 import {
   Drawer,
   DrawerContent,
@@ -19,6 +18,11 @@ import {
 
 export function AuthDrawer() {
   const [open, setOpen] = useState(false)
+  const [isLogin, setIsLogin] = useState(true)
+
+  const handleClick = () => {
+    setIsLogin(!isLogin)
+  }
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
@@ -33,11 +37,15 @@ export function AuthDrawer() {
                 width={22}
                 height={22}
               />
-              <h2>ログイン</h2>
+              <h2>
+                {isLogin ? 'ログイン' : '新規会員登録'}
+              </h2>
             </div>
           </DrawerTitle>
         </DrawerHeader>
-        <AuthForm />
+        {isLogin
+          ? <LoginForm onSuccess={() => setOpen(false)} />
+          : <SignUpForm onSuccess={() => setOpen(false)} />}
         <div className="mt-4 grid items-start gap-4">
           <p className="relative mx-5 text-center text-sm text-gray-500 before:absolute before:left-0 before:top-1/2 before:-z-10 before:h-px before:w-full before:bg-gray-300">
             <span className="inline-block bg-white px-4">OR</span>
@@ -60,7 +68,9 @@ export function AuthDrawer() {
               />
             </Button>
           </div>
-          <Link href="#" className="mx-auto inline-block text-sm hover:text-blue-500 hover:underline">新規会員登録はこちら</Link>
+          <Button onClick={handleClick} className="mx-auto my-4 inline-block h-auto !bg-transparent py-0 text-sm font-normal text-foreground hover:text-blue-500 hover:underline">
+            {isLogin ? '新規会員登録はこちら' : 'ログインはこちら'}
+          </Button>
         </div>
       </DrawerContent>
     </Drawer>
