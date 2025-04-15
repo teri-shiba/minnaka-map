@@ -38,9 +38,9 @@ function FormField<
 }: ControllerProps<TFieldValues, TName>) {
   const value = useMemo(() => ({ name: props.name }), [props.name])
   return (
-    <FormFieldContext value={value}>
+    <FormFieldContext.Provider value={value}>
       <Controller {...props} />
-    </FormFieldContext>
+    </FormFieldContext.Provider>
   )
 }
 
@@ -75,18 +75,18 @@ interface FormItemContextValue {
   id: string
 }
 
-function FormItem({ ref, className, ...props }: React.HTMLAttributes<HTMLDivElement> & { ref?: React.RefObject<HTMLDivElement | null> }) {
+function FormItem({ ref, className, ...props }: React.HTMLAttributes<HTMLDivElement> & { ref?: React.RefObject<HTMLDivElement> }) {
   const id = React.useId()
   const value = useMemo(() => ({ id }), [id])
   return (
-    <FormItemContext value={value}>
+    <FormItemContext.Provider value={value}>
       <div ref={ref} className={cn('space-y-2', className)} {...props} />
-    </FormItemContext>
+    </FormItemContext.Provider>
   )
 }
 FormItem.displayName = 'FormItem'
 
-function FormLabel({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & { ref?: React.RefObject<React.ElementRef<typeof LabelPrimitive.Root> | null> }) {
+function FormLabel({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & { ref?: React.RefObject<React.ElementRef<typeof LabelPrimitive.Root> > }) {
   const { error, formItemId } = useFormField()
 
   return (
@@ -100,7 +100,7 @@ function FormLabel({ ref, className, ...props }: React.ComponentPropsWithoutRef<
 }
 FormLabel.displayName = 'FormLabel'
 
-function FormControl({ ref, ...props }: React.ComponentPropsWithoutRef<typeof Slot> & { ref?: React.RefObject<React.ElementRef<typeof Slot> | null> }) {
+function FormControl({ ref, ...props }: React.ComponentPropsWithoutRef<typeof Slot> & { ref?: React.RefObject<React.ElementRef<typeof Slot>> }) {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
 
   return (
@@ -119,7 +119,7 @@ function FormControl({ ref, ...props }: React.ComponentPropsWithoutRef<typeof Sl
 }
 FormControl.displayName = 'FormControl'
 
-function FormDescription({ ref, className, ...props }: React.HTMLAttributes<HTMLParagraphElement> & { ref?: React.RefObject<HTMLParagraphElement | null> }) {
+function FormDescription({ ref, className, ...props }: React.HTMLAttributes<HTMLParagraphElement> & { ref?: React.RefObject<HTMLParagraphElement> }) {
   const { formDescriptionId } = useFormField()
 
   return (
@@ -133,7 +133,7 @@ function FormDescription({ ref, className, ...props }: React.HTMLAttributes<HTML
 }
 FormDescription.displayName = 'FormDescription'
 
-function FormMessage({ ref, className, children, ...props }: React.HTMLAttributes<HTMLParagraphElement> & { ref?: React.RefObject<HTMLParagraphElement | null> }) {
+function FormMessage({ ref, className, children, ...props }: React.HTMLAttributes<HTMLParagraphElement> & { ref?: React.RefObject<HTMLParagraphElement> }) {
   const { error, formMessageId } = useFormField()
   const body = error ? String(error?.message) : children
 
@@ -162,5 +162,6 @@ export {
   FormItem,
   FormLabel,
   FormMessage,
+  // eslint-disable-next-line react-refresh/only-export-components
   useFormField,
 }
