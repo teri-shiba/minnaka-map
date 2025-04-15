@@ -1,0 +1,5 @@
+<p><%= t('.greeting', email: @resource.email) %></p>
+
+<p><%= t('.instruction') %></p>
+
+<p><%= link_to t('.action'), "#{Settings.front_domain}/?confirmation_token=#{@token}", target: :_blank, rel: "noopener noreferrer" %></p>
