@@ -1,8 +1,9 @@
 'use client'
+
+import Footer from '~/app/components/layout/Footer'
+import Header from '~/app/components/layout/Header'
+import { Toaster } from '~/app/components/ui/toasts/Toast'
 import useUser from '~/app/hooks/useUser'
-import { Toaster } from '../ui/toasts/Toast'
-import Footer from './Footer'
-import Header from './Header'
 
 export default function ClientAuthProvider({
   children,
