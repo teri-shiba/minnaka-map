@@ -42,7 +42,7 @@ class Api::V1::Auth::OmniauthCallbacksController < DeviseTokenAuth::OmniauthCall
       email_exists = resource_class.exists?(email: email)
 
       if is_new_sns_user && email_exists
-        error_message = "このメールアドレスは既に登録されています。"
+        error_message = "このメールアドレスは既に登録されています"
         redirect_to "#{Settings.front_domain}/?status=error&message=#{CGI.escape(error_message)}"
         return true
       end
