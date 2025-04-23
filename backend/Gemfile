@@ -31,7 +31,6 @@ gem "active_model_serializers"
 
 # SNS認証
 gem "omniauth-google-oauth2"
-gem "omniauth-line"
 
 group :development, :test do
   gem "factory_bot_rails"
