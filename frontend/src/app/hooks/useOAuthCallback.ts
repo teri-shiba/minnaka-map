@@ -7,11 +7,14 @@ export default function useOAuthCallback() {
   const router = useRouter()
   const params = useSearchParams()
   const [status, setStatus] = useState<string | null>(null)
-  const { fetchUser, logout } = useAuth()
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const { fetchUser, resetUserState } = useAuth()
 
   useEffect(() => {
     const currentStatus = params.get('status')
+    const message = params.get('message')
     setStatus(currentStatus)
+    setErrorMessage(message)
   }, [params])
 
   useEffect(() => {
@@ -24,12 +27,18 @@ export default function useOAuthCallback() {
         await fetchUser()
       }
       else if (status === 'error') {
-        toast.error('ログインに失敗しました')
-        await logout()
+        if (errorMessage) {
+          toast.error(decodeURIComponent(errorMessage))
+        }
+        else {
+          toast.error('ログインに失敗しました')
+        }
+
+        resetUserState()
       }
       else {
         toast.error('不正なアクセスです')
-        await logout()
+        resetUserState()
       }
 
       router.push('/')
@@ -37,5 +46,5 @@ export default function useOAuthCallback() {
 
     fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status])
+  }, [status, errorMessage])
 }

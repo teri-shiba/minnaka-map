@@ -143,6 +143,7 @@ export function useAuth() {
   }
 
   return {
+    resetUserState,
     signup,
     login,
     logout,
