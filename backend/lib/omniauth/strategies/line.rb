@@ -1,6 +1,6 @@
-# lib/omniauth/strategies/line.rb
 require "omniauth-oauth2"
 require "jwt"
+require "securerandom"
 
 module OmniAuth
   module Strategies
@@ -13,18 +13,19 @@ module OmniAuth
         token_url: "/oauth2/v2.1/token",
       }
 
-      # LINE専用のパラメータをデフォルトで設定
       option :authorize_options, [:scope, :prompt, :nonce]
       option :prompt, "consent"
 
       uid { raw_info["userId"] || raw_info["sub"] }
 
       info do
-        {
+        hash = {
           name: raw_info["displayName"],
           image: raw_info["pictureUrl"],
-          email: raw_info["email"],
         }
+
+        hash[:email] = raw_info["email"] if email_scope? && raw_info["email"]
+        hash
       end
 
       extra do
@@ -33,7 +34,14 @@ module OmniAuth
         }
       end
 
-      # client_idとclient_secretを文字列に変換する
+      def callback_phase
+        if request.params["code"].nil?
+          fail!("authorization_code_missing")
+        else
+          super
+        end
+      end
+
       def client
         ::OAuth2::Client.new(
           options.client_id.to_s,
@@ -43,19 +51,24 @@ module OmniAuth
       end
 
       def raw_info
-        @raw_info ||= access_token.get("v2/profile", headers: { "Authorization" => "Bearer #{access_token.token}" }).parsed
+        @raw_info ||= begin
+          profile = access_token.get(
+            "v2/profile",
+            headers: { "Authorization" => "Bearer #{access_token.token}" },
+          ).parsed
 
-        # メールアドレスをid_tokenから取得
-        if options[:scope].include?("email")
-          id_token = access_token.params["id_token"]
-          if id_token
-            id_token_info = JWT.decode(id_token, nil, false)[0]
-            @raw_info["email"] = id_token_info["email"]
-            @raw_info["sub"] = id_token_info["sub"]
+          if (id_token = access_token.params["id_token"])
+            begin
+              id_info = JWT.decode(id_token, nil, false).first
+              profile["sub"] = id_info["sub"] if id_info["sub"]
+              profile["email"] = id_info["email"] if id_info["email"]
+            rescue JWT::DecodeError => e
+              warn "[OmniAuth::Line] JWT decode failed: #{e.message}"
+              profile.delete("email") if email_scope?
+            end
           end
+          profile
         end
-
-        @raw_info
       end
 
       def callback_url
@@ -64,10 +77,19 @@ module OmniAuth
 
       private
 
+        def auth_hash
+          OmniAuth.config.mock_auth[:line] || super
+        end
+
         def authorize_params
           super.tap do |params|
             params[:nonce] = SecureRandom.uuid
           end
+        end
+
+        def email_scope?
+          scopes = (options[:scope] || options.scope || "").to_s.split
+          scopes.include?("email")
         end
     end
   end
