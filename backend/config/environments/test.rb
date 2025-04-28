@@ -5,8 +5,25 @@ require "active_support/core_ext/integer/time"
 # your test database is "scratch space" for the test suite and is wiped
 # and recreated between test runs. Don't rely on the data there!
 
+module PathsUnfreezer
+  def self.unfreeze_paths(object)
+    object.instance_variables.each do |var|
+      value = object.instance_variable_get(var)
+      if value.is_a?(Array) && value.frozen?
+        object.instance_variable_set(var, value.dup)
+      end
+    end
+  end
+end
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
+
+  # アプリケーション初期化前に実行
+  config.before_initialize do
+    # autoload_pathsの凍結を解除するモンキーパッチ
+    PathsUnfreezer.unfreeze_paths(Rails.configuration)
+  end
 
   # While tests run files are not watched, reloading is not necessary.
   config.enable_reloading = false
