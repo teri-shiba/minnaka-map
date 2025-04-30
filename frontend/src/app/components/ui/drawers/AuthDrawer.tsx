@@ -1,15 +1,14 @@
 'use client'
 import Image from 'next/image'
 
-import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 import * as React from 'react'
-import Google from '~/public/icon_google.svg'
-import Line from '~/public/icon_line.svg'
+import { authProviders } from '~/app/lib/authConstants'
 import logoMark from '~/public/logo_mark.webp'
 import { Button } from '../buttons/Button'
-
-import AuthForm from '../forms/LoginForm'
+import LoginForm from '../forms/LoginForm'
+import SignUpForm from '../forms/SignUpForm'
 import {
   Drawer,
   DrawerContent,
@@ -20,6 +19,12 @@ import {
 
 export function AuthDrawer() {
   const [open, setOpen] = useState(false)
+  const [isLogin, setIsLogin] = useState(true)
+  const baseApiURL = process.env.NEXT_PUBLIC_API_BASE_URL
+
+  const handleClick = () => {
+    setIsLogin(!isLogin)
+  }
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
@@ -36,34 +41,39 @@ export function AuthDrawer() {
                 width={24}
                 height={24}
               />
-              <h2>ログイン</h2>
+              <h2>
+                {isLogin ? 'ログイン' : '新規会員登録'}
+              </h2>
             </div>
           </DrawerTitle>
         </DrawerHeader>
-        <AuthForm />
+        {isLogin
+          ? <LoginForm onSuccess={() => setOpen(false)} />
+          : <SignUpForm onSuccess={() => setOpen(false)} />}
         <div className="mt-4 grid items-start gap-4">
           <p className="relative mx-5 text-center text-sm text-gray-500 before:absolute before:left-0 before:top-1/2 before:-z-10 before:h-px before:w-full before:bg-gray-300">
             <span className="inline-block bg-white px-4">OR</span>
           </p>
-          <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" className="h-auto py-3 [&_svg]:size-6" aria-label="Google">
-              <Google
-                width={24}
-                height={24}
-                fill="none"
-                style={{ display: 'block' }}
-              />
-            </Button>
-            <Button variant="outline" className="h-auto py-3 [&_svg]:size-6" aria-label="LINE">
-              <Line
-                width={24}
-                height={24}
-                fill="none"
-                style={{ display: 'block' }}
-              />
-            </Button>
+          <div className="flex gap-3 max-[383px]:block">
+            {authProviders.map(provider => (
+              <a
+                key={provider.name}
+                href={`${baseApiURL}/provider/${provider.authUrl}`}
+                className="flex h-auto w-full items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent max-[383px]:[&:not(:last-child)]:mb-3"
+              >
+                <Image
+                  src={provider.iconImg}
+                  width={18}
+                  height={18}
+                  alt=""
+                />
+                {isLogin ? `${provider.name}でログイン` : `${provider.name}で登録`}
+              </a>
+            ))}
           </div>
-          <Link href="#" className="mx-auto inline-block text-sm hover:text-blue-500 hover:underline">新規会員登録はこちら</Link>
+          <Button onClick={handleClick} className="mx-auto my-4 inline-block h-auto !bg-transparent py-0 text-sm font-normal text-foreground hover:text-blue-500 hover:underline">
+            {isLogin ? '新規会員登録はこちら' : 'ログインはこちら'}
+          </Button>
         </div>
       </DrawerContent>
     </Drawer>
