@@ -1,10 +1,10 @@
 'use client'
+import type { AreaFormValues } from '~/app/types'
 import { zodResolver } from '@hookform/resolvers/zod'
+
 import { useFieldArray, useForm } from 'react-hook-form'
 
 import { areaFormSchema } from '~/app/lib/shemas/areaSearchSchema'
-
-import type { AreaFormValues } from '~/app/types'
 import { Button } from '~/components/ui/buttons/Button'
 
 import { Input } from '~/components/ui/forms/Input'
