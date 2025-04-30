@@ -1,30 +1,44 @@
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useAuth } from './useAuth'
 
 export default function useOAuthCallback() {
   const router = useRouter()
   const params = useSearchParams()
-  const currentStatus = params.get('status')
-  const { fetchUser, logout } = useAuth()
+  const [status, setStatus] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const { fetchUser, resetUserState } = useAuth()
 
   useEffect(() => {
-    if (!currentStatus)
+    const currentStatus = params.get('status')
+    const message = params.get('message')
+    setStatus(currentStatus)
+    setErrorMessage(message)
+  }, [params])
+
+  useEffect(() => {
+    if (!status)
       return
 
     const fetchData = async () => {
-      if (currentStatus === 'success') {
+      if (status === 'success') {
         toast.success('ログインに成功しました')
         await fetchUser()
       }
-      else if (currentStatus === 'error') {
-        toast.error('ログインに失敗しました')
-        await logout()
+      else if (status === 'error') {
+        if (errorMessage) {
+          toast.error(decodeURIComponent(errorMessage))
+        }
+        else {
+          toast.error('ログインに失敗しました')
+        }
+
+        resetUserState()
       }
       else {
         toast.error('不正なアクセスです')
-        await logout()
+        resetUserState()
       }
 
       router.push('/')
@@ -32,5 +46,5 @@ export default function useOAuthCallback() {
 
     fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStatus])
+  }, [status, errorMessage])
 }

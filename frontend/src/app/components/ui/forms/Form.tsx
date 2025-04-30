@@ -38,9 +38,9 @@ function FormField<
 }: ControllerProps<TFieldValues, TName>) {
   const value = useMemo(() => ({ name: props.name }), [props.name])
   return (
-    <FormFieldContext value={value}>
+    <FormFieldContext.Provider value={value}>
       <Controller {...props} />
-    </FormFieldContext>
+    </FormFieldContext.Provider>
   )
 }
 
@@ -79,14 +79,14 @@ function FormItem({ ref, className, ...props }: React.HTMLAttributes<HTMLDivElem
   const id = React.useId()
   const value = useMemo(() => ({ id }), [id])
   return (
-    <FormItemContext value={value}>
+    <FormItemContext.Provider value={value}>
       <div ref={ref} className={cn('space-y-2', className)} {...props} />
-    </FormItemContext>
+    </FormItemContext.Provider>
   )
 }
 FormItem.displayName = 'FormItem'
 
-function FormLabel({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & { ref?: React.RefObject<HTMLLabelElement> }) {
+function FormLabel({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & { ref?: React.RefObject<React.ElementRef<typeof LabelPrimitive.Root> > }) {
   const { error, formItemId } = useFormField()
 
   return (
@@ -100,7 +100,7 @@ function FormLabel({ ref, className, ...props }: React.ComponentPropsWithoutRef<
 }
 FormLabel.displayName = 'FormLabel'
 
-function FormControl({ ref, ...props }: React.ComponentPropsWithoutRef<typeof Slot> & { ref?: React.RefObject<HTMLElement> }) {
+function FormControl({ ref, ...props }: React.ComponentPropsWithoutRef<typeof Slot> & { ref?: React.RefObject<React.ElementRef<typeof Slot>> }) {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
 
   return (
