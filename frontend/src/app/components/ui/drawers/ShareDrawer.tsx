@@ -1,10 +1,10 @@
 'use client'
 import Image from 'next/image'
 import { useState } from 'react'
-import * as React from 'react'
 import { FiShare } from 'react-icons/fi'
 import { IoMail } from 'react-icons/io5'
-import Line from '~/public/line.svg'
+import Line from '~/public/icon_line.svg'
+import logo from '~/public/logo.webp'
 import { Button } from '../buttons/Button'
 
 import {
@@ -33,10 +33,10 @@ export function ShareDrawer() {
         <DrawerHeader>
           <DrawerTitle className="mx-auto">
             <Image
-              src="logo.svg"
+              src={logo}
               alt="minnaka map"
-              width={230}
-              height={52}
+              width={224}
+              height={28}
             />
           </DrawerTitle>
           <DialogDescription className="text-center">

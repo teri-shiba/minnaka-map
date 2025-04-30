@@ -1,5 +1,6 @@
+import Image from 'next/image'
 import Link from 'next/link'
-import Logo from '~/public/logo.svg'
+import logo from '~/public/logo.webp'
 
 interface NavItemProps {
   title: string
@@ -15,21 +16,23 @@ const NAV_ITEMS: NavItemProps[] = [
 export default function Footer() {
   return (
     <footer className="bg-background">
-      <div className="mx-auto px-5 py-6 xl:container sm:px-6">
-        <div className="flex flex-col items-center justify-between sm:flex-row">
+      <div className="mx-auto max-w-screen-lg px-5 py-6">
+        <div className="flex flex-col items-center justify-between md:flex-row">
           <Link href="/" className="flex items-center space-x-2">
-            <Logo
-              width={220}
-              height={35}
-              style={{ display: 'block' }}
+            <Image
+              alt="minnaka map"
+              src={logo}
+              width={224}
+              height={28}
+              className="block"
             />
           </Link>
           <nav>
-            <ul className="flex flex-wrap justify-center space-x-4 sm:justify-end sm:space-x-6">
+            <ul className="mt-3 flex flex-wrap justify-center md:mt-0 md:justify-end">
               {NAV_ITEMS.map((item) => {
                 return (
-                  <li key={item.href}>
-                    <Link href={item.href} className="text-xs text-muted-foreground transition-colors hover:text-primary sm:text-sm">
+                  <li key={item.href} className="text-center md:text-left">
+                    <Link href={item.href} className="p-2 text-xs text-muted-foreground transition-colors hover:text-primary md:px-4 md:py-2 md:text-sm">
                       {item.title}
                     </Link>
                   </li>

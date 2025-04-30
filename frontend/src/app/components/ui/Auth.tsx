@@ -1,6 +1,5 @@
 'use client'
 
-import * as React from 'react'
 import { useMediaQuery } from '~/app/hooks/useMediaQuery'
 import { AuthDialog } from './dialogs/AuthDialog'
 

@@ -1,10 +1,8 @@
 'use client'
-
 import Image from 'next/image'
 import { useState } from 'react'
-import * as React from 'react'
 import { authProviders } from '~/app/lib/authConstants'
-import Mark from '~/public/mark.svg'
+import logoMark from '~/public/logo_mark.webp'
 import { Button } from '../buttons/Button'
 import LoginForm from '../forms/LoginForm'
 import SignUpForm from '../forms/SignUpForm'
@@ -34,9 +32,11 @@ export function AuthDrawer() {
         <DrawerHeader>
           <DrawerTitle className="mx-auto">
             <div className="flex items-center gap-2 py-1">
-              <Mark
-                width={22}
-                height={22}
+              <Image
+                alt="mark"
+                src={logoMark}
+                width={24}
+                height={24}
               />
               <h2>
                 {isLogin ? 'ログイン' : '新規会員登録'}
