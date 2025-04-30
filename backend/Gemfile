@@ -31,7 +31,6 @@ gem "active_model_serializers"
 
 # SNS認証
 gem "omniauth-google-oauth2"
-gem "omniauth-line"
 
 # かな・ローマ字追加
 gem "miyabi"
@@ -47,4 +46,5 @@ group :development, :test do
   gem "rubocop-faker"
   gem "rubocop-rails"
   gem "rubocop-rspec"
+  gem "shoulda-matchers", "~> 6.0"
 end

@@ -14,7 +14,7 @@ const DialogPortal = DialogPrimitive.Portal
 
 const DialogClose = DialogPrimitive.Close
 
-function DialogOverlay({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> & { ref?: React.RefObject<HTMLDivElement> }) {
+function DialogOverlay({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> & { ref?: React.RefObject<React.ElementRef<typeof DialogPrimitive.Overlay>> }) {
   return (
     <DialogPrimitive.Overlay
       ref={ref}
@@ -28,7 +28,7 @@ function DialogOverlay({ ref, className, ...props }: React.ComponentPropsWithout
 }
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
-function DialogContent({ ref, className, children, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { ref?: React.RefObject<HTMLDivElement> }) {
+function DialogContent({ ref, className, children, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { ref?: React.RefObject<React.ElementRef<typeof DialogPrimitive.Content>> }) {
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -83,7 +83,7 @@ function DialogFooter({
 }
 DialogFooter.displayName = 'DialogFooter'
 
-function DialogTitle({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title> & { ref?: React.RefObject<HTMLHeadingElement> }) {
+function DialogTitle({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title> & { ref?: React.RefObject<React.ElementRef<typeof DialogPrimitive.Title>> }) {
   return (
     <DialogPrimitive.Title
       ref={ref}
@@ -97,7 +97,7 @@ function DialogTitle({ ref, className, ...props }: React.ComponentPropsWithoutRe
 }
 DialogTitle.displayName = DialogPrimitive.Title.displayName
 
-function DialogDescription({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description> & { ref?: React.RefObject<HTMLParagraphElement> }) {
+function DialogDescription({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description> & { ref?: React.RefObject<React.ElementRef<typeof DialogPrimitive.Description>> }) {
   return (
     <DialogPrimitive.Description
       ref={ref}
