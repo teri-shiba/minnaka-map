@@ -1,8 +1,9 @@
 import Link from 'next/link'
+import { Section } from '../../components/layout/Section'
 
 export default function Terms() {
   return (
-    <div className="mx-auto max-w-screen-lg px-5">
+    <Section>
       <h1 className="py-6 text-center sm:py-11">利用規約</h1>
       <p>
         この利用規約（以下「本規約」といいます。）は、
@@ -139,6 +140,6 @@ export default function Terms() {
         </li>
         <li className="my-2">本サービスに関して紛争が生じた場合には、千葉地方裁判所を専属的合意管轄とします。</li>
       </ol>
-    </div>
+    </Section>
   )
 }
