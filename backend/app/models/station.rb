@@ -1,5 +1,5 @@
 class Station < ApplicationRecord
-  belongs_to :operator, optional: true
+  belongs_to :operator
 
   validates :name, presence: true
   validates :latitude, presence: true
