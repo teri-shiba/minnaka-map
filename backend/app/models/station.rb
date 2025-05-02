@@ -6,7 +6,11 @@ class Station < ApplicationRecord
   validates :longitude, presence: true
 
   scope :search_by_name, ->(query) {
-    where("name ILIKE :q OR name_hiragana ILIKE :q OR name_romaji ILIKE :q", q: "#{query}%")
+    where("name ILIKE :q OR name_hiragana ILIKE :q OR name_romaji ILIKE :q", q: "#{query}%").
+      order(
+        Arel.sql("CASE WHEN name = '#{ActiveRecord::Base.connection.quote_string(query)}' THEN 0 ELSE 1 END"),
+        Arel.sql("LENGTH(name) ASC"),
+      )
   }
 
   def display_name
