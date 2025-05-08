@@ -6,7 +6,7 @@ class Station < ApplicationRecord
   validates :name_hiragana, presence: true
   validates :name_romaji, presence: true
   validates :group_code, presence: true
-  validates :name, uniqueness: { scope: :group_code }
+  validates :name, uniqueness: { scope: :group_code, case_sensitive: false }
 
   scope :search_by_name, ->(query) {
     where("name ILIKE :q OR name_hiragana ILIKE :q OR name_romaji ILIKE :q", q: "#{query}%").
