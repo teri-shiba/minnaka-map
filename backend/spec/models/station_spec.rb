@@ -118,6 +118,15 @@ RSpec.describe Station, type: :model do
         expect(results).to be_empty
       end
     end
+
+    context "検索結果のソート順" do
+      before { create_matsudo_stations }
+
+      it "完全一致を優先し、次に名前の長さで並べること" do
+        results = Station.search_by_name("松戸")
+        expect(results.map(&:name)).to eq(["松戸", "松戸新田"])
+      end
+    end
   end
 
   describe "検索時の表示名" do
