@@ -1,14 +1,14 @@
 'use client'
 import Image from 'next/image'
 
+import { Section } from '~/components/layout/Section'
+
 import { DesktopGuideCarousel } from '~/components/ui/carousels/DesktopGuideCarousel'
 import { MobileGuideCarousel } from '~/components/ui/carousels/MobileGuideCarousel'
-
+import useConfirmEmail from '~/hooks/useConfirmEmail'
+import useOAuthCallback from '~/hooks/useOAuthCallback'
 import { images } from '~/lib/image/images'
-import { Section } from './components/layout/Section'
-import { AreaSearchForm } from './components/ui/forms/AreaSearchForm'
-import useConfirmEmail from './hooks/useConfirmEmail'
-import useOAuthCallback from './hooks/useOAuthCallback'
+import StetionSearchForm from '../components/ui/forms/StationSearchForm'
 
 export default function Home() {
   useOAuthCallback()
@@ -31,7 +31,7 @@ export default function Home() {
           </h2>
 
           <div className="order-3 md:col-span-1 md:row-span-1">
-            <AreaSearchForm />
+            <StetionSearchForm />
           </div>
 
           <div className="order-2 mx-auto md:order-1 md:col-span-1 md:row-span-2">

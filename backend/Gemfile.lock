@@ -166,6 +166,8 @@ GEM
     method_source (1.1.0)
     mini_mime (1.1.5)
     minitest (5.25.4)
+    miyabi (0.3.1)
+      nokogiri (~> 1.14)
     msgpack (1.7.5)
     multi_xml (0.7.1)
       bigdecimal (~> 3.1)
@@ -376,6 +378,7 @@ DEPENDENCIES
   factory_bot_rails
   faker
   letter_opener_web
+  miyabi
   omniauth-google-oauth2
   pg (~> 1.1)
   pry-byebug
