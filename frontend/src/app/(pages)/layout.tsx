@@ -18,8 +18,6 @@ export default async function RootLayout({
         <ClientAuthProvider>
           {children}
         </ClientAuthProvider>
-        {/* <div className="mx-auto max-w-screen-lg px-5">
-        </div> */}
       </body>
     </html>
   )
