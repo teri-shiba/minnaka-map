@@ -6,7 +6,7 @@ import type { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { useAuth } from '~/app/hooks/useAuth'
-import { loginSchema } from '~/app/lib/shemas/loginSchema'
+import { loginSchema } from '~/app/lib/schemas/loginSchema'
 import { Button } from '../buttons/Button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from './Form'
 import { Input } from './Input'
@@ -26,6 +26,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
     },
   })
 
+  // TODO: RSCのfetchを使えないか検討する
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
       await login({ email: data.email, password: data.password })

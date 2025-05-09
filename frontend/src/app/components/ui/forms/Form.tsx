@@ -38,9 +38,9 @@ function FormField<
 }: ControllerProps<TFieldValues, TName>) {
   const value = useMemo(() => ({ name: props.name }), [props.name])
   return (
-    <FormFieldContext.Provider value={value}>
+    <FormFieldContext value={value}>
       <Controller {...props} />
-    </FormFieldContext.Provider>
+    </FormFieldContext>
   )
 }
 
@@ -79,14 +79,14 @@ function FormItem({ ref, className, ...props }: React.HTMLAttributes<HTMLDivElem
   const id = React.useId()
   const value = useMemo(() => ({ id }), [id])
   return (
-    <FormItemContext.Provider value={value}>
+    <FormItemContext value={value}>
       <div ref={ref} className={cn('space-y-2', className)} {...props} />
-    </FormItemContext.Provider>
+    </FormItemContext>
   )
 }
 FormItem.displayName = 'FormItem'
 
-function FormLabel({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & { ref?: React.RefObject<React.ElementRef<typeof LabelPrimitive.Root> > }) {
+function FormLabel({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & { ref?: React.RefObject<React.ElementRef<typeof LabelPrimitive.Root>> }) {
   const { error, formItemId } = useFormField()
 
   return (
