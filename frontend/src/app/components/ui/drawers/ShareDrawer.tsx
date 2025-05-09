@@ -1,7 +1,6 @@
 'use client'
 import Image from 'next/image'
 import { useState } from 'react'
-import * as React from 'react'
 import { FiShare } from 'react-icons/fi'
 import { IoMail } from 'react-icons/io5'
 import Line from '~/public/icon_line.svg'

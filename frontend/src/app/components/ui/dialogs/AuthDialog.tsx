@@ -1,11 +1,7 @@
 'use client'
 import Image from 'next/image'
-
 import { useState } from 'react'
-import * as React from 'react'
-
-import Google from '~/public/icon_google.svg'
-import Line from '~/public/icon_line.svg'
+import { authProviders } from '~/app/lib/authConstants'
 import logoMark from '~/public/logo_mark.webp'
 import { Button } from '../buttons/Button'
 import LoginForm from '../forms/LoginForm'
@@ -55,24 +51,21 @@ export function AuthDialog() {
           <span className="inline-block bg-white px-4">OR</span>
         </p>
         <div className="grid grid-cols-2 gap-3">
-          <a href={`${baseApiURL}/auth/google_oauth2`} className="flex h-auto items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent [&_svg]:size-6">
-            <Google
-              width={24}
-              height={24}
-              fill="none"
-              className="block"
-            />
-            {isLogin ? 'Googleでログイン' : 'Googleで登録'}
-          </a>
-          <a href={`${baseApiURL}/auth/line`} className="flex h-auto items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent [&_svg]:size-6">
-            <Line
-              width={24}
-              height={24}
-              fill="none"
-              className="block"
-            />
-            {isLogin ? 'LINEでログイン' : 'LINEで登録'}
-          </a>
+          {authProviders.map(provider => (
+            <a
+              key={provider.name}
+              href={`${baseApiURL}/auth/${provider.authUrl}`}
+              className="flex h-auto items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent"
+            >
+              <Image
+                src={provider.iconImg}
+                width={24}
+                height={24}
+                alt=""
+              />
+              {isLogin ? `${provider.name}でログイン` : `${provider.name}で登録`}
+            </a>
+          ))}
         </div>
         <Button onClick={handleClick} className="mx-auto my-4 inline-block h-auto !bg-transparent py-0 text-sm font-bold text-foreground hover:text-blue-500 hover:underline">
           {isLogin ? '新規会員登録はこちら' : 'ログインはこちら'}

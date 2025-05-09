@@ -1,29 +1,16 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
-import { useCallback, useEffect, useState } from 'react'
-import { useAutoplay } from '~/app/hooks/useAutoplay'
+import { useCarousel } from '~/app/hooks/useCarousel'
 import { carouselData } from '~/app/lib/data/carouselData'
 import { images } from '~/lib/image/images'
 import { Section } from '../../layout/Section'
 
 export function DesktopGuideCarousel() {
-  const [activeStep, setActiveStep] = useState(1)
-  const [isPlaying, setIsPlaying] = useState(true)
-  useAutoplay({ isPlaying, activeStep, setActiveStep, carouselData })
-
-  const startSequenceFrom = (stepId: number) => {
-    setActiveStep(stepId)
-    setIsPlaying(true)
-  }
-
-  const startAutoPlay = useCallback(() => {
-    setIsPlaying(true)
-    setActiveStep(1)
-  }, [])
-
-  useEffect(() => {
-    startAutoPlay()
-  }, [startAutoPlay])
+  const { activeStep, startSequenceFrom } = useCarousel(carouselData, {
+    initialStep: 1,
+    autoPlay: true,
+    interval: 3000,
+  })
 
   return (
     <Section className="relative mb-24 hidden md:block">
