@@ -64,7 +64,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
                 英数字と記号を含む8文字以上
               </FormDescription>
               <FormControl>
-                <Input {...field} />
+                <Input type="password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
