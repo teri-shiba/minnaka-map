@@ -81,7 +81,7 @@ export default function SignUpForm({ onSuccess }: LoginFormProps) {
                 英数字と記号を含む8文字以上
               </FormDescription>
               <FormControl>
-                <Input {...field} />
+                <Input type="password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -94,7 +94,7 @@ export default function SignUpForm({ onSuccess }: LoginFormProps) {
             <FormItem>
               <FormLabel className="font-bold">パスワード（確認用）</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input type="password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
