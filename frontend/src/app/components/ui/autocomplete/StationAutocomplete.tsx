@@ -81,21 +81,12 @@ export default function StationAutocomplete({
     )
   }, [stations, recentStations, excludedStationNames])
 
-  const showSuggestions
-  = isFocused
-    && !isSelected
-    && (filteredStations.length > 0 || matchedRecent.length > 0)
-
   return (
     <div>
       <Command
         className="relative overflow-visible focus-within:border-primary"
         shouldFilter={false}
         role="combobox"
-        aria-expanded={showSuggestions}
-        aria-owns="autocomplete-list"
-        aria-haspopup="listbox"
-        aria-label="駅入力オートコンプリート"
       >
         <CommandInput
           value={value}
@@ -106,7 +97,7 @@ export default function StationAutocomplete({
           className="h-12"
         />
 
-        {isFocused && (
+        {(isFocused && !isSelected) && (
           <StationSuggestions
             isLoading={isLoading}
             isError={isError}
