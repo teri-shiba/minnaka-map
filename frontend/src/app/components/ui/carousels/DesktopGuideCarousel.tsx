@@ -46,6 +46,7 @@ export function DesktopGuideCarousel() {
                 src={carouselData.find(data => data.id === activeStep)?.imageUrl || ''}
                 width={280}
                 height={560}
+                priority
                 className="rounded-lg"
               />
             </motion.div>

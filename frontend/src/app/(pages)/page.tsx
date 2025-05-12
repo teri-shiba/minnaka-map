@@ -24,7 +24,7 @@ export default function Home() {
               alt="minnaka map"
               src={images.logo}
               width={224}
-              height={28}
+              height={29}
               priority
               className="block"
             />
@@ -39,7 +39,7 @@ export default function Home() {
               alt="mv-pc"
               src={images.mvPC}
               width={424}
-              height={536}
+              height={533}
               priority
               className="hidden md:block"
             />
@@ -60,10 +60,10 @@ export default function Home() {
         <Image
           alt=""
           src={images.wavePC}
-          width={1280}
+          width={1245}
           height={96}
           priority
-          className="hidden h-24 w-full md:block"
+          className="hidden w-full md:block"
         />
         <Image
           alt=""
@@ -96,7 +96,7 @@ export default function Home() {
               alt="featureFriends"
               src={images.featureFriends}
               width={170}
-              height={150}
+              height={149}
               className="mb-4"
             />
             <h3 className="mb-2 text-lg text-secondary-foreground">友人との集まりに</h3>
@@ -113,7 +113,7 @@ export default function Home() {
               alt="featureDate"
               src={images.featureDate}
               width={170}
-              height={150}
+              height={148}
               className="mb-4"
             />
             <h3 className="mb-2 text-lg text-secondary-foreground">デートの場所選びに</h3>
@@ -130,7 +130,7 @@ export default function Home() {
               alt="featureBusiness"
               src={images.featureBusiness}
               width={170}
-              height={150}
+              height={149}
               className="mb-4"
             />
             <h3 className="mb-2 text-lg text-secondary-foreground">ミーティングの場所設定に</h3>
