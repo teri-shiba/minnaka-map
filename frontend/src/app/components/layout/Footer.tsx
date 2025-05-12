@@ -23,7 +23,7 @@ export default function Footer() {
               alt="minnaka map"
               src={logo}
               width={224}
-              height={28}
+              height={29}
               className="block"
             />
           </Link>
