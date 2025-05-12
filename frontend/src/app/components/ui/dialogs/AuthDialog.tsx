@@ -1,14 +1,11 @@
 'use client'
-
 import Image from 'next/image'
-import Link from 'next/link'
 import { useState } from 'react'
-import * as React from 'react'
-import Google from '~/public/google.svg'
-import Line from '~/public/line.svg'
+import { authProviders } from '~/app/lib/authConstants'
+import logoMark from '~/public/logo_mark.webp'
 import { Button } from '../buttons/Button'
-
-import AuthForm from '../forms/AuthForm'
+import LoginForm from '../forms/LoginForm'
+import SignUpForm from '../forms/SignUpForm'
 import {
   Dialog,
   DialogContent,
@@ -19,6 +16,12 @@ import {
 
 export function AuthDialog() {
   const [open, setOpen] = useState(false)
+  const [isLogin, setIsLogin] = useState(true)
+  const baseApiURL = process.env.NEXT_PUBLIC_API_BASE_URL
+
+  const handleClick = () => {
+    setIsLogin(!isLogin)
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -28,37 +31,45 @@ export function AuthDialog() {
       <DialogContent className="sm:max-w-[470px]">
         <DialogHeader>
           <DialogTitle className="mx-auto">
-            <Image
-              src="logo.svg"
-              alt="minnaka map"
-              width={230}
-              height={52}
-            />
+            <div className="flex items-center gap-2 py-2">
+              <Image
+                alt="mark"
+                src={logoMark}
+                width={24}
+                height={24}
+              />
+              <h2>
+                {isLogin ? 'ログイン' : '新規会員登録'}
+              </h2>
+            </div>
           </DialogTitle>
         </DialogHeader>
-        <AuthForm />
-        <p className="text-sm text-gray-500 text-center relative before:absolute before:top-1/2 before:left-0 before:w-full before:h-[1px] before:bg-gray-300 before:-z-10">
+        {isLogin
+          ? <LoginForm onSuccess={() => setOpen(false)} />
+          : <SignUpForm onSuccess={() => setOpen(false)} />}
+        <p className="relative text-center text-sm text-gray-500 before:absolute before:left-0 before:top-1/2 before:-z-10 before:h-px before:w-full before:bg-gray-300">
           <span className="inline-block bg-white px-4">OR</span>
         </p>
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" className="h-auto [&_svg]:size-6 py-3" aria-label="Google">
-            <Google
-              width={24}
-              height={24}
-              fill="none"
-              style={{ display: 'block' }}
-            />
-          </Button>
-          <Button variant="outline" className="h-auto [&_svg]:size-6 py-3" aria-label="LINE">
-            <Line
-              width={24}
-              height={24}
-              fill="none"
-              style={{ display: 'block' }}
-            />
-          </Button>
+          {authProviders.map(provider => (
+            <a
+              key={provider.name}
+              href={`${baseApiURL}/auth/${provider.authUrl}`}
+              className="flex h-auto items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent"
+            >
+              <Image
+                src={provider.iconImg}
+                width={24}
+                height={24}
+                alt=""
+              />
+              {isLogin ? `${provider.name}でログイン` : `${provider.name}で登録`}
+            </a>
+          ))}
         </div>
-        <Link href="#" className="inline-block mx-auto text-sm hover:text-blue-500 hover:underline">新規会員登録はこちら</Link>
+        <Button onClick={handleClick} className="mx-auto my-4 inline-block h-auto !bg-transparent py-0 text-sm font-bold text-foreground hover:text-blue-500 hover:underline">
+          {isLogin ? '新規会員登録はこちら' : 'ログインはこちら'}
+        </Button>
       </DialogContent>
     </Dialog>
   )

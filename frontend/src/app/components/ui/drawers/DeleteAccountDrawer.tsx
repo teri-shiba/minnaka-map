@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import * as React from 'react'
 import { Button } from '../buttons/Button'
 
 import {
@@ -23,7 +22,7 @@ export function DeleteAccountDrawer() {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="destructive" className="bg-white text-destructive border border-destructive">退会する</Button>
+        <Button variant="destructive" className="border border-destructive bg-white text-destructive">退会する</Button>
       </DrawerTrigger>
       <DrawerContent className="mb-8">
         <DrawerHeader className="flex flex-col space-y-2">

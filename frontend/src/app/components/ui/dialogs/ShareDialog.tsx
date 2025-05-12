@@ -2,10 +2,10 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
-import * as React from 'react'
 import { FiShare } from 'react-icons/fi'
 import { IoMail } from 'react-icons/io5'
-import Line from '~/public/line.svg'
+import Line from '~/public/icon_line.svg'
+import logo from '~/public/logo.webp'
 import { Button } from '../buttons/Button'
 
 import {
@@ -31,10 +31,10 @@ export function ShareDialog() {
         <DialogHeader>
           <DialogTitle className="mx-auto">
             <Image
-              src="logo.svg"
+              src={logo}
               alt="minnaka map"
-              width={230}
-              height={52}
+              width={224}
+              height={28}
             />
           </DialogTitle>
           <DialogDescription className="text-center">
@@ -42,7 +42,7 @@ export function ShareDialog() {
           </DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" className="flex items-center h-auto [&_svg]:size-6 py-3">
+          <Button variant="outline" className="flex h-auto items-center py-3 [&_svg]:size-6">
             <Line
               width={18}
               height={18}
@@ -51,7 +51,7 @@ export function ShareDialog() {
             />
             <span>LINEでシェア</span>
           </Button>
-          <Button variant="outline" className="flex items-center h-auto [&_svg]:size-6 py-3">
+          <Button variant="outline" className="flex h-auto items-center py-3 [&_svg]:size-6">
             <IoMail
               width={18}
               height={18}
