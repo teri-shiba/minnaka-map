@@ -40,7 +40,7 @@ export default function Header() {
             width={224}
             height={29}
             priority
-            className="hidden md:block h-auto"
+            className="hidden md:block"
           />
           <Image
             aria-label="Go to Home"
@@ -49,7 +49,7 @@ export default function Header() {
             width={28}
             height={28}
             priority
-            className="block md:hidden h-auto"
+            className="block md:hidden"
           />
         </Link>
         {userStatusUI}
