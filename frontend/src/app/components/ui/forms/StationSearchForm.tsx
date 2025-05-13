@@ -19,7 +19,10 @@ export default function StetionSearchForm() {
     resolver: zodResolver(areaFormSchema),
     defaultValues: {
       // TODO: データの返り値に緯度経度を含めること（現在: value.area.areaValue）
-      area: [{ areaValue: '' }, { areaValue: '' }],
+      area: [
+        { areaValue: '', latitude: null, longitude: null },
+        { areaValue: '', latitude: null, longitude: null },
+      ],
     },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
@@ -36,7 +39,11 @@ export default function StetionSearchForm() {
     try {
       // TODO: データの返り値に緯度経度を含めること（現在: value.area.areaValue）
       // TODO: 確認用・あとで削除する
-      toast.success(`検索条件を送信しました: ${value}`)
+      console.log('送信データ:', JSON.stringify(value, null, 2))
+
+      value.area.forEach((station, index) => {
+        console.log(`駅${index + 1}:`, station.areaValue, `(緯度:${station.latitude}, 経度:${station.longitude})`)
+      })
     }
     catch (e) {
       console.error('フォーム送信エラー:', e)
@@ -96,7 +103,11 @@ export default function StetionSearchForm() {
                         <StationAutocomplete
                           {...field}
                           value={field.value}
-                          onChange={field.onChange}
+                          onChange={(value, latitude, longitude) => {
+                            field.onChange(value)
+                            form.setValue(`area.${index}.latitude`, Number(latitude))
+                            form.setValue(`area.${index}.longitude`, Number(longitude))
+                          }}
                           placeholder={`${index + 1}人目の出発駅`}
                           excludedStations={excludedStations}
                         />

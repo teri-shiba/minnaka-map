@@ -4,6 +4,8 @@ export const areaFormSchema = z.object({
   area: z.array(
     z.object({
       areaValue: z.string().trim().min(1, '出発地点を入力してください'),
+      latitude: z.number().nullable(),
+      longitude: z.number().nullable(),
     }),
   )
     .refine(areas => areas.filter(a => a.areaValue.trim() !== '').length >= 2, {
