@@ -14,7 +14,7 @@ import { Form, FormControl, FormField, FormItem } from './Form'
 const MAX_AREA_FIELDS = 6
 const MAX_REQUIRED_FIELDS = 2
 
-export default function StetionSearchForm() {
+export default function StationSearchForm() {
   const form = useForm<AreaFormValues>({
     resolver: zodResolver(areaFormSchema),
     defaultValues: {
@@ -25,7 +25,7 @@ export default function StetionSearchForm() {
       ],
     },
     mode: 'onSubmit',
-    reValidateMode: 'onChange',
+    reValidateMode: 'onSubmit',
   })
 
   const { fields, append, remove } = useFieldArray({
