@@ -8,7 +8,7 @@ import { MobileGuideCarousel } from '~/components/ui/carousels/MobileGuideCarous
 import useConfirmEmail from '~/hooks/useConfirmEmail'
 import useOAuthCallback from '~/hooks/useOAuthCallback'
 import { images } from '~/lib/image/images'
-import StetionSearchForm from '../components/ui/forms/StationSearchForm'
+import StationSearchForm from '../components/ui/forms/StationSearchForm'
 
 export default function Home() {
   useOAuthCallback()
@@ -31,7 +31,7 @@ export default function Home() {
           </h2>
 
           <div className="order-3 md:col-span-1 md:row-span-1">
-            <StetionSearchForm />
+            <StationSearchForm />
           </div>
 
           <div className="order-2 mx-auto md:order-1 md:col-span-1 md:row-span-2">
