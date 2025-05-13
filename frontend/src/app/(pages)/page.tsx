@@ -61,7 +61,7 @@ export default function Home() {
           alt=""
           src={images.wavePC}
           width={1245}
-          height={96}
+          height={106}
           priority
           className="hidden w-full md:block"
         />
