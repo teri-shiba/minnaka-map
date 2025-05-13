@@ -57,7 +57,12 @@ export default function StationAutocomplete({
 
     setRecentStations((prev) => {
       const filtered = prev.filter(s => s.id !== station.id)
-      return [{ id: station.id, name: station.name }, ...filtered].slice(0, 5)
+      return [{
+        id: station.id,
+        name: station.name,
+        latitude: station.latitude,
+        longitude: station.longitude,
+      }, ...filtered].slice(0, 5)
     })
   }, [onChange, setRecentStations])
 
