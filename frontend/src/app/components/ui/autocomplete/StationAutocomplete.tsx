@@ -1,7 +1,7 @@
 'use client'
 import type { FormEvent } from 'react'
 import type { SavedStation, StationProps } from '~/app/types/station'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { useLocalStorage } from '~/app/hooks/useLocalStorage'
 import useSearchStation from '~/app/hooks/useSearchStation'
 import { Command, CommandInput } from '../command/Command'
@@ -33,6 +33,14 @@ export default function StationAutocomplete({
     return excludedStations ?? []
   }, [excludedStations])
 
+  const prevValueRef = useRef(value)
+  if (prevValueRef.current !== value) {
+    if (value === '') {
+      setIsSelected(false)
+    }
+    prevValueRef.current = value
+  }
+
   const handleInputChange = useCallback((e: FormEvent<HTMLInputElement>) => {
     onChange(e.currentTarget.value)
     setIsSelected(false)
@@ -48,7 +56,6 @@ export default function StationAutocomplete({
       onChange('')
     }
     setIsFocused(false)
-    setIsSelected(false)
   }, [isSelected, onChange, value])
 
   const handleSelect = useCallback((station: StationProps) => {
