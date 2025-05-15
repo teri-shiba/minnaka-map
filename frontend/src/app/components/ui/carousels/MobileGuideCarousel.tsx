@@ -50,7 +50,7 @@ export function MobileGuideCarousel() {
                       alt={data.title}
                       src={data.imageUrl}
                       width={280}
-                      height={380}
+                      height={560}
                       className=""
                     />
                   </div>

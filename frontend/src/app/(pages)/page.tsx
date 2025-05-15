@@ -48,7 +48,7 @@ export default function Home() {
               alt="mv-sp"
               src={images.mvSP}
               width={264}
-              height={184}
+              height={183}
               priority
               className="block md:hidden"
             />
@@ -68,7 +68,7 @@ export default function Home() {
         <Image
           alt=""
           src={images.waveSP}
-          width={393}
+          width={736}
           height={48}
           priority
           className="block h-12 w-full md:hidden"
