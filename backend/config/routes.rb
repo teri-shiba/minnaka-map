@@ -8,9 +8,9 @@ Rails.application.routes.draw do
         registrations: "api/v1/overrides/registrations",
         sessions: "api/v1/auth/sessions",
       }
-      get "googlemaps/api_key", to: "googlemaps#api_key"
 
       resources :stations, only: [:index]
+      resources :midpoints, only: [:create]
 
       namespace :user do
         resource :confirmations, only: [:update]
