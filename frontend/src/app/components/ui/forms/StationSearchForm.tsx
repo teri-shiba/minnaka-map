@@ -1,6 +1,7 @@
 'use client'
 import type { AreaFormValues } from '~/app/lib/schemas/areaSearchSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'next/navigation'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { areaFormSchema } from '~/app/lib/schemas/areaSearchSchema'
@@ -15,10 +16,10 @@ const MAX_AREA_FIELDS = 6
 const MAX_REQUIRED_FIELDS = 2
 
 export default function StationSearchForm() {
+  const router = useRouter()
   const form = useForm<AreaFormValues>({
     resolver: zodResolver(areaFormSchema),
     defaultValues: {
-      // TODO: データの返り値に緯度経度を含めること（現在: value.area.areaValue）
       area: [
         { areaValue: '', latitude: null, longitude: null },
         { areaValue: '', latitude: null, longitude: null },
@@ -34,17 +35,23 @@ export default function StationSearchForm() {
   })
 
   const watchedArea = form.watch('area')
-
+  const baseApiURL = process.env.NEXT_PUBLIC_API_BASE_URL
   const processValidData = async (data: AreaFormValues) => {
     try {
-      // TODO: データの返り値に緯度経度を含めること（現在: value.area.areaValue）
-      // TODO: 確認用・あとで削除する
-      // console.log('送信データ:', JSON.stringify(data, null, 2))
+      const response = await fetch(`${baseApiURL}/midpoints`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
 
-      // data.area.forEach((station, index) => {
-      //   console.log(`駅${index + 1}:`, station.areaValue, `(緯度:${station.latitude}, 経度:${station.longitude})`)
-      // })
-      toast.success('送信完了')
+      const result = await response.json()
+      if (!response.ok) {
+        throw new Error('APIリクエストに失敗しました')
+      }
+
+      router.push(`/result?lat=${result.midpoint.latitude}&lng=${result.midpoint.longitude}&signature=${result.signature}`)
     }
     catch (e) {
       console.error('フォーム送信エラー:', e)
