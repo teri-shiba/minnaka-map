@@ -12,7 +12,7 @@ Rails.application.routes.draw do
 
       resources :stations, only: [:index]
       resources :midpoints, only: [:create]
-      post '/validate_coordinates', to: 'midpoints#validate'
+      post "/validate_coordinates", to: "midpoints#validate"
 
       namespace :user do
         resource :confirmations, only: [:update]
