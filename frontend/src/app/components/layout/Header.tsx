@@ -32,30 +32,28 @@ export default function Header() {
   }
 
   return (
-    <header className={`w-full ${headerBgClass}`}>
-      <div className={`mx-auto flex h-16 ${headerMaxWidth} items-center justify-between gap-4 px-5`}>
-        <Link href="/" className="flex items-center">
-          <Image
-            aria-label="Go to Home"
-            alt="logo"
-            src={logo}
-            width={224}
-            height={29}
-            priority
-            className="hidden md:block"
-          />
-          <Image
-            aria-label="Go to Home"
-            alt="logo"
-            src={logoMark}
-            width={28}
-            height={28}
-            priority
-            className="block md:hidden"
-          />
-        </Link>
-        {userStatusUI}
-      </div>
+    <header className={`flex h-16 w-full flex-row items-center justify-between gap-4 px-5 ${headerBgClass} mx-auto ${headerMaxWidth}`}>
+      <Link href="/" className="flex items-center">
+        <Image
+          aria-label="Go to Home"
+          alt="logo"
+          src={logo}
+          width={224}
+          height={29}
+          priority
+          className="hidden md:block"
+        />
+        <Image
+          aria-label="Go to Home"
+          alt="logo"
+          src={logoMark}
+          width={28}
+          height={28}
+          priority
+          className="block md:hidden"
+        />
+      </Link>
+      {userStatusUI}
     </header>
   )
 }
