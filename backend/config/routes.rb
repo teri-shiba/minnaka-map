@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       get "health_check", to: "health_check#index"
+      get "map_tiler/api_key", to: "map_tiler#api_key"
       mount_devise_token_auth_for "UserAuth", at: "auth", controllers: {
         omniauth_callbacks: "api/v1/auth/omniauth_callbacks",
         registrations: "api/v1/overrides/registrations",
@@ -11,6 +12,7 @@ Rails.application.routes.draw do
 
       resources :stations, only: [:index]
       resources :midpoints, only: [:create]
+      post '/validate_coordinates', to: 'midpoints#validate'
 
       namespace :user do
         resource :confirmations, only: [:update]
