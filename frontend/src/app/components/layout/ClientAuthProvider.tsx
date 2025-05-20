@@ -18,13 +18,11 @@ export default function ClientAuthProvider({
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen relative">
       <Header />
-      <main>
         {children}
-      </main>
       <Toaster richColors />
       <Footer />
-    </>
+    </div>
   )
 }
