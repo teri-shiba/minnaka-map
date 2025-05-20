@@ -9,7 +9,7 @@ interface ApiKeyProps {
   style?: string
 }
 
-export default function MapTailerLayer({ apiKey, style = 'jp-mierune-streets' }: ApiKeyProps) {
+export default function MapTailerLayer({ apiKey, style = '0196eb8d-3239-7893-a5fa-e5adfc275a77' }: ApiKeyProps) {
   const map = useMap()
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function MapTailerLayer({ apiKey, style = 'jp-mierune-streets' }:
     return () => {
       map.removeLayer(layer)
     }
-  }, [map, apiKey])
+  }, [map, apiKey, style])
 
   return null
 }
