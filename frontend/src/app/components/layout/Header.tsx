@@ -14,7 +14,9 @@ export default function Header() {
   const [user] = useAtom(userStateAtom)
   const currentPath = usePathname()
   const isHomePage = currentPath === '/'
+  const isResultPage = currentPath === '/result'
   const headerBgClass = isHomePage ? 'bg-secondary' : ''
+  const headerMaxWidth = !isResultPage ? 'max-w-screen-lg' : ''
 
   let userStatusUI = null
   if (user.isLoading) {
@@ -31,7 +33,7 @@ export default function Header() {
 
   return (
     <header className={`w-full ${headerBgClass}`}>
-      <div className="mx-auto flex h-16 max-w-screen-lg items-center justify-between gap-4 px-5">
+      <div className={`mx-auto flex h-16 ${headerMaxWidth} items-center justify-between gap-4 px-5`}>
         <Link href="/" className="flex items-center">
           <Image
             aria-label="Go to Home"
