@@ -9,7 +9,7 @@ interface PositionProps {
   position: LatLngExpression
 }
 
-export default function UserLocationMarke({ position }: PositionProps) {
+export default function UserLocationMarker({ position }: PositionProps) {
   const icon = useMemo(() => {
     return L.icon({
       iconUrl: '/figure_pin_center.webp',
@@ -25,6 +25,7 @@ export default function UserLocationMarke({ position }: PositionProps) {
     <Marker
       position={position}
       icon={icon}
+      zIndexOffset={1000}
     >
     </Marker>
   )
