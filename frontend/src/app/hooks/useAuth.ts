@@ -1,75 +1,80 @@
+import type { LoginCredentials, SignupCredentials } from '../types/auth'
+import type { UserState } from '../types/user'
 import axios, { isAxiosError } from 'axios'
 import { useAtom } from 'jotai'
+import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
 import { useSWRConfig } from 'swr'
 import { userStateAtom } from '../lib/state/userStateAtom'
 
-function handleApiError(e: unknown, errorMessage: string) {
-  if (isAxiosError(e) && e.response?.status) {
-    console.error(`API Error: ${e.message}`)
+const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+const frontBaseURL = process.env.NEXT_PUBLIC_FRONT_BASE_URL
+
+function handleApiError(error: unknown, errorMessage: string): void {
+  if (isAxiosError(error) && error.response?.status) {
+    console.error(`API Error: ${error.message}`)
     toast.error(errorMessage)
   }
   else {
-    console.error(`Unexpected Error:`, e)
+    console.error(`Unexpected Error:`, error)
     toast.error('予期しないエラーが発生しました')
   }
 }
 
-function isValidResponse(res: any) {
-  return res.status === 200 && res.data
+function isValidResponse(response: any): boolean {
+  return response.status === 200 && response.data
 }
 
 export function useAuth() {
   const [, setUser] = useAtom(userStateAtom)
-  const baseApiURL = process.env.NEXT_PUBLIC_API_BASE_URL
-  const baseFrontURL = process.env.NEXT_PUBLIC_FRONT_BASE_URL
   const { mutate } = useSWRConfig()
 
-  const resetUserState = () => {
-    setUser({
+  const resetUserState = useCallback((): void => {
+    const resetState: UserState = {
       id: 0,
       name: '',
       email: '',
       isSignedIn: false,
       isLoading: false,
-    })
-  }
+    }
+    setUser(resetState)
+  }, [setUser])
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async (): Promise<void> => {
     try {
-      const res = await axios.get(`${baseApiURL}/current/user`, {
+      const response = await axios.get(`${apiBaseURL}/current/user`, {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       })
 
       setUser({
-        ...res.data,
+        ...response.data,
         isSignedIn: true,
         isLoading: false,
       })
     }
-    catch (e) {
+    catch (error) {
       resetUserState()
 
-      if (isAxiosError(e) && e.response?.status !== 401) {
-        handleApiError(e, 'ユーザー情報の取得に失敗しました')
+      if (isAxiosError(error) && error.response?.status !== 401) {
+        handleApiError(error, 'ユーザー情報の取得に失敗しました')
       }
     }
-  }
+  }, [setUser, resetUserState])
 
-  const login = async (data: { email: string, password: string }) => {
+  const login = useCallback(async (data: LoginCredentials): Promise<void> => {
     try {
       const payload = {
         email: data.email,
         password: data.password,
       }
 
-      const res = await axios.post(`${baseApiURL}/auth/sign_in`, payload, {
+      const response = await axios.post(`${apiBaseURL}/auth/sign_in`, payload, {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       })
 
-      if (!isValidResponse(res)) {
+      if (!isValidResponse(response)) {
         resetUserState()
         toast.error('ログインに失敗しました')
         return
@@ -78,26 +83,26 @@ export function useAuth() {
       await fetchUser()
       toast.success('ログインに成功しました')
     }
-    catch (e) {
-      handleApiError(e, 'ログインに失敗しました')
+    catch (error) {
+      handleApiError(error, 'ログインに失敗しました')
       resetUserState()
     }
-  }
+  }, [fetchUser, resetUserState])
 
-  const signup = async (data: { name: string, email: string, password: string }) => {
+  const signup = useCallback(async (data: SignupCredentials): Promise<void> => {
     try {
       const payload = {
         name: data.name,
         email: data.email,
         password: data.password,
-        confirm_success_url: `${baseFrontURL}/`,
+        confirm_success_url: `${frontBaseURL}/`,
       }
 
-      const res = await axios.post(`${baseApiURL}/auth`, payload, {
+      const response = await axios.post(`${apiBaseURL}/auth`, payload, {
         headers: { 'Content-Type': 'application/json' },
       })
 
-      if (!isValidResponse(res)) {
+      if (!isValidResponse(response)) {
         resetUserState()
         toast.error(`登録に失敗しました`)
         return
@@ -105,10 +110,10 @@ export function useAuth() {
 
       toast.success('認証メールをご確認ください')
     }
-    catch (e) {
-      if (isAxiosError(e) && e.response?.status) {
-        const status = e.response?.status
-        const errors = e.response?.data?.errors
+    catch (error) {
+      if (isAxiosError(error) && error.response?.status) {
+        const status = error.response?.status
+        const errors = error.response?.data?.errors
         console.error(errors)
 
         if (status === 422 && errors) {
@@ -120,33 +125,33 @@ export function useAuth() {
         resetUserState()
       }
     }
-  }
+  }, [resetUserState])
 
-  const logout = async () => {
+  const logout = useCallback(async (): Promise<void> => {
     try {
-      const res = await axios.delete(`${baseApiURL}/auth/sign_out`, {
+      const response = await axios.delete(`${apiBaseURL}/auth/sign_out`, {
         withCredentials: true,
       })
 
-      if (!isValidResponse(res)) {
+      if (!isValidResponse(response)) {
         toast.error('ログアウトに失敗しました')
         return
       }
 
-      mutate(`${baseApiURL}/current/user/show_status`)
+      mutate(`${apiBaseURL}/current/user/show_status`)
       resetUserState()
       toast.success('ログアウトしました')
     }
-    catch (e) {
-      handleApiError(e, 'ログアウトに失敗しました')
+    catch (error) {
+      handleApiError(error, 'ログアウトに失敗しました')
     }
-  }
+  }, [mutate, resetUserState])
 
-  return {
+  return useMemo(() => ({
     resetUserState,
     signup,
     login,
     logout,
     fetchUser,
-  }
+  }), [resetUserState, signup, login, logout, fetchUser])
 }
