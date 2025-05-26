@@ -2,7 +2,7 @@
 import useSWR from 'swr'
 import { useDebounce } from './useDebounce'
 
-const fetcher = (url: string) => fetch(url).then(res => res.json())
+const fetcher = (url: string) => fetch(url).then(response => response.json())
 
 export default function useSearchStation(query: string) {
   const deboucedQuery = useDebounce(query.trim(), 300)
