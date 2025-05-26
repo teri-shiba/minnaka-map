@@ -1,50 +1,51 @@
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 import { useAuth } from './useAuth'
 
 export default function useOAuthCallback() {
   const router = useRouter()
   const params = useSearchParams()
-  const [status, setStatus] = useState<string | null>(null)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const { fetchUser, resetUserState } = useAuth()
 
-  useEffect(() => {
-    const currentStatus = params.get('status')
-    const message = params.get('message')
-    setStatus(currentStatus)
-    setErrorMessage(message)
-  }, [params])
+  const authParams = useMemo(() => ({
+    status: params.get('status'),
+    message: params.get('message'),
+  }), [params])
 
   useEffect(() => {
-    if (!status)
+    if (!authParams.status)
       return
 
-    const fetchData = async () => {
-      if (status === 'success') {
-        toast.success('ログインに成功しました')
-        await fetchUser()
-      }
-      else if (status === 'error') {
-        if (errorMessage) {
-          toast.error(decodeURIComponent(errorMessage))
+    const handleOAuthCallback = async () => {
+      try {
+        if (authParams.status === 'success') {
+          toast.success('ログインに成功しました')
+          await fetchUser()
+        }
+        else if (authParams.status === 'error') {
+          const errorMessage = authParams.message
+            ? decodeURIComponent(authParams.message)
+            : 'ログインに失敗しました'
+          toast.error(errorMessage)
+          resetUserState()
         }
         else {
-          toast.error('ログインに失敗しました')
+          toast.error('不正なアクセスです')
+          resetUserState()
         }
-
+      }
+      catch (error) {
+        console.error('OAuth callback error:', error)
+        toast.error('認証処理中にエラーが発生しました')
         resetUserState()
       }
-      else {
-        toast.error('不正なアクセスです')
-        resetUserState()
+      finally {
+        router.replace('/')
       }
-
-      router.push('/')
     }
 
-    fetchData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, errorMessage])
+    handleOAuthCallback()
+  // }, [authParams, router])
+  }, [authParams, fetchUser, resetUserState, router])
 }
