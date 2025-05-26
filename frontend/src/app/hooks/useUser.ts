@@ -23,11 +23,11 @@ export default function useUser() {
       setUser(userData)
       return res.data
     }
-    catch (e) {
-      if (isAxiosError(e) && e.response?.status) {
-        console.error(`API Error: ${e.message}`)
+    catch (error) {
+      if (isAxiosError(error) && error.response?.status) {
+        console.error(`API Error: ${error.message}`)
       }
-      throw e
+      throw error
     }
   }
 

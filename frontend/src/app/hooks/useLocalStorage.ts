@@ -18,8 +18,8 @@ export function useLocalStorage<T>(
       const item = window.localStorage.getItem(key)
       return item ? JSON.parse(item) : initialValue
     }
-    catch (e) {
-      console.error(`ローカルストレージの読み込みエラー: ${key}`, e)
+    catch (error) {
+      console.error(`ローカルストレージの読み込みエラー: ${key}`, error)
       return initialValue
     }
   })
@@ -36,8 +36,8 @@ export function useLocalStorage<T>(
         setStoredValue(parsedItem)
       }
     }
-    catch (e) {
-      console.error(`ローカルストレージの読み込みエラー: ${key}`, e)
+    catch (error) {
+      console.error(`ローカルストレージの読み込みエラー: ${key}`, error)
     }
   }, [key])
 
@@ -57,8 +57,8 @@ export function useLocalStorage<T>(
         }
       }
     }
-    catch (e) {
-      console.error(`ローカルストレージの保存エラー: ${key}`, e)
+    catch (error) {
+      console.error(`ローカルストレージの保存エラー: ${key}`, error)
     }
   }, [key, storedValue])
 
@@ -69,8 +69,8 @@ export function useLocalStorage<T>(
           const newValue = JSON.parse(e.newValue)
           setStoredValue(newValue)
         }
-        catch (e) {
-          console.error(`ストレージ変更イベントの解析エラー: ${key}`, e)
+        catch (error) {
+          console.error(`ストレージ変更イベントの解析エラー: ${key}`, error)
         }
       }
     }
