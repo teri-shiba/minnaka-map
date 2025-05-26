@@ -1,17 +1,16 @@
+import type { UserState } from '~/app/types/user'
 import { atom } from 'jotai'
 
-interface userStateType {
-  id: number
-  name: string
-  email: string
-  isSignedIn: boolean
-  isLoading: boolean
-}
-
-export const userStateAtom = atom<userStateType>({
+export const initialUserState: UserState = {
   id: 0,
   name: '',
   email: '',
   isSignedIn: false,
   isLoading: true,
-})
+}
+
+export const userStateAtom = atom<UserState>(initialUserState)
+
+export const isSignedInAtom = atom(get => get(userStateAtom).isSignedIn)
+export const isLoadingAtom = atom(get => get(userStateAtom).isLoading)
+export const userNameAtom = atom(get => get(userStateAtom).name)
