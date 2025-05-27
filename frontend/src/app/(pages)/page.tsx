@@ -1,14 +1,12 @@
 'use client'
 import Image from 'next/image'
-
-import { Section } from '~/components/layout/Section'
-
+import Section from '~/components/layout/Section'
 import { DesktopGuideCarousel } from '~/components/ui/carousels/DesktopGuideCarousel'
 import { MobileGuideCarousel } from '~/components/ui/carousels/MobileGuideCarousel'
+import StetionSearchForm from '~/components/ui/forms/StationSearchForm'
 import useConfirmEmail from '~/hooks/useConfirmEmail'
-import useOAuthCallback from '~/hooks/useOAuthCallback'
 import { images } from '~/lib/image/images'
-import StetionSearchForm from '../components/ui/forms/StationSearchForm'
+import useOAuthCallback from '../hooks/useOAuthCallback'
 
 export default function Home() {
   useOAuthCallback()

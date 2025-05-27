@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { useCarousel } from '~/app/hooks/useCarousel'
 import { carouselData } from '~/app/lib/data/carouselData'
 import { images } from '~/lib/image/images'
-import { Section } from '../../layout/Section'
+import Section from '../../layout/Section'
 
 export function DesktopGuideCarousel() {
   const { activeStep, startSequenceFrom } = useCarousel(carouselData, {
