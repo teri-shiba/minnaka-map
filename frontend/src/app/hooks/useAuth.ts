@@ -2,6 +2,7 @@ import type { LoginCredentials, SignupCredentials } from '../types/auth'
 import type { UserState } from '../types/user'
 import axios, { isAxiosError } from 'axios'
 import { useAtom } from 'jotai'
+import { useAtomCallback } from 'jotai/utils'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
 import { useSWRConfig } from 'swr'
@@ -29,16 +30,19 @@ export function useAuth() {
   const [, setUser] = useAtom(userStateAtom)
   const { mutate } = useSWRConfig()
 
-  const resetUserState = useCallback((): void => {
-    const resetState: UserState = {
-      id: 0,
-      name: '',
-      email: '',
-      isSignedIn: false,
-      isLoading: false,
-    }
-    setUser(resetState)
-  }, [setUser])
+  const resetUserState = useAtomCallback(
+    useCallback(async (_get, set) => {
+      const resetState: UserState = {
+        id: 0,
+        name: '',
+        email: '',
+        isSignedIn: false,
+        isLoading: false,
+      }
+      set(userStateAtom, resetState)
+      await new Promise(resolve => setTimeout(resolve, 0))
+    }, []),
+  )
 
   const fetchUser = useCallback(async (): Promise<void> => {
     try {
@@ -54,7 +58,7 @@ export function useAuth() {
       })
     }
     catch (error) {
-      resetUserState()
+      await resetUserState()
 
       if (isAxiosError(error) && error.response?.status !== 401) {
         handleApiError(error, 'ユーザー情報の取得に失敗しました')
@@ -75,7 +79,7 @@ export function useAuth() {
       })
 
       if (!isValidResponse(response)) {
-        resetUserState()
+        await resetUserState()
         toast.error('ログインに失敗しました')
         return
       }
@@ -85,7 +89,7 @@ export function useAuth() {
     }
     catch (error) {
       handleApiError(error, 'ログインに失敗しました')
-      resetUserState()
+      await resetUserState()
     }
   }, [fetchUser, resetUserState])
 
@@ -103,7 +107,7 @@ export function useAuth() {
       })
 
       if (!isValidResponse(response)) {
-        resetUserState()
+        await resetUserState()
         toast.error(`登録に失敗しました`)
         return
       }
@@ -122,7 +126,7 @@ export function useAuth() {
         else {
           toast.error('登録処理中にエラーが発生しました。')
         }
-        resetUserState()
+        await resetUserState()
       }
     }
   }, [resetUserState])
@@ -139,7 +143,7 @@ export function useAuth() {
       }
 
       mutate(`${apiBaseURL}/current/user/show_status`)
-      resetUserState()
+      await resetUserState()
       toast.success('ログアウトしました')
     }
     catch (error) {
