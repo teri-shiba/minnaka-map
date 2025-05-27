@@ -1,12 +1,14 @@
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useMemo } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 import { useAuth } from './useAuth'
 
 export default function useOAuthCallback() {
   const router = useRouter()
   const params = useSearchParams()
+  const pathName = usePathname()
   const { fetchUser, resetUserState } = useAuth()
+  const hasRun = useRef(false)
 
   const authParams = useMemo(() => ({
     status: params.get('status'),
@@ -14,38 +16,40 @@ export default function useOAuthCallback() {
   }), [params])
 
   useEffect(() => {
-    if (!authParams.status)
+    if (!authParams.status || hasRun.current)
       return
 
-    const handleOAuthCallback = async () => {
+    hasRun.current = true
+
+    const errorMessage = authParams.message
+      ? decodeURIComponent(authParams.message)
+      : 'ログインに失敗しました'
+
+    const handleOAuthCallback = async (): Promise<void> => {
       try {
         if (authParams.status === 'success') {
-          toast.success('ログインに成功しました')
           await fetchUser()
+          toast.success('ログインに成功しました')
         }
         else if (authParams.status === 'error') {
-          const errorMessage = authParams.message
-            ? decodeURIComponent(authParams.message)
-            : 'ログインに失敗しました'
+          await resetUserState()
           toast.error(errorMessage)
-          resetUserState()
         }
         else {
+          await resetUserState()
           toast.error('不正なアクセスです')
-          resetUserState()
         }
       }
       catch (error) {
+        await resetUserState()
+        toast.error('ユーザーの取得に失敗しました')
         console.error('OAuth callback error:', error)
-        toast.error('認証処理中にエラーが発生しました')
-        resetUserState()
       }
       finally {
-        router.replace('/')
+        router.replace(pathName, { scroll: false })
       }
     }
 
     handleOAuthCallback()
-  // }, [authParams, router])
-  }, [authParams, fetchUser, resetUserState, router])
+  }, [authParams, router, pathName, fetchUser, resetUserState])
 }
