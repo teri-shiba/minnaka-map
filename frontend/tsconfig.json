@@ -11,7 +11,7 @@
       "~/public/*": ["./public/*"],
       "~/components/*": ["./src/app/components/*"],
       "~/hooks/*": ["./src/app/hooks/*"],
-      "~/lib/*": ["./src/app/lib/*"],
+      "~/lib/*": ["./src/lib/*"],
       "~/styles/*": ["./src/app/styles/*"]
     },
     "resolveJsonModule": true,
