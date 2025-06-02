@@ -9,7 +9,7 @@
     "paths": {
       "~/*": ["./src/*"],
       "~/public/*": ["./public/*"],
-      "~/components/*": ["./src/app/components/*"],
+      "~/components/*": ["./src/components/*"],
       "~/hooks/*": ["./src/app/hooks/*"],
       "~/lib/*": ["./src/lib/*"],
       "~/styles/*": ["./src/app/styles/*"]

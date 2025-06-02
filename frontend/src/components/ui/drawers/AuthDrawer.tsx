@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import { useState } from 'react'
-import { authProviders } from '~/app/lib/authConstants'
+import { authProviders } from '~/lib/authConstants'
 import logoMark from '~/public/logo_mark.webp'
 import { Button } from '../buttons/Button'
 import LoginForm from '../forms/LoginForm'

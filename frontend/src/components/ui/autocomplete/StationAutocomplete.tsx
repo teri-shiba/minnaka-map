@@ -1,9 +1,9 @@
 'use client'
 import type { FormEvent } from 'react'
-import type { SavedStation, StationProps } from '~/app/types/station'
+import type { SavedStation, StationProps } from '~/types/station'
 import { useCallback, useMemo, useState } from 'react'
-import { useLocalStorage } from '~/app/hooks/useLocalStorage'
-import useSearchStation from '~/app/hooks/useSearchStation'
+import { useLocalStorage } from '../../../hooks/useLocalStorage'
+import useSearchStation from '../../../hooks/useSearchStation'
 import { Command, CommandInput } from '../command/Command'
 import StationSuggestions from './StationSuggestions'
 

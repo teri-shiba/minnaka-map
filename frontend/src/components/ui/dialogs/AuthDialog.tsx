@@ -1,11 +1,9 @@
 'use client'
 import Image from 'next/image'
 import { useState } from 'react'
-import { authProviders } from '~/app/lib/authConstants'
+import { authProviders } from '~/lib/authConstants'
 import logoMark from '~/public/logo_mark.webp'
 import { Button } from '../buttons/Button'
-import LoginForm from '../forms/LoginForm'
-import SignUpForm from '../forms/SignUpForm'
 import {
   Dialog,
   DialogContent,
@@ -44,9 +42,10 @@ export function AuthDialog() {
             </div>
           </DialogTitle>
         </DialogHeader>
-        {isLogin
+
+        {/* {isLogin
           ? <LoginForm onSuccess={() => setOpen(false)} />
-          : <SignUpForm onSuccess={() => setOpen(false)} />}
+          : <SignUpForm onSuccess={() => setOpen(false)} />} */}
         <p className="relative text-center text-sm text-gray-500 before:absolute before:left-0 before:top-1/2 before:-z-10 before:h-px before:w-full before:bg-gray-300">
           <span className="inline-block bg-white px-4">OR</span>
         </p>

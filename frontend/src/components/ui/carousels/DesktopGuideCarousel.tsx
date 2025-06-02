@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
-import { useCarousel } from '~/app/hooks/useCarousel'
-import { carouselData } from '~/app/lib/data/carouselData'
+import { carouselData } from '~/lib/data/carouselData'
 import { images } from '~/lib/image/images'
+import { useCarousel } from '../../../hooks/useCarousel'
 import Section from '../../layout/Section'
 
 export function DesktopGuideCarousel() {

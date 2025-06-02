@@ -1,4 +1,4 @@
-import type { SavedStation, StationProps } from '~/app/types/station'
+import type { SavedStation, StationProps } from '~/types/station'
 import Loading from '~/public/figure_loading_circle.svg'
 import { CommandEmpty, CommandGroup, CommandItem, CommandList } from '../command/Command'
 
