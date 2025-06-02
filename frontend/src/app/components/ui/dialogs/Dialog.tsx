@@ -1,9 +1,8 @@
 'use client'
 
 import * as DialogPrimitive from '@radix-ui/react-dialog'
+import { XIcon } from 'lucide-react'
 import * as React from 'react'
-import { LuX } from 'react-icons/lu'
-
 import { cn } from '~/lib/utils'
 
 const Dialog = DialogPrimitive.Root
@@ -14,7 +13,7 @@ const DialogPortal = DialogPrimitive.Portal
 
 const DialogClose = DialogPrimitive.Close
 
-function DialogOverlay({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> & { ref?: React.RefObject<React.ElementRef<typeof DialogPrimitive.Overlay>> }) {
+function DialogOverlay({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> & { ref?: React.RefObject<React.ComponentRef<typeof DialogPrimitive.Overlay>> }) {
   return (
     <DialogPrimitive.Overlay
       ref={ref}
@@ -28,7 +27,7 @@ function DialogOverlay({ ref, className, ...props }: React.ComponentPropsWithout
 }
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
-function DialogContent({ ref, className, children, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { ref?: React.RefObject<React.ElementRef<typeof DialogPrimitive.Content>> }) {
+function DialogContent({ ref, className, children, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { ref?: React.RefObject<React.ComponentRef<typeof DialogPrimitive.Content>> }) {
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -42,7 +41,7 @@ function DialogContent({ ref, className, children, ...props }: React.ComponentPr
       >
         {children}
         <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-          <LuX className="size-4" />
+          <XIcon className="size-4" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
@@ -83,7 +82,7 @@ function DialogFooter({
 }
 DialogFooter.displayName = 'DialogFooter'
 
-function DialogTitle({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title> & { ref?: React.RefObject<React.ElementRef<typeof DialogPrimitive.Title>> }) {
+function DialogTitle({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title> & { ref?: React.RefObject<React.ComponentRef<typeof DialogPrimitive.Title>> }) {
   return (
     <DialogPrimitive.Title
       ref={ref}
@@ -97,7 +96,7 @@ function DialogTitle({ ref, className, ...props }: React.ComponentPropsWithoutRe
 }
 DialogTitle.displayName = DialogPrimitive.Title.displayName
 
-function DialogDescription({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description> & { ref?: React.RefObject<React.ElementRef<typeof DialogPrimitive.Description>> }) {
+function DialogDescription({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description> & { ref?: React.RefObject<React.ComponentRef<typeof DialogPrimitive.Description>> }) {
   return (
     <DialogPrimitive.Description
       ref={ref}
