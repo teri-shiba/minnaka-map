@@ -1,5 +1,5 @@
-import type { LoginCredentials, SignupCredentials } from '../types/auth'
-import type { UserState } from '../types/user'
+import type { LoginCredentials, SignupCredentials } from '../../types/auth'
+import type { UserState } from '../../types/user'
 import axios, { isAxiosError } from 'axios'
 import { useAtom } from 'jotai'
 import { useAtomCallback } from 'jotai/utils'
