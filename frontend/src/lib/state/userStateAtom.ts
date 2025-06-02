@@ -1,4 +1,4 @@
-import type { UserState } from '~/app/types/user'
+import type { UserState } from '~/types/user'
 import { atom } from 'jotai'
 
 export const initialUserState: UserState = {
