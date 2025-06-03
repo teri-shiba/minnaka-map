@@ -6,7 +6,7 @@ import { useAtomCallback } from 'jotai/utils'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
 import { useSWRConfig } from 'swr'
-import { userStateAtom } from '../lib/state/userStateAtom'
+import { userStateAtom } from '~/lib/state/userStateAtom'
 
 const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
 const frontBaseURL = process.env.NEXT_PUBLIC_FRONT_BASE_URL
