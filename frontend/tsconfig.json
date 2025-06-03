@@ -12,6 +12,7 @@
       "~/components/*": ["./src/components/*"],
       "~/hooks/*": ["./src/hooks/*"],
       "~/lib/*": ["./src/lib/*"],
+      "~/types/*": ["./src/types/*"],
       "~/styles/*": ["./src/styles/*"]
     },
     "resolveJsonModule": true,
