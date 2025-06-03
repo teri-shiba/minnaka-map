@@ -10,9 +10,9 @@
       "~/*": ["./src/*"],
       "~/public/*": ["./public/*"],
       "~/components/*": ["./src/components/*"],
-      "~/hooks/*": ["./src/app/hooks/*"],
+      "~/hooks/*": ["./src/hooks/*"],
       "~/lib/*": ["./src/lib/*"],
-      "~/styles/*": ["./src/app/styles/*"]
+      "~/styles/*": ["./src/styles/*"]
     },
     "resolveJsonModule": true,
     "allowJs": true,
