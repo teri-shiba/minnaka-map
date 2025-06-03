@@ -5,12 +5,12 @@ import type { z } from 'zod'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import { useFetchUser } from '~/hooks/useFetchUser'
 import { login } from '~/lib/actions/auth'
 import { loginSchema } from '~/lib/schemas/loginSchema'
-import { useFetchUser } from '~/hooks/useFetchUser'
+import { Button } from '../buttons/Button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from './Form'
 import { Input } from './Input'
-import { Button } from '../buttons/Button'
 
 interface LoginFormProps {
   onSuccess?: () => void

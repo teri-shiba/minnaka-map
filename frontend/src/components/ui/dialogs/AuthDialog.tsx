@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { authProviders } from '~/lib/authConstants'
 import logoMark from '~/public/logo_mark.webp'
 import { Button } from '../buttons/Button'
+import LoginForm from '../forms/LoginForm'
+import SignUpForm from '../forms/SignUpForm'
 import {
   Dialog,
   DialogContent,
@@ -11,8 +13,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './Dialog'
-import LoginForm from '../forms/LoginForm'
-import SignUpForm from '../forms/SignUpForm'
 
 export function AuthDialog() {
   const [open, setOpen] = useState(false)
