@@ -2,7 +2,7 @@ import type { AxiosResponse } from 'axios'
 import axios, { isAxiosError } from 'axios'
 import { useAtom } from 'jotai'
 import useSWR from 'swr'
-import { userStateAtom } from '../lib/state/userStateAtom'
+import { userStateAtom } from '~/lib/state/userStateAtom'
 
 export default function useUser() {
   const [, setUser] = useAtom(userStateAtom)
