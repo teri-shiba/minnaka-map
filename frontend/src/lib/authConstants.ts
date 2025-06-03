@@ -1,4 +1,4 @@
-import type { AuthProvider } from '../types/authProvider'
+import type { AuthProvider } from '~/types/authProvider'
 
 export const authProviders: readonly AuthProvider[] = [
   {
