@@ -1,6 +1,6 @@
 'use client'
 
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { useMediaQuery } from '~/hooks/useMediaQuery'
 
 import { DeleteAccountDialog } from './dialogs/DeleteAccountDialog'
 import { DeleteAccountDrawer } from './drawers/DeleteAccountDrawer'
