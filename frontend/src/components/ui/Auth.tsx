@@ -1,6 +1,6 @@
 'use client'
 
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { useMediaQuery } from '~/hooks/useMediaQuery'
 import { AuthDialog } from './dialogs/AuthDialog'
 
 import { AuthDrawer } from './drawers/AuthDrawer'

@@ -4,9 +4,11 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import logo from '~/public/logo.webp'
 import logoMark from '~/public/logo_mark.webp'
-import { useFetchUser } from '../../hooks/useFetchUser'
+import { useFetchUser } from '~/hooks/useFetchUser'
 import { AuthDialog } from '../ui/dialogs/AuthDialog'
 import { Skeleton } from '../ui/skeleton/Skeleton'
+import UserMenu from '../ui/dropdownmenu/UserMenu'
+import { Auth } from '../ui/Auth'
 
 export default function Header() {
   const pathName = usePathname()
@@ -38,17 +40,17 @@ export default function Header() {
             className="block h-auto md:hidden"
           />
         </Link>
-        {isLoading
+        {/* {isLoading
           ? <Skeleton className="h-[40px] w-[87px] rounded-full" />
           : user
             ? <p>ログイン済</p>
-            : <AuthDialog />}
-        {/* {isLoading
+            : <AuthDialog />} */}
+        {isLoading
           ? <Skeleton className="h-[40px] w-[87px] rounded-full" />
           : user
             ? <UserMenu />
             : <Auth />
-        } */}
+        }
       </div>
     </header>
   )

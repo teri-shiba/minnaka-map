@@ -1,5 +1,5 @@
 import { Heart, LogOut, Settings, UserRound } from 'lucide-react'
-import { useAuth } from '../../../hooks/useAuth'
+import { useAuth } from '~/hooks/useAuth'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './DropdownMenu'
 
 export default function UserMenu() {
