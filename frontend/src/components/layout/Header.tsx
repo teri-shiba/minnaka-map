@@ -1,23 +1,13 @@
-'use client'
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import logo from '~/public/logo.webp'
 import logoMark from '~/public/logo_mark.webp'
-import { useFetchUser } from '~/hooks/useFetchUser'
-import { AuthDialog } from '../ui/dialogs/AuthDialog'
-import { Skeleton } from '../ui/skeleton/Skeleton'
-import UserMenu from '../ui/dropdownmenu/UserMenu'
-import { Auth } from '../ui/Auth'
 
-export default function Header() {
-  const pathName = usePathname()
-  const isHomePage = pathName === '/'
-  const headerBgClass = isHomePage ? 'bg-secondary' : ''
-  const { user, isLoading } = useFetchUser()
+export default async function Header() {
+  // const [user] = useAtom(userStateAtom)
 
   return (
-    <header className={`w-full ${headerBgClass}`}>
+    <header className="w-full">
       <div className="mx-auto flex h-16 max-w-screen-lg items-center justify-between gap-4 px-5">
         <Link href="/" className="flex items-center">
           {/* TODO: Image タグをひとつにして、切り替える */}
@@ -40,17 +30,11 @@ export default function Header() {
             className="block h-auto md:hidden"
           />
         </Link>
-        {/* {isLoading
-          ? <Skeleton className="h-[40px] w-[87px] rounded-full" />
-          : user
-            ? <p>ログイン済</p>
-            : <AuthDialog />} */}
-        {isLoading
-          ? <Skeleton className="h-[40px] w-[87px] rounded-full" />
-          : user
-            ? <UserMenu />
-            : <Auth />
-        }
+        {/* {user.isSignedIn
+          // ? <Skeleton className="h-[40px] w-[87px] rounded-full" />
+          // : user
+          ? <UserMenu />
+          : <Auth />} */}
       </div>
     </header>
   )
