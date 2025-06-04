@@ -26,7 +26,7 @@ export function AuthDialog() {
 
   const linkText = isLogin ? '新規登録' : 'ログイン'
   const messageText = isLogin ? 'アカウントをお持ちでない方は、' : 'アカウントをお持ちの方は、'
-  const descClassName = "font-bold text-foreground hover:text-blue-500 hover:underline cursor-pointer"
+  const descClassName = 'font-bold text-foreground hover:text-blue-500 hover:underline cursor-pointer'
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
