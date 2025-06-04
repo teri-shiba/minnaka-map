@@ -11,13 +11,17 @@ import { loginSchema } from '~/lib/schemas/loginSchema'
 import { Button } from '../buttons/Button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from './Form'
 import { Input } from './Input'
+import { userStateAtom } from '~/lib/state/userStateAtom'
+import { useAtom } from 'jotai'
+import { useEffect } from 'react'
+import { useAuth } from '~/hooks/useAuth'
 
 interface LoginFormProps {
   onSuccess?: () => void
 }
 
 export default function LoginForm({ onSuccess }: LoginFormProps) {
-  const { mutate } = useFetchUser()
+  const { login } = useAuth()
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -29,11 +33,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      const userData = await login({ email: data.email, password: data.password })
-
-      mutate(() => userData, false)
-      mutate()
-
+      await login({ email: data.email, password: data.password })
       if (onSuccess)
         onSuccess()
     }
