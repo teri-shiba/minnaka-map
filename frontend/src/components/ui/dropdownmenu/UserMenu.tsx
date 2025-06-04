@@ -1,11 +1,10 @@
 import { Heart, LogOut, Settings, UserRound } from 'lucide-react'
-import { logout } from '~/lib/actions/auth'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './DropdownMenu'
 import { useAuth } from '~/hooks/useAuth'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './DropdownMenu'
 
 export default function UserMenu() {
   const { logout } = useAuth()
-  
+
   const handleLogout = async () => {
     await logout()
   }

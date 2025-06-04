@@ -5,16 +5,11 @@ import type { z } from 'zod'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { useFetchUser } from '~/hooks/useFetchUser'
-import { login } from '~/lib/actions/auth'
+import { useAuth } from '~/hooks/useAuth'
 import { loginSchema } from '~/lib/schemas/loginSchema'
 import { Button } from '../buttons/Button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from './Form'
 import { Input } from './Input'
-import { userStateAtom } from '~/lib/state/userStateAtom'
-import { useAtom } from 'jotai'
-import { useEffect } from 'react'
-import { useAuth } from '~/hooks/useAuth'
 
 interface LoginFormProps {
   onSuccess?: () => void
