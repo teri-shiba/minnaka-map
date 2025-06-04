@@ -1,18 +1,19 @@
 import { Heart, LogOut, Settings, UserRound } from 'lucide-react'
-import { useAuth } from '~/hooks/useAuth'
+import { logout } from '~/lib/actions/auth'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './DropdownMenu'
+import { useAuth } from '~/hooks/useAuth'
 
 export default function UserMenu() {
   const { logout } = useAuth()
-
+  
   const handleLogout = async () => {
     await logout()
   }
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex size-10 items-center justify-center rounded-full border border-orange-900/10 bg-muted">
-        <UserRound className="size-5 text-primary" />
+      <DropdownMenuTrigger className="flex size-10 items-center justify-center rounded-full border border-orange-900/10 bg-white">
+        <UserRound className="size-5 fill-current stroke-none text-primary" />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem>
