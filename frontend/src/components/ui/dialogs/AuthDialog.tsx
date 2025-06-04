@@ -9,6 +9,7 @@ import SignUpForm from '../forms/SignUpForm'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -22,6 +23,10 @@ export function AuthDialog() {
   const handleClick = () => {
     setIsLogin(!isLogin)
   }
+
+  const linkText = isLogin ? '新規登録' : 'ログイン'
+  const messageText = isLogin ? 'アカウントをお持ちでない方は、' : 'アカウントをお持ちの方は、'
+  const descClassName = "font-bold text-foreground hover:text-blue-500 hover:underline cursor-pointer"
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -43,6 +48,12 @@ export function AuthDialog() {
               </h2>
             </div>
           </DialogTitle>
+          <DialogDescription className="text-center">
+            {messageText}
+            <span onClick={handleClick} className={descClassName}>
+              {linkText}
+            </span>
+          </DialogDescription>
         </DialogHeader>
         {isLogin
           ? <LoginForm onSuccess={() => setOpen(false)} />
@@ -67,9 +78,6 @@ export function AuthDialog() {
             </a>
           ))}
         </div>
-        <Button onClick={handleClick} className="mx-auto my-4 inline-block h-auto !bg-transparent py-0 text-sm font-bold text-foreground hover:text-blue-500 hover:underline">
-          {isLogin ? '新規会員登録はこちら' : 'ログインはこちら'}
-        </Button>
       </DialogContent>
     </Dialog>
   )
