@@ -12,7 +12,7 @@ export default function Home() {
 
   return (
     <>
-      <Section className="bg-secondary py-12 md:py-4">
+      <Section className="bg-secondary py-12 md:py-16">
         <div className="grid md:grid-cols-2 md:gap-x-6">
           <h2 className="order-1 mx-auto mb-6 text-center md:col-span-1 md:row-span-1 md:ml-0 md:mr-auto md:mt-auto md:text-left">
             <span className="mb-1 inline-block text-lg text-secondary-foreground md:mb-2 md:text-xl">みんなのまんなか</span>
@@ -51,25 +51,6 @@ export default function Home() {
           </div>
         </div>
       </Section>
-
-      <div>
-        <Image
-          alt=""
-          src={images.wavePC}
-          width={1245}
-          height={96}
-          priority
-          className="hidden w-full md:block"
-        />
-        <Image
-          alt=""
-          src={images.waveSP}
-          width={393}
-          height={48}
-          priority
-          className="block h-12 w-full md:hidden"
-        />
-      </div>
 
       <Section className="py-14 md:py-24">
         <h2 className="mb-7 text-center text-lg text-secondary-foreground sm:text-2xl md:mb-12">
