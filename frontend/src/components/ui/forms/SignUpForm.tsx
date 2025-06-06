@@ -29,11 +29,7 @@ export default function SignUpForm({ onSuccess }: LoginFormProps) {
   // TODO: RSCのfetchを使えないか検討する
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      await signup({
-        name: data.name,
-        email: data.email,
-        password: data.password,
-      })
+      await signup(data.name, data.email, data.password)
       if (onSuccess)
         onSuccess()
     }

@@ -28,7 +28,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      await login({ email: data.email, password: data.password })
+      await login(data.email, data.password)
       if (onSuccess)
         onSuccess()
     }
