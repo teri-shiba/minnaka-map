@@ -2,7 +2,7 @@
 import type { StaticImageData } from 'next/image'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useFetchUser } from '~/hooks/useFetchUser'
+import { useAuth } from '~/hooks/useAuth'
 import logo from '~/public/logo.webp'
 import logoMark from '~/public/logo_mark.webp'
 import { Auth } from '../ui/Auth'
@@ -18,7 +18,7 @@ interface logoImages {
 }
 
 export default function Header() {
-  const { user, isLoading } = useFetchUser()
+  const { user, isLoading } = useAuth()
 
   const logoImages: logoImages[] = [
     {
@@ -56,7 +56,7 @@ export default function Header() {
         </Link>
         {isLoading
           ? <Skeleton className="h-[40px] w-[87px] rounded-full" />
-          : user
+          : user && user.isSignedIn
             ? <UserMenu />
             : <Auth />}
       </div>
