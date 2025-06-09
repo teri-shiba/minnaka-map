@@ -1,7 +1,7 @@
 'use client'
 
+import type { ComponentPropsWithoutRef, ComponentRef, HTMLAttributes, RefObject } from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import * as React from 'react'
 import { LuX } from 'react-icons/lu'
 import { cn } from '~/lib/utils'
 
@@ -13,7 +13,7 @@ const DialogPortal = DialogPrimitive.Portal
 
 const DialogClose = DialogPrimitive.Close
 
-function DialogOverlay({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> & { ref?: React.RefObject<React.ComponentRef<typeof DialogPrimitive.Overlay>> }) {
+function DialogOverlay({ ref, className, ...props }: ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> & { ref?: RefObject<ComponentRef<typeof DialogPrimitive.Overlay>> }) {
   return (
     <DialogPrimitive.Overlay
       ref={ref}
@@ -27,7 +27,7 @@ function DialogOverlay({ ref, className, ...props }: React.ComponentPropsWithout
 }
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
-function DialogContent({ ref, className, children, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { ref?: React.RefObject<React.ComponentRef<typeof DialogPrimitive.Content>> }) {
+function DialogContent({ ref, className, children, ...props }: ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { ref?: RefObject<ComponentRef<typeof DialogPrimitive.Content>> }) {
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -53,7 +53,7 @@ DialogContent.displayName = DialogPrimitive.Content.displayName
 function DialogHeader({
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
@@ -69,7 +69,7 @@ DialogHeader.displayName = 'DialogHeader'
 function DialogFooter({
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
@@ -82,7 +82,7 @@ function DialogFooter({
 }
 DialogFooter.displayName = 'DialogFooter'
 
-function DialogTitle({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title> & { ref?: React.RefObject<React.ComponentRef<typeof DialogPrimitive.Title>> }) {
+function DialogTitle({ ref, className, ...props }: ComponentPropsWithoutRef<typeof DialogPrimitive.Title> & { ref?: RefObject<ComponentRef<typeof DialogPrimitive.Title>> }) {
   return (
     <DialogPrimitive.Title
       ref={ref}
@@ -96,7 +96,7 @@ function DialogTitle({ ref, className, ...props }: React.ComponentPropsWithoutRe
 }
 DialogTitle.displayName = DialogPrimitive.Title.displayName
 
-function DialogDescription({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description> & { ref?: React.RefObject<React.ComponentRef<typeof DialogPrimitive.Description>> }) {
+function DialogDescription({ ref, className, ...props }: ComponentPropsWithoutRef<typeof DialogPrimitive.Description> & { ref?: RefObject<ComponentRef<typeof DialogPrimitive.Description>> }) {
   return (
     <DialogPrimitive.Description
       ref={ref}
