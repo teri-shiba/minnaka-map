@@ -10,6 +10,7 @@
       "~/*": ["./src/*"],
       "~/public/*": ["./public/*"],
       "~/components/*": ["./src/components/*"],
+      "~/ui/*": ["./src/components/ui/*"],
       "~/hooks/*": ["./src/hooks/*"],
       "~/lib/*": ["./src/lib/*"],
       "~/types/*": ["./src/types/*"],

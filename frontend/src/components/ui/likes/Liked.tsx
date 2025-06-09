@@ -1,9 +1,11 @@
 'use client'
+
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { FiHeart } from 'react-icons/fi'
 import { Button } from '../buttons/Button'
 
+// TODO: 連続リクエストを考慮して、コードを修正する
 export default function Liked() {
   const [isLiked, setIsLiked] = useState(false)
 

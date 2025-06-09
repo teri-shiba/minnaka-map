@@ -1,9 +1,9 @@
 import type { EmblaOptionsType } from 'embla-carousel'
 import Autoplay from 'embla-carousel-autoplay'
 import Image from 'next/image'
+import Section from '~/components/layout/Section'
 import { carouselData } from '~/lib/data/carouselData'
 import { images } from '~/lib/image/images'
-import { Section } from '../../layout/Section'
 import { Card, CardContent } from '../cards/Card'
 import {
   Carousel,
