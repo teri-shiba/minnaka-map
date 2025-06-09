@@ -12,6 +12,7 @@ import SignUpForm from '../forms/SignUpForm'
 import {
   Drawer,
   DrawerContent,
+  DrawerDescription,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
@@ -25,6 +26,12 @@ export function AuthDrawer() {
   const handleClick = () => {
     setIsLogin(!isLogin)
   }
+
+  const linkText = isLogin ? '新規登録' : 'ログイン'
+  const messageText = isLogin
+    ? 'アカウントをお持ちでない方は、'
+    : 'アカウントをお持ちの方は、'
+  const descClassName = 'font-bold text-foreground hover:text-blue-500 hover:underline cursor-pointer'
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
@@ -46,6 +53,12 @@ export function AuthDrawer() {
               </h2>
             </div>
           </DrawerTitle>
+          <DrawerDescription className="text-center">
+            {messageText}
+            <span onClick={handleClick} className={descClassName}>
+              {linkText}
+            </span>
+          </DrawerDescription>
         </DrawerHeader>
         {isLogin
           ? <LoginForm onSuccess={() => setOpen(false)} />
@@ -71,9 +84,6 @@ export function AuthDrawer() {
               </a>
             ))}
           </div>
-          <Button onClick={handleClick} className="mx-auto my-4 inline-block h-auto !bg-transparent py-0 text-sm font-normal text-foreground hover:text-blue-500 hover:underline">
-            {isLogin ? '新規会員登録はこちら' : 'ログインはこちら'}
-          </Button>
         </div>
       </DrawerContent>
     </Drawer>
