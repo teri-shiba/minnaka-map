@@ -6,7 +6,7 @@ import useSWR, { useSWRConfig } from 'swr'
 import api from '~/lib/api'
 import { userStateAtom } from '~/lib/state/userStateAtom'
 
-const frontURL = process.env.NEXT_PUBLIC_FRONT_BASE_URL
+const appOrigin = process.env.NEXT_PUBLIC_FRONT_BASE_URL
 
 export function useAuth() {
   const [user, setUser] = useAtom(userStateAtom)
@@ -50,7 +50,7 @@ export function useAuth() {
           name,
           email,
           password,
-          confirm_success_url: frontURL,
+          confirm_success_url: appOrigin,
         })
         toast.success('認証メールをご確認ください')
       }

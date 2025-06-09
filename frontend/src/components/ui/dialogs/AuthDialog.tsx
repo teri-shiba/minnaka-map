@@ -21,7 +21,7 @@ import {
 export function AuthDialog() {
   const [open, setOpen] = useAtom(authModalOpenAtom)
   const [isLogin, setIsLogin] = useState(true)
-  const baseApiURL = process.env.NEXT_PUBLIC_API_BASE_URL
+  const apiOrigin = process.env.NEXT_PUBLIC_API_BASE_URL
 
   const handleClick = () => {
     setIsLogin(!isLogin)
@@ -70,7 +70,7 @@ export function AuthDialog() {
           {authProviders.map(provider => (
             <a
               key={provider.name}
-              href={`${baseApiURL}/auth/${provider.authUrl}`}
+              href={`${apiOrigin}/auth/${provider.authUrl}`}
               className="flex h-auto items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent"
             >
               <Image
