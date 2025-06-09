@@ -1,6 +1,6 @@
 'use client'
 
-import * as React from 'react'
+import type { ComponentProps, ComponentPropsWithoutRef, ComponentRef, HTMLAttributes, RefObject } from 'react'
 import { Drawer as DrawerPrimitive } from 'vaul'
 
 import { cn } from '~/lib/utils'
@@ -8,7 +8,7 @@ import { cn } from '~/lib/utils'
 function Drawer({
   shouldScaleBackground = true,
   ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Root>) {
+}: ComponentProps<typeof DrawerPrimitive.Root>) {
   return (
     <DrawerPrimitive.Root
       shouldScaleBackground={shouldScaleBackground}
@@ -24,7 +24,7 @@ const DrawerPortal = DrawerPrimitive.Portal
 
 const DrawerClose = DrawerPrimitive.Close
 
-function DrawerOverlay({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Overlay> & { ref?: React.RefObject<React.ElementRef<typeof DrawerPrimitive.Overlay>> }) {
+function DrawerOverlay({ ref, className, ...props }: ComponentPropsWithoutRef<typeof DrawerPrimitive.Overlay> & { ref?: RefObject<ComponentRef<typeof DrawerPrimitive.Overlay>> }) {
   return (
     <DrawerPrimitive.Overlay
       ref={ref}
@@ -35,7 +35,7 @@ function DrawerOverlay({ ref, className, ...props }: React.ComponentPropsWithout
 }
 DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
 
-function DrawerContent({ ref, className, children, ...props }: React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content> & { ref?: React.RefObject<React.ElementRef<typeof DrawerPrimitive.Content>> }) {
+function DrawerContent({ ref, className, children, ...props }: ComponentPropsWithoutRef<typeof DrawerPrimitive.Content> & { ref?: RefObject<ComponentRef<typeof DrawerPrimitive.Content>> }) {
   return (
     <DrawerPortal>
       <DrawerOverlay />
@@ -58,7 +58,7 @@ DrawerContent.displayName = 'DrawerContent'
 function DrawerHeader({
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn('grid gap-1.5 py-4 text-center sm:text-left', className)}
@@ -71,7 +71,7 @@ DrawerHeader.displayName = 'DrawerHeader'
 function DrawerFooter({
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn('mt-auto flex flex-col gap-2 p-4', className)}
@@ -81,7 +81,7 @@ function DrawerFooter({
 }
 DrawerFooter.displayName = 'DrawerFooter'
 
-function DrawerTitle({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Title> & { ref?: React.RefObject<React.ElementRef<typeof DrawerPrimitive.Title>> }) {
+function DrawerTitle({ ref, className, ...props }: ComponentPropsWithoutRef<typeof DrawerPrimitive.Title> & { ref?: RefObject<ComponentRef<typeof DrawerPrimitive.Title>> }) {
   return (
     <DrawerPrimitive.Title
       ref={ref}
@@ -95,7 +95,7 @@ function DrawerTitle({ ref, className, ...props }: React.ComponentPropsWithoutRe
 }
 DrawerTitle.displayName = DrawerPrimitive.Title.displayName
 
-function DrawerDescription({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Description> & { ref?: React.RefObject<React.ElementRef<typeof DrawerPrimitive.Description>> }) {
+function DrawerDescription({ ref, className, ...props }: ComponentPropsWithoutRef<typeof DrawerPrimitive.Description> & { ref?: RefObject<ComponentRef<typeof DrawerPrimitive.Description>> }) {
   return (
     <DrawerPrimitive.Description
       ref={ref}

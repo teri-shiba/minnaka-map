@@ -1,13 +1,14 @@
 'use client'
 
 import type { DialogProps } from '@radix-ui/react-dialog'
+import type { ComponentPropsWithoutRef, HTMLAttributes, RefObject } from 'react'
 import { Command as CommandPrimitive } from 'cmdk'
-import * as React from 'react'
+import { memo } from 'react'
 
 import { Dialog, DialogContent } from '~/components/ui/dialogs/Dialog'
 import { cn } from '~/lib/utils'
 
-const Command = React.memo(({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive> & { ref?: React.RefObject<HTMLDivElement> }) => (
+const Command = memo(({ ref, className, ...props }: ComponentPropsWithoutRef<typeof CommandPrimitive> & { ref?: RefObject<HTMLDivElement> }) => (
   <CommandPrimitive
     ref={ref}
     className={cn(
@@ -19,7 +20,7 @@ const Command = React.memo(({ ref, className, ...props }: React.ComponentPropsWi
 ))
 Command.displayName = CommandPrimitive.displayName
 
-const CommandDialog = React.memo(({ children, ...props }: DialogProps) => {
+const CommandDialog = memo(({ children, ...props }: DialogProps) => {
   return (
     <Dialog {...props}>
       <DialogContent className="overflow-hidden p-0 shadow-lg">
@@ -31,7 +32,7 @@ const CommandDialog = React.memo(({ children, ...props }: DialogProps) => {
   )
 })
 
-const CommandInput = React.memo(({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & { ref?: React.RefObject<HTMLInputElement> }) => (
+const CommandInput = memo(({ ref, className, ...props }: ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & { ref?: RefObject<HTMLInputElement> }) => (
   <div className="flex items-center px-3" cmdk-input-wrapper="">
     <CommandPrimitive.Input
       ref={ref}
@@ -46,7 +47,7 @@ const CommandInput = React.memo(({ ref, className, ...props }: React.ComponentPr
 
 CommandInput.displayName = CommandPrimitive.Input.displayName
 
-const CommandList = React.memo(({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.List> & { ref?: React.RefObject<HTMLDivElement> }) => (
+const CommandList = memo(({ ref, className, ...props }: ComponentPropsWithoutRef<typeof CommandPrimitive.List> & { ref?: RefObject<HTMLDivElement> }) => (
   <CommandPrimitive.List
     ref={ref}
     className={cn('max-h-[300px] overflow-y-auto overflow-x-hidden', className)}
@@ -56,7 +57,7 @@ const CommandList = React.memo(({ ref, className, ...props }: React.ComponentPro
 
 CommandList.displayName = CommandPrimitive.List.displayName
 
-const CommandEmpty = React.memo(({ ref, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty> & { ref?: React.RefObject<HTMLDivElement> }) => (
+const CommandEmpty = memo(({ ref, ...props }: ComponentPropsWithoutRef<typeof CommandPrimitive.Empty> & { ref?: RefObject<HTMLDivElement> }) => (
   <CommandPrimitive.Empty
     ref={ref}
     className="py-6 text-center text-sm"
@@ -66,7 +67,7 @@ const CommandEmpty = React.memo(({ ref, ...props }: React.ComponentPropsWithoutR
 
 CommandEmpty.displayName = CommandPrimitive.Empty.displayName
 
-const CommandGroup = React.memo(({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Group> & { ref?: React.RefObject<HTMLDivElement> }) => (
+const CommandGroup = memo(({ ref, className, ...props }: ComponentPropsWithoutRef<typeof CommandPrimitive.Group> & { ref?: RefObject<HTMLDivElement> }) => (
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
@@ -79,7 +80,7 @@ const CommandGroup = React.memo(({ ref, className, ...props }: React.ComponentPr
 
 CommandGroup.displayName = CommandPrimitive.Group.displayName
 
-const CommandSeparator = React.memo(({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Separator> & { ref?: React.RefObject<HTMLDivElement> }) => (
+const CommandSeparator = memo(({ ref, className, ...props }: ComponentPropsWithoutRef<typeof CommandPrimitive.Separator> & { ref?: RefObject<HTMLDivElement> }) => (
   <CommandPrimitive.Separator
     ref={ref}
     className={cn('-mx-1 h-px bg-border', className)}
@@ -89,7 +90,7 @@ const CommandSeparator = React.memo(({ ref, className, ...props }: React.Compone
 
 CommandSeparator.displayName = CommandPrimitive.Separator.displayName
 
-const CommandItem = React.memo(({ ref, className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item> & { ref?: React.RefObject<HTMLDivElement> }) => (
+const CommandItem = memo(({ ref, className, ...props }: ComponentPropsWithoutRef<typeof CommandPrimitive.Item> & { ref?: RefObject<HTMLDivElement> }) => (
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
@@ -102,10 +103,10 @@ const CommandItem = React.memo(({ ref, className, ...props }: React.ComponentPro
 
 CommandItem.displayName = CommandPrimitive.Item.displayName
 
-const CommandShortcut = React.memo(({
+const CommandShortcut = memo(({
   className,
   ...props
-}: React.HTMLAttributes<HTMLSpanElement>) => {
+}: HTMLAttributes<HTMLSpanElement>) => {
   return (
     <span
       className={cn(
