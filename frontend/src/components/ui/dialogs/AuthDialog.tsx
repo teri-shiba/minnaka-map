@@ -1,7 +1,10 @@
 'use client'
+
+import { useAtom } from 'jotai'
 import Image from 'next/image'
 import { useState } from 'react'
 import { authProviders } from '~/lib/authConstants'
+import { authModalOpenAtom } from '~/lib/state/authModalOpenAtom'
 import logoMark from '~/public/logo_mark.webp'
 import { Button } from '../buttons/Button'
 import LoginForm from '../forms/LoginForm'
@@ -16,7 +19,7 @@ import {
 } from './Dialog'
 
 export function AuthDialog() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useAtom(authModalOpenAtom)
   const [isLogin, setIsLogin] = useState(true)
   const baseApiURL = process.env.NEXT_PUBLIC_API_BASE_URL
 
@@ -25,7 +28,9 @@ export function AuthDialog() {
   }
 
   const linkText = isLogin ? '新規登録' : 'ログイン'
-  const messageText = isLogin ? 'アカウントをお持ちでない方は、' : 'アカウントをお持ちの方は、'
+  const messageText = isLogin
+    ? 'アカウントをお持ちでない方は、'
+    : 'アカウントをお持ちの方は、'
   const descClassName = 'font-bold text-foreground hover:text-blue-500 hover:underline cursor-pointer'
 
   return (

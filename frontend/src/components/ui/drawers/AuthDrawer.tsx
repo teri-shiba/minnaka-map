@@ -1,7 +1,10 @@
 'use client'
+
+import { useAtom } from 'jotai'
 import Image from 'next/image'
 import { useState } from 'react'
 import { authProviders } from '~/lib/authConstants'
+import { authModalOpenAtom } from '~/lib/state/authModalOpenAtom'
 import logoMark from '~/public/logo_mark.webp'
 import { Button } from '../buttons/Button'
 import LoginForm from '../forms/LoginForm'
@@ -15,7 +18,7 @@ import {
 } from './Drawer'
 
 export function AuthDrawer() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useAtom(authModalOpenAtom)
   const [isLogin, setIsLogin] = useState(true)
   const baseApiURL = process.env.NEXT_PUBLIC_API_BASE_URL
 
