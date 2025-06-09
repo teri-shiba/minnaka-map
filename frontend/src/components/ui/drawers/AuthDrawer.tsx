@@ -20,7 +20,7 @@ import {
 export function AuthDrawer() {
   const [open, setOpen] = useAtom(authModalOpenAtom)
   const [isLogin, setIsLogin] = useState(true)
-  const baseApiURL = process.env.NEXT_PUBLIC_API_BASE_URL
+  const apiOrigin = process.env.NEXT_PUBLIC_API_BASE_URL
 
   const handleClick = () => {
     setIsLogin(!isLogin)
@@ -58,7 +58,7 @@ export function AuthDrawer() {
             {authProviders.map(provider => (
               <a
                 key={provider.name}
-                href={`${baseApiURL}/provider/${provider.authUrl}`}
+                href={`${apiOrigin}/provider/${provider.authUrl}`}
                 className="flex h-auto w-full items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent max-[383px]:[&:not(:last-child)]:mb-3"
               >
                 <Image
