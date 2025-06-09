@@ -1,9 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
+import Section from '~/components/layout/Section'
 import { useCarousel } from '~/hooks/useCarousel'
 import { carouselData } from '~/lib/data/carouselData'
 import { images } from '~/lib/image/images'
-import Section from '../../layout/Section'
 
 export function DesktopGuideCarousel() {
   const { activeStep, startSequenceFrom } = useCarousel(carouselData, {

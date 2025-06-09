@@ -1,4 +1,5 @@
 'use client'
+
 import Image from 'next/image'
 import Section from '~/components/layout/Section'
 import StetionSearchForm from '~/components/ui/forms/StationSearchForm'

@@ -5,9 +5,9 @@ import Link from 'next/link'
 import { useAuth } from '~/hooks/useAuth'
 import logo from '~/public/logo.webp'
 import logoMark from '~/public/logo_mark.webp'
-import { Auth } from '../ui/Auth'
-import UserMenu from '../ui/dropdownmenu/UserMenu'
-import { Skeleton } from '../ui/skeleton/Skeleton'
+import { Auth } from '~/ui/Auth'
+import UserMenu from '~/ui/dropdownmenu/UserMenu'
+import { Skeleton } from '~/ui/skeleton/Skeleton'
 
 interface logoImages {
   id: number
