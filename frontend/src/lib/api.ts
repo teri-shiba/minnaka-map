@@ -13,15 +13,25 @@ api.interceptors.response.use(
   (error) => {
     if (axios.isAxiosError(error) && error.response) {
       const status = error.response.status
-      if (status === 401) {
-        toast.error('認証エラーが発生しました。再ログインしてください。')
-      }
-      else if (status === 422) {
-        const errors = error.response.data.errors
-        toast.error(errors.full_messages || 'バリデーションエラーです')
-      }
-      else {
-        toast.error('サーバーエラーが発生しました')
+      switch (status) {
+        case 400:
+          toast.error('メールアドレスはすでに確認済みです')
+          break
+        case 404:
+          toast.error('ユーザーは見つかりません')
+          break
+        case 401:
+          toast.error('認証エラーが発生しました。再ログインしてください。')
+          break
+        case 422:
+          {
+            const errors = error.response.data.errors
+            toast.error(errors.full_messages?.join(',') || 'バリデーションエラーです')
+          }
+          break
+
+        default:
+          toast.error('サーバーエラーが発生しました')
       }
     }
     else {
