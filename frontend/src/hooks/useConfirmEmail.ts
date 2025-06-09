@@ -1,16 +1,19 @@
 'use client'
 
+import { useSetAtom } from 'jotai'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import api from '~/lib/api'
+import { authModalOpenAtom } from '~/lib/state/authModalOpenAtom'
 
 export default function useConfirmEmail() {
   const router = useRouter()
   const params = useSearchParams()
+  const setModalOpen = useSetAtom(authModalOpenAtom)
+  const token = params.get('confirmation_token')
 
   useEffect(() => {
-    const token = params.get('confirmation_token')
     if (!token)
       return
 
@@ -24,6 +27,8 @@ export default function useConfirmEmail() {
             error: '確認に失敗しました',
           },
         )
+
+        setModalOpen(true)
       }
       catch (error) {
         console.error('Confirm Email callback error:', error)
@@ -34,5 +39,5 @@ export default function useConfirmEmail() {
     }
 
     handleConfirmEmail()
-  }, [params, router])
+  }, [token, setModalOpen, router])
 }
