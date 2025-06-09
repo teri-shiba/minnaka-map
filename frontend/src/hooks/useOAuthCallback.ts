@@ -1,55 +1,63 @@
+'use client'
+
+import { useResetAtom } from 'jotai/utils'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect } from 'react'
 import { toast } from 'sonner'
-import { useAuth } from './useAuth'
+import { useSWRConfig } from 'swr'
+import api from '~/lib/api'
+import { userStateAtom } from '~/lib/state/userStateAtom'
 
 export default function useOAuthCallback() {
   const router = useRouter()
   const params = useSearchParams()
-  const pathName = usePathname()
-  const { fetchUser, resetUserState } = useAuth()
-  const hasRun = useRef(false)
+  const pathname = usePathname()
+  const { mutate } = useSWRConfig()
+  const resetUser = useResetAtom(userStateAtom)
 
-  const authParams = useMemo(() => ({
-    status: params.get('status'),
-    message: params.get('message'),
-  }), [params])
+  const status = params.get('status')
+  const message = params.get('message')
 
   useEffect(() => {
-    if (!authParams.status || hasRun.current)
+    if (!status)
       return
 
-    hasRun.current = true
-
-    const errorMessage = authParams.message
-      ? decodeURIComponent(authParams.message)
-      : 'ログインに失敗しました'
-
-    const handleOAuthCallback = async (): Promise<void> => {
-      try {
-        if (authParams.status === 'success') {
-          await fetchUser()
-          toast.success('ログインに成功しました')
+    const handleOAuthCallback = async () => {
+      if (status === 'success') {
+        try {
+          await toast.promise(
+            api.get('/current/user/show_status')
+              .then((response) => {
+                if (response.data.login === false) {
+                  throw new Error('未ログイン')
+                }
+                return response
+              }),
+            {
+              loading: '認証中…',
+              success: 'ログインに成功しました',
+              error: '認証に失敗しました',
+            },
+          )
+          await mutate('/current/user/show_status')
         }
-        else if (authParams.status === 'error') {
-          await resetUserState()
-          toast.error(errorMessage)
+        catch (error) {
+          resetUser()
+          toast.error('ログインの検証に失敗しました')
+          console.error('OAuth callback error:', error)
         }
-        else {
-          await resetUserState()
-          toast.error('不正なアクセスです')
-        }
+        router.replace(pathname, { scroll: false })
       }
-      catch (error) {
-        await resetUserState()
-        toast.error('ユーザーの取得に失敗しました')
-        console.error('OAuth callback error:', error)
-      }
-      finally {
-        router.replace(pathName, { scroll: false })
+      else {
+        resetUser()
+        const errorMessage = (status === 'error' && message)
+          ? decodeURIComponent(message)
+          : '不正なアクセスです'
+        toast.error(errorMessage)
+        router.replace(pathname, { scroll: false })
       }
     }
 
     handleOAuthCallback()
-  }, [authParams, router, pathName, fetchUser, resetUserState])
+  }, [status, message, mutate, resetUser, router, pathname])
 }
