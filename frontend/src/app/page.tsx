@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Section from '~/components/layout/Section'
 import StetionSearchForm from '~/components/ui/forms/StationSearchForm'
+import { GuideCarousel } from '~/components/ui/GuideCarousel'
 import useConfirmEmail from '~/hooks/useConfirmEmail'
 import useOAuthCallback from '~/hooks/useOAuthCallback'
 import { images } from '~/lib/image/images'
@@ -123,8 +124,7 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* <MobileGuideCarousel />
-      <DesktopGuideCarousel /> */}
+      <GuideCarousel />
     </>
   )
 }
