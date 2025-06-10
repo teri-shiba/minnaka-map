@@ -5,7 +5,7 @@ import { useCarousel } from '~/hooks/useCarousel'
 import { carouselData } from '~/lib/data/carouselData'
 import { images } from '~/lib/image/images'
 
-export function DesktopGuideCarousel() {
+export default function DesktopGuideCarousel() {
   const { activeStep, startSequenceFrom } = useCarousel(carouselData, {
     initialStep: 1,
     autoPlay: true,
