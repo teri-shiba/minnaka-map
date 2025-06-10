@@ -23,7 +23,7 @@ const carouselPlugins = [
   }),
 ]
 
-export function MobileGuideCarousel() {
+export default function MobileGuideCarousel() {
   return (
     <Section className="relative block py-8 before:absolute before:left-0 before:top-0 before:z-[-1] before:h-2/3 before:w-full before:rounded-2xl before:bg-secondary md:hidden">
       <h2 className="mb-7 text-center text-lg text-secondary-foreground sm:text-2xl md:mb-12">
