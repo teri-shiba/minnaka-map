@@ -1,7 +1,7 @@
 import type { CarouselData } from '~/lib/data/carouselData'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-interface UseCrouselOptions {
+interface UseCarouselOptions {
   initialStep?: number
   autoPlay?: boolean
   interval?: number
@@ -16,7 +16,7 @@ interface UseCarouselResult {
 
 export function useCarousel(
   carouselData: CarouselData[],
-  options: UseCrouselOptions = {},
+  options: UseCarouselOptions = {},
 ): UseCarouselResult {
   const {
     initialStep = 1,
