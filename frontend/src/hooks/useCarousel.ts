@@ -31,16 +31,18 @@ export function useCarousel(
   }, [])
 
   useEffect(() => {
-    if (!autoPlay) return
+    if (!autoPlay)
+      return
 
     timerRef.current = setTimeout(() => {
       setActiveStep(current => getNextStep(current))
     }, interval)
 
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current)
+      if (timerRef.current)
+        clearTimeout(timerRef.current)
     }
-  }, [activeStep, interval, getNextStep])
+  }, [autoPlay, activeStep, interval, getNextStep])
 
   return {
     activeStep,
