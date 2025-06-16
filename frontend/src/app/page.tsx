@@ -1,12 +1,19 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Section from '~/components/layout/Section'
 import StetionSearchForm from '~/components/ui/forms/StationSearchForm'
-import { GuideCarousel } from '~/components/ui/GuideCarousel'
+import LogoImage from '~/components/ui/LogoImage'
 import useConfirmEmail from '~/hooks/useConfirmEmail'
 import useOAuthCallback from '~/hooks/useOAuthCallback'
+
 import { images } from '~/lib/image/images'
+// import '~/styles/components/SectionGuide.css'
+
+const GuideCarousel = dynamic(() => import('../components/ui/carousels/GuideCarousel'), {
+  ssr: false,
+})
 
 export default function Home() {
   useOAuthCallback()
@@ -18,12 +25,9 @@ export default function Home() {
         <div className="grid md:grid-cols-2 md:gap-x-6">
           <h2 className="order-1 mx-auto mb-6 text-center md:col-span-1 md:row-span-1 md:ml-0 md:mr-auto md:mt-auto md:text-left">
             <span className="mb-1 inline-block text-lg text-secondary-foreground md:mb-2 md:text-xl">みんなのまんなか</span>
-            <Image
-              alt="minnaka map"
-              src={images.logo}
+            <LogoImage
               width={224}
               height={29}
-              priority
               className="block"
             />
           </h2>
@@ -57,12 +61,9 @@ export default function Home() {
       <Section className="py-14 md:py-24">
         <h2 className="mb-7 text-center text-lg text-secondary-foreground sm:text-2xl md:mb-12">
           <span className="inline-block align-text-bottom">
-            <Image
-              alt="minnaka map"
-              src={images.logo}
+            <LogoImage
               width={170}
               height={30}
-              priority
               className="w-44 sm:w-60"
             />
           </span>
@@ -124,7 +125,11 @@ export default function Home() {
         </div>
       </Section>
 
-      <GuideCarousel />
+      <Section className="relative mb-24">
+        <div className="section-guide">
+          <GuideCarousel />
+        </div>
+      </Section>
     </>
   )
 }
