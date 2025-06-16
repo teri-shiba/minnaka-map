@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import { useCarousel } from '~/hooks/useCarousel'
 import { carouselData } from '~/lib/data/carouselData'
-import LogoImage from '../../../LogoImage'
 import GuideItem from './GuideItem'
 
 const dataMap = new Map<number, typeof carouselData[0]>(
@@ -48,9 +47,12 @@ export default function DesktopGuideCarousel() {
       <div className="flex w-1/2 flex-col gap-4">
         <h2 className="mb-3 pl-5 text-2xl text-secondary-foreground">
           <span className="inline-block align-text-top">
-            <LogoImage
+            <Image
+              alt="minnaka map"
+              src="/logo.webp"
               width={170}
               height={30}
+              priority
               className="w-60"
             />
           </span>
