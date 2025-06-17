@@ -12,13 +12,13 @@ import '@maptiler/sdk/dist/maptiler-sdk.css'
 export default function Map({
   userLocation,
 }: MapProps) {
-  const baseApiURL = process.env.NEXT_PUBLIC_API_BASE_URL
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
   const [mapApiKey, setMapApiKey] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchApiKey = async () => {
       try {
-        const response = await fetch(`${baseApiURL}/map_tiler/api_key`)
+        const response = await fetch(`${baseURL}/map_tiler/api_key`)
         const data = await response.json()
         setMapApiKey(data.api_key)
       }
@@ -28,7 +28,7 @@ export default function Map({
     }
 
     fetchApiKey()
-  }, [baseApiURL])
+  }, [baseURL])
 
   const mapOptions = createMapOptions(userLocation)
 
