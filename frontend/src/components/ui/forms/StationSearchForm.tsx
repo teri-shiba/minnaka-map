@@ -36,10 +36,10 @@ export default function StationSearchForm() {
   })
 
   const watchedArea = form.watch('area')
-  const baseApiURL = process.env.NEXT_PUBLIC_API_BASE_URL
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
   const processValidData = async (data: AreaFormValues) => {
     try {
-      const response = await fetch(`${baseApiURL}/midpoints`, {
+      const response = await fetch(`${baseURL}/midpoints`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -14,7 +14,7 @@ export default function Result() {
   const params = useSearchParams()
   const router = useRouter()
   const [userLocation, setUserLocation] = useState<LatLngExpression | null>(null)
-  const baseApiURL = process.env.NEXT_PUBLIC_API_BASE_URL
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
 
   useEffect(() => {
     const validateCoordinates = async () => {
@@ -38,7 +38,7 @@ export default function Result() {
       }
 
       try {
-        const response = await fetch(`${baseApiURL}/validate_coordinates`, {
+        const response = await fetch(`${baseURL}/validate_coordinates`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ export default function Result() {
     }
 
     validateCoordinates()
-  }, [params, router, baseApiURL])
+  }, [params, router, baseURL])
 
   return (
     <>
