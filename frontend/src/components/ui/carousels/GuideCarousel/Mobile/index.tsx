@@ -2,8 +2,8 @@
 
 import type { EmblaOptionsType } from 'embla-carousel'
 import Autoplay from 'embla-carousel-autoplay'
+import Image from 'next/image'
 import { carouselData } from '~/lib/data/carouselData'
-import LogoImage from '../../../LogoImage'
 import {
   Carousel,
   CarouselContent,
@@ -28,9 +28,12 @@ export default function MobileGuideCarousel() {
     <>
       <h2 className="mb-7 text-center text-lg text-secondary-foreground sm:text-2xl md:mb-12">
         <span className="inline-block align-text-bottom">
-          <LogoImage
+          <Image
+            alt="minnaka map"
+            src="/logo.webp"
             width={170}
             height={30}
+            priority
             className="w-44"
           />
         </span>
