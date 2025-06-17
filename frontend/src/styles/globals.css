@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #262626;
+    --card: #ffffff;
+    --card-foreground: #262626;
+    --popover: #ffffff;
+    --popover-foreground: #262626;
+    --primary: #ff8f56;
+    --primary-darker: #ff8f56;
+    --primary-foreground: #ffffff;
+    --secondary: #FFF8F2;
+    --secondary-foreground: #581206;
+    --muted: #FFF8F2;
+    --muted-foreground: #B0B0B0;
+    --accent: #FFF8F2;
+    --accent-foreground: #261d1a;
+    --destructive: #FF5959;
+    --destructive-foreground: #ffffff;
+    --border: #e7dfd9;
+    --input: #e7dfd9;
+    --ring: #ff8f56;
+    --radius: 0.5rem;
+    --chart-1: #e94e20;
+    --chart-2: #288c63;
+    --chart-3: #3a4a61;
+    --chart-4: #ecad44;
+    --chart-5: #f3a024;
+  }
+
+  .dark {
+    --background: #262626;
+    --foreground: #ffffff;
+    --card: #262626;
+    --card-foreground: #ffffff;
+    --popover: #262626;
+    --popover-foreground: #ffffff;
+    --primary: #ff8f56;
+    --primary-foreground: #ffffff;
+    --secondary: #2a231f;
+    --secondary-foreground: #ffffff;
+    --muted: #2a231f;
+    --muted-foreground: #655c58;
+    --accent: #2a231f;
+    --accent-foreground: #ffffff;
+    --destructive: #FF5959;
+    --destructive-foreground: #ffffff;
+    --border: #2a231f;
+    --input: #2a231f;
+    --ring: #ff8f56;
+    --chart-1: #3399cc;
+    --chart-2: #398673;
+    --chart-3: #ffb352;
+    --chart-4: #a84b99;
+    --chart-5: #da396c;
+  }
+
+  body {
+    font-family: -apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Hiragino Sans",Meiryo,sans-serif,"Segoe UI Emoji";
+    color: #262626;
+  }
+}
+
+@layer components {
+  h1 { @apply text-2xl md:text-3xl font-bold }
+  h2 { @apply text-xl md:text-2xl font-bold }
+  h3 { @apply text-lg font-bold }
+  p { @apply text-sm md:text-base }
+
+  .section-guide {
+    @apply relative block py-8
+           md:flex md:items-center md:justify-between md:py-20;
+  }
+
+  .section-guide::before {
+    content: "";
+    @apply absolute left-0 top-0 z-[-1]
+           h-2/3 w-full rounded-2xl
+           bg-cover bg-center opacity-50
+           md:-left-1/4 md:h-full md:w-1/2
+           md:rounded-[2rem] md:opacity-100
+           md:min-h-[46rem];
+    background-image: url("/image_guide_background.webp");
+  }
+}
