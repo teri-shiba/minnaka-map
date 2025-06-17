@@ -1,7 +1,7 @@
 'use client'
 import type { FormEvent } from 'react'
 import type { SavedStation, StationProps } from '~/types/station'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { useLocalStorage } from '~/hooks/useLocalStorage'
 import useSearchStation from '~/hooks/useSearchStation'
 import { Command, CommandInput } from '../command/Command'
@@ -10,7 +10,7 @@ import StationSuggestions from './StationSuggestions'
 interface StationAutocompleteProps {
   value: string
   placeholder: string
-  onChange: (value: string) => void
+  onChange: (value: string, latitude?: number, longitude?: number) => void
   excludedStations?: string[]
 }
 
@@ -33,6 +33,14 @@ export default function StationAutocomplete({
     return excludedStations ?? []
   }, [excludedStations])
 
+  const prevValueRef = useRef(value)
+  if (prevValueRef.current !== value) {
+    if (value === '') {
+      setIsSelected(false)
+    }
+    prevValueRef.current = value
+  }
+
   const handleInputChange = useCallback((e: FormEvent<HTMLInputElement>) => {
     onChange(e.currentTarget.value)
     setIsSelected(false)
@@ -48,16 +56,20 @@ export default function StationAutocomplete({
       onChange('')
     }
     setIsFocused(false)
-    setIsSelected(false)
   }, [isSelected, onChange, value])
 
   const handleSelect = useCallback((station: StationProps) => {
     setIsSelected(true)
-    onChange(station.name)
+    onChange(station.name, station.latitude, station.longitude)
 
     setRecentStations((prev) => {
       const filtered = prev.filter(s => s.id !== station.id)
-      return [{ id: station.id, name: station.name }, ...filtered].slice(0, 5)
+      return [{
+        id: station.id,
+        name: station.name,
+        latitude: station.latitude,
+        longitude: station.longitude,
+      }, ...filtered].slice(0, 5)
     })
   }, [onChange, setRecentStations])
 

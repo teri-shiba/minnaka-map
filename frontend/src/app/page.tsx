@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Section from '~/components/layout/Section'
-import StetionSearchForm from '~/components/ui/forms/StationSearchForm'
+import StationSearchForm from '~/components/ui/forms/StationSearchForm'
 import useConfirmEmail from '~/hooks/useConfirmEmail'
 import useOAuthCallback from '~/hooks/useOAuthCallback'
 
@@ -32,7 +32,7 @@ export default function Home() {
           </h2>
 
           <div className="order-3 md:col-span-1 md:row-span-1">
-            <StetionSearchForm />
+            <StationSearchForm />
           </div>
 
           <div className="order-2 mx-auto md:order-1 md:col-span-1 md:row-span-2">
@@ -48,7 +48,7 @@ export default function Home() {
               alt=""
               src="/mv_sp.webp"
               width={264}
-              height={184}
+              height={183}
               priority
               className="block md:hidden"
             />

@@ -35,6 +35,9 @@ gem "omniauth-google-oauth2"
 # かな・ローマ字追加
 gem "miyabi"
 
+# ジオコーディング
+gem "geocoder", "~> 1.8", ">= 1.8.5"
+
 group :development, :test do
   gem "factory_bot_rails"
   gem "faker"

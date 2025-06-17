@@ -38,7 +38,7 @@ export default function Header() {
   ]
 
   return (
-    <header className="w-full">
+    <header className="h-16 w-full">
       <div className="mx-auto flex h-16 max-w-screen-lg items-center justify-between gap-4 px-5">
         <Link href="/" className="flex items-center">
           {logoImages.map(logo => (
