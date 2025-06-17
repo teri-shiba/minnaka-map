@@ -1,5 +1,7 @@
+'use client'
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname, useSearchParams } from 'next/navigation'
 import logo from '~/public/logo.webp'
 
 interface NavItemProps {
@@ -14,8 +16,11 @@ const NAV_ITEMS: NavItemProps[] = [
 ]
 
 export default function Footer() {
+  const pathname = usePathname()
+  const footerVisibilityClass = pathname === '/result' ? 'hidden md:block' : null
+
   return (
-    <footer className="absolute top-full w-full bg-background">
+    <footer className={`bg-background ${footerVisibilityClass}`}>
       <div className="mx-auto max-w-screen-lg px-5 py-6">
         <div className="flex flex-col items-center justify-between md:flex-row">
           <Link href="/" className="flex items-center space-x-2">
