@@ -33,7 +33,7 @@ export default function Map({
   const mapOptions = createMapOptions(userLocation)
 
   return (
-    <main className="relative h-screen w-full flex-1 overflow-hidden md:w-3/5">
+    <main className="relative size-full flex-1 overflow-hidden md:w-3/5">
       <MapContainer
         center={userLocation}
         {...mapOptions}
