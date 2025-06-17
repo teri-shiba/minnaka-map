@@ -1,0 +1,65 @@
+'use client'
+import type { StaticImageData } from 'next/image'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useAuth } from '~/hooks/useAuth'
+import logo from '~/public/logo.webp'
+import logoMark from '~/public/logo_mark.webp'
+import { Auth } from '~/ui/Auth'
+import UserMenu from '~/ui/dropdownmenu/UserMenu'
+import { Skeleton } from '~/ui/skeleton/Skeleton'
+
+interface logoImages {
+  id: number
+  src: StaticImageData
+  width: number
+  height: number
+  customClassName: string
+}
+
+export default function Header() {
+  const { user, isLoading } = useAuth()
+
+  const logoImages: logoImages[] = [
+    {
+      id: 0,
+      src: logo,
+      width: 224,
+      height: 29,
+      customClassName: 'hidden md:block',
+    },
+    {
+      id: 1,
+      src: logoMark,
+      width: 28,
+      height: 28,
+      customClassName: 'block md:hidden',
+    },
+  ]
+
+  return (
+    <header className="w-full">
+      <div className="mx-auto flex h-16 max-w-screen-lg items-center justify-between gap-4 px-5">
+        <Link href="/" className="flex items-center">
+          {logoImages.map(logo => (
+            <Image
+              key={logo.id}
+              src={logo.src}
+              alt="logo"
+              width={logo.width}
+              height={logo.height}
+              priority
+              aria-label="Go to Home"
+              className={logo.customClassName}
+            />
+          ))}
+        </Link>
+        {isLoading
+          ? <Skeleton className="h-[40px] w-[87px] rounded-full" />
+          : user && user.isSignedIn
+            ? <UserMenu />
+            : <Auth />}
+      </div>
+    </header>
+  )
+}
