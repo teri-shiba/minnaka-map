@@ -4,12 +4,8 @@ import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Section from '~/components/layout/Section'
 import StetionSearchForm from '~/components/ui/forms/StationSearchForm'
-import LogoImage from '~/components/ui/LogoImage'
 import useConfirmEmail from '~/hooks/useConfirmEmail'
 import useOAuthCallback from '~/hooks/useOAuthCallback'
-
-import { images } from '~/lib/image/images'
-// import '~/styles/components/SectionGuide.css'
 
 const GuideCarousel = dynamic(() => import('../components/ui/carousels/GuideCarousel'), {
   ssr: false,
@@ -25,9 +21,12 @@ export default function Home() {
         <div className="grid md:grid-cols-2 md:gap-x-6">
           <h2 className="order-1 mx-auto mb-6 text-center md:col-span-1 md:row-span-1 md:ml-0 md:mr-auto md:mt-auto md:text-left">
             <span className="mb-1 inline-block text-lg text-secondary-foreground md:mb-2 md:text-xl">みんなのまんなか</span>
-            <LogoImage
+            <Image
+              alt="minnaka map"
+              src="/logo.webp"
               width={224}
               height={29}
+              priority
               className="block"
             />
           </h2>
@@ -38,17 +37,16 @@ export default function Home() {
 
           <div className="order-2 mx-auto md:order-1 md:col-span-1 md:row-span-2">
             <Image
-              alt="mv-pc"
-              src={images.mvPC}
+              alt=""
+              src="/mv_pc.webp"
               width={424}
               height={533}
               priority
               className="hidden md:block"
             />
-
             <Image
-              alt="mv-sp"
-              src={images.mvSP}
+              alt=""
+              src="/mv_sp.webp"
               width={264}
               height={184}
               priority
@@ -61,9 +59,12 @@ export default function Home() {
       <Section className="py-14 md:py-24">
         <h2 className="mb-7 text-center text-lg text-secondary-foreground sm:text-2xl md:mb-12">
           <span className="inline-block align-text-bottom">
-            <LogoImage
+            <Image
+              alt="minnaka map"
+              src="/logo.webp"
               width={170}
               height={30}
+              priority
               className="w-44 sm:w-60"
             />
           </span>
@@ -74,7 +75,7 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center">
             <Image
               alt="featureFriends"
-              src={images.featureFriends}
+              src="/image_feature_01.webp"
               width={170}
               height={149}
               className="mb-4"
@@ -91,7 +92,7 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center">
             <Image
               alt="featureDate"
-              src={images.featureDate}
+              src="/image_feature_02.webp"
               width={170}
               height={148}
               className="mb-4"
@@ -108,7 +109,7 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center">
             <Image
               alt="featureBusiness"
-              src={images.featureBusiness}
+              src="/image_feature_03.webp"
               width={170}
               height={149}
               className="mb-4"
