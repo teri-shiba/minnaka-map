@@ -2,6 +2,7 @@
 
 import type { AreaFormValues } from '~/lib/schemas/areaSearchSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'next/navigation'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/buttons/Button'
@@ -15,15 +16,18 @@ import { Form, FormControl, FormField, FormItem } from './Form'
 const MAX_AREA_FIELDS = 6
 const MAX_REQUIRED_FIELDS = 2
 
-export default function StetionSearchForm() {
+export default function StationSearchForm() {
+  const router = useRouter()
   const form = useForm<AreaFormValues>({
     resolver: zodResolver(areaFormSchema),
     defaultValues: {
-      // TODO: データの返り値に緯度経度を含めること（現在: value.area.areaValue）
-      area: [{ areaValue: '' }, { areaValue: '' }],
+      area: [
+        { areaValue: '', latitude: null, longitude: null },
+        { areaValue: '', latitude: null, longitude: null },
+      ],
     },
     mode: 'onSubmit',
-    reValidateMode: 'onChange',
+    reValidateMode: 'onSubmit',
   })
 
   const { fields, append, remove } = useFieldArray({
@@ -32,12 +36,23 @@ export default function StetionSearchForm() {
   })
 
   const watchedArea = form.watch('area')
-
-  const onSubmit = async (value: AreaFormValues) => {
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+  const processValidData = async (data: AreaFormValues) => {
     try {
-      // TODO: データの返り値に緯度経度を含めること（現在: value.area.areaValue）
-      // TODO: 確認用・あとで削除する
-      toast.success(`検索条件を送信しました: ${value}`)
+      const response = await fetch(`${baseURL}/midpoints`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+
+      const result = await response.json()
+      if (!response.ok) {
+        throw new Error('APIリクエストに失敗しました')
+      }
+
+      router.push(`/result?lat=${result.midpoint.latitude}&lng=${result.midpoint.longitude}&signature=${result.signature}`)
     }
     catch (e) {
       console.error('フォーム送信エラー:', e)
@@ -45,15 +60,7 @@ export default function StetionSearchForm() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    form.handleSubmit((data) => {
-      onSubmit(data)
-    })(e)
-
-    const errors = form.formState.errors
-
+  const handleValidationErrors = (errors: any) => {
     if (errors.area) {
       if ('root' in errors.area && errors.area.root?.message) {
         toast.error(errors.area.root.message)
@@ -62,6 +69,15 @@ export default function StetionSearchForm() {
         toast.error(errors.area.message)
       }
     }
+  }
+
+  const handleFormEvent = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    form.handleSubmit(
+      validData => processValidData(validData),
+      errors => handleValidationErrors(errors),
+    )(e)
   }
 
   const renderFieldButtons = (index: number, value: string) => {
@@ -75,7 +91,7 @@ export default function StetionSearchForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit} noValidate>
+      <form onSubmit={handleFormEvent} noValidate>
 
         <div className="mb-6 md:grid md:grid-flow-col md:grid-cols-2 md:grid-rows-3 md:gap-x-6 md:gap-y-3">
           {fields.map((field, index) => {
@@ -97,7 +113,11 @@ export default function StetionSearchForm() {
                         <StationAutocomplete
                           {...field}
                           value={field.value}
-                          onChange={field.onChange}
+                          onChange={(value, latitude, longitude) => {
+                            field.onChange(value)
+                            form.setValue(`area.${index}.latitude`, Number(latitude))
+                            form.setValue(`area.${index}.longitude`, Number(longitude))
+                          }}
                           placeholder={`${index + 1}人目の出発駅`}
                           excludedStations={excludedStations}
                         />

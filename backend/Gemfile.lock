@@ -99,6 +99,7 @@ GEM
       ostruct
     connection_pool (2.4.1)
     crass (1.0.6)
+    csv (3.3.4)
     date (3.4.1)
     deep_merge (1.2.2)
     devise (4.9.4)
@@ -129,6 +130,9 @@ GEM
       logger
     faraday-net_http (3.4.0)
       net-http (>= 0.5.0)
+    geocoder (1.8.5)
+      base64 (>= 0.1.0)
+      csv (>= 3.0.0)
     globalid (1.2.1)
       activesupport (>= 6.1)
     hashie (5.0.0)
@@ -377,6 +381,7 @@ DEPENDENCIES
   devise_token_auth
   factory_bot_rails
   faker
+  geocoder (~> 1.8, >= 1.8.5)
   letter_opener_web
   miyabi
   omniauth-google-oauth2
