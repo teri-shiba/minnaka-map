@@ -9,9 +9,12 @@
     "paths": {
       "~/*": ["./src/*"],
       "~/public/*": ["./public/*"],
-      "~/components/*": ["./src/app/components/*"],
-      "~/hooks/*": ["./src/app/hooks/*"],
-      "~/lib/*": ["./src/app/lib/*"]
+      "~/components/*": ["./src/components/*"],
+      "~/ui/*": ["./src/components/ui/*"],
+      "~/hooks/*": ["./src/hooks/*"],
+      "~/lib/*": ["./src/lib/*"],
+      "~/types/*": ["./src/types/*"],
+      "~/styles/*": ["./src/styles/*"]
     },
     "resolveJsonModule": true,
     "allowJs": true,
