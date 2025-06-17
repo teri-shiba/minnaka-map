@@ -71,9 +71,9 @@ export default function Result() {
 
   return (
     <>
-      <main className="size-full">
+      <div className="h-[calc(100vh-4rem)] w-full">
         {userLocation && <Map userLocation={userLocation} />}
-      </main>
+      </div>
     </>
   )
 }
