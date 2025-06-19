@@ -87,3 +87,14 @@
     background-image: url("/image_guide_background.webp");
   }
 }
+
+@layer utilities {
+  .hidden-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hidden-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
