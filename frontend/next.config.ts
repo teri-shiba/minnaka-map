@@ -3,6 +3,7 @@ import type { NextConfig } from 'next'
 const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
+    domains: ['imgfp.hotp.jp'],
   },
   webpack(config) {
     config.module.rules.push({
