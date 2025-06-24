@@ -1,8 +1,8 @@
 'use client'
 
-import type { CarouselData } from '~/lib/data/carouselData'
+import type { CarouselData } from '~/data/carouselData'
 import { AnimatePresence, motion } from 'framer-motion'
-import { cn } from '~/lib/utils'
+import { cn } from '~/utils/utils'
 
 interface GuideItemProps {
   data: CarouselData

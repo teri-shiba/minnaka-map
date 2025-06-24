@@ -3,7 +3,7 @@
 import type { ComponentProps, ComponentPropsWithoutRef, ComponentRef, HTMLAttributes, RefObject } from 'react'
 import { Drawer as DrawerPrimitive } from 'vaul'
 
-import { cn } from '~/lib/utils'
+import { cn } from '~/utils/utils'
 
 function Drawer({
   shouldScaleBackground = true,
@@ -47,7 +47,7 @@ function DrawerContent({ ref, className, children, ...props }: ComponentPropsWit
         )}
         {...props}
       >
-        <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
+        <div className="mx-auto mt-4 h-1 w-9 rounded-full bg-gray-200" />
         {children}
       </DrawerPrimitive.Content>
     </DrawerPortal>

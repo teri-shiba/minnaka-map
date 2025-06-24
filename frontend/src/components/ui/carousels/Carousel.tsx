@@ -7,7 +7,7 @@ import { createContext, use, useCallback, useEffect, useMemo, useSyncExternalSto
 import { LuArrowLeft, LuArrowRight } from 'react-icons/lu'
 
 import { Button } from '~/components/ui/buttons/Button'
-import { cn } from '~/lib/utils'
+import { cn } from '~/utils/utils'
 
 type CarouselApi = UseEmblaCarouselType[1]
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>

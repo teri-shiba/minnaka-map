@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { useSWRConfig } from 'swr'
 import api from '~/lib/api'
-import { userStateAtom } from '~/lib/state/userStateAtom'
+import { userStateAtom } from '~/state/userStateAtom'
 
 export default function useOAuthCallback() {
   const router = useRouter()

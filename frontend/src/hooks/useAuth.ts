@@ -4,7 +4,7 @@ import { useCallback } from 'react'
 import { toast } from 'sonner'
 import useSWR, { useSWRConfig } from 'swr'
 import api from '~/lib/api'
-import { userStateAtom } from '~/lib/state/userStateAtom'
+import { userStateAtom } from '~/state/userStateAtom'
 
 const appOrigin = process.env.NEXT_PUBLIC_FRONT_BASE_URL
 
