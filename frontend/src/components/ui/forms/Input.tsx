@@ -1,5 +1,5 @@
 import type { ComponentPropsWithRef } from 'react'
-import { cn } from '~/lib/utils'
+import { cn } from '~/utils/utils'
 
 function Input({ ref, className, type, ...props }: ComponentPropsWithRef<'input'>) {
   return (

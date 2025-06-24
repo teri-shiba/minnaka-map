@@ -1,6 +1,6 @@
 'use client'
 
-import type { CarouselData } from '~/lib/data/carouselData'
+import type { CarouselData } from '~/data/carouselData'
 import Image from 'next/image'
 import { Card, CardContent } from '../../../cards/Card'
 

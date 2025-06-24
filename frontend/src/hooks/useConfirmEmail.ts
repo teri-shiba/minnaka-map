@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import api from '~/lib/api'
-import { authModalOpenAtom } from '~/lib/state/authModalOpenAtom'
+import { authModalOpenAtom } from '~/state/authModalOpenAtom'
 
 export default function useConfirmEmail() {
   const router = useRouter()

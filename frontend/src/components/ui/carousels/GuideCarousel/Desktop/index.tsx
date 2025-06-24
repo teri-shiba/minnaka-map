@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import { useCarousel } from '~/hooks/useCarousel'
-import { carouselData } from '~/lib/data/carouselData'
+import { carouselData } from '~/data/carouselData'
 import GuideItem from './GuideItem'
 
 const dataMap = new Map<number, typeof carouselData[0]>(
