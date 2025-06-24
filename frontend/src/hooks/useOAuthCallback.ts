@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { useSWRConfig } from 'swr'
-import api from '~/lib/api'
+import api from '~/lib/axios-interceptor'
 import { userStateAtom } from '~/state/user-state.atom'
 
 export default function useOAuthCallback() {
