@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const areaFormSchema = z.object({
+export const stationSearchSchema = z.object({
   area: z.array(
     z.object({
       areaValue: z.string().trim().min(1, '出発地点を入力してください'),
@@ -21,4 +21,4 @@ export const areaFormSchema = z.object({
     }),
 })
 
-export type AreaFormValues = z.infer<typeof areaFormSchema>
+export type AreaFormValues = z.infer<typeof stationSearchSchema>
