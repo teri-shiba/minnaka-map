@@ -4,7 +4,7 @@ import type { ComponentPropsWithoutRef, ComponentRef, RefObject } from 'react'
 import * as SelectPrimitive from '@radix-ui/react-select'
 import { LuCheck, LuChevronDown, LuChevronUp } from 'react-icons/lu'
 
-import { cn } from '~/utils/utils'
+import { cn } from '~/utils/cn'
 
 const Select = SelectPrimitive.Root
 
