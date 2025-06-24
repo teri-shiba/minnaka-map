@@ -1,12 +1,12 @@
 'use client'
 
-import type { AreaFormValues } from '~/schemas/areaSearchSchema'
+import type { AreaFormValues } from '~/schemas/station-search.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/buttons/Button'
-import { areaFormSchema } from '~/schemas/areaSearchSchema'
+import { stationSearchSchema } from '~/schemas/station-search.schema'
 import StationAutocomplete from '../autocomplete/StationAutocomplete'
 import { AddFormButton } from '../buttons/AddFormButton'
 import { RemoveFormButton } from '../buttons/RemoveFormButton'
@@ -19,7 +19,7 @@ const MAX_REQUIRED_FIELDS = 2
 export default function StationSearchForm() {
   const router = useRouter()
   const form = useForm<AreaFormValues>({
-    resolver: zodResolver(areaFormSchema),
+    resolver: zodResolver(stationSearchSchema),
     defaultValues: {
       area: [
         { areaValue: '', latitude: null, longitude: null },
