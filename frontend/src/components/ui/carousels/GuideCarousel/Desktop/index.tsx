@@ -2,8 +2,8 @@
 
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
+import { carouselData } from '~/data/carousel-data'
 import { useCarousel } from '~/hooks/useCarousel'
-import { carouselData } from '~/data/carouselData'
 import GuideItem from './GuideItem'
 
 const dataMap = new Map<number, typeof carouselData[0]>(

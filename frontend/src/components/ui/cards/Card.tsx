@@ -1,5 +1,5 @@
 import type { HTMLAttributes, RefObject } from 'react'
-import { cn } from '~/lib/utils'
+import { cn } from '~/utils/cn'
 
 function Card({ ref, className, ...props }: HTMLAttributes<HTMLDivElement> & { ref?: RefObject<HTMLDivElement> }) {
   return (
@@ -44,7 +44,7 @@ function CardDescription({ ref, className, ...props }: HTMLAttributes<HTMLDivEle
   return (
     <div
       ref={ref}
-      className={cn('text-sm text-muted-foreground', className)}
+      className={cn('text-sm', className)}
       {...props}
     />
   )
