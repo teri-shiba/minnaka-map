@@ -3,7 +3,7 @@
 import type { MapProps } from '~/types/map'
 import { useEffect, useState } from 'react'
 import { MapContainer, ZoomControl } from 'react-leaflet'
-import { createMapOptions } from '~/lib/mapOptions'
+import { createLeafletOptions } from '~/lib/createLeafletOptions'
 import MapTailerLayer from './layers/MapTailerLayer'
 import UserLocationMarker from './markers/UserLocationMarker'
 import 'leaflet/dist/leaflet.css'
@@ -30,7 +30,7 @@ export default function Map({
     fetchApiKey()
   }, [baseURL])
 
-  const mapOptions = createMapOptions(userLocation)
+  const mapOptions = createLeafletOptions(userLocation)
 
   return (
     <main className="relative size-full flex-1 overflow-hidden md:w-3/5">
