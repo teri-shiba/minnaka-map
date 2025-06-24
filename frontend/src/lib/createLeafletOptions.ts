@@ -1,7 +1,7 @@
 import type { LatLngExpression, MapOptions } from 'leaflet'
 import L from 'leaflet'
 
-export function createMapOptions(userLocation: LatLngExpression): MapOptions {
+export function createLeafletOptions(userLocation: LatLngExpression): MapOptions {
   const latlng = L.latLng(userLocation)
   return {
     zoom: 18,
