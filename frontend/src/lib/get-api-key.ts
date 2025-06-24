@@ -4,11 +4,11 @@ export type SupportedService = 'hotpepper' | 'maptiler'
 
 const SERVICE_CONFIG = {
   hotpepper: {
-    endpoint: '/hotpepper/api_key',
+    endpoint: '/api_keys/hotpepper',
     serviceName: 'HotPepper',
   },
   maptiler: {
-    endpoint: '/maptiler/api_key',
+    endpoint: '/api_keys/maptiler',
     serviceName: 'MapTiler',
   },
 } as const
@@ -33,11 +33,6 @@ export async function getApiKey(service: SupportedService): Promise<string> {
     }
 
     const data = await response.json()
-
-    if (!data.api_key) {
-      throw new Error(`${config.serviceName} APIキーがレスポンスに含まれていません`)
-    }
-
     return data.api_key
   }
   catch (error) {
