@@ -11,6 +11,7 @@ export interface RestaurantProps {
 
 // TODO: レストランの実装時にコメントを復活
 export interface MapProps {
+  apiKey: string
   // restaurants: RestaurantProps[]
   userLocation: LatLngExpression
   // onMarkerClick?: (id: string | number) => void
