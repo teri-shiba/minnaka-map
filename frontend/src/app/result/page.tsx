@@ -1,79 +1,63 @@
-'use client'
-import type { LatLngExpression } from 'leaflet'
-import dynamic from 'next/dynamic'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
+import type { SearchParams } from '~/types/search-params'
+import RestaurantsDrawer from '~/components/ui/drawers/RestaurantsDrawer'
+import Map from '~/components/ui/map/Map'
+import { fetchRestaurants } from '~/services/fetch-restaurants'
+import { getApiKey } from '~/services/get-api-key'
+import { validateCoordinates } from '~/services/validate-coordinates'
 
-const Map = dynamic(() => import('~/components/ui/map/Map'), {
-  ssr: false,
-  loading: () => <p>Loading...</p>,
-})
+interface ResultPageProps {
+  searchParams: SearchParams
+}
 
-export default function Result() {
-  const params = useSearchParams()
-  const router = useRouter()
-  const [userLocation, setUserLocation] = useState<LatLngExpression | null>(null)
-  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+export default async function Result({ searchParams }: ResultPageProps) {
+  const params = await searchParams
 
-  useEffect(() => {
-    const validateCoordinates = async () => {
-      const latParam = params.get('lat')
-      const lngParam = params.get('lng')
-      const signature = params.get('signature')
-
-      if (!latParam || !lngParam || !signature) {
-        toast.error('検索パラメータが不足しています。再度計算を行ってください。')
-        router.push('/')
-        return
-      }
-
-      const lat = Number.parseFloat(latParam)
-      const lng = Number.parseFloat(lngParam)
-
-      if (Number.isNaN(lat) || Number.isNaN(lng)) {
-        toast.error('無効な位置情報です。再度検索を行ってください。')
-        router.push('/')
-        return
-      }
-
-      try {
-        const response = await fetch(`${baseURL}/validate_coordinates`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            latitude: lat,
-            longitude: lng,
-            signature,
-          }),
-        })
-
-        if (!response.ok) {
-          const errorData = await response.json()
-          toast.error(errorData.message || '座標の検証に失敗しました。再検索を行ってください。')
-          router.push('/')
-          return
-        }
-
-        setUserLocation([lat, lng])
-      }
-      catch (e) {
-        console.error('検証エラー:', e)
-        toast.error('検証中にエラーが発生しました。再度お試しください。')
-        router.push('/')
-      }
-    }
-
-    validateCoordinates()
-  }, [params, router, baseURL])
+  const userLocation = await validateCoordinates(params)
+  const restaurants = await fetchRestaurants(params)
+  const maptilerApiKey = await getApiKey('maptiler')
 
   return (
     <>
-      <div className="h-[calc(100vh-4rem)] w-full">
-        {userLocation && <Map userLocation={userLocation} />}
+      <div className="relative mx-auto h-[calc(100dvh-4rem)] max-w-screen-2xl overflow-hidden sm:flex">
+        <div className="h-[calc(60vh-4rem)] w-full md:h-[calc(100vh-4rem)] md:w-3/5">
+          {(maptilerApiKey && userLocation)
+            && (
+              <Map
+                apiKey={maptilerApiKey}
+                userLocation={userLocation}
+              />
+            )}
+        </div>
+
+        {/* PC */}
+        {/* <div className="p-6 max-h-dvh overflow-y-scroll hidden-scrollbar md:w-2/5">
+          {restaurants.map(item => (
+            <RestaurantCard
+              key={item.name}
+              id={item.id}
+              name={item.name}
+              genre={item.genre.name}
+              address={item.address}
+              station={item.station_name}
+              open={item.open}
+              close={item.close}
+              card={item.card}
+              access={item.mobile_access} // 店によって違うから一覧ではいらんかも
+              url={item.urls.pc} // ホットペッパーのURL
+              imageUrl={item.photo.mobile.l}
+              privateRoom={item.private_room}
+              budget={item.budget.average}
+              capacity={item.capacity}
+            />
+          ))}
+        </div> */}
+
+        {/* SP */}
+        <RestaurantsDrawer
+          restaurants={restaurants}
+        />
       </div>
+
     </>
   )
 }
