@@ -1,5 +1,3 @@
-'use server'
-
 export type SupportedService = 'hotpepper' | 'maptiler'
 
 const SERVICE_CONFIG = {
