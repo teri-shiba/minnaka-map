@@ -12,16 +12,11 @@ export function createLeafletOptions(userLocation: LatLngExpression): MapOptions
 
     scrollWheelZoom: 'center',
     wheelDebounceTime: 500,
+    doubleClickZoom: false,
+    tapTolerance: 15,
 
     touchZoom: 'center',
-    tapTolerance: 15,
     bounceAtZoomLimits: false,
-    doubleClickZoom: false,
-    maxBounds: [
-      [latlng.lat - 0.001, latlng.lng - 0.001],
-      [latlng.lat + 0.001, latlng.lng + 0.001],
-    ],
-    maxBoundsViscosity: 0.8,
 
     fadeAnimation: false,
     zoomAnimation: false,
@@ -34,5 +29,11 @@ export function createLeafletOptions(userLocation: LatLngExpression): MapOptions
 
     preferCanvas: true,
     zoomControl: false,
+
+    maxBounds: [
+      [latlng.lat - 0.001, latlng.lng - 0.001],
+      [latlng.lat + 0.001, latlng.lng + 0.001],
+    ],
+    maxBoundsViscosity: 0.8,
   }
 }
