@@ -14,7 +14,6 @@ export default function ErrorToastHandler() {
   const params = useSearchParams()
   const error = params.get('error')
   const message = params.get('message')
-  console.log(error, message)
   const router = useRouter()
 
   useEffect(() => {
