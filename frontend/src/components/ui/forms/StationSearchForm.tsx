@@ -52,7 +52,18 @@ export default function StationSearchForm() {
         throw new Error('APIリクエストに失敗しました')
       }
 
-      router.push(`/result?lat=${result.midpoint.latitude}&lng=${result.midpoint.longitude}&signature=${result.signature}`)
+      const query: Record<string, string> = {
+        lat: result.midpoint.latitude,
+        lng: result.midpoint.longitude,
+        signature: result.signature,
+      }
+
+      if (result.expires_at) {
+        query.expires_at = result.expires_at
+      }
+
+      const qs = new URLSearchParams(query).toString()
+      router.push(`/result?${qs}`)
     }
     catch (e) {
       console.error('フォーム送信エラー:', e)
