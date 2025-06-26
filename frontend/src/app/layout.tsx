@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Footer from '~/components/layout/Footer'
 import Header from '~/components/layout/Header'
+import ErrorToastHandler from '~/components/ui/toasts/ErrorToastHandler'
 import { Toaster } from '~/components/ui/toasts/Toast'
 import '~/styles/globals.css'
 
@@ -18,6 +19,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           {children}
         </main>
         <Toaster richColors />
+        <ErrorToastHandler />
         <Footer />
       </body>
     </html>
