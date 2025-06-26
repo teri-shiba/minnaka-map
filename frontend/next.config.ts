@@ -1,9 +1,15 @@
 import type { NextConfig } from 'next'
+import { hostname } from 'os'
 
 const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
-    domains: ['imgfp.hotp.jp'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'imgfp.hotp.jp',
+      }
+    ]
   },
   webpack(config) {
     config.module.rules.push({
