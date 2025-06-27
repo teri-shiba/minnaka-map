@@ -3,4 +3,5 @@ export interface SearchParams {
   lng: string
   radius?: string
   signature?: string
+  expires_at?: number
 }
