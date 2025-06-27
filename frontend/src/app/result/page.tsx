@@ -1,9 +1,11 @@
 import type { SearchParams } from '~/types/search-params'
+import { redirect } from 'next/navigation'
 import RestaurantsDrawer from '~/components/ui/drawers/RestaurantsDrawer'
 import Map from '~/components/ui/map/Map'
 import { fetchRestaurants } from '~/services/fetch-restaurants'
 import { getApiKey } from '~/services/get-api-key'
-import { validateCoordinates } from '~/services/validate-coordinates'
+import { verifyCoordsSignature } from '~/services/verify-coords-signature'
+import { parseAndValidateCoordinates } from '~/services/parse-and-validate-coords'
 
 interface ResultPageProps {
   searchParams: SearchParams
@@ -12,8 +14,25 @@ interface ResultPageProps {
 export default async function Result({ searchParams }: ResultPageProps) {
   const params = await searchParams
 
-  const userLocation = await validateCoordinates(params)
-  const restaurants = await fetchRestaurants(params)
+  if (!params.lat || !params.lng || !params.signature) {
+    redirect('/?error=missing_params')
+  }
+
+  const { lat, lng } = await parseAndValidateCoordinates(params)
+
+  const userLocation = await verifyCoordsSignature({
+    latitude: lat,
+    longitude: lng,
+    signature: params.signature,
+    expires_at: params.expires_at,
+  })
+
+  const restaurants = await fetchRestaurants({
+    latitude: lat,
+    longitude: lng,
+    radius: params.radius,
+  })
+
   const maptilerApiKey = await getApiKey('maptiler')
 
   return (
