@@ -1,44 +1,48 @@
+import type { Restaurant } from '~/types/restaurant'
 import Image from 'next/image'
-import Link from 'next/link'
-import { FaStar } from 'react-icons/fa'
-import Liked from '../likes/Liked'
+import { LuCalendarX2, LuTramFront } from 'react-icons/lu'
+import { Badge } from '../badges/badge'
 import {
   Card,
   CardContent,
+  CardDescription,
   CardTitle,
 } from './Card'
 
-export default function RestaurantCard() {
+interface RestaurantCardProps {
+  restaurant: Restaurant
+}
+
+export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
   return (
-    <Link href="/terms">
-      <Card className="relative mb-4 sm:w-[498px]">
-        <div className="absolute right-1 top-1 z-50 sm:right-0 sm:top-0">
-          <Liked />
-        </div>
-        <div className="relative aspect-[4/3] h-auto w-full overflow-hidden rounded-lg sm:aspect-square sm:size-[140px]">
-          <Image
-            src="/dummy-image.png"
-            alt="image"
-            fill
-            sizes="(max-width: 640px) 100vw, 140px"
-            className="object-cover"
-          />
-        </div>
-        <CardContent className="flex-col space-y-2">
-          <CardTitle>店舗名</CardTitle>
-          <div className="flex space-x-2">
-            <span className="text-sm">ジャンル</span>
-            <span className="flex items-center space-x-1 text-sm">
-              <FaStar
-                size={16}
-                fill="orange"
-              />
-              <span>4.0</span>
-            </span>
-          </div>
-          <p className="text-sm text-gray-500">〒000-0000 東京都渋谷区渋谷 0-0-0</p>
-        </CardContent>
-      </Card>
-    </Link>
+    <Card className="[@media(max-width:335px)]:flex-col">
+      <div className="relative aspect-square size-32 shrink-0 overflow-hidden rounded-lg [@media(max-width:335px)]:w-full">
+        <Image
+          alt={restaurant.name}
+          src={restaurant.imageUrl}
+          fill={true}
+          className="object-cover"
+        />
+      </div>
+      <CardContent className="relative min-w-0 space-y-2 py-0">
+        <Badge>{restaurant.genreName}</Badge>
+        <CardTitle className="text-limit-twolines pl-1 text-sm md:text-base">
+          {restaurant.name}
+        </CardTitle>
+        <CardDescription className="pl-1">
+          <ul className="space-y-1 text-xs md:text-sm">
+            <li className="text-limit-oneline">
+              <LuTramFront className="mb-0.5 mr-1 inline-block size-3.5 text-gray-400" />
+              {restaurant.station}
+              駅
+            </li>
+            <li className="text-limit-oneline">
+              <LuCalendarX2 className="mb-0.5 mr-1 inline-block size-3.5 text-gray-400" />
+              {restaurant.close}
+            </li>
+          </ul>
+        </CardDescription>
+      </CardContent>
+    </Card>
   )
 }

@@ -1,19 +1,28 @@
-'use client'
+// 'use client'
 
-import dynamic from 'next/dynamic'
+// import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Section from '~/components/layout/Section'
 import StationSearchForm from '~/components/ui/forms/StationSearchForm'
-import useConfirmEmail from '~/hooks/useConfirmEmail'
-import useOAuthCallback from '~/hooks/useOAuthCallback'
+// import useConfirmEmail from '~/hooks/useConfirmEmail'
+// import useOAuthCallback from '~/hooks/useOAuthCallback'
 
-const GuideCarousel = dynamic(() => import('../components/ui/carousels/GuideCarousel'), {
-  ssr: false,
-})
+// const GuideCarousel = dynamic(() => import('../components/ui/carousels/GuideCarousel'), {
+//   ssr: false,
+// })
 
-export default function Home() {
-  useOAuthCallback()
-  useConfirmEmail()
+interface HomePageProps {
+  searchParams: Promise<{ error?: string, message?: string }>
+}
+
+export default async function Home({ searchParams }: HomePageProps) {
+  // ↓ `useOAuthCallback()` と `useConfirmEmail()`
+  //    は、param を直接サーバーコンポーネントから受け取れば
+  //    サーバーコンポーネントにできるかも
+  // -------------------
+  // useOAuthCallback()
+  // useConfirmEmail()
+  // -------------------
 
   return (
     <>
@@ -128,7 +137,7 @@ export default function Home() {
 
       <Section className="relative mb-24">
         <div className="section-guide">
-          <GuideCarousel />
+          {/* <GuideCarousel /> */}
         </div>
       </Section>
     </>
