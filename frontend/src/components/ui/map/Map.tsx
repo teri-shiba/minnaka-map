@@ -2,7 +2,7 @@
 
 import type { MapProps } from '~/types/map'
 import { MapContainer, ZoomControl } from 'react-leaflet'
-import { createLeafletOptions } from '~/utils/createLeafletOptions'
+import { createLeafletOptions } from '~/utils/create-leaflet-options'
 import MapTailerLayer from './layers/MapTailerLayer'
 import UserLocationMarker from './markers/UserLocationMarker'
 import 'leaflet/dist/leaflet.css'
