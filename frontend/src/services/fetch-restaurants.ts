@@ -1,4 +1,5 @@
 import type { HotPepperRestaurant, Restaurant } from '~/types/restaurant'
+import { redirect } from 'next/navigation'
 import { transfromHotPepperToRestaurant } from '~/types/restaurant'
 import { getApiKey } from './get-api-key'
 
@@ -31,11 +32,15 @@ export async function fetchRestaurants(opts: FetchRestaurantsOpts): Promise<Rest
     }
 
     const data = await response.json()
-    const hotpepperRestaurant: HotPepperRestaurant[] = data.results.shop || []
-    return hotpepperRestaurant.map(transfromHotPepperToRestaurant)
+    const restaurants: HotPepperRestaurant[] = data.results.shop || []
+
+    if (restaurants.length === 0) {
+      throw new Error('NoRestaurantsFound')
+    }
+
+    return restaurants.map(transfromHotPepperToRestaurant)
   }
   catch (error) {
-    console.error('Restaurant fetch error:', error)
-    return []
+    redirect('/?error=unexpected_error')
   }
 }
