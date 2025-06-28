@@ -22,13 +22,13 @@ export async function verifyCoordsSignature(opts: {
       latitude: latStr,
       longitude: lngStr,
       signature: opts.signature,
-      ...(opts.expires_at ? { expires_at: opts.expires_at } : {})
+      ...(opts.expires_at ? { expires_at: opts.expires_at } : {}),
     }
 
     const response = await fetch(`${process.env.API_BASE_URL}/validate_coordinates`, {
       next: { revalidate: 3600 },
       method: 'POST',
-      headers: { 'Content-Type': 'application/json'},
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     })
 

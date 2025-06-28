@@ -9,7 +9,7 @@ const ERROR_MESSAGE = {
   invalid_coordinates: '座標エラー: 無効な位置情報です',
   outside_japan: '座標エラー: 日本列島の範囲外です',
   validation_failed: '座標エラー: 検証に失敗しました',
-  validation_error: '座標エラー: 予期しないエラーが発生しました'
+  validation_error: '座標エラー: 予期しないエラーが発生しました',
 } as const
 
 type ErrorType = keyof typeof ERROR_MESSAGE
