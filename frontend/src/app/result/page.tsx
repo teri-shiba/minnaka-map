@@ -4,8 +4,8 @@ import RestaurantsDrawer from '~/components/ui/drawers/RestaurantsDrawer'
 import Map from '~/components/ui/map/Map'
 import { fetchRestaurants } from '~/services/fetch-restaurants'
 import { getApiKey } from '~/services/get-api-key'
-import { verifyCoordsSignature } from '~/services/verify-coords-signature'
 import { parseAndValidateCoordinates } from '~/services/parse-and-validate-coords'
+import { verifyCoordsSignature } from '~/services/verify-coords-signature'
 
 interface ResultPageProps {
   searchParams: SearchParams
