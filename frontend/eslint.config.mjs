@@ -5,6 +5,7 @@ export default antfu(
   {
     react: true,
     ignores: [],
+    jsdoc: false,
   },
   {
     rules: {
@@ -16,12 +17,11 @@ export default antfu(
       '@typescript-eslint/no-require-imports': [
         'error',
         {
-          allow: [
-            'tailwindcss-animate',
-          ],
+          allow: ['tailwindcss-animate'],
         },
       ],
     },
   },
-  ...tailwindcss.configs['flat/recommended'],
+
+  tailwindcss.configs['flat/recommended'],
 )
