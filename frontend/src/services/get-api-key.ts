@@ -1,3 +1,5 @@
+import { logger } from '~/lib/logger'
+
 export type SupportedService = 'hotpepper' | 'maptiler'
 
 const SERVICE_CONFIG = {
@@ -34,7 +36,10 @@ export async function getApiKey(service: SupportedService): Promise<string> {
     return data.api_key
   }
   catch (error) {
-    console.error(`${config.serviceName} APIキー取得エラー:`, error)
+    logger(error, {
+      service: config.serviceName,
+      tags: { component: 'getApiKey' },
+    })
 
     throw error instanceof Error
       ? error

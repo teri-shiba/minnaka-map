@@ -5,6 +5,7 @@ import type { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { useAuth } from '~/hooks/useAuth'
+import { logger } from '~/lib/logger'
 import { signupSchema } from '~/schemas/signup.schema'
 import { Button } from '../buttons/Button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from './Form'
@@ -34,7 +35,7 @@ export default function SignUpForm({ onSuccess }: LoginFormProps) {
         onSuccess()
     }
     catch (error) {
-      console.error(error)
+      logger(error, { tags: { component: 'SignUpForm' } })
     }
   }
 

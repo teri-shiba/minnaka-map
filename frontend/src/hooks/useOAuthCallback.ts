@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { useSWRConfig } from 'swr'
 import api from '~/lib/axios-interceptor'
+import { logger } from '~/lib/logger'
 import { userStateAtom } from '~/state/user-state.atom'
 
 export default function useOAuthCallback() {
@@ -44,7 +45,7 @@ export default function useOAuthCallback() {
         catch (error) {
           resetUser()
           toast.error('ログインの検証に失敗しました')
-          console.error('OAuth callback error:', error)
+          logger(error, { tags: { component: 'handleOAuthCallback' } })
         }
         router.replace(pathname, { scroll: false })
       }
