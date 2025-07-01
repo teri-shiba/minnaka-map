@@ -1,6 +1,6 @@
 import type { LatLngExpression } from 'leaflet'
 import { redirect } from 'next/navigation'
-// import { logger } from '~/lib/logger'
+import { logger } from '~/lib/logger'
 
 interface ValidateCoordsRequest {
   latitude: string
@@ -40,8 +40,7 @@ export async function verifyCoordsSignature(opts: {
     return [opts.latitude, opts.longitude]
   }
   catch (error) {
-    console.error(error)
-    // logger(error, { tags: { component: 'verifyCoordsSignature' } })
+    logger(error, { tags: { component: 'verifyCoordsSignature' } })
     redirect('/?error=validation_error')
   }
 }

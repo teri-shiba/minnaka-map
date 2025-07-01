@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-// import { logger } from '~/lib/logger'
+import { logger } from '~/lib/logger'
 
 export function useLocalStorage<T>(
   key: string,
@@ -20,11 +20,10 @@ export function useLocalStorage<T>(
       return item ? JSON.parse(item) : initialValue
     }
     catch (error) {
-      console.error(error)
-      // logger(error, {
-      //   key,
-      //   tags: { component: 'useLocalStorage: storedValue' },
-      // })
+      logger(error, {
+        key,
+        tags: { component: 'useLocalStorage: storedValue' },
+      })
       return initialValue
     }
   })
@@ -42,11 +41,10 @@ export function useLocalStorage<T>(
       }
     }
     catch (error) {
-      console.error(error)
-      // logger(error, {
-      //   key,
-      //   tags: { component: 'useLocalStorage: refreshValue' },
-      // })
+      logger(error, {
+        key,
+        tags: { component: 'useLocalStorage: refreshValue' },
+      })
     }
   }, [key])
 
@@ -67,11 +65,10 @@ export function useLocalStorage<T>(
       }
     }
     catch (error) {
-      console.error(error)
-      // logger(error, {
-      //   key,
-      //   tags: { component: 'useLocalStorage: setValue' },
-      // })
+      logger(error, {
+        key,
+        tags: { component: 'useLocalStorage: setValue' },
+      })
     }
   }, [key, storedValue])
 
@@ -83,11 +80,10 @@ export function useLocalStorage<T>(
           setStoredValue(newValue)
         }
         catch (error) {
-          console.error(error)
-          // logger(error, {
-          //   key,
-          //   tags: { component: 'useLocalStorage: handleStorageChange' },
-          // })
+          logger(error, {
+            key,
+            tags: { component: 'useLocalStorage: handleStorageChange' },
+          })
         }
       }
     }

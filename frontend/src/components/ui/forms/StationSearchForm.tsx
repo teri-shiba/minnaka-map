@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/buttons/Button'
+import { logger } from '~/lib/logger'
 import { stationSearchSchema } from '~/schemas/station-search.schema'
 import StationAutocomplete from '../autocomplete/StationAutocomplete'
 import { AddFormButton } from '../buttons/AddFormButton'
@@ -65,8 +66,8 @@ export default function StationSearchForm() {
       const qs = new URLSearchParams(query).toString()
       router.push(`/result?${qs}`)
     }
-    catch (e) {
-      console.error('フォーム送信エラー:', e)
+    catch (error) {
+      logger(error, { tags: { component: 'StationSearchForm' } })
       toast.error('フォームの送信に失敗しました')
     }
   }
