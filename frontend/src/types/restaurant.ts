@@ -1,3 +1,30 @@
+export interface RestaurantList {
+  readonly id: string
+  readonly name: string
+  readonly station: string
+  readonly lat: number
+  readonly lng: number
+  readonly genreName: string
+  readonly genreCode: string
+  readonly imageUrl: string
+  readonly close: string
+}
+
+export interface RestaurantDetail extends RestaurantList {
+  readonly address: string
+  readonly budget: string
+  readonly capacity: number
+  readonly access: string
+  readonly urls: string
+  readonly open: string
+  readonly wifi: string
+  readonly privateRoom: string
+  readonly card: string
+  readonly nonSmoking: string
+  readonly charter: string
+  readonly parking: string
+}
+
 export interface HotPepperRestaurant {
   readonly id: string
   readonly name: string
@@ -33,50 +60,29 @@ export interface HotPepperRestaurant {
   readonly parking: string
 }
 
-export interface Restaurant {
-  readonly id: string
-  readonly name: string
-  readonly address: string
-  readonly station: string
-  readonly lat: number
-  readonly lng: number
-  readonly genreCode: string
-  readonly genreName: string
-  readonly budget: string
-  readonly catch: string
-  readonly capacity: number
-  readonly access: string
-  readonly urls: string
-  readonly imageUrl: string
-  readonly open: string
-  readonly close: string
-  readonly wifi: string
-  readonly privateRoom: string
-  readonly card: string
-  readonly nonSmoking: string
-  readonly charter: string
-  readonly parking: string
-
-}
-
-export function transfromHotPepperToRestaurant(hotpepperData: HotPepperRestaurant): Restaurant {
+export function transfromToList(hotpepperData: HotPepperRestaurant): RestaurantList {
   return {
     id: hotpepperData.id,
     name: hotpepperData.name,
-    address: hotpepperData.address,
     station: hotpepperData.station_name,
     lat: hotpepperData.lat,
     lng: hotpepperData.lng,
     genreCode: hotpepperData.genre.code,
     genreName: hotpepperData.genre.name,
+    imageUrl: hotpepperData.photo.pc.l,
+    close: hotpepperData.close,
+  }
+}
+
+export function transfromToDetail(hotpepperData: HotPepperRestaurant): RestaurantDetail {
+  return {
+    ...transfromToList(hotpepperData),
+    address: hotpepperData.address,
     budget: hotpepperData.budget.average,
-    catch: hotpepperData.catch,
     capacity: hotpepperData.capacity,
     access: hotpepperData.access,
     urls: hotpepperData.urls.pc,
-    imageUrl: hotpepperData.photo.pc.l,
     open: hotpepperData.open,
-    close: hotpepperData.close,
     wifi: hotpepperData.wifi,
     privateRoom: hotpepperData.private_room,
     card: hotpepperData.card,
