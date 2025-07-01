@@ -1,4 +1,4 @@
-import type { Restaurant } from '~/types/restaurant'
+import type { RestaurantList } from '~/types/restaurant'
 import Image from 'next/image'
 import { LuCalendarX2, LuTramFront } from 'react-icons/lu'
 import { Badge } from '../badges/badge'
@@ -10,7 +10,7 @@ import {
 } from './Card'
 
 interface RestaurantCardProps {
-  restaurant: Restaurant
+  restaurant: RestaurantList
 }
 
 export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
@@ -21,6 +21,7 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
           alt={restaurant.name}
           src={restaurant.imageUrl}
           fill={true}
+          sizes="(max-width: 335px) 100vw, 128px"
           className="object-cover"
         />
       </div>
