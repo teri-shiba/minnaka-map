@@ -1,6 +1,6 @@
 import type { HotPepperRestaurant, Restaurant } from '~/types/restaurant'
 import { redirect } from 'next/navigation'
-// import { logger } from '~/lib/logger'
+import { logger } from '~/lib/logger'
 import { transfromHotPepperToRestaurant } from '~/types/restaurant'
 import { getApiKey } from './get-api-key'
 
@@ -42,8 +42,7 @@ export async function fetchRestaurants(opts: FetchRestaurantsOpts): Promise<Rest
     return restaurants.map(transfromHotPepperToRestaurant)
   }
   catch (error) {
-    console.error(error)
-    // logger(error, { tags: { component: 'fetchRestaurants' } })
+    logger(error, { tags: { component: 'fetchRestaurants' } })
     redirect('/?error=unexpected_error')
   }
 }
