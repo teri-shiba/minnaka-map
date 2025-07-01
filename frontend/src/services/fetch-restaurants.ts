@@ -1,7 +1,7 @@
-import type { HotPepperRestaurant, Restaurant } from '~/types/restaurant'
+import type { HotPepperRestaurant, RestaurantList } from '~/types/restaurant'
 import { redirect } from 'next/navigation'
 import { logger } from '~/lib/logger'
-import { transfromHotPepperToRestaurant } from '~/types/restaurant'
+import { transfromToList } from '~/types/restaurant'
 import { getApiKey } from './get-api-key'
 
 interface FetchRestaurantsOpts {
@@ -10,7 +10,7 @@ interface FetchRestaurantsOpts {
   radius?: string
 }
 
-export async function fetchRestaurants(opts: FetchRestaurantsOpts): Promise<Restaurant[]> {
+export async function fetchRestaurants(opts: FetchRestaurantsOpts): Promise<RestaurantList[]> {
   try {
     const apiKey = await getApiKey('hotpepper')
     const hotpepperUrl = 'https://webservice.recruit.co.jp/hotpepper/gourmet/v1/'
@@ -25,7 +25,10 @@ export async function fetchRestaurants(opts: FetchRestaurantsOpts): Promise<Rest
     })
 
     const response = await fetch(`${hotpepperUrl}?${searchParams}`, {
-      next: { revalidate: 86400 },
+      next: {
+        revalidate: 86400,
+        tags: [`restaurants-${opts.latitude}-${opts.longitude}`],
+      },
     })
 
     if (!response.ok) {
@@ -39,7 +42,7 @@ export async function fetchRestaurants(opts: FetchRestaurantsOpts): Promise<Rest
       throw new Error('NoRestaurantsFound')
     }
 
-    return restaurants.map(transfromHotPepperToRestaurant)
+    return restaurants.map(transfromToList)
   }
   catch (error) {
     logger(error, { tags: { component: 'fetchRestaurants' } })
