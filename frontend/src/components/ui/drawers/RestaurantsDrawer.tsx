@@ -1,12 +1,12 @@
 'use client'
-import type { Restaurant } from '~/types/restaurant'
+import type { RestaurantList } from '~/types/restaurant'
 import { motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '../buttons/Button'
 import RestaurantCard from '../cards/RestaurantCard'
 
 interface RestaurantsDrawerProps {
-  restaurants: Restaurant[]
+  restaurants: RestaurantList[]
 }
 
 export default function RestaurantsDrawer({ restaurants }: RestaurantsDrawerProps) {
