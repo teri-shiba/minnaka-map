@@ -20,7 +20,7 @@ export default async function Result({ searchParams }: ResultPageProps) {
 
   const { lat, lng } = await parseAndValidateCoordinates(params)
 
-  const userLocation = await verifyCoordsSignature({
+  const midpoint = await verifyCoordsSignature({
     latitude: lat,
     longitude: lng,
     signature: params.signature,
@@ -37,11 +37,11 @@ export default async function Result({ searchParams }: ResultPageProps) {
     <>
       <div className="relative mx-auto h-[calc(100dvh-4rem)] max-w-screen-2xl overflow-hidden sm:flex">
         <div className="h-[calc(60vh-4rem)] w-full bg-orange-600 md:h-[calc(100vh-4rem)] md:w-3/5">
-          {/* {(maptilerApiKey && userLocation)
+          {/* {(maptilerApiKey && midpoint)
             && (
               <Map
                 apiKey={maptilerApiKey}
-                userLocation={userLocation}
+                midpoint={midpoint}
               />
             )} */}
         </div>

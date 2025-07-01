@@ -13,6 +13,6 @@ export interface RestaurantProps {
 export interface MapProps {
   apiKey: string
   // restaurants: RestaurantProps[]
-  userLocation: LatLngExpression
+  midpoint: LatLngExpression
   // onMarkerClick?: (id: string | number) => void
 }
