@@ -1,16 +1,25 @@
 'use client'
 
-import type { MapProps } from '~/types/map'
+import type { LatLngExpression } from 'leaflet'
+import type { RestaurantList } from '~/types/restaurant'
 import { MapContainer, ZoomControl } from 'react-leaflet'
 import { createLeafletOptions } from '~/utils/create-leaflet-options'
 import MapTailerLayer from './layers/MapTailerLayer'
-import MidpointMarker from './markers/MidPointMarker'
+import MidpointMarker from './markers/MidpointMarker'
+import RestaurantMarker from './markers/RestaurantMarker'
 import 'leaflet/dist/leaflet.css'
 import '@maptiler/sdk/dist/maptiler-sdk.css'
+
+interface MapProps {
+  apiKey: string
+  midpoint: LatLngExpression
+  restaurants: RestaurantList[]
+}
 
 export default function Map({
   apiKey,
   midpoint,
+  restaurants,
 }: MapProps) {
   const mapOptions = createLeafletOptions(midpoint)
 
@@ -29,6 +38,7 @@ export default function Map({
           )}
         <ZoomControl position="bottomright" />
         <MidpointMarker position={midpoint} />
+        <RestaurantMarker restaurants={restaurants} />
       </MapContainer>
     </main>
   )
