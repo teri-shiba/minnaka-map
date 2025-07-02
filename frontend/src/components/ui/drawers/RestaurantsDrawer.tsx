@@ -1,6 +1,6 @@
 'use client'
 import type { RestaurantList } from '~/types/restaurant'
-import { motion } from 'framer-motion'
+import { motion, useAnimationControls } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import { LuAlignLeft } from 'react-icons/lu'
 import { Button } from '../buttons/Button'
@@ -22,8 +22,13 @@ export default function RestaurantsDrawer({
 }: RestaurantsDrawerProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const modalRef = useRef<HTMLDivElement>(null)
+  const controls = useAnimationControls()
 
   const [dragConstraints, setDragConstraints] = useState({ top: 0, bottom: 0 })
+
+  useEffect(() => {
+    controls.start({ y: 0 })
+  }, [currentPage, controls])
 
   useEffect(() => {
     const calculateConstraints = () => {
@@ -52,10 +57,16 @@ export default function RestaurantsDrawer({
 
   return (
     <motion.div
+      ref={modalRef}
       drag="y"
       dragConstraints={dragConstraints}
+      animate={controls}
       className="absolute bottom-0 z-40 h-[40vh] w-full"
-      ref={modalRef}
+      transition={{
+        type: 'spring',
+        damping: 25,
+        stiffness: 300,
+      }}
     >
       <div className="rounded-t-[10px] border bg-background px-5 py-4" ref={contentRef}>
         <div className="mx-auto mb-2 h-1 w-9 cursor-grabbing rounded-full bg-gray-200" />
