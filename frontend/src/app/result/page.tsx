@@ -8,7 +8,7 @@ import { parseAndValidateCoordinates } from '~/services/parse-and-validate-coord
 import { verifyCoordsSignature } from '~/services/verify-coords-signature'
 
 interface ResultPageProps {
-  searchParams: SearchParams
+  searchParams: Promise<SearchParams & { page?: string }>
 }
 
 export default async function Result({ searchParams }: ResultPageProps) {
@@ -33,6 +33,13 @@ export default async function Result({ searchParams }: ResultPageProps) {
     longitude: lng,
     radius: params.radius,
   })
+
+  const currentPage = Number.parseInt(params.page || '1')
+  const itemsPerPage = 10
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentPageRestaurants = restaurants.slice(startIndex, endIndex)
+  const totalPages = Math.ceil(restaurants.length / itemsPerPage)
 
   return (
     <>
@@ -73,7 +80,10 @@ export default async function Result({ searchParams }: ResultPageProps) {
 
         {/* SP */}
         <RestaurantsDrawer
-          restaurants={restaurants}
+          restaurants={currentPageRestaurants}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalCount={restaurants.length}
         />
       </div>
 
