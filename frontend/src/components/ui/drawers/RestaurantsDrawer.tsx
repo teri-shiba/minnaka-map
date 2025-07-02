@@ -2,14 +2,24 @@
 import type { RestaurantList } from '~/types/restaurant'
 import { motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
+import { LuAlignLeft } from 'react-icons/lu'
 import { Button } from '../buttons/Button'
 import RestaurantCard from '../cards/RestaurantCard'
+import RestaurantPagination from '../pagination/RestaurantPagination'
 
 interface RestaurantsDrawerProps {
   restaurants: RestaurantList[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
 }
 
-export default function RestaurantsDrawer({ restaurants }: RestaurantsDrawerProps) {
+export default function RestaurantsDrawer({
+  restaurants,
+  currentPage,
+  totalPages,
+  totalCount,
+}: RestaurantsDrawerProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const modalRef = useRef<HTMLDivElement>(null)
 
@@ -52,17 +62,20 @@ export default function RestaurantsDrawer({ restaurants }: RestaurantsDrawerProp
 
         <div className="flex flex-wrap items-center justify-between">
           <h2 className="text-base">
-            検索結果はこちら
-          </h2>
-          <p className="text-sm">
-            {restaurants.length}
+            検索結果 全
+            {' '}
+            {totalCount}
             {' '}
             件
+          </h2>
+          <p className="text-xs">
+            <LuAlignLeft className="mb-0.5 mr-1 inline size-3.5" />
+            中心地点から近い順
           </p>
         </div>
 
         <div className="mt-4 space-y-4">
-          {restaurants.length > 0
+          {totalCount > 0
             ? (
                 <>
                   {restaurants.map(restaurant => (
@@ -84,6 +97,13 @@ export default function RestaurantsDrawer({ restaurants }: RestaurantsDrawerProp
                 </div>
               )}
         </div>
+
+        {totalPages > 1 && (
+          <RestaurantPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+          />
+        )}
 
         <p
           className="pt-4 text-center text-xs text-muted-foreground"
