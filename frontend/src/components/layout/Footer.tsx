@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import logo from '~/public/logo.webp'
+import { cn } from '~/utils/cn'
 
 interface NavItemProps {
   title: string
@@ -17,10 +18,13 @@ const NAV_ITEMS: NavItemProps[] = [
 
 export default function Footer() {
   const pathname = usePathname()
-  const footerVisibilityClass = pathname === '/result' ? 'hidden md:block' : null
 
   return (
-    <footer className={`bg-background ${footerVisibilityClass}`}>
+    <footer className={cn(
+      'bg-background',
+      pathname === '/result' && 'hidden md:block',
+    )}
+    >
       <div className="mx-auto max-w-screen-lg px-5 py-6">
         <div className="flex flex-col items-center justify-between md:flex-row">
           <Link href="/" className="flex items-center space-x-2">
