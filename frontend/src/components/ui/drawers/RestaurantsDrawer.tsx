@@ -1,4 +1,5 @@
 'use client'
+
 import type { RestaurantList } from '~/types/restaurant'
 import { motion, useAnimationControls } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
