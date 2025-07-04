@@ -72,8 +72,7 @@
   p { @apply text-sm md:text-base }
 
   .section-guide {
-    @apply relative block py-8
-           md:flex md:items-center md:justify-between md:py-20;
+    @apply relative min-h-[23rem] py-8 sm:min-h-[46rem] sm:py-20;
   }
 
   .section-guide::before {
