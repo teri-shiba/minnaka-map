@@ -1,4 +1,4 @@
-import type { HotPepperRestaurant, RestaurantList } from '~/types/restaurant'
+import type { HotPepperRestaurant, RestaurantListItem } from '~/types/restaurant'
 import { redirect } from 'next/navigation'
 import { logger } from '~/lib/logger'
 import { transfromToList } from '~/types/restaurant'
@@ -10,7 +10,7 @@ interface FetchRestaurantsOpts {
   radius?: string
 }
 
-export async function fetchRestaurants(opts: FetchRestaurantsOpts): Promise<RestaurantList[]> {
+export async function fetchRestaurants(opts: FetchRestaurantsOpts): Promise<RestaurantListItem[]> {
   try {
     const apiKey = await getApiKey('hotpepper')
     const hotpepperUrl = 'https://webservice.recruit.co.jp/hotpepper/gourmet/v1/'

@@ -1,4 +1,4 @@
-import type { RestaurantList } from '~/types/restaurant'
+import type { RestaurantListItem } from '~/types/restaurant'
 import Image from 'next/image'
 import { LuCalendarX2, LuTramFront } from 'react-icons/lu'
 import { Badge } from '../badges/badge'
@@ -10,7 +10,7 @@ import {
 } from './Card'
 
 interface RestaurantCardProps {
-  restaurant: RestaurantList
+  restaurant: RestaurantListItem
 }
 
 export default function RestaurantCard({ restaurant }: RestaurantCardProps) {

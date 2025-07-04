@@ -1,4 +1,4 @@
-export interface RestaurantList {
+export interface RestaurantListItem {
   readonly id: string
   readonly name: string
   readonly station: string
@@ -10,7 +10,7 @@ export interface RestaurantList {
   readonly close: string
 }
 
-export interface RestaurantDetail extends RestaurantList {
+export interface RestaurantDetailItem extends RestaurantListItem {
   readonly address: string
   readonly budget: string
   readonly capacity: number
@@ -60,7 +60,7 @@ export interface HotPepperRestaurant {
   readonly parking: string
 }
 
-export function transfromToList(hotpepperData: HotPepperRestaurant): RestaurantList {
+export function transfromToList(hotpepperData: HotPepperRestaurant): RestaurantListItem {
   return {
     id: hotpepperData.id,
     name: hotpepperData.name,
@@ -74,7 +74,7 @@ export function transfromToList(hotpepperData: HotPepperRestaurant): RestaurantL
   }
 }
 
-export function transfromToDetail(hotpepperData: HotPepperRestaurant): RestaurantDetail {
+export function transfromToDetail(hotpepperData: HotPepperRestaurant): RestaurantDetailItem {
   return {
     ...transfromToList(hotpepperData),
     address: hotpepperData.address,
