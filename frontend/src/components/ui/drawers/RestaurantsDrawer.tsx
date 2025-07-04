@@ -1,6 +1,6 @@
 'use client'
 
-import type { RestaurantList } from '~/types/restaurant'
+import type { RestaurantListItem } from '~/types/restaurant'
 import { motion, useAnimationControls } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import { LuAlignLeft } from 'react-icons/lu'
@@ -9,7 +9,7 @@ import RestaurantCard from '../cards/RestaurantCard'
 import RestaurantPagination from '../pagination/RestaurantPagination'
 
 interface RestaurantsDrawerProps {
-  restaurants: RestaurantList[]
+  restaurants: RestaurantListItem[]
   currentPage: number
   totalPages: number
   totalCount: number

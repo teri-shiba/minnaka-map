@@ -1,12 +1,12 @@
 'use client'
 
-import type { RestaurantList } from '~/types/restaurant'
+import type { RestaurantListItem } from '~/types/restaurant'
 import L from 'leaflet'
 import { useMemo } from 'react'
 import { Marker, Tooltip } from 'react-leaflet'
 
 interface RestaurantMarkerProps {
-  restaurants: RestaurantList[]
+  restaurants: RestaurantListItem[]
 }
 
 export default function RestaurantMarkers({ restaurants }: RestaurantMarkerProps) {

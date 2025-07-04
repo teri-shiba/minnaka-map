@@ -1,7 +1,7 @@
 'use client'
 
 import type { LatLngExpression } from 'leaflet'
-import type { RestaurantList } from '~/types/restaurant'
+import type { RestaurantListItem } from '~/types/restaurant'
 import { MapContainer, ZoomControl } from 'react-leaflet'
 import { createLeafletOptions } from '~/utils/create-leaflet-options'
 import MapTailerLayer from './layers/MapTailerLayer'
@@ -13,7 +13,7 @@ import '@maptiler/sdk/dist/maptiler-sdk.css'
 interface MapProps {
   apiKey: string
   midpoint: LatLngExpression
-  restaurants: RestaurantList[]
+  restaurants: RestaurantListItem[]
 }
 
 export default function Map({
