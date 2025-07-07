@@ -3,10 +3,16 @@ import L from 'leaflet'
 
 export function createLeafletOptions(userLocation: LatLngExpression): MapOptions {
   const latlng = L.latLng(userLocation)
+
+  const boundaryOffset = {
+    lat: 0.018,
+    lng: 0.022,
+  }
+
   return {
     zoom: 15,
-    minZoom: 13,
-    maxZoom: 16,
+    minZoom: 14,
+    maxZoom: 18,
     zoomSnap: 1,
     zoomDelta: 1,
 
@@ -31,8 +37,8 @@ export function createLeafletOptions(userLocation: LatLngExpression): MapOptions
     zoomControl: false,
 
     maxBounds: [
-      [latlng.lat - 0.001, latlng.lng - 0.001],
-      [latlng.lat + 0.001, latlng.lng + 0.001],
+      [latlng.lat - boundaryOffset.lat, latlng.lng - boundaryOffset.lng],
+      [latlng.lat + boundaryOffset.lat, latlng.lng + boundaryOffset.lng],
     ],
     maxBoundsViscosity: 0.8,
   }
