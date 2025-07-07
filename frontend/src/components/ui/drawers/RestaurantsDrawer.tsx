@@ -4,6 +4,7 @@ import type { RestaurantListItem } from '~/types/restaurant'
 import { motion, useAnimationControls } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import { LuAlignLeft } from 'react-icons/lu'
+import { cn } from '~/utils/cn'
 import { Button } from '../buttons/Button'
 import RestaurantCard from '../cards/RestaurantCard'
 import RestaurantPagination from '../pagination/RestaurantPagination'
@@ -13,6 +14,7 @@ interface RestaurantsDrawerProps {
   currentPage: number
   totalPages: number
   totalCount: number
+  className?: string
 }
 
 export default function RestaurantsDrawer({
@@ -20,6 +22,7 @@ export default function RestaurantsDrawer({
   currentPage,
   totalPages,
   totalCount,
+  className,
 }: RestaurantsDrawerProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const modalRef = useRef<HTMLDivElement>(null)
@@ -62,7 +65,7 @@ export default function RestaurantsDrawer({
       drag="y"
       dragConstraints={dragConstraints}
       animate={controls}
-      className="absolute bottom-0 z-40 h-[40vh] w-full"
+      className={cn('absolute bottom-0 z-40 h-[40vh] w-full', className)}
       transition={{
         type: 'spring',
         damping: 25,
