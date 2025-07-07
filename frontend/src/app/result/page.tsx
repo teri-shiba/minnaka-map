@@ -1,20 +1,19 @@
 import type { SearchParams } from '~/types/search-params'
 import { redirect } from 'next/navigation'
-// import { verifyCoordsSignature } from '~/services/verify-coords-signature'
+import MapClient from '~/components/ui/map/MapClient'
 import RestaurantList from '~/components/ui/RestaurantList'
 import { calculatePagination } from '~/services/calculate-pagination'
-// import RestaurantsDrawer from '~/components/ui/drawers/RestaurantsDrawer'
-// import Map from '~/components/ui/map/Map'
 import { fetchRestaurants } from '~/services/fetch-restaurants'
-// import { getApiKey } from '~/services/get-api-key'
+import { getApiKey } from '~/services/get-api-key'
 import { parseAndValidateCoordinates } from '~/services/parse-and-validate-coords'
+import { verifyCoordsSignature } from '~/services/verify-coords-signature'
 
 interface ResultPageProps {
   searchParams: Promise<SearchParams & { page?: string }>
 }
 
 export default async function Result({ searchParams }: ResultPageProps) {
-  // const maptilerApiKey = await getApiKey('maptiler')
+  const maptilerApiKey = await getApiKey('maptiler')
   const params = await searchParams
 
   if (!params.lat || !params.lng || !params.signature) {
@@ -23,12 +22,12 @@ export default async function Result({ searchParams }: ResultPageProps) {
 
   const { lat, lng } = await parseAndValidateCoordinates(params)
 
-  // const midpoint = await verifyCoordsSignature({
-  //   latitude: lat,
-  //   longitude: lng,
-  //   signature: params.signature,
-  //   expires_at: params.expires_at,
-  // })
+  const midpoint = await verifyCoordsSignature({
+    latitude: lat,
+    longitude: lng,
+    signature: params.signature,
+    expires_at: params.expires_at,
+  })
 
   const restaurants = await fetchRestaurants({
     latitude: lat,
@@ -44,24 +43,22 @@ export default async function Result({ searchParams }: ResultPageProps) {
   return (
     <>
       <div className="relative mx-auto h-[calc(100dvh-4rem)] max-w-screen-2xl overflow-hidden sm:flex">
-        <div className="h-[calc(60vh-4rem)] w-full bg-orange-600 md:h-[calc(100vh-4rem)] md:w-3/5">
-          {/* {(maptilerApiKey && midpoint)
+        <div className="h-[calc(60vh-4rem)] w-full md:h-[calc(100vh-4rem)] md:w-3/5">
+          {(maptilerApiKey && midpoint)
             && (
-              <Map
+              <MapClient
                 apiKey={maptilerApiKey}
                 midpoint={midpoint}
                 restaurants={restaurants}
               />
-            )} */}
+            )}
         </div>
 
-        {/* TODO: 検索結果の件数とスケルトンはSSRで用意しておくとレンダリングのとき自然にみえる */}
         <RestaurantList
           restaurants={currentPageRestaurants}
           pagination={pagination}
         />
       </div>
-
     </>
   )
 }
