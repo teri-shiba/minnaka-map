@@ -1,12 +1,13 @@
 import type { SearchParams } from '~/types/search-params'
 import { redirect } from 'next/navigation'
+// import { verifyCoordsSignature } from '~/services/verify-coords-signature'
+import RestaurantList from '~/components/ui/RestaurantList'
+import { caculatePagination } from '~/services/caculate-pagination'
 // import RestaurantsDrawer from '~/components/ui/drawers/RestaurantsDrawer'
 // import Map from '~/components/ui/map/Map'
 import { fetchRestaurants } from '~/services/fetch-restaurants'
 // import { getApiKey } from '~/services/get-api-key'
 import { parseAndValidateCoordinates } from '~/services/parse-and-validate-coords'
-// import { verifyCoordsSignature } from '~/services/verify-coords-signature'
-import RestaurantList from '~/components/ui/RestaurantList'
 
 interface ResultPageProps {
   searchParams: Promise<SearchParams & { page?: string }>
@@ -35,12 +36,10 @@ export default async function Result({ searchParams }: ResultPageProps) {
     radius: params.radius,
   })
 
-  const currentPage = Number.parseInt(params.page || '1')
-  const itemsPerPage = 10
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const currentPageRestaurants = restaurants.slice(startIndex, endIndex)
-  const totalPages = Math.ceil(restaurants.length / itemsPerPage)
+  const { items: currentPageRestaurants, pagination } = caculatePagination(
+    restaurants,
+    { page: params.page, itemsPerPage: 10 },
+  )
 
   return (
     <>
@@ -59,9 +58,7 @@ export default async function Result({ searchParams }: ResultPageProps) {
         {/* TODO: 検索結果の件数とスケルトンはSSRで用意しておくとレンダリングのとき自然にみえる */}
         <RestaurantList
           restaurants={currentPageRestaurants}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalCount={restaurants.length}
+          pagination={pagination}
         />
       </div>
 
