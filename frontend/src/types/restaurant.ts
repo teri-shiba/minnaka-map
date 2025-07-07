@@ -60,7 +60,7 @@ export interface HotPepperRestaurant {
   readonly parking: string
 }
 
-export function transfromToList(hotpepperData: HotPepperRestaurant): RestaurantListItem {
+export function transformToList(hotpepperData: HotPepperRestaurant): RestaurantListItem {
   return {
     id: hotpepperData.id,
     name: hotpepperData.name,
@@ -74,9 +74,9 @@ export function transfromToList(hotpepperData: HotPepperRestaurant): RestaurantL
   }
 }
 
-export function transfromToDetail(hotpepperData: HotPepperRestaurant): RestaurantDetailItem {
+export function transformToDetail(hotpepperData: HotPepperRestaurant): RestaurantDetailItem {
   return {
-    ...transfromToList(hotpepperData),
+    ...transformToList(hotpepperData),
     address: hotpepperData.address,
     budget: hotpepperData.budget.average,
     capacity: hotpepperData.capacity,
