@@ -2,7 +2,6 @@ import type { SearchParams } from '~/types/search-params'
 import { redirect } from 'next/navigation'
 import MapClient from '~/components/ui/map/MapClient'
 import RestaurantList from '~/components/ui/RestaurantList'
-import { calculatePagination } from '~/services/calculate-pagination'
 import { fetchRestaurants } from '~/services/fetch-restaurants'
 import { getApiKey } from '~/services/get-api-key'
 import { parseAndValidateCoordinates } from '~/services/parse-and-validate-coords'
@@ -29,16 +28,14 @@ export default async function Result({ searchParams }: ResultPageProps) {
     expires_at: params.expires_at,
   })
 
-  const restaurants = await fetchRestaurants({
+  const currentPage = Number(params.page) || 1
+  const paginatedResult = await fetchRestaurants({
     latitude: lat,
     longitude: lng,
     radius: params.radius,
+    page: currentPage,
+    itemsPerPage: 10,
   })
-
-  const { items: currentPageRestaurants, pagination } = calculatePagination(
-    restaurants,
-    { page: params.page, itemsPerPage: 10 },
-  )
 
   return (
     <>
@@ -49,14 +46,14 @@ export default async function Result({ searchParams }: ResultPageProps) {
               <MapClient
                 apiKey={maptilerApiKey}
                 midpoint={midpoint}
-                restaurants={restaurants}
+                restaurants={paginatedResult.items}
               />
             )}
         </div>
 
         <RestaurantList
-          restaurants={currentPageRestaurants}
-          pagination={pagination}
+          restaurants={paginatedResult.items}
+          pagination={paginatedResult.pagination}
         />
       </div>
     </>
