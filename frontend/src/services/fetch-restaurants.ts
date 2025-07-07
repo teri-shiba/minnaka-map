@@ -1,7 +1,7 @@
 import type { HotPepperRestaurant, RestaurantListItem } from '~/types/restaurant'
 import { redirect } from 'next/navigation'
 import { logger } from '~/lib/logger'
-import { transfromToList } from '~/types/restaurant'
+import { transformToList } from '~/types/restaurant'
 import { getApiKey } from './get-api-key'
 
 interface FetchRestaurantsOpts {
@@ -42,7 +42,7 @@ export async function fetchRestaurants(opts: FetchRestaurantsOpts): Promise<Rest
       throw new Error('NoRestaurantsFound')
     }
 
-    return restaurants.map(transfromToList)
+    return restaurants.map(transformToList)
   }
   catch (error) {
     logger(error, { tags: { component: 'fetchRestaurants' } })
