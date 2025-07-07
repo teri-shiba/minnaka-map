@@ -1,5 +1,8 @@
+'use client'
+
 import type { PageInfo } from '~/types/pagination'
 import type { RestaurantListItem } from '~/types/restaurant'
+import { useEffect, useRef } from 'react'
 import { LuAlignLeft } from 'react-icons/lu'
 import { cn } from '~/utils/cn'
 import { Button } from '../buttons/Button'
@@ -17,10 +20,23 @@ export default function RestaurantSidebar({
   pagination,
   className,
 }: RestaurantSidebarProps) {
-  const { totalCount, totalPages } = pagination
+  const { totalCount, totalPages, currentPage } = pagination
+  const scrollContaierRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (scrollContaierRef.current) {
+      scrollContaierRef.current.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      })
+    }
+  }, [currentPage])
 
   return (
-    <div className={cn('hidden-scrollbar max-h-dvh overflow-y-scroll p-6 md:w-2/5', className)}>
+    <div
+      ref={scrollContaierRef}
+      className={cn('hidden-scrollbar max-h-dvh overflow-y-scroll p-6 md:w-2/5', className)}
+    >
       <div className="flex flex-wrap items-center justify-between">
         <h2 className="text-base">
           検索結果 全
