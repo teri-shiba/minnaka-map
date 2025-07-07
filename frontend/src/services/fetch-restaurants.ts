@@ -1,3 +1,4 @@
+import type { PaginatedResult } from '~/types/pagination'
 import type { HotPepperRestaurant, RestaurantListItem } from '~/types/restaurant'
 import { redirect } from 'next/navigation'
 import { logger } from '~/lib/logger'
@@ -8,10 +9,18 @@ interface FetchRestaurantsOpts {
   latitude: number
   longitude: number
   radius?: string
+  page?: number
+  itemsPerPage?: number
 }
 
-export async function fetchRestaurants(opts: FetchRestaurantsOpts): Promise<RestaurantListItem[]> {
+export async function fetchRestaurants(
+  opts: FetchRestaurantsOpts,
+): Promise<PaginatedResult<RestaurantListItem>> {
   try {
+    const page = opts.page || 1
+    const itemsPerPage = Math.min(opts.itemsPerPage || 10, 100)
+    const start = (page - 1) * itemsPerPage + 1
+
     const apiKey = await getApiKey('hotpepper')
     const hotpepperUrl = 'https://webservice.recruit.co.jp/hotpepper/gourmet/v1/'
 
@@ -20,8 +29,9 @@ export async function fetchRestaurants(opts: FetchRestaurantsOpts): Promise<Rest
       lat: opts.latitude.toString(),
       lng: opts.longitude.toString(),
       range: opts.radius || '5',
+      start: start.toString(),
+      count: itemsPerPage.toString(),
       format: 'json',
-      count: '20',
     })
 
     const response = await fetch(`${hotpepperUrl}?${searchParams}`, {
@@ -37,12 +47,24 @@ export async function fetchRestaurants(opts: FetchRestaurantsOpts): Promise<Rest
 
     const data = await response.json()
     const restaurants: HotPepperRestaurant[] = data.results.shop || []
+    const totalCount = Number(data.results.results_available) || 0
+    const totalPages = Math.ceil(totalCount / itemsPerPage)
+    const transformedRestaurants = restaurants.map(transformToList)
 
     if (restaurants.length === 0) {
       throw new Error('NoRestaurantsFound')
     }
 
-    return restaurants.map(transformToList)
+    return {
+      items: transformedRestaurants,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        itemsPerPage,
+      },
+      hasMore: page < totalPages,
+    }
   }
   catch (error) {
     logger(error, { tags: { component: 'fetchRestaurants' } })
