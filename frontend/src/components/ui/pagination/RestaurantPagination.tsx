@@ -1,3 +1,4 @@
+import type { PageInfo } from '~/types/pagination'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
 import {
@@ -11,8 +12,7 @@ import {
 } from './Pagination'
 
 interface RestaurantPaginationProps {
-  currentPage: number
-  totalPages: number
+  pagination: PageInfo
 }
 
 const PAGINATION_CONFIG = {
@@ -21,7 +21,8 @@ const PAGINATION_CONFIG = {
   ELLIPSIS_END_OFFSET: 2,
 }
 
-export default function RestaurantPagination({ currentPage, totalPages }: RestaurantPaginationProps) {
+export default function RestaurantPagination({ pagination }: RestaurantPaginationProps) {
+  const { currentPage, totalPages } = pagination
   const router = useRouter()
   const searchParams = useSearchParams()
 

@@ -1,3 +1,4 @@
+import type { PageInfo } from '~/types/pagination'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { LuAlignLeft } from 'react-icons/lu'
 import { cn } from '~/utils/cn'
@@ -7,13 +8,17 @@ import RestaurantPagination from '../pagination/RestaurantPagination'
 
 interface RestaurantSidebarProps {
   restaurants: RestaurantListItem[]
-  currentPage: number
-  totalPages: number
-  totalCount: number
+  pagination: PageInfo
   className?: string
 }
 
-export default function RestaurantSidebar({ restaurants, currentPage, totalPages, totalCount, className }: RestaurantSidebarProps) {
+export default function RestaurantSidebar({
+  restaurants,
+  pagination,
+  className,
+}: RestaurantSidebarProps) {
+  const { totalCount, totalPages } = pagination
+
   return (
     <div className={cn('hidden-scrollbar max-h-dvh overflow-y-scroll p-6 md:w-2/5', className)}>
       <div className="flex flex-wrap items-center justify-between">
@@ -54,8 +59,7 @@ export default function RestaurantSidebar({ restaurants, currentPage, totalPages
 
       {totalPages > 1 && (
         <RestaurantPagination
-          currentPage={currentPage}
-          totalPages={totalPages}
+          pagination={pagination}
         />
       )}
     </div>

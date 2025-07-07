@@ -1,5 +1,6 @@
 'use client'
 
+import type { PageInfo } from '~/types/pagination'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { motion, useAnimationControls } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
@@ -11,19 +12,17 @@ import RestaurantPagination from '../pagination/RestaurantPagination'
 
 interface RestaurantsDrawerProps {
   restaurants: RestaurantListItem[]
-  currentPage: number
-  totalPages: number
-  totalCount: number
+  pagination: PageInfo
   className?: string
 }
 
 export default function RestaurantsDrawer({
   restaurants,
-  currentPage,
-  totalPages,
-  totalCount,
+  pagination,
   className,
 }: RestaurantsDrawerProps) {
+  const { currentPage, totalPages, totalCount } = pagination
+
   const contentRef = useRef<HTMLDivElement>(null)
   const modalRef = useRef<HTMLDivElement>(null)
   const controls = useAnimationControls()
@@ -115,8 +114,7 @@ export default function RestaurantsDrawer({
 
         {totalPages > 1 && (
           <RestaurantPagination
-            currentPage={currentPage}
-            totalPages={totalPages}
+            pagination={pagination}
           />
         )}
 
