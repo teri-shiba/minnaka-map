@@ -3,3 +3,8 @@ export interface PageInfo {
   readonly totalPages: number
   readonly totalCount: number
 }
+
+export interface PaginatedResult<T> {
+  readonly items: T[]
+  readonly pagination: PageInfo
+}

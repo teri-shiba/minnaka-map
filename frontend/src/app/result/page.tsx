@@ -2,7 +2,7 @@ import type { SearchParams } from '~/types/search-params'
 import { redirect } from 'next/navigation'
 // import { verifyCoordsSignature } from '~/services/verify-coords-signature'
 import RestaurantList from '~/components/ui/RestaurantList'
-import { caculatePagination } from '~/services/caculate-pagination'
+import { calculatePagination } from '~/services/calculate-pagination'
 // import RestaurantsDrawer from '~/components/ui/drawers/RestaurantsDrawer'
 // import Map from '~/components/ui/map/Map'
 import { fetchRestaurants } from '~/services/fetch-restaurants'
@@ -36,7 +36,7 @@ export default async function Result({ searchParams }: ResultPageProps) {
     radius: params.radius,
   })
 
-  const { items: currentPageRestaurants, pagination } = caculatePagination(
+  const { items: currentPageRestaurants, pagination } = calculatePagination(
     restaurants,
     { page: params.page, itemsPerPage: 10 },
   )
