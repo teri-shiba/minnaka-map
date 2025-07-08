@@ -2,9 +2,15 @@
 
 import type { PageInfo } from '~/types/pagination'
 import type { RestaurantListItem } from '~/types/restaurant'
-import { useMediaQuery } from '~/hooks/useMediaQuery'
-import RestaurantsDrawer from './drawers/RestaurantsDrawer'
-import RestaurantSidebar from './restaurant/RestaurantSidebar'
+import dynamic from 'next/dynamic'
+
+const RestaurantSidebar = dynamic(
+  () => import('./restaurant/RestaurantSidebar'),
+)
+
+const RestaurantsDrawer = dynamic(
+  () => import('./drawers/RestaurantsDrawer'),
+)
 
 interface RestaurantListProps {
   restaurants: RestaurantListItem[]
@@ -12,25 +18,23 @@ interface RestaurantListProps {
 }
 
 export default function RestaurantList({ restaurants, pagination }: RestaurantListProps) {
-  const isDesktop = useMediaQuery('(min-width: 768px)')
+  // const isDesktop = useMediaQuery('(min-width: 768px)')
 
   return (
     <>
-      {isDesktop
-        ? (
-            <RestaurantSidebar
-              restaurants={restaurants}
-              pagination={pagination}
-              className="hidden md:block"
-            />
-          )
-        : (
-            <RestaurantsDrawer
-              restaurants={restaurants}
-              pagination={pagination}
-              className="block md:hidden"
-            />
-          )}
+      {/* PC */}
+      <RestaurantSidebar
+        restaurants={restaurants}
+        pagination={pagination}
+        className="hidden md:block"
+      />
+
+      {/* SP */}
+      <RestaurantsDrawer
+        restaurants={restaurants}
+        pagination={pagination}
+        className="block md:hidden"
+      />
     </>
   )
 }
