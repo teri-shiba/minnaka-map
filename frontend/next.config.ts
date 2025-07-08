@@ -1,5 +1,4 @@
 import type { NextConfig } from 'next'
-import { withSentryConfig } from '@sentry/nextjs'
 
 const nextConfig: NextConfig = {
   images: {
@@ -21,9 +20,4 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withSentryConfig(nextConfig, {
-  org: 'sole-proprietor-s4',
-  project: 'minnaka-map',
-  silent: !process.env.CI,
-  disableLogger: true,
-})
+export default nextConfig
