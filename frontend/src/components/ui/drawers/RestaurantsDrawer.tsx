@@ -77,9 +77,7 @@ export default function RestaurantsDrawer({
         <div className="flex flex-wrap items-center justify-between">
           <h2 className="text-base">
             検索結果 全
-            {' '}
             {totalCount}
-            {' '}
             件
           </h2>
           <p className="text-xs">
