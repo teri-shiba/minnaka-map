@@ -2,7 +2,7 @@
 import type { StaticImageData } from 'next/image'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useAuth } from '~/hooks/useAuth'
 import logo from '~/public/logo.webp'
 import logoMark from '~/public/logo_mark.webp'
@@ -21,8 +21,8 @@ interface logoImages {
 export default function Header() {
   const { user, isLoading } = useAuth()
 
-  const params = useSearchParams()
-  const exceptHomeClassName = !params.get('/') ? 'border-b border-gray-200' : null
+  const pathname = usePathname()
+  const exceptHomeClassName = pathname !== '/' ? 'border-b border-gray-200' : null
 
   const logoImages: logoImages[] = [
     {
