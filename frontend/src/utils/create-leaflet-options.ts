@@ -4,9 +4,10 @@ import L from 'leaflet'
 export function createLeafletOptions(userLocation: LatLngExpression): MapOptions {
   const latlng = L.latLng(userLocation)
 
+  const radiusMeters = 3000
   const boundaryOffset = {
-    lat: 0.018,
-    lng: 0.022,
+    lat: radiusMeters / 111000,
+    lng: radiusMeters / (111000 * Math.cos((latlng.lat * Math.PI) / 180)),
   }
 
   return {
@@ -40,6 +41,6 @@ export function createLeafletOptions(userLocation: LatLngExpression): MapOptions
       [latlng.lat - boundaryOffset.lat, latlng.lng - boundaryOffset.lng],
       [latlng.lat + boundaryOffset.lat, latlng.lng + boundaryOffset.lng],
     ],
-    maxBoundsViscosity: 0.8,
+    maxBoundsViscosity: 0.7,
   }
 }
