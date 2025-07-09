@@ -12,7 +12,6 @@ interface ResultPageProps {
 }
 
 export default async function Result({ searchParams }: ResultPageProps) {
-  const maptilerApiKey = await getApiKey('maptiler')
   const params = await searchParams
 
   if (!params.lat || !params.lng || !params.signature) {
@@ -21,6 +20,7 @@ export default async function Result({ searchParams }: ResultPageProps) {
 
   const { lat, lng } = await parseAndValidateCoordinates(params)
 
+  const maptilerApiKey = await getApiKey('maptiler')
   const midpoint = await verifyCoordsSignature({
     latitude: lat,
     longitude: lng,

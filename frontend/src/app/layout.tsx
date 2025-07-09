@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import Footer from '~/components/layout/Footer'
 import Header from '~/components/layout/Header'
 import ErrorToastHandler from '~/components/ui/toasts/ErrorToastHandler'
@@ -19,7 +20,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           {children}
         </main>
         <Toaster richColors />
-        <ErrorToastHandler />
+        <Suspense fallback={null}>
+          <ErrorToastHandler />
+        </Suspense>
         <Footer />
       </body>
     </html>
