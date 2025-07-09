@@ -1,6 +1,7 @@
 import type { PageInfo } from '~/types/pagination'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
+import { PAGINATION } from '~/constants'
 import {
   Pagination,
   PaginationContent,
@@ -13,12 +14,6 @@ import {
 
 interface RestaurantPaginationProps {
   pagination: PageInfo
-}
-
-const PAGINATION_CONFIG = {
-  ELLIPSIS_THRESHOLD: 4,
-  ELLIPSIS_START_OFFSET: 3,
-  ELLIPSIS_END_OFFSET: 2,
 }
 
 export default function RestaurantPagination({ pagination }: RestaurantPaginationProps) {
@@ -64,7 +59,7 @@ export default function RestaurantPagination({ pagination }: RestaurantPaginatio
 
   const pageNumbers = useMemo(() => {
     const pages = []
-    const showEllipsis = totalPages > PAGINATION_CONFIG.ELLIPSIS_THRESHOLD
+    const showEllipsis = totalPages > PAGINATION.ELLIPSIS_THRESHOLD
 
     const createPageItem = (page: number) => (
       <PaginationItem key={page}>
@@ -90,7 +85,7 @@ export default function RestaurantPagination({ pagination }: RestaurantPaginatio
     else {
       pages.push(createPageItem(1))
 
-      if (currentPage > PAGINATION_CONFIG.ELLIPSIS_START_OFFSET) {
+      if (currentPage > PAGINATION.ELLIPSIS_START_OFFSET) {
         pages.push(createEllipsis('ellipsis1'))
       }
 
@@ -101,7 +96,7 @@ export default function RestaurantPagination({ pagination }: RestaurantPaginatio
         pages.push (createPageItem(i))
       }
 
-      if (currentPage < totalPages - PAGINATION_CONFIG.ELLIPSIS_END_OFFSET) {
+      if (currentPage < totalPages - PAGINATION.ELLIPSIS_END_OFFSET) {
         pages.push(createEllipsis('ellipsis2'))
       }
 
