@@ -1,4 +1,4 @@
-import { AuthProvider } from '~/types/auth-provider'
+import type { AuthProvider } from '~/types/auth-provider'
 
 // ========================================================
 // API Services Configuration

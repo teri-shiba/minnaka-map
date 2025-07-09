@@ -3,6 +3,7 @@
 import { useAtom } from 'jotai'
 import Image from 'next/image'
 import { useState } from 'react'
+import { AUTH_PROVIDERS } from '~/constants'
 import logoMark from '~/public/logo_mark.webp'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
 import { Button } from '../buttons/Button'
@@ -16,7 +17,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from './Drawer'
-import { AUTH_PROVIDERS } from '~/constants'
 
 export function AuthDrawer() {
   const [open, setOpen] = useAtom(authModalOpenAtom)
