@@ -3,10 +3,10 @@
 import type { PageInfo } from '~/types/pagination'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { useEffect, useRef } from 'react'
-import { LuAlignLeft } from 'react-icons/lu'
 import { Button } from '~/ui/buttons/Button'
 import { cn } from '~/utils/cn'
 import RestaurantCard from './RestaurantCard'
+import RestaurantListHeader from './RestaurantListHeader'
 import RestaurantPagination from './RestaurantPagination'
 
 interface RestaurantSidebarProps {
@@ -37,17 +37,7 @@ export default function RestaurantSidebar({
       ref={scrollContaierRef}
       className={cn('hidden-scrollbar max-h-dvh overflow-y-scroll p-6 md:w-2/5', className)}
     >
-      <div className="flex flex-wrap items-center justify-between">
-        <h2 className="text-base">
-          検索結果 全
-          {totalCount}
-          件
-        </h2>
-        <p className="text-sm">
-          <LuAlignLeft className="mb-0.5 mr-1 inline size-3.5" />
-          中心地点から近い順
-        </p>
-      </div>
+      <RestaurantListHeader totalCount={totalCount} />
 
       <div className="mt-4 space-y-4">
         {totalCount > 0
