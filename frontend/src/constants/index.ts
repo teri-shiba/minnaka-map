@@ -13,3 +13,13 @@ export const API_SERVICES = {
 } as const
 
 export type SupportedService = keyof typeof API_SERVICES
+
+// =============================================================================
+// Geography & Location
+// =============================================================================
+export const JAPAN_BOUNDS = {
+  LAT_MIN: 26.0,
+  LAT_MAX: 45.5,
+  LNG_MIN: 123.0,
+  LNG_MAX: 146.0,
+} as const
