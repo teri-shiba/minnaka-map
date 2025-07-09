@@ -9,7 +9,7 @@ interface ApiKeyProps {
   apiKey: string | null
 }
 
-export default function MapTailerLayer({ apiKey }: ApiKeyProps) {
+export default function MapTilerLayer({ apiKey }: ApiKeyProps) {
   const map = useMap()
 
   useEffect(() => {
