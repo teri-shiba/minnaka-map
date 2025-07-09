@@ -1,14 +1,23 @@
 import { Skeleton } from '~/components/ui/skeleton/Skeleton'
+import LoadingIcon from '~/public/figure_loading_circle.svg'
 import { createSequence } from '~/utils/array'
 
 export default function Loading() {
   return (
     <div className="relative mx-auto h-[calc(100dvh-4rem)] max-w-screen-2xl overflow-hidden sm:flex">
-      <Skeleton className="h-[calc(60vh-4rem)] w-full md:h-[calc(100vh-4rem)] md:w-3/5" />
-      <div className="w-2/5 p-6">
-        <div className="flex flex-wrap items-center justify-between">
+      <div className="relative h-[calc(60vh-4rem)] w-full md:h-[calc(100vh-4rem)]">
+        <Skeleton className="size-full" />
+        <LoadingIcon
+          aria-label="ローディング中"
+          width={40}
+          height={40}
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        />
+      </div>
+      <div className="p-6 md:w-2/5">
+        <div className="flex items-center justify-between">
           <Skeleton className="h-6 w-32" />
-          <Skeleton className="h-5 w-36" />
+          <Skeleton className="h-6 w-36" />
         </div>
         <div className="mt-4 space-y-4">
           {createSequence(10).map(id => (
