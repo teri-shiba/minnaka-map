@@ -1,13 +1,13 @@
 import type { RestaurantListItem } from '~/types/restaurant'
 import Image from 'next/image'
 import { LuCalendarX2, LuTramFront } from 'react-icons/lu'
-import { Badge } from '../badges/badge'
+import { Badge } from '~/ui/badges/badge'
 import {
   Card,
   CardContent,
   CardDescription,
   CardTitle,
-} from './Card'
+} from '~/ui/cards/Card'
 
 interface RestaurantCardProps {
   restaurant: RestaurantListItem

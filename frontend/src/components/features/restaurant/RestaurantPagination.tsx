@@ -9,7 +9,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from './Pagination'
+} from '~/ui/pagination/Pagination'
 
 interface RestaurantPaginationProps {
   pagination: PageInfo

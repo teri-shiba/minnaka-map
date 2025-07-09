@@ -5,10 +5,10 @@ import type { RestaurantListItem } from '~/types/restaurant'
 import { motion, useAnimationControls } from 'framer-motion'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { LuAlignLeft } from 'react-icons/lu'
+import { Button } from '~/ui/buttons/Button'
 import { cn } from '~/utils/cn'
-import { Button } from '../buttons/Button'
-import RestaurantCard from '../cards/RestaurantCard'
-import RestaurantPagination from '../pagination/RestaurantPagination'
+import RestaurantCard from './RestaurantCard'
+import RestaurantPagination from './RestaurantPagination'
 
 interface RestaurantsDrawerProps {
   restaurants: RestaurantListItem[]

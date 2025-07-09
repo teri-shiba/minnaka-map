@@ -4,10 +4,10 @@ import type { PageInfo } from '~/types/pagination'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { useEffect, useRef } from 'react'
 import { LuAlignLeft } from 'react-icons/lu'
+import { Button } from '~/ui/buttons/Button'
 import { cn } from '~/utils/cn'
-import { Button } from '../buttons/Button'
-import RestaurantCard from '../cards/RestaurantCard'
-import RestaurantPagination from '../pagination/RestaurantPagination'
+import RestaurantCard from './RestaurantCard'
+import RestaurantPagination from './RestaurantPagination'
 
 interface RestaurantSidebarProps {
   restaurants: RestaurantListItem[]
