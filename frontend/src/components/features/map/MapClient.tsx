@@ -2,7 +2,7 @@
 
 import type { MapItems } from '~/types/map'
 import dynamic from 'next/dynamic'
-import Loading from '~/public/figure_loading_circle.svg'
+import LoadingIcon from '~/public/figure_loading_circle.svg'
 import { Skeleton } from '~/ui/skeleton/Skeleton'
 
 const Map = dynamic(() => import('./Map'), {
@@ -10,7 +10,7 @@ const Map = dynamic(() => import('./Map'), {
   loading: () => (
     <div className="relative h-[calc(60vh-4rem)] w-full md:h-[calc(100vh-4rem)]">
       <Skeleton className="size-full" />
-      <Loading
+      <LoadingIcon
         aria-label="ローディング中"
         width={40}
         height={40}
