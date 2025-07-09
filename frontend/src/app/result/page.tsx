@@ -1,6 +1,6 @@
 import type { SearchParams } from '~/types/search-params'
 import { redirect } from 'next/navigation'
-import MapClient from '~/components/ui/map/MapClient'
+import MapClient from '~/components/features/map/MapClient'
 import RestaurantList from '~/components/ui/RestaurantList'
 import { fetchRestaurants } from '~/services/fetch-restaurants'
 import { getApiKey } from '~/services/get-api-key'

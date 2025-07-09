@@ -3,7 +3,7 @@
 import type { MapItems } from '~/types/map'
 import dynamic from 'next/dynamic'
 import Loading from '~/public/figure_loading_circle.svg'
-import { Skeleton } from '../skeleton/Skeleton'
+import { Skeleton } from '../../ui/skeleton/Skeleton'
 
 const Map = dynamic(() => import('./Map'), {
   ssr: false,
