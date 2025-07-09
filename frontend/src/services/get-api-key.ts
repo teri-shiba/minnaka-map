@@ -1,20 +1,9 @@
+import type { SupportedService } from '~/constants'
+import { API_SERVICES } from '~/constants'
 import { logger } from '~/lib/logger'
 
-export type SupportedService = 'hotpepper' | 'maptiler'
-
-const SERVICE_CONFIG = {
-  hotpepper: {
-    endpoint: '/api_keys/hotpepper',
-    serviceName: 'HotPepper',
-  },
-  maptiler: {
-    endpoint: '/api_keys/maptiler',
-    serviceName: 'MapTiler',
-  },
-} as const
-
 export async function getApiKey(service: SupportedService): Promise<string> {
-  const config = SERVICE_CONFIG[service]
+  const config = API_SERVICES[service]
 
   if (!config) {
     throw new Error(`未対応のサービスです: ${service}`)
