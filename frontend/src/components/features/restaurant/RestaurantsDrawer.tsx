@@ -4,10 +4,10 @@ import type { PageInfo } from '~/types/pagination'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { motion, useAnimationControls } from 'framer-motion'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { LuAlignLeft } from 'react-icons/lu'
 import { Button } from '~/ui/buttons/Button'
 import { cn } from '~/utils/cn'
 import RestaurantCard from './RestaurantCard'
+import RestaurantListHeader from './RestaurantListHeader'
 import RestaurantPagination from './RestaurantPagination'
 
 interface RestaurantsDrawerProps {
@@ -74,17 +74,7 @@ export default function RestaurantsDrawer({
       <div className="rounded-t-[10px] border bg-background px-5 py-4" ref={contentRef}>
         <div className="mx-auto mb-2 h-1 w-9 cursor-grabbing rounded-full bg-gray-200" />
 
-        <div className="flex flex-wrap items-center justify-between">
-          <h2 className="text-base">
-            検索結果 全
-            {totalCount}
-            件
-          </h2>
-          <p className="text-xs">
-            <LuAlignLeft className="mb-0.5 mr-1 inline size-3.5" />
-            中心地点から近い順
-          </p>
-        </div>
+        <RestaurantListHeader totalCount={totalCount} />
 
         <div className="mt-4 space-y-4">
           {totalCount > 0
