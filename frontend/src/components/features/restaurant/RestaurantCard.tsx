@@ -22,7 +22,6 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
           src={restaurant.imageUrl}
           fill={true}
           sizes="(max-width: 335px) 100vw, 128px"
-          priority
           className="object-cover"
         />
       </div>
