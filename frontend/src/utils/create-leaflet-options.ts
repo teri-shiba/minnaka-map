@@ -11,7 +11,7 @@ export function createLeafletOptions(userLocation: LatLngExpression): MapOptions
   }
 
   return {
-    zoom: 15,
+    zoom: 14,
     minZoom: 14,
     maxZoom: 18,
     zoomSnap: 1,
