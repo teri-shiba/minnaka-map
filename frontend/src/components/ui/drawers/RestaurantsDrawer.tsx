@@ -3,7 +3,7 @@
 import type { PageInfo } from '~/types/pagination'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { motion, useAnimationControls } from 'framer-motion'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { LuAlignLeft } from 'react-icons/lu'
 import { cn } from '~/utils/cn'
 import { Button } from '../buttons/Button'
@@ -29,26 +29,26 @@ export default function RestaurantsDrawer({
 
   const [dragConstraints, setDragConstraints] = useState({ top: 0, bottom: 0 })
 
+  const calculateConstraints = useCallback(() => {
+    if (!contentRef.current)
+      return
+
+    const contentHeight = contentRef.current.offsetHeight
+    const modalViewHeight = window.innerHeight * 0.4
+    const dragDistance = contentHeight - modalViewHeight
+
+    setDragConstraints({
+      top: -dragDistance,
+      bottom: 0,
+    })
+  }, [])
+
   useEffect(() => {
     controls.start({ y: 0 })
   }, [currentPage, controls])
 
   useEffect(() => {
-    const calculateConstraints = () => {
-      if (!contentRef.current)
-        return
-
-      const contentHeight = contentRef.current.offsetHeight
-      const modalViewHeight = window.innerHeight * 0.4
-      const dragDistance = contentHeight - modalViewHeight
-
-      setDragConstraints({
-        top: -dragDistance,
-        bottom: 0,
-      })
-    }
-
-    const timer = setTimeout(calculateConstraints, 100)
+    const timer = setTimeout(calculateConstraints, 300)
 
     window.addEventListener('resize', calculateConstraints)
 
@@ -56,7 +56,7 @@ export default function RestaurantsDrawer({
       clearTimeout(timer)
       window.removeEventListener('resize', calculateConstraints)
     }
-  }, [])
+  }, [calculateConstraints])
 
   return (
     <motion.div
