@@ -28,6 +28,9 @@ export default function MapTailerLayer({ apiKey }: ApiKeyProps) {
     const layer = new MaptilerLayer({
       apiKey,
       style: styleUrl,
+      // @ts-expect-error: TODO remove this once maptiler-sdk-js v4.1.0 (or later) fixes extractCustomLayerStyle warning (see #216)
+      space: false,
+      halo: false,
     }).addTo(map)
 
     return () => {
