@@ -3,7 +3,6 @@
 import { useAtom } from 'jotai'
 import Image from 'next/image'
 import { useState } from 'react'
-import { authProviders } from '~/constants/auth-providers'
 import logoMark from '~/public/logo_mark.webp'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
 import { Button } from '../buttons/Button'
@@ -17,6 +16,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from './Drawer'
+import { AUTH_PROVIDERS } from '~/constants'
 
 export function AuthDrawer() {
   const [open, setOpen] = useAtom(authModalOpenAtom)
@@ -68,7 +68,7 @@ export function AuthDrawer() {
             <span className="inline-block bg-white px-4">OR</span>
           </p>
           <div className="flex gap-3 max-[383px]:block">
-            {authProviders.map(provider => (
+            {AUTH_PROVIDERS.map(provider => (
               <a
                 key={provider.name}
                 href={`${apiOrigin}/provider/${provider.authUrl}`}

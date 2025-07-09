@@ -1,3 +1,5 @@
+import { AuthProvider } from '~/types/auth-provider'
+
 // ========================================================
 // API Services Configuration
 // ========================================================
@@ -13,6 +15,22 @@ export const API_SERVICES = {
 } as const
 
 export type SupportedService = keyof typeof API_SERVICES
+
+// =========================================================
+// Authentication Providers
+// =========================================================
+export const AUTH_PROVIDERS: readonly AuthProvider[] = [
+  {
+    name: 'Google',
+    iconImg: '/icon_Google.webp',
+    authUrl: 'google_oauth2',
+  },
+  {
+    name: 'LINE',
+    iconImg: '/icon_LINE.webp',
+    authUrl: 'line',
+  },
+] as const
 
 // ========================================================
 // Geography & Location

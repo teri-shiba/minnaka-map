@@ -3,7 +3,6 @@
 import { useAtom } from 'jotai'
 import Image from 'next/image'
 import { useState } from 'react'
-import { authProviders } from '~/constants/auth-providers'
 import logoMark from '~/public/logo_mark.webp'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
 import { Button } from '../buttons/Button'
@@ -17,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './Dialog'
+import { AUTH_PROVIDERS } from '~/constants'
 
 export function AuthDialog() {
   const [open, setOpen] = useAtom(authModalOpenAtom)
@@ -67,7 +67,7 @@ export function AuthDialog() {
           <span className="inline-block bg-white px-4">OR</span>
         </p>
         <div className="grid grid-cols-2 gap-3">
-          {authProviders.map(provider => (
+          {AUTH_PROVIDERS.map(provider => (
             <a
               key={provider.name}
               href={`${apiOrigin}/auth/${provider.authUrl}`}
