@@ -42,7 +42,15 @@ export async function fetchRestaurants(
     })
 
     if (!response.ok) {
-      throw new Error('レストランデータの取得に失敗しました')
+      if (response.status === 429) {
+        redirect('/?error=rate_limit_exceeded')
+      }
+      else if (response.status >= 500) {
+        redirect('/?error=server_error')
+      }
+      else {
+        throw new Error('レストランデータの取得に失敗しました')
+      }
     }
 
     const data = await response.json()
@@ -52,7 +60,16 @@ export async function fetchRestaurants(
     const transformedRestaurants = restaurants.map(transformToList)
 
     if (restaurants.length === 0) {
-      throw new Error('NoRestaurantsFound')
+      return {
+        items: [],
+        pagination: {
+          currentPage: page,
+          totalPages: 0,
+          totalCount: 0,
+          itemsPerPage,
+        },
+        hasMore: false,
+      }
     }
 
     return {
@@ -68,6 +85,6 @@ export async function fetchRestaurants(
   }
   catch (error) {
     logger(error, { tags: { component: 'fetchRestaurants' } })
-    redirect('/?error=unexpected_error')
+    redirect('/?error=restaurant_fetch_failed')
   }
 }
