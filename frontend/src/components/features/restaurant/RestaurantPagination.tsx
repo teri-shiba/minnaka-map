@@ -59,6 +59,9 @@ export default function RestaurantPagination({ pagination }: RestaurantPaginatio
     )
   }, [createPageUrl, handlePageClick])
 
+  /*---------------- */
+  // ↓ リファクタリング
+  /*---------------- */
   const pageNumbers = useMemo(() => {
     const pages = []
     const showEllipsis = totalPages > PAGINATION.ELLIPSIS_THRESHOLD
@@ -91,8 +94,8 @@ export default function RestaurantPagination({ pagination }: RestaurantPaginatio
         pages.push(createEllipsis('ellipsis1'))
       }
 
-      const start = Math.max(2, currentPage - 1)
-      const end = Math.min(totalPages - 1, currentPage + 1)
+      const start = Math.max(PAGINATION.SECOND_PAGE, currentPage - PAGINATION.CURRENT_PAGE_RANGE)
+      const end = Math.min(totalPages - PAGINATION.LAST_PAGE_OFFSET, currentPage + PAGINATION.CURRENT_PAGE_RANGE)
 
       for (let i = start; i <= end; i++) {
         pages.push (createPageItem(i))
@@ -109,6 +112,10 @@ export default function RestaurantPagination({ pagination }: RestaurantPaginatio
 
     return pages
   }, [currentPage, totalPages, createPageUrl, handlePageClick])
+
+  /*---------------- */
+  // ↑ リファクタリング
+  /*---------------- */
 
   return (
     <Pagination className="mt-4">

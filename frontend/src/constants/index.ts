@@ -46,6 +46,10 @@ export const JAPAN_BOUNDS = {
 // Pagination
 // ========================================================
 export const PAGINATION = {
+  FIRST_PAGE: 1,
+  SECOND_PAGE: 2,
+  CURRENT_PAGE_RANGE: 1,
+  LAST_PAGE_OFFSET: 1,
   ELLIPSIS_THRESHOLD: 4,
   ELLIPSIS_START_OFFSET: 3,
   ELLIPSIS_END_OFFSET: 2,
