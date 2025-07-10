@@ -1,3 +1,5 @@
+'use client'
+
 import type { PageInfo } from '~/types/pagination'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
