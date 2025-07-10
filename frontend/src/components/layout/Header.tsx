@@ -59,7 +59,7 @@ export default function Header() {
           ))}
         </Link>
         {isLoading
-          ? <Skeleton className="h-[40px] w-[87px] rounded-full" />
+          ? <Skeleton className="h-10 w-[87px] rounded-full" />
           : user && user.isSignedIn
             ? <UserMenu />
             : <Auth />}

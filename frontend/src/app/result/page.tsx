@@ -40,7 +40,7 @@ export default async function Result({ searchParams }: ResultPageProps) {
   return (
     <>
       <div className="relative mx-auto h-[calc(100dvh-4rem)] max-w-screen-2xl overflow-hidden sm:flex">
-        <div className="h-[calc(60vh-4rem)] w-full md:h-[calc(100vh-4rem)] md:w-3/5">
+        <div className="h-mobile-map w-full md:h-desktop-map md:w-3/5">
           {(maptilerApiKey && midpoint)
             && (
               <MapClient

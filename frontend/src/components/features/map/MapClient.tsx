@@ -8,7 +8,7 @@ import { Skeleton } from '~/ui/skeleton/Skeleton'
 const Map = dynamic(() => import('./Map'), {
   ssr: false,
   loading: () => (
-    <div className="relative h-[calc(60vh-4rem)] w-full md:h-[calc(100vh-4rem)]">
+    <div className="relative h-mobile-map w-full md:h-desktop-map">
       <Skeleton className="size-full" />
       <LoadingIcon
         aria-label="ローディング中"

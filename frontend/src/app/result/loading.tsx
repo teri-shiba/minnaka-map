@@ -5,7 +5,7 @@ import { createSequence } from '~/utils/array'
 export default function Loading() {
   return (
     <div className="relative mx-auto h-[calc(100dvh-4rem)] max-w-screen-2xl overflow-hidden sm:flex">
-      <div className="relative h-[calc(60vh-4rem)] w-full md:h-[calc(100vh-4rem)]">
+      <div className="relative h-mobile-map w-full md:h-desktop-map">
         <Skeleton className="size-full" />
         <LoadingIcon
           aria-label="ローディング中"
