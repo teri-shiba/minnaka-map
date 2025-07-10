@@ -60,9 +60,9 @@ const config: Config = {
       },
       height: {
         'header': '4rem',
-        'drawer': '40dvh',
-        'mobile-map': 'calc(60vh - theme(height.header))',
-        'desktop-map': 'calc(100vh - theme(height.header))',
+        'drawer': '35dvh',
+        'mobile-map': 'calc(65dvh - theme(height.header))',
+        'desktop-map': 'calc(100dvh - theme(height.header))',
       },
     },
   },
