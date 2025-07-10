@@ -18,8 +18,6 @@ interface RestaurantListProps {
 }
 
 export default function RestaurantList({ restaurants, pagination }: RestaurantListProps) {
-  // const isDesktop = useMediaQuery('(min-width: 768px)')
-
   return (
     <>
       {/* PC */}
