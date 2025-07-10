@@ -34,7 +34,7 @@ export default function RestaurantsDrawer({
       return
 
     const contentHeight = contentRef.current.offsetHeight
-    const modalViewHeight = window.innerHeight * 0.4
+    const modalViewHeight = window.innerHeight * 0.35
     const dragDistance = contentHeight - modalViewHeight
 
     setDragConstraints({
