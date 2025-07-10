@@ -1,8 +1,8 @@
 'use client'
 
 import type { PageInfo } from '~/types/pagination'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
+import { usePagination } from '~/hooks/usePagination'
 import {
   Pagination,
   PaginationContent,
@@ -20,44 +20,13 @@ interface RestaurantPaginationProps {
 
 export default function RestaurantPagination({ pagination }: RestaurantPaginationProps) {
   const { currentPage, totalPages } = pagination
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  const createPageUrl = useCallback((page: number) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('page', page.toString())
-    return `?${params.toString()}`
-  }, [searchParams])
-
-  const handlePageClick = useCallback((page: number) => {
-    router.push(createPageUrl(page))
-  }, [router, createPageUrl])
+  const { createPageUrl, navigateToPage } = usePagination()
 
   const createEllipsis = (key: string) => (
     <PaginationItem key={key}>
       <PaginationEllipsis />
     </PaginationItem>
   )
-
-  const createNavigationButton = useCallback((
-    direction: 'previous' | 'next',
-    targetPage: number,
-    isActive: boolean,
-  ) => {
-    const Component = direction === 'previous' ? PaginationPrevious : PaginationNext
-
-    return (
-      <Component
-        href={isActive ? createPageUrl(targetPage) : '#'}
-        onClick={(e) => {
-          e.preventDefault()
-          if (isActive)
-            handlePageClick(targetPage)
-        }}
-        className={!isActive ? 'cursor-not-allowed opacity-50' : ''}
-      />
-    )
-  }, [createPageUrl, handlePageClick])
 
   const pageNumbers = useMemo(() => {
     const paginationStructure = generatePaginationStructure({ currentPage, totalPages,
@@ -71,7 +40,7 @@ export default function RestaurantPagination({ pagination }: RestaurantPaginatio
           size="sm"
           onClick={(e) => {
             e.preventDefault()
-            handlePageClick(page)
+            navigateToPage(page)
           }}
         >
           {page}
@@ -102,20 +71,36 @@ export default function RestaurantPagination({ pagination }: RestaurantPaginatio
     currentPage,
     totalPages,
     createPageUrl,
-    handlePageClick,
+    navigateToPage,
   ])
 
   return (
     <Pagination className="mt-4">
       <PaginationContent>
         <PaginationItem>
-          {createNavigationButton('previous', currentPage - 1, currentPage > 1)}
+          <PaginationPrevious
+            href={currentPage > 1 ? createPageUrl(currentPage - 1) : '#'}
+            onClick={(e) => {
+              e.preventDefault()
+              if (currentPage > 1)
+                navigateToPage(currentPage - 1)
+            }}
+            className={currentPage <= 1 ? 'cursor-not-allowed opacity-50' : ''}
+          />
         </PaginationItem>
 
         {pageNumbers}
 
         <PaginationItem>
-          {createNavigationButton('next', currentPage + 1, currentPage < totalPages)}
+          <PaginationNext
+            href={currentPage < totalPages ? createPageUrl(currentPage + 1) : '#'}
+            onClick={(e) => {
+              e.preventDefault()
+              if (currentPage < totalPages)
+                navigateToPage(currentPage + 1)
+            }}
+            className={currentPage >= totalPages ? 'cursor-not-allowed opacity-50' : ''}
+          />
         </PaginationItem>
       </PaginationContent>
     </Pagination>
