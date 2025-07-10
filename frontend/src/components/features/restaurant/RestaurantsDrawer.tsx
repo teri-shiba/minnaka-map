@@ -64,7 +64,7 @@ export default function RestaurantsDrawer({
       drag="y"
       dragConstraints={dragConstraints}
       animate={controls}
-      className={cn('absolute bottom-0 z-40 h-[40vh] w-full', className)}
+      className={cn('absolute bottom-0 z-40 h-drawer w-full', className)}
       transition={{
         type: 'spring',
         damping: 25,
