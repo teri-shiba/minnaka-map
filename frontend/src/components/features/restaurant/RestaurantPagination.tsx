@@ -22,61 +22,28 @@ export default function RestaurantPagination({ pagination }: RestaurantPaginatio
   const { currentPage, totalPages } = pagination
   const { createPageUrl, navigateToPage } = usePagination()
 
-  const createEllipsis = (key: string) => (
-    <PaginationItem key={key}>
-      <PaginationEllipsis />
-    </PaginationItem>
-  )
+  const paginationStructure = useMemo(() =>
+    generatePaginationStructure({ currentPage, totalPages }), [currentPage, totalPages])
 
-  const pageNumbers = useMemo(() => {
-    const paginationStructure = generatePaginationStructure({ currentPage, totalPages,
-    })
+  const paginationSequence = useMemo(() => {
+    const pages = paginationStructure.pages
+    let result: (number | string)[] = [...pages]
 
-    const createPageItem = (page: number) => (
-      <PaginationItem key={page}>
-        <PaginationLink
-          href={createPageUrl(page)}
-          isActive={currentPage === page}
-          size="sm"
-          onClick={(e) => {
-            e.preventDefault()
-            navigateToPage(page)
-          }}
-        >
-          {page}
-        </PaginationLink>
-      </PaginationItem>
-    )
+    if (paginationStructure.ellipsisPositions.includes('start')) {
+      result = [pages[0], 'ellipsis-start', ...pages.slice(1)]
+    }
 
-    const pageItems = paginationStructure.pages.map(createPageItem)
+    if (paginationStructure.ellipsisPositions.includes('end')) {
+      result = [...result.slice(0, -1), 'ellipsis-end', result[result.length - 1]]
+    }
 
-    const withStartEllipsis = paginationStructure.ellipsisPositions.includes('start')
-      ? [
-          pageItems[0],
-          createEllipsis('ellipsis1'),
-          ...pageItems.slice(1),
-        ]
-      : pageItems
-
-    const withBothEllipsis = paginationStructure.ellipsisPositions.includes('end')
-      ? [
-          ...withStartEllipsis.slice(0, -1),
-          createEllipsis('ellipsis2'),
-          withStartEllipsis[withStartEllipsis.length - 1],
-        ]
-      : withStartEllipsis
-
-    return withBothEllipsis
-  }, [
-    currentPage,
-    totalPages,
-    createPageUrl,
-    navigateToPage,
-  ])
+    return result
+  }, [paginationStructure])
 
   return (
     <Pagination className="mt-4">
       <PaginationContent>
+        {/* 前へボタン */}
         <PaginationItem>
           <PaginationPrevious
             href={currentPage > 1 ? createPageUrl(currentPage - 1) : '#'}
@@ -89,8 +56,35 @@ export default function RestaurantPagination({ pagination }: RestaurantPaginatio
           />
         </PaginationItem>
 
-        {pageNumbers}
+        {paginationSequence.map((item) => {
+          // 省略記号の場合
+          if (typeof item === 'string') {
+            return (
+              <PaginationItem key={item}>
+                <PaginationEllipsis />
+              </PaginationItem>
+            )
+          }
 
+          // ページ番号の場合
+          return (
+            <PaginationItem key={item}>
+              <PaginationLink
+                href={createPageUrl(item)}
+                isActive={currentPage === item}
+                size="sm"
+                onClick={(e) => {
+                  e.preventDefault()
+                  navigateToPage(item)
+                }}
+              >
+                {item}
+              </PaginationLink>
+            </PaginationItem>
+          )
+        })}
+
+        {/* 次へボタン */}
         <PaginationItem>
           <PaginationNext
             href={currentPage < totalPages ? createPageUrl(currentPage + 1) : '#'}
