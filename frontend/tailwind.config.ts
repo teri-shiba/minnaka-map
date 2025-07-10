@@ -63,7 +63,7 @@ const config: Config = {
         'drawer': '40dvh',
         'mobile-map': 'calc(60vh - theme(height.header))',
         'desktop-map': 'calc(100vh - theme(height.header))',
-      }
+      },
     },
   },
   plugins: [
