@@ -1,4 +1,4 @@
-class Api::V1::MidpointsController < ApplicationController
+class Api::V1::MidpointController < ApplicationController
   def create
     valid_stations = params[:area].
                        select {|station| station[:latitude].present? && station[:longitude].present? }.

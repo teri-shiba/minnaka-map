@@ -40,7 +40,7 @@ export default function StationSearchForm() {
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
   const processValidData = async (data: AreaFormValues) => {
     try {
-      const response = await fetch(`${baseURL}/midpoints`, {
+      const response = await fetch(`${baseURL}/midpoint`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
