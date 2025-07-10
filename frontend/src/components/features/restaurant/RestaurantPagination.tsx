@@ -3,7 +3,6 @@
 import type { PageInfo } from '~/types/pagination'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
-import { PAGINATION } from '~/constants'
 import {
   Pagination,
   PaginationContent,
@@ -13,6 +12,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '~/ui/pagination/Pagination'
+import { generatePaginationStructure } from '~/utils/pagination'
 
 interface RestaurantPaginationProps {
   pagination: PageInfo
@@ -59,12 +59,9 @@ export default function RestaurantPagination({ pagination }: RestaurantPaginatio
     )
   }, [createPageUrl, handlePageClick])
 
-  /*---------------- */
-  // ↓ リファクタリング
-  /*---------------- */
   const pageNumbers = useMemo(() => {
-    const pages = []
-    const showEllipsis = totalPages > PAGINATION.ELLIPSIS_THRESHOLD
+    const paginationStructure = generatePaginationStructure({ currentPage, totalPages,
+    })
 
     const createPageItem = (page: number) => (
       <PaginationItem key={page}>
@@ -82,40 +79,31 @@ export default function RestaurantPagination({ pagination }: RestaurantPaginatio
       </PaginationItem>
     )
 
-    if (!showEllipsis) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(createPageItem(i))
-      }
-    }
-    else {
-      pages.push(createPageItem(1))
+    const pageItems = paginationStructure.pages.map(createPageItem)
 
-      if (currentPage > PAGINATION.ELLIPSIS_START_OFFSET) {
-        pages.push(createEllipsis('ellipsis1'))
-      }
+    const withStartEllipsis = paginationStructure.ellipsisPositions.includes('start')
+      ? [
+          pageItems[0],
+          createEllipsis('ellipsis1'),
+          ...pageItems.slice(1),
+        ]
+      : pageItems
 
-      const start = Math.max(PAGINATION.SECOND_PAGE, currentPage - PAGINATION.CURRENT_PAGE_RANGE)
-      const end = Math.min(totalPages - PAGINATION.LAST_PAGE_OFFSET, currentPage + PAGINATION.CURRENT_PAGE_RANGE)
+    const withBothEllipsis = paginationStructure.ellipsisPositions.includes('end')
+      ? [
+          ...withStartEllipsis.slice(0, -1),
+          createEllipsis('ellipsis2'),
+          withStartEllipsis[withStartEllipsis.length - 1],
+        ]
+      : withStartEllipsis
 
-      for (let i = start; i <= end; i++) {
-        pages.push (createPageItem(i))
-      }
-
-      if (currentPage < totalPages - PAGINATION.ELLIPSIS_END_OFFSET) {
-        pages.push(createEllipsis('ellipsis2'))
-      }
-
-      if (totalPages > 1) {
-        pages.push(createPageItem(totalPages))
-      }
-    }
-
-    return pages
-  }, [currentPage, totalPages, createPageUrl, handlePageClick])
-
-  /*---------------- */
-  // ↑ リファクタリング
-  /*---------------- */
+    return withBothEllipsis
+  }, [
+    currentPage,
+    totalPages,
+    createPageUrl,
+    handlePageClick,
+  ])
 
   return (
     <Pagination className="mt-4">
