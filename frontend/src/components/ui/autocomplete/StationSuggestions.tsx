@@ -25,10 +25,10 @@ export default function StationSuggestions({
       >
         <CommandEmpty className="p-2 text-center text-sm">
           <Loading
+            aria-label="ローディング中"
             width={28}
             height={28}
             className="mx-auto"
-            aria-label="ローディング中"
           />
         </CommandEmpty>
       </CommandList>

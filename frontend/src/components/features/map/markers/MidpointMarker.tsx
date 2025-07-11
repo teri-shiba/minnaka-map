@@ -9,7 +9,7 @@ interface PositionProps {
   position: LatLngExpression
 }
 
-export default function UserLocationMarker({ position }: PositionProps) {
+export default function MidpointMarker({ position }: PositionProps) {
   const icon = useMemo(() => {
     return L.icon({
       iconUrl: '/figure_pin_center.webp',

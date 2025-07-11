@@ -2,15 +2,15 @@
 
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
+import { carouselData } from '~/data/carousel-data'
 import { useCarousel } from '~/hooks/useCarousel'
-import { carouselData } from '~/lib/data/carouselData'
 import GuideItem from './GuideItem'
 
 const dataMap = new Map<number, typeof carouselData[0]>(
   carouselData.map(data => [data.id, data]),
 )
 
-export default function DesktopGuideCarousel() {
+export default function DesktopGuideCarousel({ className }: { className?: string }) {
   const { activeStep, startSequenceFrom } = useCarousel(carouselData, {
     autoPlay: true,
     interval: 3000,
@@ -19,7 +19,7 @@ export default function DesktopGuideCarousel() {
   const current = dataMap.get(activeStep)
 
   return (
-    <>
+    <div className={className}>
       {/* Images */}
       <div className="w-1/2 text-center">
         <AnimatePresence mode="wait">
@@ -67,6 +67,6 @@ export default function DesktopGuideCarousel() {
           />
         ))}
       </div>
-    </>
+    </div>
   )
 }

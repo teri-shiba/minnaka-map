@@ -72,8 +72,7 @@
   p { @apply text-sm md:text-base }
 
   .section-guide {
-    @apply relative block py-8
-           md:flex md:items-center md:justify-between md:py-20;
+    @apply relative min-h-[23rem] py-8 sm:min-h-[46rem] sm:py-20;
   }
 
   .section-guide::before {
@@ -85,5 +84,31 @@
            md:rounded-[2rem] md:opacity-100
            md:min-h-[46rem];
     background-image: url("/image_guide_background.webp");
+  }
+}
+
+@layer utilities {
+  .hidden-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hidden-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .text-limit-oneline {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .text-limit-twolines {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
   }
 }
