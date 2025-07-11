@@ -1,78 +1,60 @@
-'use client'
-import type { LatLngExpression } from 'leaflet'
-import dynamic from 'next/dynamic'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
+import type { SearchParams } from '~/types/search-params'
+import { redirect } from 'next/navigation'
+import MapClient from '~/components/features/map/MapClient'
+import RestaurantList from '~/components/features/restaurant/RestaurantList'
+import { fetchRestaurants } from '~/services/fetch-restaurants'
+import { getApiKey } from '~/services/get-api-key'
+import { parseAndValidateCoordinates } from '~/services/parse-and-validate-coords'
+import { verifyCoordsSignature } from '~/services/verify-coords-signature'
 
-const Map = dynamic(() => import('~/components/ui/map/Map'), {
-  ssr: false,
-  loading: () => <p>Loading...</p>,
-})
+interface ResultPageProps {
+  searchParams: Promise<SearchParams & { page?: string }>
+}
 
-export default function Result() {
-  const params = useSearchParams()
-  const router = useRouter()
-  const [userLocation, setUserLocation] = useState<LatLngExpression | null>(null)
-  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+export default async function Result({ searchParams }: ResultPageProps) {
+  const params = await searchParams
 
-  useEffect(() => {
-    const validateCoordinates = async () => {
-      const latParam = params.get('lat')
-      const lngParam = params.get('lng')
-      const signature = params.get('signature')
+  if (!params.lat || !params.lng || !params.signature) {
+    redirect('/?error=missing_params')
+  }
 
-      if (!latParam || !lngParam || !signature) {
-        toast.error('検索パラメータが不足しています。再度計算を行ってください。')
-        router.push('/')
-        return
-      }
+  const { lat, lng } = await parseAndValidateCoordinates(params)
 
-      const lat = Number.parseFloat(latParam)
-      const lng = Number.parseFloat(lngParam)
+  const maptilerApiKey = await getApiKey('maptiler')
+  const midpoint = await verifyCoordsSignature({
+    latitude: lat,
+    longitude: lng,
+    signature: params.signature,
+    expires_at: params.expires_at,
+  })
 
-      if (Number.isNaN(lat) || Number.isNaN(lng)) {
-        toast.error('無効な位置情報です。再度検索を行ってください。')
-        router.push('/')
-        return
-      }
-
-      try {
-        const response = await fetch(`${baseURL}/validate_coordinates`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            latitude: lat,
-            longitude: lng,
-            signature,
-          }),
-        })
-
-        if (!response.ok) {
-          const errorData = await response.json()
-          toast.error(errorData.message || '座標の検証に失敗しました。再検索を行ってください。')
-          router.push('/')
-          return
-        }
-
-        setUserLocation([lat, lng])
-      }
-      catch (e) {
-        console.error('検証エラー:', e)
-        toast.error('検証中にエラーが発生しました。再度お試しください。')
-        router.push('/')
-      }
-    }
-
-    validateCoordinates()
-  }, [params, router, baseURL])
+  const currentPage = Number(params.page) || 1
+  const paginatedResult = await fetchRestaurants({
+    latitude: lat,
+    longitude: lng,
+    radius: params.radius,
+    page: currentPage,
+    itemsPerPage: 10,
+  })
 
   return (
     <>
-      <div className="h-[calc(100vh-4rem)] w-full">
-        {userLocation && <Map userLocation={userLocation} />}
+      <div className="relative mx-auto h-[calc(100dvh-4rem)] max-w-screen-2xl overflow-hidden sm:flex">
+        <div className="h-mobile-map w-full md:h-desktop-map md:w-3/5">
+          {(maptilerApiKey && midpoint)
+            && (
+              <MapClient
+                apiKey={maptilerApiKey}
+                midpoint={midpoint}
+                restaurants={paginatedResult.items}
+              />
+            )}
+        </div>
+
+        <RestaurantList
+          restaurants={paginatedResult.items}
+          pagination={paginatedResult.pagination}
+        />
       </div>
     </>
   )

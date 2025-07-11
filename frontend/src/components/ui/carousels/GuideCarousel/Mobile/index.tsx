@@ -3,7 +3,7 @@
 import type { EmblaOptionsType } from 'embla-carousel'
 import Autoplay from 'embla-carousel-autoplay'
 import Image from 'next/image'
-import { carouselData } from '~/lib/data/carouselData'
+import { carouselData } from '~/data/carousel-data'
 import {
   Carousel,
   CarouselContent,
@@ -23,9 +23,9 @@ const carouselPlugins = [
   }),
 ]
 
-export default function MobileGuideCarousel() {
+export default function MobileGuideCarousel({ className }: { className?: string }) {
   return (
-    <>
+    <div className={className}>
       <h2 className="mb-7 text-center text-lg text-secondary-foreground sm:text-2xl md:mb-12">
         <span className="inline-block align-text-bottom">
           <Image
@@ -49,6 +49,6 @@ export default function MobileGuideCarousel() {
           ))}
         </CarouselContent>
       </Carousel>
-    </>
+    </div>
   )
 }

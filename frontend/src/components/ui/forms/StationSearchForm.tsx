@@ -1,12 +1,13 @@
 'use client'
 
-import type { AreaFormValues } from '~/lib/schemas/areaSearchSchema'
+import type { AreaFormValues } from '~/schemas/station-search.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/buttons/Button'
-import { areaFormSchema } from '~/lib/schemas/areaSearchSchema'
+import { logger } from '~/lib/logger'
+import { stationSearchSchema } from '~/schemas/station-search.schema'
 import StationAutocomplete from '../autocomplete/StationAutocomplete'
 import { AddFormButton } from '../buttons/AddFormButton'
 import { RemoveFormButton } from '../buttons/RemoveFormButton'
@@ -19,7 +20,7 @@ const MAX_REQUIRED_FIELDS = 2
 export default function StationSearchForm() {
   const router = useRouter()
   const form = useForm<AreaFormValues>({
-    resolver: zodResolver(areaFormSchema),
+    resolver: zodResolver(stationSearchSchema),
     defaultValues: {
       area: [
         { areaValue: '', latitude: null, longitude: null },
@@ -39,7 +40,7 @@ export default function StationSearchForm() {
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
   const processValidData = async (data: AreaFormValues) => {
     try {
-      const response = await fetch(`${baseURL}/midpoints`, {
+      const response = await fetch(`${baseURL}/midpoint`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,10 +53,21 @@ export default function StationSearchForm() {
         throw new Error('APIリクエストに失敗しました')
       }
 
-      router.push(`/result?lat=${result.midpoint.latitude}&lng=${result.midpoint.longitude}&signature=${result.signature}`)
+      const query: Record<string, string> = {
+        lat: result.midpoint.latitude,
+        lng: result.midpoint.longitude,
+        signature: result.signature,
+      }
+
+      if (result.expires_at) {
+        query.expires_at = result.expires_at
+      }
+
+      const qs = new URLSearchParams(query).toString()
+      router.push(`/result?${qs}`)
     }
-    catch (e) {
-      console.error('フォーム送信エラー:', e)
+    catch (error) {
+      logger(error, { tags: { component: 'StationSearchForm' } })
       toast.error('フォームの送信に失敗しました')
     }
   }

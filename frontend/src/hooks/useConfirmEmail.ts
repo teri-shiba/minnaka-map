@@ -4,8 +4,9 @@ import { useSetAtom } from 'jotai'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import api from '~/lib/api'
-import { authModalOpenAtom } from '~/lib/state/authModalOpenAtom'
+import api from '~/lib/axios-interceptor'
+import { logger } from '~/lib/logger'
+import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
 
 export default function useConfirmEmail() {
   const router = useRouter()
@@ -31,7 +32,7 @@ export default function useConfirmEmail() {
         setModalOpen(true)
       }
       catch (error) {
-        console.error('Confirm Email callback error:', error)
+        logger(error, { tags: { component: 'handleConfirmEmail' } })
       }
       finally {
         router.replace('/', { scroll: false })

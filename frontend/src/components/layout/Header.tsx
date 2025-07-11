@@ -2,6 +2,7 @@
 import type { StaticImageData } from 'next/image'
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useAuth } from '~/hooks/useAuth'
 import logo from '~/public/logo.webp'
 import logoMark from '~/public/logo_mark.webp'
@@ -19,6 +20,9 @@ interface logoImages {
 
 export default function Header() {
   const { user, isLoading } = useAuth()
+
+  const pathname = usePathname()
+  const exceptHomeClassName = pathname !== '/' ? 'border-b border-gray-200' : null
 
   const logoImages: logoImages[] = [
     {
@@ -38,7 +42,7 @@ export default function Header() {
   ]
 
   return (
-    <header className="h-16 w-full">
+    <header className={`relative z-50 h-16 w-full bg-white ${exceptHomeClassName}`}>
       <div className="mx-auto flex h-16 max-w-screen-lg items-center justify-between gap-4 px-5">
         <Link href="/" className="flex items-center">
           {logoImages.map(logo => (
@@ -55,7 +59,7 @@ export default function Header() {
           ))}
         </Link>
         {isLoading
-          ? <Skeleton className="h-[40px] w-[87px] rounded-full" />
+          ? <Skeleton className="h-10 w-[87px] rounded-full" />
           : user && user.isSignedIn
             ? <UserMenu />
             : <Auth />}

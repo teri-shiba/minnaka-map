@@ -58,6 +58,12 @@ const config: Config = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      height: {
+        'header': '4rem',
+        'drawer': '35dvh',
+        'mobile-map': 'calc(65dvh - theme(height.header))',
+        'desktop-map': 'calc(100dvh - theme(height.header))',
+      },
     },
   },
   plugins: [
