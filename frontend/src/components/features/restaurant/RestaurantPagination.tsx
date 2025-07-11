@@ -41,7 +41,7 @@ export default function RestaurantPagination({ pagination }: RestaurantPaginatio
   }, [paginationStructure])
 
   return (
-    <Pagination className="mt-4">
+    <Pagination>
       <PaginationContent>
         {/* 前へボタン */}
         <PaginationItem>

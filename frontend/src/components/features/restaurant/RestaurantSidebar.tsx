@@ -63,11 +63,24 @@ export default function RestaurantSidebar({
             )}
       </div>
 
-      {totalPages > 1 && (
-        <RestaurantPagination
-          pagination={pagination}
-        />
-      )}
+      <div className="mt-4 space-y-2 rounded-lg bg-gray-50/50 p-4">
+        {totalPages > 1 && (
+          <RestaurantPagination
+            pagination={pagination}
+          />
+        )}
+
+        <p className="border-t pt-2 text-center text-xs text-muted-foreground">
+          Powered by
+          {' '}
+          <a
+            href="http://webservice.recruit.co.jp/"
+            className="text-sky-500"
+          >
+            ホットペッパーグルメ Webサービス
+          </a>
+        </p>
+      </div>
     </div>
   )
 }
