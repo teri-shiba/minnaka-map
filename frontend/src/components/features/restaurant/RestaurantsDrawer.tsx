@@ -100,11 +100,13 @@ export default function RestaurantsDrawer({
               )}
         </div>
 
-        {totalPages > 1 && (
-          <RestaurantPagination
-            pagination={pagination}
-          />
-        )}
+        <div className="mt-4">
+          {totalPages > 1 && (
+            <RestaurantPagination
+              pagination={pagination}
+            />
+          )}
+        </div>
 
         <p
           className="pt-4 text-center text-xs text-muted-foreground"
