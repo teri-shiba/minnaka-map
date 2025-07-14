@@ -75,7 +75,7 @@ export default function RestaurantSidebar({
           {' '}
           <a
             href="http://webservice.recruit.co.jp/"
-            className="text-sky-500"
+            className="text-sky-600"
           >
             ホットペッパーグルメ Webサービス
           </a>

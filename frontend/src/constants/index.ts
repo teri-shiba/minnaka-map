@@ -54,3 +54,10 @@ export const PAGINATION = {
   ELLIPSIS_START_OFFSET: 3,
   ELLIPSIS_END_OFFSET: 2,
 } as const
+
+// ========================================================
+// Cache
+// ========================================================
+export const CACHE_DURATION = {
+  RESTAURANT_INFO: 86400, // 24H (60 * 60 * 24)
+} as const
