@@ -44,13 +44,16 @@ export async function fetchRestaurants(
 
     if (!response.ok) {
       if (response.status === 429) {
+        logger(response.status === 429, { tags: { component: 'fetchRestaurants' } })
         redirect('/?error=rate_limit_exceeded')
       }
       else if (response.status >= 500) {
+        logger(response.status >= 500, { tags: { component: 'fetchRestaurants' } })
         redirect('/?error=server_error')
       }
       else {
-        throw new Error('レストランデータの取得に失敗しました')
+        logger(!response.ok, { tags: { component: 'fetchRestaurants' } })
+        redirect('/?error=restaurant_fetch_failed')
       }
     }
 
