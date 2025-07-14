@@ -1,5 +1,6 @@
 import type { HotPepperRestaurant, RestaurantDetailItem } from '~/types/restaurant'
 import { redirect } from 'next/navigation'
+import { CACHE_DURATION } from '~/constants'
 import { logger } from '~/lib/logger'
 import { transformToDetail } from '~/types/restaurant'
 import { getApiKey } from './get-api-key'
@@ -7,30 +8,40 @@ import { getApiKey } from './get-api-key'
 export async function fetchRestaurantDetail(id: string): Promise<RestaurantDetailItem> {
   try {
     const apiKey = await getApiKey('hotpepper')
-    const hotpepperUrl = 'https://webservice.recruit.co.jp/hotpepper/gourmet/v1/'
-
     const searchParams = new URLSearchParams({
       key: apiKey,
       id,
       format: 'json',
     })
 
-    const response = await fetch(`${hotpepperUrl}?${searchParams}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}?${searchParams}`, {
       next: {
-        revalidate: 86400,
+        revalidate: CACHE_DURATION.RESTAURANT_INFO,
         tags: [`restaurant-detail-${id}`],
       },
     })
 
     if (!response.ok) {
       if (response.status === 429) {
+        logger(
+          new Error(`HotPepper API rate limit exceeded: ${response.status}`),
+          { tags: { component: 'fetchRestaurantDetail' } },
+        )
         redirect('/?error=rate_limit_exceeded')
       }
       else if (response.status >= 500) {
+        logger(
+          new Error(`HotPepper API server error: response.status >= 500`),
+          { tags: { component: 'fetchRestaurantDetail' } },
+        )
         redirect('/?error=server_error')
       }
       else {
-        throw new Error('レストラン詳細データの取得に失敗しました')
+        logger(
+          new Error(`HotPepper API request failed: !response.ok`),
+          { tags: { component: 'fetchRestaurantDetail' } },
+        )
+        redirect('/?error=restaurant_fetch_failed')
       }
     }
 
