@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { logger } from '~/lib/logger'
 import { transformToList } from '~/types/restaurant'
 import { getApiKey } from './get-api-key'
+import { CACHE_DURATION } from '~/constants'
 
 interface FetchRestaurantsOpts {
   latitude: number
@@ -36,7 +37,7 @@ export async function fetchRestaurants(
 
     const response = await fetch(`${hotpepperUrl}?${searchParams}`, {
       next: {
-        revalidate: 86400,
+        revalidate: CACHE_DURATION.RESTAURANT_INFO,
         tags: [`restaurants-${opts.latitude}-${opts.longitude}`],
       },
     })
