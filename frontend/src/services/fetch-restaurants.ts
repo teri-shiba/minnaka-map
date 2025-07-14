@@ -1,10 +1,10 @@
 import type { PaginatedResult } from '~/types/pagination'
 import type { HotPepperRestaurant, RestaurantListItem } from '~/types/restaurant'
 import { redirect } from 'next/navigation'
+import { CACHE_DURATION } from '~/constants'
 import { logger } from '~/lib/logger'
 import { transformToList } from '~/types/restaurant'
 import { getApiKey } from './get-api-key'
-import { CACHE_DURATION } from '~/constants'
 
 interface FetchRestaurantsOpts {
   latitude: number
@@ -43,15 +43,24 @@ export async function fetchRestaurants(
 
     if (!response.ok) {
       if (response.status === 429) {
-        logger(response.status === 429, { tags: { component: 'fetchRestaurants' } })
+        logger(
+          new Error(`HotPepper API rate limit exceeded: ${response.status}`),
+          { tags: { component: 'fetchRestaurants' } },
+        )
         redirect('/?error=rate_limit_exceeded')
       }
       else if (response.status >= 500) {
-        logger(response.status >= 500, { tags: { component: 'fetchRestaurants' } })
+        logger(
+          new Error(`HotPepper API server error: response.status >= 500`),
+          { tags: { component: 'fetchRestaurants' } },
+        )
         redirect('/?error=server_error')
       }
       else {
-        logger(!response.ok, { tags: { component: 'fetchRestaurants' } })
+        logger(
+          new Error(`HotPepper API request failed: !response.ok`),
+          { tags: { component: 'fetchRestaurants' } },
+        )
         redirect('/?error=restaurant_fetch_failed')
       }
     }
