@@ -23,7 +23,7 @@ function TableBody({ ref, className, ...props }: HTMLAttributes<HTMLTableSection
   return (
     <tbody
       ref={ref}
-      className={cn('[&_tr:last-child]:border-0', className)}
+      className={cn('', className)}
       {...props}
     />
   )
@@ -35,7 +35,7 @@ function TableFooter({ ref, className, ...props }: HTMLAttributes<HTMLTableSecti
     <tfoot
       ref={ref}
       className={cn(
-        'border-t bg-muted/50 font-medium [&>tr]:last:border-b-0',
+        'border-t bg-muted/50 font-medium',
         className,
       )}
       {...props}
@@ -49,7 +49,7 @@ function TableRow({ ref, className, ...props }: HTMLAttributes<HTMLTableRowEleme
     <tr
       ref={ref}
       className={cn(
-        'border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted',
+        'border-y transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted',
         className,
       )}
       {...props}
@@ -63,7 +63,7 @@ function TableHead({ ref, className, ...props }: ThHTMLAttributes<HTMLTableCellE
     <th
       ref={ref}
       className={cn(
-        'h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0',
+        'h-12 px-4 text-left align-middle font-bold [&:has([role=checkbox])]:pr-0',
         className,
       )}
       {...props}
