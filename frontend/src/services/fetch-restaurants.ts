@@ -23,7 +23,6 @@ export async function fetchRestaurants(
     const start = (page - 1) * itemsPerPage + 1
 
     const apiKey = await getApiKey('hotpepper')
-    const hotpepperUrl = 'https://webservice.recruit.co.jp/hotpepper/gourmet/v1/'
 
     const searchParams = new URLSearchParams({
       key: apiKey,
@@ -35,7 +34,7 @@ export async function fetchRestaurants(
       format: 'json',
     })
 
-    const response = await fetch(`${hotpepperUrl}?${searchParams}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}?${searchParams}`, {
       next: {
         revalidate: CACHE_DURATION.RESTAURANT_INFO,
         tags: [`restaurants-${opts.latitude}-${opts.longitude}`],
