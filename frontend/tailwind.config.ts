@@ -64,6 +64,9 @@ const config: Config = {
         'mobile-map': 'calc(65dvh - theme(height.header))',
         'desktop-map': 'calc(100dvh - theme(height.header))',
       },
+      aspectRatio: {
+        '3/2': '3 / 2',
+      },
     },
   },
   plugins: [
