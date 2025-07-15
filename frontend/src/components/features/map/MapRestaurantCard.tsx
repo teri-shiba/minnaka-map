@@ -18,17 +18,26 @@ export default function MapRestaurantCard({ restaurant, onClose }: MapRestaurant
     <Link
       href={`restaurant/${restaurant.id}`}
       className="block"
+      onClick={(e) => {
+        e.stopPropagation()
+      }}
     >
-      <Card className="relative w-full flex-row md:flex-col">
+      <Card
+        className="relative w-full flex-row md:flex-col"
+        onClick={(e) => {
+          e.stopPropagation()
+        }}
+      >
         {onClose && (
           <Button
             size="icon"
             aria-label="カードを閉じる"
             onClick={(e) => {
               e.preventDefault()
+              e.stopPropagation()
               onClose()
             }}
-            className="absolute right-2 top-2 z-50 size-6 md:size-8 rounded-full bg-white/90 transition-all duration-200 ease-linear hover:scale-105 hover:bg-white"
+            className="absolute right-2 top-2 z-50 size-6 rounded-full bg-white/90 transition-all duration-200 ease-linear hover:scale-105 hover:bg-white md:size-8"
           >
             <LuX className="block size-4 text-foreground" />
           </Button>
