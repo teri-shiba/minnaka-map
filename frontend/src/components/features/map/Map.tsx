@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks-extra/no-direct-set-state-in-use-effect */
 'use client'
 
 import type { MapItems } from '~/types/map'
@@ -116,7 +117,7 @@ export default function Map({
       }
       setCardOffset(offset)
     }
-  }, [selectedRestaurant?.id, mapData.pinPosition, mapData.mapCenter, mapData.mapSize])
+  }, [selectedRestaurant, selectedRestaurant?.id, mapData.pinPosition, mapData.mapCenter, mapData.mapSize])
 
   const mapOptions = createLeafletOptions(midpoint)
 

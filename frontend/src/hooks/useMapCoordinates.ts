@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks-extra/no-direct-set-state-in-use-effect */
+
+'use client'
 import type { LatLngExpression } from 'leaflet'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useMap } from 'react-leaflet'
