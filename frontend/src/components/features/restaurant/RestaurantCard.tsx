@@ -18,9 +18,9 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
   return (
     <Link
       href={`restaurant/${restaurant.id}`}
-      className="group block [@media(max-width:335px)]:flex-col"
+      className="group block"
     >
-      <Card>
+      <Card className="flex-row gap-2 [@media(max-width:335px)]:flex-col">
         <div className="relative aspect-square size-32 shrink-0 overflow-hidden rounded-lg [@media(max-width:335px)]:w-full">
           <Image
             alt={restaurant.name}
