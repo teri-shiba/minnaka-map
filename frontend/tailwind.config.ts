@@ -60,8 +60,8 @@ const config: Config = {
       },
       height: {
         'header': '4rem',
-        'drawer': '35dvh',
-        'mobile-map': 'calc(65dvh - theme(height.header))',
+        'drawer': '30dvh',
+        'mobile-map': 'calc(70dvh - theme(height.header))',
         'desktop-map': 'calc(100dvh - theme(height.header))',
       },
       aspectRatio: {
