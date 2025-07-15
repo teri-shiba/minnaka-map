@@ -7,9 +7,10 @@ import { Marker, Tooltip } from 'react-leaflet'
 
 interface RestaurantMarkerProps {
   restaurants: RestaurantListItem[]
+  onRestaurantClick: (restaurant: RestaurantListItem) => void
 }
 
-export default function RestaurantMarkers({ restaurants }: RestaurantMarkerProps) {
+export default function RestaurantMarkers({ restaurants, onRestaurantClick }: RestaurantMarkerProps) {
   const icon = useMemo(() => {
     return L.icon({
       iconUrl: '/figure_pin_restaurant.webp',
@@ -25,6 +26,9 @@ export default function RestaurantMarkers({ restaurants }: RestaurantMarkerProps
           key={restaurant.id}
           position={[restaurant.lat, restaurant.lng]}
           icon={icon}
+          eventHandlers={{
+            click: () => onRestaurantClick(restaurant),
+          }}
         >
           <Tooltip
             permanent
