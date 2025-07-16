@@ -61,3 +61,77 @@ export const PAGINATION = {
 export const CACHE_DURATION = {
   RESTAURANT_INFO: 86400, // 24H (60 * 60 * 24)
 } as const
+
+// ========================================================
+// Sort Restaurant
+// ========================================================
+export const SORT_GENRE = [
+  {
+    genreCode: 'G001',
+    genreName: '居酒屋',
+  },
+  {
+    genreCode: 'G002',
+    genreName: 'ダイニングバー・バル',
+  },
+  {
+    genreCode: 'G003',
+    genreName: '創作料理',
+  },
+  {
+    genreCode: 'G004',
+    genreName: '和食',
+  },
+  {
+    genreCode: 'G005',
+    genreName: '洋食',
+  },
+  {
+    genreCode: 'G006',
+    genreName: 'イタリアン・フレンチ',
+  },
+  {
+    genreCode: 'G007',
+    genreName: '中華',
+  },
+  {
+    genreCode: 'G008',
+    genreName: '焼肉・ホルモン',
+  },
+  {
+    genreCode: 'G017',
+    genreName: '韓国料理',
+  },
+  {
+    genreCode: 'G009',
+    genreName: 'アジア・エスニック料理',
+  },
+  {
+    genreCode: 'G010',
+    genreName: '各国料理',
+  },
+  {
+    genreCode: 'G011',
+    genreName: 'カラオケ・パーティ',
+  },
+  {
+    genreCode: 'G012',
+    genreName: 'バー・カクテル',
+  },
+  {
+    genreCode: 'G013',
+    genreName: 'ラーメン',
+  },
+  {
+    genreCode: 'G016',
+    genreName: 'お好み焼き・もんじゃ',
+  },
+  {
+    genreCode: 'G014',
+    genreName: 'カフェ・スイーツ',
+  },
+  {
+    genreCode: 'G015',
+    genreName: 'その他グルメ',
+  },
+] as const
