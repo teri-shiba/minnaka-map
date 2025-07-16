@@ -1,4 +1,3 @@
-// src/utils/calculate-card-position.ts を修正
 interface Position {
   x: number
   y: number
@@ -14,12 +13,11 @@ export function calculateCardPosition({ pinPosition, mapCenter, mapSize }: MapIn
   const CARD_WIDTH = 240
   const CARD_HEIGHT = 280
   const OFFSET = 5
-  const MARGIN = 10 // 画面端からの余白
+  const MARGIN = 10
 
   let left = pinPosition.x
   let top = pinPosition.y
 
-  // 基本配置（地図中心方向）
   if (pinPosition.x < mapCenter.x) {
     left = pinPosition.x + OFFSET
   }
@@ -33,9 +31,6 @@ export function calculateCardPosition({ pinPosition, mapCenter, mapSize }: MapIn
   else {
     top = pinPosition.y - CARD_HEIGHT - OFFSET
   }
-
-  left = Math.max(MARGIN, Math.min(left, mapSize.width - CARD_WIDTH - MARGIN))
-  top = Math.max(MARGIN, Math.min(top, mapSize.height - CARD_HEIGHT - MARGIN))
 
   if (pinPosition.x < CARD_WIDTH / 2) {
     left = pinPosition.x + OFFSET
