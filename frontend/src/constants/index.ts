@@ -61,3 +61,13 @@ export const PAGINATION = {
 export const CACHE_DURATION = {
   RESTAURANT_INFO: 86400, // 24H (60 * 60 * 24)
 } as const
+
+// ========================================================
+// Display Restaurant Card on Map
+// ========================================================
+export const CARD_POSITION = {
+  CARD_WIDTH: 240,
+  CARD_HEIGHT: 280,
+  OFFSET: 5,
+  MARGIN: 10,
+} as const
