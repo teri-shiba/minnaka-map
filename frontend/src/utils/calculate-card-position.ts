@@ -1,3 +1,5 @@
+import { CARD_POSITION } from '~/constants'
+
 interface Position {
   x: number
   y: number
@@ -10,44 +12,39 @@ interface MapInfo {
 }
 
 export function calculateCardPosition({ pinPosition, mapCenter, mapSize }: MapInfo) {
-  const CARD_WIDTH = 240
-  const CARD_HEIGHT = 280
-  const OFFSET = 5
-  const MARGIN = 10
-
   let left = pinPosition.x
   let top = pinPosition.y
 
   if (pinPosition.x < mapCenter.x) {
-    left = pinPosition.x + OFFSET
+    left = pinPosition.x + CARD_POSITION.OFFSET
   }
   else {
-    left = pinPosition.x - CARD_WIDTH - OFFSET
+    left = pinPosition.x - CARD_POSITION.CARD_WIDTH - CARD_POSITION.OFFSET
   }
 
   if (pinPosition.y < mapCenter.y) {
-    top = pinPosition.y + OFFSET
+    top = pinPosition.y + CARD_POSITION.OFFSET
   }
   else {
-    top = pinPosition.y - CARD_HEIGHT - OFFSET
+    top = pinPosition.y - CARD_POSITION.CARD_HEIGHT - CARD_POSITION.OFFSET
   }
 
-  if (pinPosition.x < CARD_WIDTH / 2) {
-    left = pinPosition.x + OFFSET
+  if (pinPosition.x < CARD_POSITION.CARD_WIDTH / 2) {
+    left = pinPosition.x + CARD_POSITION.OFFSET
   }
-  else if (pinPosition.x > mapSize.width - CARD_WIDTH / 2) {
-    left = pinPosition.x - CARD_WIDTH - OFFSET
-  }
-
-  if (pinPosition.y < CARD_HEIGHT / 2) {
-    top = pinPosition.y + OFFSET
-  }
-  else if (pinPosition.y > mapSize.height - CARD_HEIGHT / 2) {
-    top = pinPosition.y - CARD_HEIGHT - OFFSET
+  else if (pinPosition.x > mapSize.width - CARD_POSITION.CARD_WIDTH / 2) {
+    left = pinPosition.x - CARD_POSITION.CARD_WIDTH - CARD_POSITION.OFFSET
   }
 
-  left = Math.max(MARGIN, Math.min(left, mapSize.width - CARD_WIDTH - MARGIN))
-  top = Math.max(MARGIN, Math.min(top, mapSize.height - CARD_HEIGHT - MARGIN))
+  if (pinPosition.y < CARD_POSITION.CARD_HEIGHT / 2) {
+    top = pinPosition.y + CARD_POSITION.OFFSET
+  }
+  else if (pinPosition.y > mapSize.height - CARD_POSITION.CARD_HEIGHT / 2) {
+    top = pinPosition.y - CARD_POSITION.CARD_HEIGHT - CARD_POSITION.OFFSET
+  }
+
+  left = Math.max(CARD_POSITION.MARGIN, Math.min(left, mapSize.width - CARD_POSITION.CARD_WIDTH - CARD_POSITION.MARGIN))
+  top = Math.max(CARD_POSITION.MARGIN, Math.min(top, mapSize.height - CARD_POSITION.CARD_HEIGHT - CARD_POSITION.MARGIN))
 
   return { left, top, transform: '' }
 }
