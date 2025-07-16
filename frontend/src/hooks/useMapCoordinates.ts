@@ -1,9 +1,8 @@
-/* eslint-disable react-hooks-extra/no-direct-set-state-in-use-effect */
-
 'use client'
 import type { LatLngExpression } from 'leaflet'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useMap } from 'react-leaflet'
+import { throttle } from '~/utils/throttle'
 
 interface Position {
   x: number
@@ -12,13 +11,12 @@ interface Position {
 
 export function useMapCoordinates(latLng: LatLngExpression | null) {
   const map = useMap()
-  const [pinPosition, setPinPosition] = useState<Position | null>(null)
-  const [mapCenter, setMapCenter] = useState<Position | null>(null)
-  const [mapSize, setMapSize] = useState<{ width: number, height: number } | null>(null)
+  const [mapState, setMapState] = useState({
+    pinPosition: null as Position | null,
+    mapCenter: null as Position | null,
+    mapSize: null as { width: number, height: number } | null,
+  })
 
-  const positionRef = useRef<Position | null>(null)
-  const mapCenterRef = useRef<Position | null>(null)
-  const mapSizeRef = useRef<{ width: number, height: number } | null>(null)
   const stableLatLng = useMemo(() => latLng, [latLng])
 
   const updatePosition = useCallback(() => {
@@ -28,24 +26,29 @@ export function useMapCoordinates(latLng: LatLngExpression | null) {
     const size = map.getSize()
     const newMapSize = { width: size.x, height: size.y }
 
-    if (!mapSizeRef.current || mapSizeRef.current.width !== newMapSize.width || mapSizeRef.current.height !== newMapSize.height) {
-      mapSizeRef.current = newMapSize
-      setMapSize(newMapSize)
+    if (
+      !mapState.mapSize
+      || mapState.mapSize.width !== newMapSize.width
+      || mapState.mapSize.height !== newMapSize.height
+    ) {
+      setMapState(prev => ({ ...prev, mapSize: newMapSize }))
     }
 
     const center = map.latLngToContainerPoint(map.getCenter())
     const newMapCenter = { x: center.x, y: center.y }
 
-    if (!mapCenterRef.current || mapCenterRef.current.x !== newMapCenter.x || mapCenterRef.current.y !== newMapCenter.y) {
-      mapCenterRef.current = newMapCenter
-      setMapCenter(newMapCenter)
+    if (
+      !mapState.mapCenter
+      || mapState.mapCenter.x !== newMapCenter.x
+      || mapState.mapCenter.y !== newMapCenter.y
+    ) {
+      setMapState(prev => ({ ...prev, mapCenter: newMapCenter }))
     }
 
     if (!stableLatLng) {
       const newPosition = null
-      if (positionRef.current !== newPosition) {
-        positionRef.current = newPosition
-        setPinPosition(newPosition)
+      if (mapState.pinPosition !== newPosition) {
+        setMapState(prev => ({ ...prev, pinPosition: newPosition }))
       }
       return
     }
@@ -53,22 +56,37 @@ export function useMapCoordinates(latLng: LatLngExpression | null) {
     const point = map.latLngToContainerPoint(stableLatLng)
     const newPosition = { x: point.x, y: point.y }
 
-    const prev = positionRef.current
+    const prev = mapState.pinPosition
     if (!prev || prev.x !== newPosition.x || prev.y !== newPosition.y) {
-      positionRef.current = newPosition
-      setPinPosition(newPosition)
+      setMapState(prev => ({ ...prev, pinPosition: newPosition }))
     }
-  }, [map, stableLatLng])
+  }, [map, mapState, stableLatLng])
+
+  const throttledUpdatePosition = useCallback(
+    throttle(updatePosition, 16),
+    [updatePosition],
+  )
 
   useEffect(() => {
     updatePosition()
+  }, [updatePosition, stableLatLng])
 
-    map?.on('zoomend moveend move', updatePosition)
+  useEffect(() => {
+    if (!map)
+      return
+
+    map.on('zoomend moveend', updatePosition)
+    map.on('move', throttledUpdatePosition)
 
     return () => {
-      map?.off('zoomend moveend move', updatePosition)
+      map.off('zoomend moveend', updatePosition)
+      map.off('move', throttledUpdatePosition)
     }
-  }, [map, updatePosition])
+  }, [map, updatePosition, throttledUpdatePosition])
 
-  return { pinPosition, mapCenter, mapSize }
+  return {
+    pinPosition: mapState.pinPosition,
+    mapCenter: mapState.mapCenter,
+    mapSize: mapState.mapSize,
+  }
 }
