@@ -9,6 +9,7 @@ import { getApiKey } from './get-api-key'
 interface FetchRestaurantsOpts {
   latitude: number
   longitude: number
+  genre?: string
   radius?: string
   page?: number
   itemsPerPage?: number
@@ -24,7 +25,7 @@ export async function fetchRestaurants(
 
     const apiKey = await getApiKey('hotpepper')
 
-    const searchParams = new URLSearchParams({
+    const params: Record<string, string> = {
       key: apiKey,
       lat: opts.latitude.toString(),
       lng: opts.longitude.toString(),
@@ -32,8 +33,13 @@ export async function fetchRestaurants(
       start: start.toString(),
       count: itemsPerPage.toString(),
       format: 'json',
-    })
+    }
 
+    if (opts.genre) {
+      params.genre = opts.genre
+    }
+
+    const searchParams = new URLSearchParams(params)
     const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}?${searchParams}`, {
       next: {
         revalidate: CACHE_DURATION.RESTAURANT_INFO,
