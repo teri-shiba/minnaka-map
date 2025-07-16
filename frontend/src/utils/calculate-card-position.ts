@@ -8,43 +8,35 @@ interface Position {
 interface MapInfo {
   pinPosition: Position
   mapCenter: Position
-  mapSize: { width: number, height: number }
 }
 
-export function calculateCardPosition({ pinPosition, mapCenter, mapSize }: MapInfo) {
+export function calculateCardPosition({ pinPosition, mapCenter }: MapInfo) {
+  // 1.初期位置をピンの座標に設定
   let left = pinPosition.x
   let top = pinPosition.y
 
+  // 2.重複する計算式を事前に算出
+  const { CARD_WIDTH, CARD_HEIGHT, OFFSET } = CARD_POSITION
+
+  const rightPosition = pinPosition.x + OFFSET
+  const leftPosition = pinPosition.x - CARD_WIDTH - OFFSET
+  const bottomPosition = pinPosition.y + OFFSET
+  const topPosition = pinPosition.y - CARD_HEIGHT - OFFSET
+
+  // 3.地図中心方向へのカード配置
   if (pinPosition.x < mapCenter.x) {
-    left = pinPosition.x + CARD_POSITION.OFFSET
+    left = rightPosition
   }
   else {
-    left = pinPosition.x - CARD_POSITION.CARD_WIDTH - CARD_POSITION.OFFSET
+    left = leftPosition
   }
 
   if (pinPosition.y < mapCenter.y) {
-    top = pinPosition.y + CARD_POSITION.OFFSET
+    top = bottomPosition
   }
   else {
-    top = pinPosition.y - CARD_POSITION.CARD_HEIGHT - CARD_POSITION.OFFSET
+    top = topPosition
   }
-
-  if (pinPosition.x < CARD_POSITION.CARD_WIDTH / 2) {
-    left = pinPosition.x + CARD_POSITION.OFFSET
-  }
-  else if (pinPosition.x > mapSize.width - CARD_POSITION.CARD_WIDTH / 2) {
-    left = pinPosition.x - CARD_POSITION.CARD_WIDTH - CARD_POSITION.OFFSET
-  }
-
-  if (pinPosition.y < CARD_POSITION.CARD_HEIGHT / 2) {
-    top = pinPosition.y + CARD_POSITION.OFFSET
-  }
-  else if (pinPosition.y > mapSize.height - CARD_POSITION.CARD_HEIGHT / 2) {
-    top = pinPosition.y - CARD_POSITION.CARD_HEIGHT - CARD_POSITION.OFFSET
-  }
-
-  left = Math.max(CARD_POSITION.MARGIN, Math.min(left, mapSize.width - CARD_POSITION.CARD_WIDTH - CARD_POSITION.MARGIN))
-  top = Math.max(CARD_POSITION.MARGIN, Math.min(top, mapSize.height - CARD_POSITION.CARD_HEIGHT - CARD_POSITION.MARGIN))
 
   return { left, top, transform: '' }
 }
