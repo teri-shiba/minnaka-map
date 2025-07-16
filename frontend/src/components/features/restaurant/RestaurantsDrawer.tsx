@@ -3,6 +3,7 @@
 import type { PageInfo } from '~/types/pagination'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { motion, useAnimationControls } from 'framer-motion'
+import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Button } from '~/ui/buttons/Button'
 import { cn } from '~/utils/cn'
@@ -56,7 +57,7 @@ export default function RestaurantsDrawer({
       clearTimeout(timer)
       window.removeEventListener('resize', calculateConstraints)
     }
-  }, [calculateConstraints])
+  }, [calculateConstraints, restaurants])
 
   return (
     <motion.div
@@ -86,43 +87,38 @@ export default function RestaurantsDrawer({
                       restaurant={restaurant}
                     />
                   ))}
+
+                  {totalPages > 1 && (
+                    <RestaurantPagination
+                      pagination={pagination}
+                    />
+                  )}
+
+                  <p className="text-center text-xs text-muted-foreground">
+                    Powered by
+                    {' '}
+                    <a href="http://webservice.recruit.co.jp/" className="text-sky-600">
+                      ホットペッパーグルメ Webサービス
+                    </a>
+                  </p>
                 </>
               )
             : (
                 <div className="text-center">
-                  <p>
+                  <p className="text-sm leading-relaxed">
                     お店が見つかりませんでした。
                     <br />
                     条件を変えて再検索してください。
                   </p>
-                  <Button>検索条件を変更する</Button>
+                  <Link href="/" className="mt-4 inline-block">
+                    <Button>
+                      再検索する
+                    </Button>
+                  </Link>
                 </div>
               )}
         </div>
 
-        <div className="mt-4">
-          {totalPages > 1 && (
-            <RestaurantPagination
-              pagination={pagination}
-            />
-          )}
-        </div>
-
-        <p
-          className="pt-4 text-center text-xs text-muted-foreground"
-        >
-          Powered by
-          {' '}
-          <a
-            href="http://webservice.recruit.co.jp/"
-            className="text-sky-600"
-          >
-            ホットペッパーグルメ Webサービス
-          </a>
-        </p>
-        <p className="pt-1 text-center text-xs text-muted-foreground">
-          画像提供：ホットペッパー グルメ
-        </p>
       </div>
     </motion.div>
   )

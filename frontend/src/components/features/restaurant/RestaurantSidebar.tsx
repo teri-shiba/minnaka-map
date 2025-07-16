@@ -2,6 +2,7 @@
 
 import type { PageInfo } from '~/types/pagination'
 import type { RestaurantListItem } from '~/types/restaurant'
+import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { Button } from '~/ui/buttons/Button'
 import { cn } from '~/utils/cn'
@@ -49,38 +50,43 @@ export default function RestaurantSidebar({
                     restaurant={restaurant}
                   />
                 ))}
+
+                <div className="mt-4 space-y-2 rounded-lg bg-gray-50/50 p-4">
+                  {totalPages > 1 && (
+                    <RestaurantPagination
+                      pagination={pagination}
+                    />
+                  )}
+
+                  <p className="text-center text-xs text-muted-foreground">
+                    Powered by
+                    {' '}
+                    <a
+                      href="http://webservice.recruit.co.jp/"
+                      className="text-sky-600"
+                    >
+                      ホットペッパーグルメ Webサービス
+                    </a>
+                  </p>
+                </div>
               </>
             )
           : (
               <div className="text-center">
-                <p>
+                <p className="text-sm leading-relaxed">
                   お店が見つかりませんでした。
                   <br />
                   条件を変えて再検索してください。
                 </p>
-                <Button>検索条件を変更する</Button>
+                <Link href="/" className="mt-4 inline-block">
+                  <Button>
+                    再検索する
+                  </Button>
+                </Link>
               </div>
             )}
       </div>
 
-      <div className="mt-4 space-y-2 rounded-lg bg-gray-50/50 p-4">
-        {totalPages > 1 && (
-          <RestaurantPagination
-            pagination={pagination}
-          />
-        )}
-
-        <p className="border-t pt-2 text-center text-xs text-muted-foreground">
-          Powered by
-          {' '}
-          <a
-            href="http://webservice.recruit.co.jp/"
-            className="text-sky-600"
-          >
-            ホットペッパーグルメ Webサービス
-          </a>
-        </p>
-      </div>
     </div>
   )
 }
