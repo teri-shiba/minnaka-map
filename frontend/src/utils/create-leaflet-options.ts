@@ -21,7 +21,7 @@ export function createLeafletOptions(
     zoomDelta: 1,
 
     scrollWheelZoom: 'center',
-    wheelDebounceTime: isMobile? 100 : 500,
+    wheelDebounceTime: isMobile ? 100 : 500,
     wheelPxPerZoomLevel: isMobile ? 200 : 60,
     doubleClickZoom: false,
     tapTolerance: 15,
