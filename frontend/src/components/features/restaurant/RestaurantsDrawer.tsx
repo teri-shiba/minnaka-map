@@ -77,7 +77,11 @@ export default function RestaurantsDrawer({
 
         <RestaurantListHeader totalCount={totalCount} />
 
-        <div className="mt-4 space-y-4">
+        <div
+          className="mt-4 space-y-4"
+          onTouchStart={e => e.stopPropagation()}
+          style={{ touchAction: 'pan-y' }}
+        >
           {totalCount > 0
             ? (
                 <>
