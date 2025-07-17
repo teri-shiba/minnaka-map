@@ -33,7 +33,6 @@ export default async function Result({ searchParams }: ResultPageProps) {
   const paginatedResult = await fetchRestaurants({
     latitude: lat,
     longitude: lng,
-    radius: params.radius,
     page: currentPage,
     itemsPerPage: 10,
     genre: genreCode,
