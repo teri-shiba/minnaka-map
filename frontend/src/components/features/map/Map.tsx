@@ -2,6 +2,7 @@
 
 import type { MapItems } from '~/types/map'
 import { MapContainer, ZoomControl } from 'react-leaflet'
+import { useMediaQuery } from '~/hooks/useMediaQuery'
 import { createLeafletOptions } from '~/utils/create-leaflet-options'
 import MapTilerLayer from './layers/MapTilerLayer'
 import MidpointMarker from './markers/MidpointMarker'
@@ -14,10 +15,11 @@ export default function Map({
   midpoint,
   restaurants,
 }: MapItems) {
-  const mapOptions = createLeafletOptions(midpoint)
+  const isMobile = useMediaQuery('(max-width: 768px)')
+  const mapOptions = createLeafletOptions(midpoint, isMobile)
 
   return (
-    <main className="relative z-40 size-full flex-1 overflow-hidden">
+    <main className="relative z-40 size-full overflow-hidden">
       <MapContainer
         center={midpoint}
         {...mapOptions}

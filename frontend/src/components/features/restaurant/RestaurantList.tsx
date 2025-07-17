@@ -24,7 +24,7 @@ export default function RestaurantList({ restaurants, pagination }: RestaurantLi
       <RestaurantSidebar
         restaurants={restaurants}
         pagination={pagination}
-        className="hidden md:block"
+        className="hidden md:block md:shrink-0"
       />
 
       {/* SP */}

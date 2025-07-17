@@ -11,13 +11,13 @@ import { userStateAtom } from '~/state/user-state.atom'
 
 export default function useOAuthCallback() {
   const router = useRouter()
-  const params = useSearchParams()
+  const searchParams = useSearchParams()
   const pathname = usePathname()
   const { mutate } = useSWRConfig()
   const resetUser = useResetAtom(userStateAtom)
 
-  const status = params.get('status')
-  const message = params.get('message')
+  const status = searchParams.get('status')
+  const message = searchParams.get('message')
 
   useEffect(() => {
     if (!status)
