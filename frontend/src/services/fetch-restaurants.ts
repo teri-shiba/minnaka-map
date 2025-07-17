@@ -10,7 +10,6 @@ interface FetchRestaurantsOpts {
   latitude: number
   longitude: number
   genre?: string
-  radius?: string
   page?: number
   itemsPerPage?: number
 }
@@ -29,7 +28,7 @@ export async function fetchRestaurants(
       key: apiKey,
       lat: opts.latitude.toString(),
       lng: opts.longitude.toString(),
-      range: opts.radius || '5',
+      range: '5',
       start: start.toString(),
       count: itemsPerPage.toString(),
       format: 'json',
@@ -43,7 +42,7 @@ export async function fetchRestaurants(
     const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}?${searchParams}`, {
       next: {
         revalidate: CACHE_DURATION.RESTAURANT_INFO,
-        tags: [`restaurants-${opts.latitude}-${opts.longitude}`],
+        tags: [`restaurants-${opts.latitude}-${opts.longitude}-${opts.genre || 'all'}`],
       },
     })
 
