@@ -32,7 +32,6 @@ export default function RestaurantListHeader({ totalCount }: RestaurantListHeade
         {totalCount}
         件
       </h2>
-      {/* 料理ジャンル */}
       <Select value={currentGenre} onValueChange={onGenreChange}>
         <SelectTrigger className="md:w-40">
           <SelectValue placeholder="料理ジャンル" />
@@ -46,8 +45,6 @@ export default function RestaurantListHeader({ totalCount }: RestaurantListHeade
           ))}
         </SelectContent>
       </Select>
-
-      {/* 中心点からの範囲 */}
     </div>
   )
 }
