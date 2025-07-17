@@ -15,7 +15,7 @@ export default function RestaurantListHeader({ totalCount }: RestaurantListHeade
   const onGenreChange = (code: string) => {
     const next = new URL(location.href)
     next.searchParams.delete('page')
-    
+
     if (code === 'all') {
       next.searchParams.delete('genre')
     }
@@ -40,8 +40,8 @@ export default function RestaurantListHeader({ totalCount }: RestaurantListHeade
         <SelectContent>
           <SelectItem value="all">すべて</SelectItem>
           {SORT_GENRE.map(genre => (
-            <SelectItem key={genre.genreCode} value={genre.genreCode}>
-              {genre.genreName}
+            <SelectItem key={genre.code} value={genre.code}>
+              {genre.name}
             </SelectItem>
           ))}
         </SelectContent>

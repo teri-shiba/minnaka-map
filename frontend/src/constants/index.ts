@@ -66,72 +66,21 @@ export const CACHE_DURATION = {
 // Sort Restaurant
 // ========================================================
 export const SORT_GENRE = [
-  {
-    genreCode: 'G001',
-    genreName: '居酒屋',
-  },
-  {
-    genreCode: 'G002',
-    genreName: 'ダイニングバー・バル',
-  },
-  {
-    genreCode: 'G003',
-    genreName: '創作料理',
-  },
-  {
-    genreCode: 'G004',
-    genreName: '和食',
-  },
-  {
-    genreCode: 'G005',
-    genreName: '洋食',
-  },
-  {
-    genreCode: 'G006',
-    genreName: 'イタリアン・フレンチ',
-  },
-  {
-    genreCode: 'G007',
-    genreName: '中華',
-  },
-  {
-    genreCode: 'G008',
-    genreName: '焼肉・ホルモン',
-  },
-  {
-    genreCode: 'G017',
-    genreName: '韓国料理',
-  },
-  {
-    genreCode: 'G009',
-    genreName: 'アジア・エスニック料理',
-  },
-  {
-    genreCode: 'G010',
-    genreName: '各国料理',
-  },
-  {
-    genreCode: 'G011',
-    genreName: 'カラオケ・パーティ',
-  },
-  {
-    genreCode: 'G012',
-    genreName: 'バー・カクテル',
-  },
-  {
-    genreCode: 'G013',
-    genreName: 'ラーメン',
-  },
-  {
-    genreCode: 'G016',
-    genreName: 'お好み焼き・もんじゃ',
-  },
-  {
-    genreCode: 'G014',
-    genreName: 'カフェ・スイーツ',
-  },
-  {
-    genreCode: 'G015',
-    genreName: 'その他グルメ',
-  },
+  { code: 'G001', name: '居酒屋' },
+  { code: 'G002', name: 'ダイニングバー・バル' },
+  { code: 'G003', name: '創作料理' },
+  { code: 'G004', name: '和食' },
+  { code: 'G005', name: '洋食' },
+  { code: 'G006', name: 'イタリアン・フレンチ' },
+  { code: 'G007', name: '中華' },
+  { code: 'G008', name: '焼肉・ホルモン' },
+  { code: 'G017', name: '韓国料理' },
+  { code: 'G009', name: 'アジア・エスニック料理' },
+  { code: 'G010', name: '各国料理' },
+  { code: 'G011', name: 'カラオケ・パーティ' },
+  { code: 'G012', name: 'バー・カクテル' },
+  { code: 'G013', name: 'ラーメン' },
+  { code: 'G016', name: 'お好み焼き・もんじゃ' },
+  { code: 'G014', name: 'カフェ・スイーツ' },
+  { code: 'G015', name: 'その他グルメ' },
 ] as const
