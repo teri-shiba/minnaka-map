@@ -36,7 +36,7 @@ export default function RestaurantSidebar({
   return (
     <div
       ref={scrollContaierRef}
-      className={cn('hidden-scrollbar max-h-dvh overflow-y-scroll p-6 md:w-2/5', className)}
+      className={cn('hidden-scrollbar max-h-dvh overflow-y-scroll p-6 md:w-2/5 md:min-w-[24rem]', className)}
     >
       <RestaurantListHeader totalCount={totalCount} />
 
