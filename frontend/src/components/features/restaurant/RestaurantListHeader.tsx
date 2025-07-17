@@ -1,5 +1,6 @@
 'use client'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/selects/Select'
 import { SORT_GENRE } from '~/constants'
 
@@ -9,20 +10,32 @@ interface RestaurantListHeaderProps {
 
 export default function RestaurantListHeader({ totalCount }: RestaurantListHeaderProps) {
   const router = useRouter()
-  const params = useSearchParams()
-  const currentGenre = params.get('genre') ?? 'all'
+  const searchParams = useSearchParams()
+  const currentGenre = searchParams.get('genre')
+  const isValidGenre = currentGenre && SORT_GENRE.some(g => g.code === currentGenre)
+
+  useEffect(() => {
+    if (currentGenre && !isValidGenre) {
+      const updatedUrl = new URL(window.location.href)
+      updatedUrl.searchParams.delete('genre')
+      updatedUrl.searchParams.delete('page')
+      router.replace(updatedUrl.toString())
+    }
+  }, [currentGenre, isValidGenre, router])
+
+  const validCurrentGenre = isValidGenre ? currentGenre : undefined
 
   const onGenreChange = (code: string) => {
-    const next = new URL(location.href)
-    next.searchParams.delete('page')
+    const updatedUrl = new URL(window.location.href)
+    updatedUrl.searchParams.delete('page')
 
-    if (code === 'all') {
-      next.searchParams.delete('genre')
+    if (code === 'all' || !code) {
+      updatedUrl.searchParams.delete('genre')
     }
     else {
-      next.searchParams.set('genre', code)
+      updatedUrl.searchParams.set('genre', code)
     }
-    router.push(next.toString())
+    router.push(updatedUrl.toString())
   }
 
   return (
@@ -32,7 +45,7 @@ export default function RestaurantListHeader({ totalCount }: RestaurantListHeade
         {totalCount}
         件
       </h2>
-      <Select value={currentGenre} onValueChange={onGenreChange}>
+      <Select value={validCurrentGenre} onValueChange={onGenreChange}>
         <SelectTrigger className="md:w-40">
           <SelectValue placeholder="料理ジャンル" />
         </SelectTrigger>
