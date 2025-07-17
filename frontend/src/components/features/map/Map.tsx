@@ -8,13 +8,15 @@ import MidpointMarker from './markers/MidpointMarker'
 import RestaurantMarker from './markers/RestaurantMarker'
 import 'leaflet/dist/leaflet.css'
 import '@maptiler/sdk/dist/maptiler-sdk.css'
+import { useMediaQuery } from '~/hooks/useMediaQuery'
 
 export default function Map({
   apiKey,
   midpoint,
   restaurants,
 }: MapItems) {
-  const mapOptions = createLeafletOptions(midpoint)
+  const isMobile = useMediaQuery('(max-width: 768px)')
+  const mapOptions = createLeafletOptions(midpoint, isMobile)
 
   return (
     <main className="relative z-40 size-full overflow-hidden">
