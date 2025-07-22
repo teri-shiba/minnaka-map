@@ -13,7 +13,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
-    command: bash -c "tail -f log/development.log"
+    command: bash -c "mkdir -p log && touch log/development.log && tail -f log/development.log"
     volumes:
       - ./backend:/app
     ports:
