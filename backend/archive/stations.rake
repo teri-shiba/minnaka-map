@@ -87,7 +87,7 @@ namespace :stations do
   task import_corrected_readings: :environment do
     require "csv"
 
-    csv_path = Rails.root.join("tmp", "station_readings_corrected.csv")
+    csv_path = Rails.root.join("data", "station_readings_corrected.csv")
 
     unless File.exist?(csv_path)
       puts "エラー: #{csv_path} が見つかりません"
