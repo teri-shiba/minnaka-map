@@ -1,9 +1,8 @@
-/* eslint-disable react-hooks-extra/no-direct-set-state-in-use-effect */
 'use client'
 
 import type { MapItems } from '~/types/map'
 import type { RestaurantListItem } from '~/types/restaurant'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { MapContainer, useMap, ZoomControl } from 'react-leaflet'
 import { useMapCoordinates } from '~/hooks/useMapCoordinates'
 import { calculateCardPosition } from '~/utils/calculate-card-position'
@@ -14,6 +13,11 @@ import MidpointMarker from './markers/MidpointMarker'
 import RestaurantMarker from './markers/RestaurantMarker'
 import 'leaflet/dist/leaflet.css'
 import '@maptiler/sdk/dist/maptiler-sdk.css'
+
+interface CardPosition {
+  left: number
+  top: number
+}
 
 interface MapContentProps extends MapItems {
   selectedRestaurant: RestaurantListItem | null
@@ -76,48 +80,31 @@ function MapContent({
   )
 }
 
-export default function Map({
-  apiKey,
-  midpoint,
-  restaurants,
-}: MapItems) {
+export default function Map({ apiKey, midpoint, restaurants }: MapItems) {
   const [selectedRestaurant, setSelectedRestaurant] = useState<RestaurantListItem | null>(null)
   const [mapData, setMapData] = useState<{
     pinPosition: { x: number, y: number } | null
     mapCenter: { x: number, y: number } | null
     mapSize: { width: number, height: number } | null
-  }>({
-    pinPosition: null,
-    mapCenter: null,
-    mapSize: null,
-  })
-
-  const [cardOffset, setCardOffset] = useState<{ x: number, y: number } | null>(null)
+  }>({ pinPosition: null, mapCenter: null, mapSize: null })
 
   useEffect(() => {
-    setSelectedRestaurant(null)
-    setCardOffset(null)
+    const raf = requestAnimationFrame(() => {
+      setSelectedRestaurant(null)
+    })
+    return () => cancelAnimationFrame(raf)
   }, [restaurants])
 
-  useEffect(() => {
-    setCardOffset(null)
-  }, [selectedRestaurant?.id])
-
-  useEffect(() => {
-    if (selectedRestaurant && mapData.pinPosition && mapData.mapCenter && mapData.mapSize) {
-      const initialCardPosition = calculateCardPosition({
-        pinPosition: mapData.pinPosition,
-        mapCenter: mapData.mapCenter,
-        mapSize: mapData.mapSize,
-      })
-
-      const offset = {
-        x: initialCardPosition.left - mapData.pinPosition.x,
-        y: initialCardPosition.top - mapData.pinPosition.y,
-      }
-      setCardOffset(offset)
+  const cardPosition = useMemo<CardPosition | null>(() => {
+    if (!selectedRestaurant || !mapData.pinPosition || !mapData.mapCenter) {
+      return null
     }
-  }, [selectedRestaurant, selectedRestaurant?.id, mapData.pinPosition, mapData.mapCenter, mapData.mapSize])
+
+    return calculateCardPosition({
+      pinPosition: mapData.pinPosition,
+      mapCenter: mapData.mapCenter,
+    })
+  }, [selectedRestaurant, mapData.pinPosition, mapData.mapCenter])
 
   const mapOptions = createLeafletOptions(midpoint)
 
@@ -136,26 +123,23 @@ export default function Map({
           onRestaurantClick={setSelectedRestaurant}
           onRestaurantClose={() => {
             setSelectedRestaurant(null)
-            setCardOffset(null)
           }}
           onPinPositionChange={setMapData}
         />
       </MapContainer>
 
-      {selectedRestaurant && mapData.pinPosition && cardOffset && (
+      {cardPosition && (
         <div
           className="absolute z-[999] hidden w-60 overflow-hidden rounded-2xl md:block"
           style={{
-            left: mapData.pinPosition.x + cardOffset.x,
-            top: mapData.pinPosition.y + cardOffset.y,
-            transform: '',
+            left: cardPosition.left,
+            top: cardPosition.top,
           }}
         >
           <MapRestaurantCard
-            restaurant={selectedRestaurant}
+            restaurant={selectedRestaurant!}
             onClose={() => {
               setSelectedRestaurant(null)
-              setCardOffset(null)
             }}
           />
         </div>
