@@ -3,6 +3,7 @@ class Operator < ApplicationRecord
 
   validates :name, presence: true, uniqueness: true
   validates :alias_name, presence: true
+  validates :uuid, presence: true, uniqueness: true
 
   before_validation :ensure_alias_name
 
