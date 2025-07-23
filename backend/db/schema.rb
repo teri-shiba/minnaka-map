@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_07_23_010406) do
+ActiveRecord::Schema[7.2].define(version: 2025_07_23_011305) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "uuid-ossp"
@@ -60,11 +60,13 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_23_010406) do
     t.string "name_romaji", null: false
     t.string "group_code", null: false
     t.bigint "operator_id", null: false
+    t.uuid "uuid", default: -> { "uuid_generate_v4()" }, null: false
     t.index ["name", "group_code"], name: "index_stations_on_name_and_group_code", unique: true
     t.index ["name"], name: "index_stations_on_name"
     t.index ["name_hiragana"], name: "index_stations_on_name_hiragana"
     t.index ["name_romaji"], name: "index_stations_on_name_romaji"
     t.index ["operator_id"], name: "index_stations_on_operator_id"
+    t.index ["uuid"], name: "index_stations_on_uuid", unique: true
   end
 
   create_table "user_auths", force: :cascade do |t|
