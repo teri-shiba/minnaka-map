@@ -10,9 +10,9 @@ import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
 
 export default function useConfirmEmail() {
   const router = useRouter()
-  const params = useSearchParams()
+  const searchParams = useSearchParams()
   const setModalOpen = useSetAtom(authModalOpenAtom)
-  const token = params.get('confirmation_token')
+  const token = searchParams.get('confirmation_token')
 
   useEffect(() => {
     if (!token)

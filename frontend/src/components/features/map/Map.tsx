@@ -122,7 +122,7 @@ export default function Map({
   const mapOptions = createLeafletOptions(midpoint)
 
   return (
-    <main className="relative z-40 size-full flex-1 overflow-hidden">
+    <main className="relative z-40 size-full overflow-hidden">
       <MapContainer
         center={midpoint}
         {...mapOptions}

@@ -1,11 +1,12 @@
 class Station < ApplicationRecord
   belongs_to :operator
   validates :name, presence: true
-  validates :latitude, presence: true
-  validates :longitude, presence: true
   validates :name_hiragana, presence: true
   validates :name_romaji, presence: true
+  validates :latitude, presence: true
+  validates :longitude, presence: true
   validates :group_code, presence: true
+  validates :uuid, presence: true, uniqueness: true
   validates :name, uniqueness: { scope: :group_code, case_sensitive: false }
 
   scope :search_by_name, ->(query) {

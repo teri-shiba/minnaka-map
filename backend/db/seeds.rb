@@ -7,7 +7,4 @@ ActiveRecord::Base.transaction do
     confirmed_at: Time.current,
     user_id: user.id,
   )
-
-  require_relative "../lib/tasks/import_stations"
-  ImportStations.run
 end
