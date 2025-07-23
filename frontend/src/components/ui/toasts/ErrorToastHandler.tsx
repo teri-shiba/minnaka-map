@@ -18,9 +18,9 @@ const ERROR_MESSAGE = {
 type ErrorType = keyof typeof ERROR_MESSAGE
 
 export default function ErrorToastHandler() {
-  const params = useSearchParams()
-  const error = params.get('error')
-  const message = params.get('message')
+  const searchParams = useSearchParams()
+  const error = searchParams.get('error')
+  const message = searchParams.get('message')
   const router = useRouter()
 
   useEffect(() => {
