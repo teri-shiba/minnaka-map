@@ -1,40 +1,44 @@
 require "csv"
 
 namespace :stations do
-  desc "Export Operators and Stations to CSV"
+  desc "Export Operators and Stations to CSV with date suffix"
   task export: :environment do
-    export_dir = Rails.root.join("db", "exported")
-    FileUtils.mkdir_p(export_dir)
+    export_operator_dir = Rails.root.join("db", "exported", "operators")
+    export_station_dir = Rails.root.join("db", "exported", "stations")
+    FileUtils.mkdir_p(export_operator_dir)
+    FileUtils.mkdir_p(export_station_dir)
 
-    operators_path = export_dir.join("operators.csv")
-    stations_path = export_dir.join("stations.csv")
+    date_suffix = Time.zone.now.strftime("%Y%m%d_%H%M%S")
+    operators_path = export_operator_dir.join("operators_#{date_suffix}.csv")
+    stations_path = export_station_dir.join("stations_#{date_suffix}.csv")
 
     puts "Operators をエクスポート中..."
-    CSV.open(operators_path, "w", write_headers: true, headers: %w[name alias_name]) do |csv|
+    CSV.open(operators_path, "w", headers: true) do |csv|
+      csv << %w[uuid name alias_name]
       Operator.find_each do |op|
-        csv << [op.name, op.alias_name]
+        csv << [op.uuid, op.name, op.alias_name]
       end
     end
 
     puts "Stations をエクスポート中..."
-    CSV.open(stations_path, "w", write_headers: true, headers: %w[
-      name name_hiragana name_romaji latitude longitude group_code operator_name
-    ]) do |csv|
-      Station.includes(:operator).find_each do |station|
+    CSV.open(stations_path, "w", headers: true) do |csv|
+      csv << %w[uuid name name_hiragana name_romaji latitude longitude group_code operator_uuid]
+      Station.includes(:operator).find_each do |st|
         csv << [
-          station.name,
-          station.name_hiragana,
-          station.name_romaji,
-          station.latitude,
-          station.longitude,
-          station.group_code,
-          station.operator&.name,
+          st.uuid,
+          st.name,
+          st.name_hiragana,
+          st.name_romaji,
+          st.latitude,
+          st.longitude,
+          st.group_code,
+          st.operator&.uuid,
         ]
       end
     end
 
     puts "エクスポートが完了しました"
     puts "- Operators: #{operators_path}"
-    puts "- Stations: #{stations_path}"
+    puts "- Stations : #{stations_path}"
   end
 end
