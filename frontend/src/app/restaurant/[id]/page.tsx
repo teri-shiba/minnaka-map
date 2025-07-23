@@ -152,7 +152,7 @@ export default async function RestaurantDetailPage({ params }: RestaurantDetailP
                       className="text-sky-600 hover:underline"
                     >
                       ホットペッパーグルメ店舗ページ
-                      <LuArrowUpRight className="inline-block size-4 pl-0.5 align-bottom" />
+                      <LuArrowUpRight className="inline-block size-4 pl-0.5 align-bottom md:align-text-bottom" />
                     </a>
                   </TableCell>
                 </TableRow>
