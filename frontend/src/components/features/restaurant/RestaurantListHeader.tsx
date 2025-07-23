@@ -24,7 +24,7 @@ export default function RestaurantListHeader({ totalCount }: RestaurantListHeade
     }
   }, [currentGenre, isValidGenre, router])
 
-  const validCurrentGenre = isValidGenre ? currentGenre : undefined
+  const validCurrentGenre = isValidGenre ? currentGenre : 'all'
 
   const onGenreChange = (code: string) => {
     const updatedUrl = new URL(window.location.href)
@@ -64,7 +64,7 @@ export default function RestaurantListHeader({ totalCount }: RestaurantListHeade
         </Select>
       </div>
 
-      {/* SP: Bottun */}
+      {/* SP: Button */}
       <div
         className="hidden-scrollbar mb-4 block w-full overflow-x-scroll border-b py-4 md:hidden"
         style={{ touchAction: 'pan-x' }}
