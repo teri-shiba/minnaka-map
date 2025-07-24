@@ -1,5 +1,7 @@
 FactoryBot.define do
   factory :station do
+    uuid { SecureRandom.uuid }
+
     transient do
       station_data_list { StationTestData::STATIONS.values }
     end
