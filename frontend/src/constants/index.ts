@@ -12,6 +12,10 @@ export const API_SERVICES = {
     endpoint: '/api_keys/maptiler',
     serviceName: 'MapTiler',
   },
+  googlemaps: {
+    endpoint: '/api_keys/googlemaps',
+    serviceName: 'GoogleMaps',
+  },
 } as const
 
 export type SupportedService = keyof typeof API_SERVICES
