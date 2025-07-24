@@ -1,21 +1,10 @@
+import type { CalculateCardPositionOptions, CardPosition } from '~/types/map'
 import { CARD_POSITION } from '~/constants'
 
-interface Position {
-  x: number
-  y: number
-}
-
-interface MapInfo {
-  pinPosition: Position
-  mapCenter: Position
-}
-
-interface CardPosition {
-  left: number
-  top: number
-}
-
-export function calculateCardPosition({ pinPosition, mapCenter }: MapInfo): CardPosition {
+export function calculateCardPosition({
+  pinPosition,
+  mapCenter,
+}: CalculateCardPositionOptions): CardPosition {
   // 1.初期位置をピンの座標に設定
   let left = pinPosition.x
   let top = pinPosition.y
