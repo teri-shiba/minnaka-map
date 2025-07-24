@@ -9,7 +9,16 @@ interface Position {
   y: number
 }
 
-export function useMapCoordinates(latLng: LatLngExpression | null) {
+interface ChangeData {
+  pinPosition: Position | null
+  mapCenter: Position | null
+  mapSize: { width: number, height: number } | null
+}
+
+export function useMapCoordinates(
+  latLng: LatLngExpression | null,
+  onChange: (data: ChangeData) => void,
+) {
   const map = useMap()
   const [pinPosition, setPinPosition] = useState<Position | null>(null)
   const [mapCenter, setMapCenter] = useState<Position | null>(null)
@@ -69,6 +78,10 @@ export function useMapCoordinates(latLng: LatLngExpression | null) {
     const rafId = requestAnimationFrame(updatePosition)
     return () => cancelAnimationFrame(rafId)
   }, [updatePosition, latLng])
+
+  useEffect(() => {
+    onChange({ pinPosition, mapCenter, mapSize })
+  }, [onChange, pinPosition, mapCenter, mapSize])
 
   return { pinPosition, mapCenter, mapSize }
 }
