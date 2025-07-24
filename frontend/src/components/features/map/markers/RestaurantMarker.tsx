@@ -36,13 +36,14 @@ function RestaurantMarkers({
   return (
     <>
       {restaurants.map((restaurant) => {
-        const isSelected = restaurant.id === selectedRestaurantId
+        const { id, name, lat, lng } = restaurant
+        const isSelected = id === selectedRestaurantId
         const icon = isSelected ? selectedIcon : defaultIcon
 
         return (
           <Marker
-            key={restaurant.id}
-            position={[restaurant.lat, restaurant.lng]}
+            key={id}
+            position={[lat, lng]}
             icon={icon}
             eventHandlers={{
               click: () => handleClick(restaurant),
@@ -54,7 +55,7 @@ function RestaurantMarkers({
               offset={[0, -32]}
               className="!pointer-events-auto !cursor-pointer !rounded-md !px-2 !text-secondary-foreground !shadow-none"
             >
-              {restaurant.name}
+              {name}
             </Tooltip>
           </Marker>
         )
