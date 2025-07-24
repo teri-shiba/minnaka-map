@@ -2,7 +2,7 @@
 
 import type { MapItems } from '~/types/map'
 import type { RestaurantListItem } from '~/types/restaurant'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { MapContainer } from 'react-leaflet'
 import { calculateCardPosition } from '~/utils/calculate-card-position'
 import { createLeafletOptions } from '~/utils/create-leaflet-options'
@@ -25,11 +25,18 @@ export default function Map({ apiKey, midpoint, restaurants }: MapItems) {
   }>({ pinPosition: null, mapCenter: null, mapSize: null })
 
   useEffect(() => {
-    const raf = requestAnimationFrame(() => {
-      setSelectedRestaurant(null)
-    })
+    const raf = requestAnimationFrame(() => setSelectedRestaurant(null))
     return () => cancelAnimationFrame(raf)
   }, [restaurants])
+
+  const handleRestaurantClick = useCallback(
+    (restaurant: RestaurantListItem) => setSelectedRestaurant(restaurant),
+    [],
+  )
+
+  const handleRestaurantClose = useCallback(() => setSelectedRestaurant(null), [])
+
+  const handlePinPositionChange = setMapData
 
   const cardPosition = useMemo<CardPosition | null>(() => {
     if (!selectedRestaurant || !mapData.pinPosition || !mapData.mapCenter) {
@@ -42,7 +49,13 @@ export default function Map({ apiKey, midpoint, restaurants }: MapItems) {
     })
   }, [selectedRestaurant, mapData.pinPosition, mapData.mapCenter])
 
-  const mapOptions = createLeafletOptions(midpoint)
+  const mapOptions = useMemo(() => createLeafletOptions(midpoint), [midpoint])
+
+  const cardStyle = useMemo<React.CSSProperties | undefined>(() => {
+    if (!cardPosition)
+      return undefined
+    return { left: cardPosition.left, top: cardPosition.top }
+  }, [cardPosition])
 
   return (
     <main className="relative z-40 size-full overflow-hidden">
@@ -56,21 +69,16 @@ export default function Map({ apiKey, midpoint, restaurants }: MapItems) {
           midpoint={midpoint}
           restaurants={restaurants}
           selectedRestaurant={selectedRestaurant}
-          onRestaurantClick={setSelectedRestaurant}
-          onRestaurantClose={() => {
-            setSelectedRestaurant(null)
-          }}
-          onPinPositionChange={setMapData}
+          onRestaurantClick={handleRestaurantClick}
+          onRestaurantClose={handleRestaurantClose}
+          onPinPositionChange={handlePinPositionChange}
         />
       </MapContainer>
 
       {cardPosition && (
         <div
           className="absolute z-[999] hidden w-60 overflow-hidden rounded-2xl md:block"
-          style={{
-            left: cardPosition.left,
-            top: cardPosition.top,
-          }}
+          style={cardStyle}
         >
           <MapRestaurantCard
             restaurant={selectedRestaurant!}
