@@ -15,7 +15,7 @@ export default function Loading() {
         />
       </div>
       <div className="rounded-t-[10px] border px-5 py-4 md:w-2/5 md:min-w-96 md:shrink-0 md:rounded-none md:border-none md:p-6">
-        <div className="mx-auto mb-2 h-1 w-9 cursor-grabbing rounded-full bg-gray-200" />
+        <div className="block mx-auto mb-2 h-1 w-9 cursor-grabbing rounded-full bg-gray-200 md:hidden" />
         <div className="mb-4 overflow-x-hidden border-b py-4 md:hidden">
           <div className="flex w-full min-w-max gap-2">
             {createSequence(6).map(id => (
