@@ -4,6 +4,7 @@ import Section from '~/components/layout/Section'
 import { Button } from '~/components/ui/buttons/Button'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '~/components/ui/table/Table'
 import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
+import { getApiKey } from '~/services/get-api-key'
 
 interface RestaurantDetailPageProps {
   params: Promise<{ id: string }>
@@ -12,24 +13,53 @@ interface RestaurantDetailPageProps {
 export default async function RestaurantDetailPage({ params }: RestaurantDetailPageProps) {
   const { id } = await params
   const restaurant = await fetchRestaurantDetail(id)
+  const googleMapsApiKey = await getApiKey('googlemaps')
+
+  const {
+    // 基本情報
+    name,
+    address,
+    access,
+    station,
+    genreName,
+    budget,
+    imageUrl,
+
+    // 営業情報
+    open,
+    close,
+    card,
+    urls,
+
+    // 設備情報
+    capacity,
+    privateRoom,
+    charter,
+    nonSmoking,
+    wifi,
+    parking,
+  } = restaurant
+
+  const query = encodeURIComponent(`${name} ${address}`)
+  const mapUrl = `https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${query}`
 
   return (
     <Section className="mb-6 md:mb-8">
       <div className="flex flex-col-reverse py-4 md:items-start md:justify-between md:border-b md:py-6">
         <div className="space-y-2">
-          <h2>{restaurant.name}</h2>
+          <h2>{name}</h2>
           <ul className="text-sm md:flex md:flex-row md:gap-3">
             <li>
               <span className="font-bold">最寄駅：</span>
-              {restaurant.station}
+              {station}
             </li>
             <li>
               <span className="font-bold">ジャンル：</span>
-              {restaurant.genreName}
+              {genreName}
             </li>
             <li>
               <span className="font-bold">予算：</span>
-              {restaurant.budget}
+              {budget}
             </li>
           </ul>
         </div>
@@ -48,8 +78,8 @@ export default async function RestaurantDetailPage({ params }: RestaurantDetailP
         <div className="mx-auto mb-6 max-w-96 md:mb-0 md:h-[168px] md:w-[223px] md:shrink-0">
           <div className="relative overflow-hidden rounded-lg bg-gray-100">
             <Image
-              src={restaurant.imageUrl || '/placeholder.svg'}
-              alt={restaurant.name}
+              src={imageUrl || '/placeholder.svg'}
+              alt={name}
               width={223}
               height={168}
               className="size-full object-cover blur-[0.5px] brightness-105"
@@ -70,37 +100,52 @@ export default async function RestaurantDetailPage({ params }: RestaurantDetailP
               <TableBody>
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">店舗名</TableHead>
-                  <TableCell>{restaurant.name}</TableCell>
+                  <TableCell>{name}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">住所</TableHead>
-                  <TableCell>{restaurant.address}</TableCell>
+                  <TableCell>
+                    {address}
+                    <div className="relative mt-4 h-44 w-full md:h-96">
+                      <iframe
+                        src={mapUrl}
+                        width="600"
+                        height="338"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        referrerPolicy="no-referrer-when-downgrade"
+                        sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
+                        className="absolute left-0 top-0 size-full"
+                      >
+                      </iframe>
+                    </div>
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">アクセス</TableHead>
-                  <TableCell>{restaurant.access}</TableCell>
+                  <TableCell>{access}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">営業時間</TableHead>
-                  <TableCell>{restaurant.open}</TableCell>
+                  <TableCell>{open}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">定休日</TableHead>
-                  <TableCell>{restaurant.close}</TableCell>
+                  <TableCell>{close}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">予算</TableHead>
-                  <TableCell>{restaurant.budget}</TableCell>
+                  <TableCell>{budget}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">クレジットカード</TableHead>
-                  <TableCell>{restaurant.card}</TableCell>
+                  <TableCell>{card}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">店舗URL</TableHead>
                   <TableCell>
                     <a
-                      href={restaurant.urls}
+                      href={urls}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label="ホットペッパーグルメ店舗ページ（新しいタブで開きます）"
@@ -122,29 +167,29 @@ export default async function RestaurantDetailPage({ params }: RestaurantDetailP
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">総席数</TableHead>
                   <TableCell>
-                    {restaurant.capacity}
+                    {capacity}
                     席
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">個室</TableHead>
-                  <TableCell>{restaurant.privateRoom}</TableCell>
+                  <TableCell>{privateRoom}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">貸切</TableHead>
-                  <TableCell>{restaurant.charter}</TableCell>
+                  <TableCell>{charter}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">WiFi</TableHead>
-                  <TableCell>{restaurant.wifi}</TableCell>
+                  <TableCell>{wifi}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">禁煙・喫煙</TableHead>
-                  <TableCell>{restaurant.nonSmoking}</TableCell>
+                  <TableCell>{nonSmoking}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">駐車場</TableHead>
-                  <TableCell>{restaurant.parking}</TableCell>
+                  <TableCell>{parking}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
