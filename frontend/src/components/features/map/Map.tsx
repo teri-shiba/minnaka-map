@@ -59,7 +59,7 @@ export default function Map({ apiKey, midpoint, restaurants }: MapItems) {
           apiKey={apiKey}
           midpoint={midpoint}
           restaurants={restaurants}
-          selected={selected}
+          selectedRestaurant={selected}
           onRestaurantClick={handleRestaurantClick}
           onRestaurantClose={handleRestaurantClose}
           onPinPositionChange={handlePinPositionChange}
