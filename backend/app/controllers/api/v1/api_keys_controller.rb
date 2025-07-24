@@ -2,6 +2,7 @@ class Api::V1::ApiKeysController < ApplicationController
   SUPPORTED_SERVICE = {
     "hotpepper" => :hotpepper,
     "maptiler" => :map_tiler,
+    "googlemaps" => :google_maps,
   }.freeze
 
   def show
