@@ -63,6 +63,14 @@ export const CACHE_DURATION = {
 } as const
 
 // ========================================================
+// Restaurant Marker Options
+// ========================================================
+export const ICON = {
+  SIZE: [40, 44] as [number, number],
+  ANCHOR: [20, 34] as [number, number],
+} as const
+
+// ========================================================
 // Display Restaurant Card on Map
 // ========================================================
 export const CARD_POSITION = {
