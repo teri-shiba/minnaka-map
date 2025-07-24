@@ -2,8 +2,21 @@
 
 import type { RestaurantListItem } from '~/types/restaurant'
 import L from 'leaflet'
-import { useMemo } from 'react'
+import { memo, useCallback } from 'react'
 import { Marker, Tooltip } from 'react-leaflet'
+import { ICON } from '~/constants'
+
+const defaultIcon = L.icon({
+  iconUrl: '/figure_pin_restaurant.webp',
+  iconSize: ICON.SIZE,
+  iconAnchor: ICON.ANCHOR,
+})
+
+const selectedIcon = L.icon({
+  iconUrl: '/figure_pin_restaurant_selected.webp',
+  iconSize: ICON.SIZE,
+  iconAnchor: ICON.ANCHOR,
+})
 
 interface RestaurantMarkerProps {
   restaurants: RestaurantListItem[]
@@ -11,22 +24,14 @@ interface RestaurantMarkerProps {
   selectedRestaurantId?: string | null
 }
 
-export default function RestaurantMarkers({ restaurants, onRestaurantClick, selectedRestaurantId }: RestaurantMarkerProps) {
-  const defaultIcon = useMemo(() => {
-    return L.icon({
-      iconUrl: '/figure_pin_restaurant.webp',
-      iconSize: [40, 44],
-      iconAnchor: [20, 34],
-    })
-  }, [])
-
-  const selectedIcon = useMemo(() => {
-    return L.icon({
-      iconUrl: '/figure_pin_restaurant_selected.webp',
-      iconSize: [40, 44],
-      iconAnchor: [20, 34],
-    })
-  }, [])
+function RestaurantMarkers({
+  restaurants,
+  onRestaurantClick,
+  selectedRestaurantId,
+}: RestaurantMarkerProps) {
+  const handleClick = useCallback((restaurant: RestaurantListItem) => {
+    onRestaurantClick(restaurant)
+  }, [onRestaurantClick])
 
   return (
     <>
@@ -40,7 +45,7 @@ export default function RestaurantMarkers({ restaurants, onRestaurantClick, sele
             position={[restaurant.lat, restaurant.lng]}
             icon={icon}
             eventHandlers={{
-              click: () => onRestaurantClick(restaurant),
+              click: () => handleClick(restaurant),
             }}
           >
             <Tooltip
@@ -57,3 +62,5 @@ export default function RestaurantMarkers({ restaurants, onRestaurantClick, sele
     </>
   )
 }
+
+export default memo(RestaurantMarkers)
