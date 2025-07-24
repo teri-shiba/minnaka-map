@@ -114,7 +114,7 @@ export default async function RestaurantDetailPage({ params }: RestaurantDetailP
                         style={{ border: 0 }}
                         allowFullScreen
                         referrerPolicy="no-referrer-when-downgrade"
-                        sandbox="allow-popups"
+                        sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
                         className="absolute left-0 top-0 size-full"
                       >
                       </iframe>
