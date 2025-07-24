@@ -1,77 +1,55 @@
 'use client'
 import type { LatLngExpression } from 'leaflet'
-import type { MapData, MapSize, Position } from '~/types/map'
+import type { MapData } from '~/types/map'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useMap, useMapEvents } from 'react-leaflet'
 import { throttle } from '~/utils/throttle'
 
+const THROTTLE_MS = 16
+
 export function useMapCoordinates(
   latLng: LatLngExpression | null,
   onChange: (data: MapData) => void,
-): MapData {
+): void {
   const map = useMap()
-  const [pinPosition, setPinPosition] = useState<Position | null>(null)
-  const [mapCenter, setMapCenter] = useState<Position | null>(null)
-  const [mapSize, setMapSize] = useState<MapSize | null>(null)
+  const [data, setData] = useState<MapData>({
+    pinPosition: null,
+    mapCenter: null,
+    mapSize: null,
+  })
 
   const updatePosition = useCallback(() => {
     const size = map.getSize()
-    const newMapSize: MapSize = { width: size.x, height: size.y }
+    const centerPoint = map.latLngToContainerPoint(map.getCenter())
+    const pinPoint = latLng
+      ? map.latLngToContainerPoint(latLng)
+      : null
 
-    setMapSize((prev) => {
-      if (!prev || prev.width !== newMapSize.width || prev.height !== newMapSize.height) {
-        return newMapSize
-      }
-      return prev
+    setData({
+      mapSize: { width: size.x, height: size.y },
+      mapCenter: { x: centerPoint.x, y: centerPoint.y },
+      pinPosition: pinPoint ? { x: pinPoint.x, y: pinPoint.y } : null,
     })
-
-    const center = map.latLngToContainerPoint(map.getCenter())
-    const newMapCenter: Position = { x: center.x, y: center.y }
-
-    setMapCenter((prev) => {
-      if (!prev || prev.x !== newMapCenter.x || prev.y !== newMapCenter.y) {
-        return newMapCenter
-      }
-      return prev
-    })
-
-    if (!latLng) {
-      setPinPosition(prev => (prev !== null ? null : prev))
-    }
-    else {
-      const point = map.latLngToContainerPoint(latLng)
-      const newPosition: Position = { x: point.x, y: point.y }
-      setPinPosition((prev) => {
-        if (!prev || prev.x !== newPosition.x || prev.y !== newPosition.y) {
-          return newPosition
-        }
-        return prev
-      })
-    }
   }, [map, latLng])
 
   const throttledUpdate = useMemo(
-    () => throttle(updatePosition, 16),
+    () => throttle(updatePosition, THROTTLE_MS),
     [updatePosition],
   )
 
-  useMapEvents(
-    {
-      load: updatePosition,
-      zoomend: updatePosition,
-      moveend: updatePosition,
-      move: throttledUpdate,
-    },
-  )
+  useMapEvents({
+    load: updatePosition,
+    zoomend: updatePosition,
+    moveend: updatePosition,
+    move: throttledUpdate,
+  })
 
   useEffect(() => {
-    const rafId = requestAnimationFrame(updatePosition)
-    return () => cancelAnimationFrame(rafId)
+    const id = requestAnimationFrame(updatePosition)
+    return () => cancelAnimationFrame(id)
   }, [updatePosition, latLng])
 
   useEffect(() => {
-    onChange({ pinPosition, mapCenter, mapSize })
-  }, [onChange, pinPosition, mapCenter, mapSize])
-
-  return { pinPosition, mapCenter, mapSize }
+    onChange(data)
+  }, [onChange, data])
 }
