@@ -21,13 +21,13 @@ const selectedIcon = L.icon({
 interface RestaurantMarkerProps {
   restaurants: RestaurantListItem[]
   onRestaurantClick: (restaurant: RestaurantListItem) => void
-  selectedRestaurantId?: string | null
+  selectedId?: string | null
 }
 
 function RestaurantMarkers({
   restaurants,
   onRestaurantClick,
-  selectedRestaurantId,
+  selectedId,
 }: RestaurantMarkerProps) {
   const handleClick = useCallback((restaurant: RestaurantListItem) => {
     onRestaurantClick(restaurant)
@@ -37,7 +37,7 @@ function RestaurantMarkers({
     <>
       {restaurants.map((restaurant) => {
         const { id, name, lat, lng } = restaurant
-        const isSelected = id === selectedRestaurantId
+        const isSelected = id === selectedId
         const icon = isSelected ? selectedIcon : defaultIcon
 
         return (

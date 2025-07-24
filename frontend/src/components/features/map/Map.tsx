@@ -12,7 +12,7 @@ import 'leaflet/dist/leaflet.css'
 import '@maptiler/sdk/dist/maptiler-sdk.css'
 
 export default function Map({ apiKey, midpoint, restaurants }: MapItems) {
-  const [selectedRestaurant, setSelectedRestaurant] = useState<RestaurantListItem | null>(null)
+  const [selected, setSelected] = useState<RestaurantListItem | null>(null)
   const [mapData, setMapData] = useState<MapData>({
     pinPosition: null,
     mapCenter: null,
@@ -20,29 +20,25 @@ export default function Map({ apiKey, midpoint, restaurants }: MapItems) {
   })
 
   useEffect(() => {
-    const raf = requestAnimationFrame(() => setSelectedRestaurant(null))
-    return () => cancelAnimationFrame(raf)
+    const id = requestAnimationFrame(() => setSelected(null))
+    return () => cancelAnimationFrame(id)
   }, [restaurants])
 
   const handleRestaurantClick = useCallback(
-    (restaurant: RestaurantListItem) => setSelectedRestaurant(restaurant),
+    (restaurant: RestaurantListItem) => setSelected(restaurant),
     [],
   )
 
-  const handleRestaurantClose = useCallback(() => setSelectedRestaurant(null), [])
+  const handleRestaurantClose = useCallback(() => setSelected(null), [])
 
   const handlePinPositionChange = setMapData
 
   const cardPosition = useMemo<CardPosition | null>(() => {
-    if (!selectedRestaurant || !mapData.pinPosition || !mapData.mapCenter) {
-      return null
-    }
-
-    return calculateCardPosition({
-      pinPosition: mapData.pinPosition,
-      mapCenter: mapData.mapCenter,
-    })
-  }, [selectedRestaurant, mapData.pinPosition, mapData.mapCenter])
+    const { pinPosition, mapCenter } = mapData
+    return selected && pinPosition && mapCenter
+      ? calculateCardPosition({ pinPosition, mapCenter })
+      : null
+  }, [selected, mapData.pinPosition, mapData.mapCenter])
 
   const mapOptions = useMemo(() => createLeafletOptions(midpoint), [midpoint])
 
@@ -63,30 +59,30 @@ export default function Map({ apiKey, midpoint, restaurants }: MapItems) {
           apiKey={apiKey}
           midpoint={midpoint}
           restaurants={restaurants}
-          selectedRestaurant={selectedRestaurant}
+          selected={selected}
           onRestaurantClick={handleRestaurantClick}
           onRestaurantClose={handleRestaurantClose}
           onPinPositionChange={handlePinPositionChange}
         />
       </MapContainer>
 
-      {cardPosition && (
+      {selected && cardPosition && (
         <div
           className="absolute z-[999] hidden w-60 overflow-hidden rounded-2xl md:block"
           style={cardStyle}
         >
           <MapRestaurantCard
-            restaurant={selectedRestaurant!}
-            onClose={() => setSelectedRestaurant(null)}
+            restaurant={selected!}
+            onClose={() => setSelected(null)}
           />
         </div>
       )}
 
-      {selectedRestaurant && (
+      {selected && (
         <div className="absolute inset-x-0 bottom-8 z-[999] mx-auto w-11/12 max-w-96 overflow-hidden rounded-2xl  md:hidden">
           <MapRestaurantCard
-            restaurant={selectedRestaurant}
-            onClose={() => setSelectedRestaurant(null)}
+            restaurant={selected}
+            onClose={() => setSelected(null)}
           />
         </div>
       )}

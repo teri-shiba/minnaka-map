@@ -8,7 +8,7 @@ import MidpointMarker from './markers/MidpointMarker'
 import RestaurantMarker from './markers/RestaurantMarker'
 
 interface MapContentProps extends MapItems {
-  selectedRestaurant: RestaurantListItem | null
+  selected: RestaurantListItem | null
   onRestaurantClick: (restaurant: RestaurantListItem) => void
   onRestaurantClose: () => void
   onPinPositionChange: (data: MapData) => void
@@ -18,23 +18,23 @@ export default function MapContent({
   apiKey,
   midpoint,
   restaurants,
-  selectedRestaurant,
+  selected,
   onRestaurantClick,
   onRestaurantClose,
   onPinPositionChange,
 }: MapContentProps) {
   useMapCoordinates(
-    selectedRestaurant ? [selectedRestaurant.lat, selectedRestaurant.lng] : null,
+    selected ? [selected.lat, selected.lng] : null,
     onPinPositionChange,
   )
 
   const handleMapClick = useCallback(
     () => {
-      if (selectedRestaurant) {
+      if (selected) {
         onRestaurantClose()
       }
     },
-    [selectedRestaurant, onRestaurantClose],
+    [selected, onRestaurantClose],
   )
 
   useMapEvent('click', handleMapClick)
@@ -47,7 +47,7 @@ export default function MapContent({
       <RestaurantMarker
         restaurants={restaurants}
         onRestaurantClick={onRestaurantClick}
-        selectedRestaurantId={selectedRestaurant?.id}
+        selectedId={selected?.id}
       />
     </>
   )
