@@ -38,7 +38,7 @@ export default function Map({ apiKey, midpoint, restaurants }: MapItems) {
     return selected && pinPosition && mapCenter
       ? calculateCardPosition({ pinPosition, mapCenter })
       : null
-  }, [selected, mapData.pinPosition, mapData.mapCenter])
+  }, [selected, mapData])
 
   const mapOptions = useMemo(() => createLeafletOptions(midpoint), [midpoint])
 
