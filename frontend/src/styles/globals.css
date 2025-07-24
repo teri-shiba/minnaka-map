@@ -96,21 +96,6 @@
   .hidden-scrollbar::-webkit-scrollbar {
     display: none;
   }
-
-  .text-limit-oneline {
-    width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .text-limit-twolines {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    line-clamp: 2;
-    -webkit-line-clamp: 2;
-  }
 }
 
 @media (max-width: 768px) {
