@@ -3,81 +3,17 @@
 import type { MapItems } from '~/types/map'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { useEffect, useMemo, useState } from 'react'
-import { MapContainer, useMap, ZoomControl } from 'react-leaflet'
-import { useMapCoordinates } from '~/hooks/useMapCoordinates'
+import { MapContainer } from 'react-leaflet'
 import { calculateCardPosition } from '~/utils/calculate-card-position'
 import { createLeafletOptions } from '~/utils/create-leaflet-options'
-import MapTilerLayer from './layers/MapTilerLayer'
+import MapContent from './MapContent'
 import MapRestaurantCard from './MapRestaurantCard'
-import MidpointMarker from './markers/MidpointMarker'
-import RestaurantMarker from './markers/RestaurantMarker'
 import 'leaflet/dist/leaflet.css'
 import '@maptiler/sdk/dist/maptiler-sdk.css'
 
 interface CardPosition {
   left: number
   top: number
-}
-
-interface MapContentProps extends MapItems {
-  selectedRestaurant: RestaurantListItem | null
-  onRestaurantClick: (restaurant: RestaurantListItem) => void
-  onRestaurantClose: () => void
-  onPinPositionChange: (data: {
-    pinPosition: { x: number, y: number } | null
-    mapCenter: { x: number, y: number } | null
-    mapSize: { width: number, height: number } | null
-  }) => void
-}
-
-function MapContent({
-  apiKey,
-  midpoint,
-  restaurants,
-  selectedRestaurant,
-  onRestaurantClick,
-  onRestaurantClose,
-  onPinPositionChange,
-}: MapContentProps) {
-  const { pinPosition, mapCenter, mapSize } = useMapCoordinates(
-    selectedRestaurant ? [selectedRestaurant.lat, selectedRestaurant.lng] : null,
-  )
-
-  const map = useMap()
-
-  useEffect(() => {
-    if (!map)
-      return
-
-    const handleMapClick = () => {
-      if (selectedRestaurant) {
-        onRestaurantClose()
-      }
-    }
-
-    map.on('click', handleMapClick)
-
-    return () => {
-      map.off('click', handleMapClick)
-    }
-  }, [map, selectedRestaurant, onRestaurantClose])
-
-  useEffect(() => {
-    onPinPositionChange({ pinPosition, mapCenter, mapSize })
-  }, [pinPosition, mapCenter, mapSize, onPinPositionChange])
-
-  return (
-    <>
-      {apiKey && <MapTilerLayer apiKey={apiKey} />}
-      <ZoomControl position="topright" />
-      <MidpointMarker position={midpoint} />
-      <RestaurantMarker
-        restaurants={restaurants}
-        onRestaurantClick={onRestaurantClick}
-        selectedRestaurantId={selectedRestaurant?.id}
-      />
-    </>
-  )
 }
 
 export default function Map({ apiKey, midpoint, restaurants }: MapItems) {
@@ -138,9 +74,7 @@ export default function Map({ apiKey, midpoint, restaurants }: MapItems) {
         >
           <MapRestaurantCard
             restaurant={selectedRestaurant!}
-            onClose={() => {
-              setSelectedRestaurant(null)
-            }}
+            onClose={() => setSelectedRestaurant(null)}
           />
         </div>
       )}
