@@ -4,6 +4,7 @@ import Section from '~/components/layout/Section'
 import { Button } from '~/components/ui/buttons/Button'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '~/components/ui/table/Table'
 import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
+import { getApiKey } from '~/services/get-api-key'
 
 interface RestaurantDetailPageProps {
   params: Promise<{ id: string }>
@@ -12,6 +13,8 @@ interface RestaurantDetailPageProps {
 export default async function RestaurantDetailPage({ params }: RestaurantDetailPageProps) {
   const { id } = await params
   const restaurant = await fetchRestaurantDetail(id)
+  const googleMapsApiKey = await getApiKey('googlemaps')
+
   const {
     // 基本情報
     name,
@@ -36,6 +39,10 @@ export default async function RestaurantDetailPage({ params }: RestaurantDetailP
     wifi,
     parking,
   } = restaurant
+
+  const query = encodeURIComponent(`${name} ${address}`)
+  const mapUrl = `https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${query}`
+
 
   return (
     <Section className="mb-6 md:mb-8">
@@ -98,7 +105,21 @@ export default async function RestaurantDetailPage({ params }: RestaurantDetailP
                 </TableRow>
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">住所</TableHead>
-                  <TableCell>{address}</TableCell>
+                  <TableCell>
+                    {address}
+                    <div className="relative h-44 md:h-96 w-full mt-4">
+                      <iframe
+                        src={mapUrl}
+                        width="600"
+                        height="338"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        referrerPolicy="no-referrer-when-downgrade"
+                        className="absolute t-0 l-0 size-full"
+                      >
+                      </iframe>
+                    </div>
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">アクセス</TableHead>
