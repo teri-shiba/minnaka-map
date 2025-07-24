@@ -1,6 +1,6 @@
 'use client'
 
-import type { MapItems } from '~/types/map'
+import type { CardPosition, MapData, MapItems } from '~/types/map'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { MapContainer } from 'react-leaflet'
@@ -11,18 +11,13 @@ import MapRestaurantCard from './MapRestaurantCard'
 import 'leaflet/dist/leaflet.css'
 import '@maptiler/sdk/dist/maptiler-sdk.css'
 
-interface CardPosition {
-  left: number
-  top: number
-}
-
 export default function Map({ apiKey, midpoint, restaurants }: MapItems) {
   const [selectedRestaurant, setSelectedRestaurant] = useState<RestaurantListItem | null>(null)
-  const [mapData, setMapData] = useState<{
-    pinPosition: { x: number, y: number } | null
-    mapCenter: { x: number, y: number } | null
-    mapSize: { width: number, height: number } | null
-  }>({ pinPosition: null, mapCenter: null, mapSize: null })
+  const [mapData, setMapData] = useState<MapData>({
+    pinPosition: null,
+    mapCenter: null,
+    mapSize: null,
+  })
 
   useEffect(() => {
     const raf = requestAnimationFrame(() => setSelectedRestaurant(null))

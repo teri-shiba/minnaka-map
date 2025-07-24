@@ -1,4 +1,4 @@
-import type { MapItems } from '~/types/map'
+import type { MapData, MapItems } from '~/types/map'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { useCallback } from 'react'
 import { useMapEvent, ZoomControl } from 'react-leaflet'
@@ -11,11 +11,7 @@ interface MapContentProps extends MapItems {
   selectedRestaurant: RestaurantListItem | null
   onRestaurantClick: (restaurant: RestaurantListItem) => void
   onRestaurantClose: () => void
-  onPinPositionChange: (data: {
-    pinPosition: { x: number, y: number } | null
-    mapCenter: { x: number, y: number } | null
-    mapSize: { width: number, height: number } | null
-  }) => void
+  onPinPositionChange: (data: MapData) => void
 }
 
 export default function MapContent({
