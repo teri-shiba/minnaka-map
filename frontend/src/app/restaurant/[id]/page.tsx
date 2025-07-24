@@ -43,7 +43,6 @@ export default async function RestaurantDetailPage({ params }: RestaurantDetailP
   const query = encodeURIComponent(`${name} ${address}`)
   const mapUrl = `https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${query}`
 
-
   return (
     <Section className="mb-6 md:mb-8">
       <div className="flex flex-col-reverse py-4 md:items-start md:justify-between md:border-b md:py-6">
@@ -107,7 +106,7 @@ export default async function RestaurantDetailPage({ params }: RestaurantDetailP
                   <TableHead className="w-24 bg-secondary md:w-36">住所</TableHead>
                   <TableCell>
                     {address}
-                    <div className="relative h-44 md:h-96 w-full mt-4">
+                    <div className="relative mt-4 h-44 w-full md:h-96">
                       <iframe
                         src={mapUrl}
                         width="600"
@@ -115,7 +114,8 @@ export default async function RestaurantDetailPage({ params }: RestaurantDetailP
                         style={{ border: 0 }}
                         allowFullScreen
                         referrerPolicy="no-referrer-when-downgrade"
-                        className="absolute t-0 l-0 size-full"
+                        sandbox="allow-popups"
+                        className="absolute left-0 top-0 size-full"
                       >
                       </iframe>
                     </div>
