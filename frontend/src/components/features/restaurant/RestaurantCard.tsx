@@ -15,36 +15,37 @@ interface RestaurantCardProps {
 }
 
 export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
+  const { id, name, imageUrl, genreName, station, close } = restaurant
   return (
     <Link
-      href={`restaurant/${restaurant.id}`}
+      href={`restaurant/${id}`}
       className="group block"
     >
       <Card className="flex-row gap-2 [@media(max-width:335px)]:flex-col">
         <div className="relative aspect-square size-32 shrink-0 overflow-hidden rounded-lg [@media(max-width:335px)]:w-full">
           <Image
-            alt={restaurant.name}
-            src={restaurant.imageUrl}
+            alt={name}
+            src={imageUrl}
             fill={true}
             sizes="(max-width: 335px) 100vw, 128px"
             className="object-cover"
           />
         </div>
         <CardContent className="relative min-w-0 space-y-2 py-0">
-          <Badge>{restaurant.genreName}</Badge>
+          <Badge>{genreName}</Badge>
           <CardTitle className="line-clamp-2 pl-1 text-sm text-sky-600 group-hover:text-primary group-hover:underline md:text-base">
-            {restaurant.name}
+            {name}
           </CardTitle>
           <CardDescription className="pl-1">
             <ul className="space-y-1 text-xs md:text-sm">
               <li className="truncate">
                 <LuTramFront className="mb-0.5 mr-1 inline-block size-3.5 text-gray-400" />
-                {restaurant.station}
+                {station}
                 駅
               </li>
               <li className="truncate">
                 <LuCalendarX2 className="mb-0.5 mr-1 inline-block size-3.5 text-gray-400" />
-                {restaurant.close}
+                {close}
               </li>
             </ul>
           </CardDescription>
