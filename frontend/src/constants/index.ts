@@ -12,6 +12,10 @@ export const API_SERVICES = {
     endpoint: '/api_keys/maptiler',
     serviceName: 'MapTiler',
   },
+  googlemaps: {
+    endpoint: '/api_keys/googlemaps',
+    serviceName: 'GoogleMaps',
+  },
 } as const
 
 export type SupportedService = keyof typeof API_SERVICES
@@ -60,6 +64,24 @@ export const PAGINATION = {
 // ========================================================
 export const CACHE_DURATION = {
   RESTAURANT_INFO: 86400, // 24H (60 * 60 * 24)
+} as const
+
+// ========================================================
+// Restaurant Marker Options
+// ========================================================
+export const ICON = {
+  SIZE: [40, 44] as [number, number],
+  ANCHOR: [20, 34] as [number, number],
+} as const
+
+// ========================================================
+// Display Restaurant Card on Map
+// ========================================================
+export const CARD_POSITION = {
+  CARD_WIDTH: 240,
+  CARD_HEIGHT: 280,
+  OFFSET: 5,
+  MARGIN: 10,
 } as const
 
 // ========================================================

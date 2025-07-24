@@ -96,19 +96,14 @@
   .hidden-scrollbar::-webkit-scrollbar {
     display: none;
   }
+}
 
-  .text-limit-oneline {
-    width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+@media (max-width: 768px) {
+  .leaflet-control-attribution {
+    font-size: 10px;
   }
 
-  .text-limit-twolines {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    line-clamp: 2;
-    -webkit-line-clamp: 2;
+  .leaflet-container > a > img {
+    width: 70px;
   }
 }

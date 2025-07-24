@@ -6,7 +6,7 @@ function Card({ ref, className, ...props }: HTMLAttributes<HTMLDivElement> & { r
     <div
       ref={ref}
       className={cn(
-        'flex gap-2 bg-card text-card-foreground',
+        'bg-card text-card-foreground flex flex-col',
         className,
       )}
       {...props}
