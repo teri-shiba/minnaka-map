@@ -1,6 +1,20 @@
 class Api::V1::FavoritesController < Api::V1::BaseController
   before_action :authenticate_user!
 
+  def index
+    favorites_by_search = current_user.favorites_by_search_history
+
+    render json: {
+      success: true,
+      data: serialize_favorites_by_search_history(favorites_by_search),
+    }, status: :ok
+  rescue => e
+    render json: {
+      success: false,
+      message: "お気に入り一覧の取得に失敗しました #{e.message}",
+    }, status: :internal_server_error
+  end
+
   def create
     search_history = find_user_search_history
     favorite = create_favorite(search_history)
@@ -33,6 +47,18 @@ class Api::V1::FavoritesController < Api::V1::BaseController
   end
 
   private
+
+    def serialize_favorites_by_search_history(favorites_by_search)
+      favorites_by_search.map do |search_history, favorites|
+        {
+          search_history: {
+            id: search_history.id,
+            station_names: search_history.station_names,
+          },
+          favorites: favorites.map(&:as_json),
+        }
+      end
+    end
 
     def find_user_search_history
       current_user.search_histories.find(favorite_params[:search_history_id])
