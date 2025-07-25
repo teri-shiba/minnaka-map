@@ -10,10 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_07_23_011305) do
+ActiveRecord::Schema[7.2].define(version: 2025_07_25_050912) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "uuid-ossp"
+
+  create_table "favorites", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "search_history_id", null: false
+    t.string "hotpepper_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["search_history_id"], name: "index_favorites_on_search_history_id"
+    t.index ["user_id", "created_at"], name: "index_favorites_on_user_created_at"
+    t.index ["user_id", "search_history_id", "hotpepper_id"], name: "index_favorites_unique", unique: true
+    t.index ["user_id"], name: "index_favorites_on_user_id"
+  end
 
   create_table "operators", force: :cascade do |t|
     t.string "name", null: false
@@ -99,6 +111,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_23_011305) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "favorites", "search_histories"
+  add_foreign_key "favorites", "users"
   add_foreign_key "search_histories", "users"
   add_foreign_key "search_history_center_stations", "search_histories"
   add_foreign_key "search_history_center_stations", "stations"
