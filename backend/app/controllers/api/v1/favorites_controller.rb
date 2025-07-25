@@ -1,4 +1,4 @@
-class Api::V1::FavoritesController < ApplicationController
+class Api::V1::FavoritesController < Api::V1::BaseController
   before_action :authenticate_user!
 
   def create
@@ -17,10 +17,29 @@ class Api::V1::FavoritesController < ApplicationController
     }, status: :internal_server_error
   end
 
+  def destroy
+    favorite = find_user_favorite
+    favorite.destroy!
+
+    render json: {
+      success: true,
+      message: "お気に入りから削除しました",
+    }, status: :ok
+  rescue => e
+    render json: {
+      success: false,
+      message: "お気に入りの削除に失敗しました #{e.message}",
+    }, status: :internal_server_error
+  end
+
   private
 
     def find_user_search_history
       current_user.search_histories.find(favorite_params[:search_history_id])
+    end
+
+    def find_user_favorite
+      current_user.favorites.find(params[:id])
     end
 
     def create_favorite(search_history)
