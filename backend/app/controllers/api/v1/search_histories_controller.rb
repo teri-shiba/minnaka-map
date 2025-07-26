@@ -10,6 +10,8 @@ class Api::V1::SearchHistoriesController < Api::V1::BaseController
       message: "検索履歴を保存しました",
     }, status: :created
   rescue => e
+    Rails.logger.error "Search history creation failed: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
     render json: {
       success: false,
       message: "検索履歴の保存に失敗しました: #{e.message}",
@@ -20,7 +22,7 @@ class Api::V1::SearchHistoriesController < Api::V1::BaseController
 
     def create_search_history_with_stations
       ActiveRecord::Base.transaction do
-        search_history = current_user.search_histories.create!
+        search_history = current_user.user.search_histories.create!
         create_start_station_associations(search_history)
         search_history.reload
       end
