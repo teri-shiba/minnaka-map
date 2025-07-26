@@ -6,7 +6,7 @@ class SearchHistory < ApplicationRecord
 
   has_one :search_history_center_stations, dependent: :destroy # 削除予定
 
-  def station_name
+  def station_names
     start_stations.pluck(:name)
   end
 end
