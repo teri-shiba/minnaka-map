@@ -2,7 +2,7 @@ class Api::V1::SearchHistoriesController < Api::V1::BaseController
   before_action :authenticate_user!
 
   def create
-    search_history = create_search_history_with_stations
+    search_history = find_or_create_search_history_with_stations
 
     render json: {
       success: true,
@@ -20,11 +20,29 @@ class Api::V1::SearchHistoriesController < Api::V1::BaseController
 
   private
 
-    def create_search_history_with_stations
+    def find_or_create_search_history_with_stations
       ActiveRecord::Base.transaction do
-        search_history = current_user.user.search_histories.create!
-        create_start_station_associations(search_history)
-        search_history.reload
+        existing_history = find_existing_search_history
+
+        if existing_history
+          existing_history.update!(updated_at: Time.current)
+          Rails.logger.info "既存の検索履歴を再利用: ID #{existing_history.id}"
+          return existing_history
+        else
+          search_history = current_user.user.search_histories.create!
+          create_start_station_associations(search_history)
+          Rails.logger.info "新規検索履歴を作成: ID #{search_history.id}"
+          search_history.reload
+        end
+      end
+    end
+
+    def find_existing_search_history
+      sorted_station_ids = station_ids.sort
+
+      current_user.user.search_histories.find do |history|
+        history_station_ids = history.search_history_start_stations.pluck(:station_id).sort
+        history_station_ids == sorted_station_ids
       end
     end
 
