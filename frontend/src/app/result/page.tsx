@@ -30,6 +30,7 @@ export default async function Result({ searchParams }: ResultPageProps) {
 
   const currentPage = Number(params.page) || 1
   const genreCode = params.genre
+  const searchHistoryId = params.search_history_id ? params.search_history_id : undefined
   const paginatedResult = await fetchRestaurants({
     latitude: lat,
     longitude: lng,
@@ -55,6 +56,7 @@ export default async function Result({ searchParams }: ResultPageProps) {
         <RestaurantList
           restaurants={paginatedResult.items}
           pagination={paginatedResult.pagination}
+          searchHistoryId={searchHistoryId}
         />
       </div>
     </>
