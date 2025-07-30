@@ -21,7 +21,7 @@ export async function apiFetch<T = any>(
   method: 'GET' | 'POST' | 'DELETE' = 'GET',
   body?: any,
 ): Promise<T> {
-  const url = `${process.env.API_BASE_URL}${path}`
+  const url = `${process.env.API_BASE_URL}/${path}`
   const headers = await getAuthHeader()
 
   try {
