@@ -14,6 +14,12 @@ interface FetchRestaurantsOpts {
   itemsPerPage?: number
 }
 
+interface FetchRestaurantsByIds {
+  restaurantIds: string[]
+  latitude?: number
+  longitude?: number
+}
+
 export async function fetchRestaurants(
   opts: FetchRestaurantsOpts,
 ): Promise<PaginatedResult<RestaurantListItem>> {
@@ -103,5 +109,46 @@ export async function fetchRestaurants(
   catch (error) {
     logger(error, { tags: { component: 'fetchRestaurants' } })
     redirect('/?error=restaurant_fetch_failed')
+  }
+}
+
+export async function fetchRestaurantsByIds(
+  opts: FetchRestaurantsByIds,
+): Promise<RestaurantListItem[]> {
+  try {
+    const apiKey = await getApiKey('hotpepper')
+
+    const params: Record<string, string> = {
+      key: apiKey,
+      id: opts.restaurantIds.join(','), // カンマ区切りで複数ID指定
+      format: 'json',
+    }
+
+    if (opts.latitude && opts.longitude) {
+      params.lat = opts.latitude.toString()
+      params.lng = opts.longitude.toString()
+    }
+
+    const searchParams = new URLSearchParams(params)
+    const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}?${searchParams}`, {
+      next: {
+        revalidate: CACHE_DURATION.RESTAURANT_INFO,
+        tags: [`restaurants-ids-${opts.restaurantIds.join('-')}`],
+      },
+    })
+
+    if (!response.ok) {
+      console.error('fetchRestaurantByIds Error:', response.status)
+      return []
+    }
+
+    const data = await response.json()
+    const restaurants: HotPepperRestaurant[] = data.results.shop || []
+
+    return restaurants.map(transformToList)
+  }
+  catch (error) {
+    console.error('fetchRestaurantByIds 予期せぬエラーが発生:', error)
+    return []
   }
 }
