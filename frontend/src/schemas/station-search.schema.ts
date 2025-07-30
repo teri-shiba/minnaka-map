@@ -4,6 +4,7 @@ export const stationSearchSchema = z.object({
   area: z.array(
     z.object({
       areaValue: z.string().trim().min(1, '出発地点を入力してください'),
+      stationId: z.number().nullable(),
       latitude: z.number().nullable(),
       longitude: z.number().nullable(),
     }),
