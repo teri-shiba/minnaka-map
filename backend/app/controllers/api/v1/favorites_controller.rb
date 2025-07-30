@@ -2,7 +2,7 @@ class Api::V1::FavoritesController < Api::V1::BaseController
   before_action :authenticate_user!
 
   def index
-    favorites_by_search = current_user.favorites_by_search_history
+    favorites_by_search = current_user.user.favorites_by_search_history
 
     render json: {
       success: true,
@@ -33,10 +33,12 @@ class Api::V1::FavoritesController < Api::V1::BaseController
 
   def destroy
     favorite = find_user_favorite
+    delete_favorite_data = { id: favorite.id, hotpepper_id: favorite.hotpepper_id }
     favorite.destroy!
 
     render json: {
       success: true,
+      data: delete_favorite_data,
       message: "お気に入りから削除しました",
     }, status: :ok
   rescue => e
@@ -61,15 +63,15 @@ class Api::V1::FavoritesController < Api::V1::BaseController
     end
 
     def find_user_search_history
-      current_user.search_histories.find(favorite_params[:search_history_id])
+      current_user.user.search_histories.find(favorite_params[:search_history_id])
     end
 
     def find_user_favorite
-      current_user.favorites.find(params[:id])
+      current_user.user.favorites.find(params[:id])
     end
 
     def create_favorite(search_history)
-      current_user.favorites.create!(
+      current_user.user.favorites.create!(
         search_history: search_history,
         hotpepper_id: favorite_params[:hotpepper_id],
       )
