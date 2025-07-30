@@ -10,7 +10,7 @@ import StationSuggestions from './StationSuggestions'
 interface StationAutocompleteProps {
   value: string
   placeholder: string
-  onChange: (value: string, latitude?: number, longitude?: number) => void
+  onChange: (value: string, stationId?: number, latitude?: number, longitude?: number) => void
   excludedStations?: string[]
 }
 
@@ -60,7 +60,7 @@ export default function StationAutocomplete({
 
   const handleSelect = useCallback((station: StationProps) => {
     setIsSelected(true)
-    onChange(station.name, station.latitude, station.longitude)
+    onChange(station.name, station.id, station.latitude, station.longitude)
 
     setRecentStations((prev) => {
       const filtered = prev.filter(s => s.id !== station.id)
