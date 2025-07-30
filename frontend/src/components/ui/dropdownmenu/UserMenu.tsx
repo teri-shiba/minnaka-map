@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { HiUser } from 'react-icons/hi2'
 import { LuHeart, LuLogOut, LuSettings } from 'react-icons/lu'
 import { useAuth } from '~/hooks/useAuth'
@@ -17,9 +18,10 @@ export default function UserMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem>
-          <LuHeart className="size-4 text-slate-400" />
-          {' '}
-          お気に入り一覧
+          <Link href="/favorites" className="flex items-center gap-2">
+            <LuHeart className="size-4 text-slate-400" />
+            お気に入り一覧
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <LuSettings className="size-4 text-slate-400" />
