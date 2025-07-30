@@ -127,6 +127,7 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
                   <TableCell>
                     {address}
                     <div className="relative mt-4 h-44 w-full md:h-96">
+                      {/* eslint-disable-next-line react-dom/no-missing-iframe-sandbox */}
                       <iframe
                         src={mapUrl}
                         width="600"
@@ -134,7 +135,6 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
                         style={{ border: 0 }}
                         allowFullScreen
                         referrerPolicy="no-referrer-when-downgrade"
-                        sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
                         className="absolute left-0 top-0 size-full"
                       >
                       </iframe>
