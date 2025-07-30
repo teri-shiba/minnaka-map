@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { Button } from '~/components/ui/buttons/Button'
 import { logger } from '~/lib/logger'
 import { stationSearchSchema } from '~/schemas/station-search.schema'
+import { saveSearchHistory } from '~/services/save-search-history'
 import StationAutocomplete from '../autocomplete/StationAutocomplete'
 import { AddFormButton } from '../buttons/AddFormButton'
 import { RemoveFormButton } from '../buttons/RemoveFormButton'
@@ -23,8 +24,8 @@ export default function StationSearchForm() {
     resolver: zodResolver(stationSearchSchema),
     defaultValues: {
       area: [
-        { areaValue: '', latitude: null, longitude: null },
-        { areaValue: '', latitude: null, longitude: null },
+        { areaValue: '', stationId: null, latitude: null, longitude: null },
+        { areaValue: '', stationId: null, latitude: null, longitude: null },
       ],
     },
     mode: 'onSubmit',
@@ -37,10 +38,42 @@ export default function StationSearchForm() {
   })
 
   const watchedArea = form.watch('area')
-  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+
+  const processSaveHistory = async (data: AreaFormValues): Promise<number | null> => {
+    try {
+      const stationIds = data.area
+        .filter(station => station.stationId !== null)
+        .map(station => station.stationId as number)
+
+      if (stationIds.length === 0) {
+        return null
+      }
+
+      const result = await saveSearchHistory(stationIds)
+
+      if (result.success) {
+        return result.data.searchHistoryId
+      }
+      else {
+        return null
+      }
+    }
+    catch (error) {
+      // TODO: エラーハンドリングの修正
+      // TODO: 【すぐ確認】「検索履歴保存に失敗しても検索は続行」とあるがそれではアプリケーションの設計上成り立たないのでどうするか考える
+      logger(
+        error,
+        { tags: {
+          component: 'StationSearchForm - processSaveHistory',
+        } },
+      )
+      return null
+    }
+  }
+
   const processValidData = async (data: AreaFormValues) => {
     try {
-      const response = await fetch(`${baseURL}/midpoint`, {
+      const midpointResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/midpoint`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,19 +81,26 @@ export default function StationSearchForm() {
         body: JSON.stringify(data),
       })
 
-      const result = await response.json()
-      if (!response.ok) {
+      const midpointResult = await midpointResponse.json()
+      // TODO: ErrorHandlerToast に踏襲する
+      if (!midpointResponse.ok) {
         throw new Error('APIリクエストに失敗しました')
       }
 
+      const searchHistoryId = await processSaveHistory(data)
+
       const query: Record<string, string> = {
-        lat: result.midpoint.latitude,
-        lng: result.midpoint.longitude,
-        signature: result.signature,
+        lat: midpointResult.midpoint.latitude,
+        lng: midpointResult.midpoint.longitude,
+        signature: midpointResult.signature,
       }
 
-      if (result.expires_at) {
-        query.expires_at = result.expires_at
+      if (midpointResult.expires_at) {
+        query.expires_at = midpointResult.expires_at
+      }
+
+      if (searchHistoryId) {
+        query.search_history_id = searchHistoryId.toString()
       }
 
       const qs = new URLSearchParams(query).toString()
@@ -125,10 +165,12 @@ export default function StationSearchForm() {
                         <StationAutocomplete
                           {...field}
                           value={field.value}
-                          onChange={(value, latitude, longitude) => {
+                          onChange={(value, stationId, latitude, longitude) => {
                             field.onChange(value)
-                            form.setValue(`area.${index}.latitude`, Number(latitude))
-                            form.setValue(`area.${index}.longitude`, Number(longitude))
+                            // TODO: 【すぐ確認】DBから取得するならNullはおかしいので、いらないのでは？
+                            form.setValue(`area.${index}.stationId`, stationId || null)
+                            form.setValue(`area.${index}.latitude`, latitude ? Number(latitude) : null)
+                            form.setValue(`area.${index}.longitude`, longitude ? Number(longitude) : null)
                           }}
                           placeholder={`${index + 1}人目の出発駅`}
                           excludedStations={excludedStations}
