@@ -45,22 +45,14 @@ export default function StationSearchForm() {
         .filter(station => station.stationId !== null)
         .map(station => station.stationId as number)
 
-      if (stationIds.length === 0) {
-        return null
-      }
-
       const result = await saveSearchHistory(stationIds)
-
-      if (result.success) {
-        return result.data.searchHistoryId
-      }
-      else {
+      if (!result.success)
         return null
-      }
+
+      return result.data.searchHistoryId
     }
     catch (error) {
-      // TODO: エラーハンドリングの修正
-      // TODO: 【すぐ確認】「検索履歴保存に失敗しても検索は続行」とあるがそれではアプリケーションの設計上成り立たないのでどうするか考える
+      // TODO2: エラーハンドリングの修正:「検索履歴保存に失敗しても検索は続行」とあるがそれではアプリケーションの設計上成り立たないのでどうするか考える
       logger(
         error,
         { tags: {
@@ -73,16 +65,19 @@ export default function StationSearchForm() {
 
   const processValidData = async (data: AreaFormValues) => {
     try {
-      const midpointResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/midpoint`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const midpointResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/midpoint`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
         },
-        body: JSON.stringify(data),
-      })
+      )
 
       const midpointResult = await midpointResponse.json()
-      // TODO: ErrorHandlerToast に踏襲する
+      // TODO3: ErrorHandlerToast に踏襲する
       if (!midpointResponse.ok) {
         throw new Error('APIリクエストに失敗しました')
       }
@@ -107,8 +102,8 @@ export default function StationSearchForm() {
       router.push(`/result?${qs}`)
     }
     catch (error) {
-      logger(error, { tags: { component: 'StationSearchForm' } })
-      toast.error('フォームの送信に失敗しました')
+      logger(error, { tags: { component: 'StationSearchForm - processValidData' } })
+      toast.error('フォームの送信に失敗しました') // TODO4: 失敗したからどうすればの文言が足りないが適切なものがわからない
     }
   }
 
@@ -167,7 +162,6 @@ export default function StationSearchForm() {
                           value={field.value}
                           onChange={(value, stationId, latitude, longitude) => {
                             field.onChange(value)
-                            // TODO: 【すぐ確認】DBから取得するならNullはおかしいので、いらないのでは？
                             form.setValue(`area.${index}.stationId`, stationId || null)
                             form.setValue(`area.${index}.latitude`, latitude ? Number(latitude) : null)
                             form.setValue(`area.${index}.longitude`, longitude ? Number(longitude) : null)
