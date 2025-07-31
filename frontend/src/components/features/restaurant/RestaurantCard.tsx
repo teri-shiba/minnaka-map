@@ -16,13 +16,11 @@ import FavoriteButton from './FavoriteButton'
 
 interface RestaurantCardProps {
   restaurant: RestaurantListItem
-  favoriteId?: number
   showFavoriteButton?: boolean
 }
 
 export default function RestaurantCard({
   restaurant,
-  favoriteId,
   showFavoriteButton = false,
 }: RestaurantCardProps) {
   const { id, name, imageUrl, genreName, station, close } = restaurant
@@ -75,8 +73,6 @@ export default function RestaurantCard({
           onClick={e => e.preventDefault()}
         >
           <FavoriteButton
-            initialIsFavorite={true}
-            initialFavoriteId={favoriteId || null}
             hotPepperId={id}
             compact={true}
           />
