@@ -1,28 +1,20 @@
 import Image from 'next/image'
-import { LuArrowUpRight, LuBookmark, LuShare } from 'react-icons/lu'
+import { LuArrowUpRight, LuShare } from 'react-icons/lu'
 import FavoriteButton from '~/components/features/restaurant/FavoriteButton'
 import Section from '~/components/layout/Section'
 import { Button } from '~/components/ui/buttons/Button'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '~/components/ui/table/Table'
-import { checkFavoriteStatus } from '~/services/favorite-action'
 import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
 import { getApiKey } from '~/services/get-api-key'
 
 interface RestaurantDetailPageProps {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ search_history_id?: string }>
 }
 
-export default async function RestaurantDetailPage({ params, searchParams }: RestaurantDetailPageProps) {
+export default async function RestaurantDetailPage({ params }: RestaurantDetailPageProps) {
   const { id } = await params
-  const { search_history_id } = await searchParams
-
   const restaurant = await fetchRestaurantDetail(id)
   const googleMapsApiKey = await getApiKey('googlemaps')
-
-  const favoriteStatus = search_history_id
-    ? await checkFavoriteStatus(id, search_history_id)
-    : { isFavorite: false, favoriteId: null }
 
   const {
     // 基本情報
@@ -77,21 +69,7 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
             <LuShare />
             シェアする
           </Button>
-          {search_history_id
-            ? (
-                <FavoriteButton
-                  initialIsFavorite={favoriteStatus.isFavorite}
-                  initialFavoriteId={favoriteStatus.favoriteId}
-                  hotPepperId={id}
-                  searchHistoryId={search_history_id}
-                />
-              )
-            : (
-                <Button variant="outline" className="w-32">
-                  <LuBookmark />
-                  保存する
-                </Button>
-              )}
+          <FavoriteButton hotPepperId={id} />
         </div>
       </div>
       <div className="md:flex md:flex-row md:justify-between md:gap-6 md:pt-8">
