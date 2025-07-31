@@ -7,8 +7,7 @@ import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 export default async function Favorites() {
   const authData = await getAuthFromCookie()
   if (!authData) {
-    // TODO: ErrorHandlerToast に合わせてクエリを付与してトーストを表示する
-    redirect('/')
+    redirect('/?error=auth_required_favorites')
   }
 
   const favoritesResult = await getFavoritesWithDetails()
