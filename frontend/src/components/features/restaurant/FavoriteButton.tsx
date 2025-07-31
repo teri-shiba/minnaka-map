@@ -1,22 +1,21 @@
 'use client'
 
-import { useAtom } from 'jotai'
-import { useCallback, useState } from 'react'
+import { useAtom, useSetAtom } from 'jotai'
+import { useCallback, useEffect, useState } from 'react'
 import { LuHeart } from 'react-icons/lu'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/buttons/Button'
+import { Skeleton } from '~/components/ui/skeleton/Skeleton'
 import { logger } from '~/lib/logger'
-import { addToFavorites, removeFromFavorites } from '~/services/favorite-action'
+import { addToFavorites, checkFavoriteStatus, removeFromFavorites } from '~/services/favorite-action'
+import { saveSearchHistory } from '~/services/save-search-history'
+import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
 import { userStateAtom } from '~/state/user-state.atom'
 import { cn } from '~/utils/cn'
 
 interface FavoriteButtonProps {
-  initialIsFavorite: boolean
-  initialFavoriteId: number | null
   hotPepperId: string
-  searchHistoryId: string
   compact?: boolean
-  className?: string
 }
 
 interface FavoriteActionResult {
@@ -24,20 +23,38 @@ interface FavoriteActionResult {
   favoriteId?: number
 }
 
-export default function FavoriteButton({
-  initialIsFavorite,
-  initialFavoriteId,
-  hotPepperId,
-  searchHistoryId,
-  compact = false,
-  className,
-}: FavoriteButtonProps) {
+export default function FavoriteButton({ hotPepperId, compact = false }: FavoriteButtonProps) {
+  const setModalOpen = useSetAtom(authModalOpenAtom)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
   const [userState] = useAtom(userStateAtom)
   const isSignedIn = userState.isSignedIn
 
-  const [isFavorite, setIsFavorite] = useState(initialIsFavorite)
-  const [favoriteId, setFavoriteId] = useState(initialFavoriteId) // TODO:なぜ必要なのか確認
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isFavorite, setIsFavorite] = useState<boolean>(false)
+  const [favoriteId, setFavoriteId] = useState<number | null>(null)
+
+  const [historyId, setHistoryId] = useState<string | null>(() =>
+    typeof window !== 'undefined' ? sessionStorage.getItem('pendingSearchHistoryId') : null,
+  )
+  const [isChecking, setIsChecking] = useState<boolean>(true)
+
+  useEffect(() => {
+    if (!isSignedIn || !historyId) {
+      return
+    }
+
+    checkFavoriteStatus(hotPepperId, historyId)
+      .then((status) => {
+        setIsFavorite(status.isFavorite)
+        setFavoriteId(status.favoriteId)
+      })
+      .catch((err) => {
+        logger(err, { tags: { component: 'FavoriteButton - initCheck' } })
+      })
+      .finally(() => {
+        setIsChecking(false)
+      })
+  }, [historyId, isSignedIn, hotPepperId])
 
   const handleClick = useCallback(async () => {
     if (isLoading)
@@ -45,7 +62,26 @@ export default function FavoriteButton({
 
     if (!isSignedIn) {
       toast.error('お気に入りに登録するには、ログインが必要です')
+      setModalOpen(true)
       return
+    }
+
+    const raw = sessionStorage.getItem('pendingStationIds')
+    const stationIds = raw ? JSON.parse(raw) as number[] : []
+    if (stationIds.length === 0) {
+      toast.error('お気に入り登録には、検索画面からもう一度検索してください')
+      return
+    }
+
+    let historyId = sessionStorage.getItem('pendingSearchHistoryId')
+    if (!historyId) {
+      const response = await saveSearchHistory(stationIds)
+      if (!response.success || response.data.searchHistoryId == null) {
+        throw new Error('検索履歴の作成に失敗しました')
+      }
+      historyId = String(response.data.searchHistoryId)
+      sessionStorage.setItem('pendingSearchHistoryId', historyId)
+      setHistoryId(historyId)
     }
 
     setIsLoading(true)
@@ -53,7 +89,7 @@ export default function FavoriteButton({
     try {
       if (!isFavorite) {
         // 追加処理
-        const result: FavoriteActionResult = await addToFavorites(hotPepperId, Number(searchHistoryId))
+        const result: FavoriteActionResult = await addToFavorites(hotPepperId, Number(historyId))
         if (!result.success || !result.favoriteId)
           throw new Error('追加失敗')
         setIsFavorite(true)
@@ -84,35 +120,38 @@ export default function FavoriteButton({
     finally {
       setIsLoading(false)
     }
-  }, [isSignedIn, isFavorite, searchHistoryId, favoriteId, hotPepperId, isLoading])
+  }, [isSignedIn, isFavorite, favoriteId, hotPepperId, isLoading, setHistoryId, setModalOpen])
 
   const buttonProps = {
     onClick: handleClick,
-    disabled: isLoading,
+    disabled: isChecking || isLoading,
   }
 
   if (compact) {
-    return (
-      <Button
-        variant="outline"
-        size="sm"
-        className={cn('h-9 w-9 p-0 bg-white/90 hover:bg-white shadow-sm rounded-full', className)}
-        {...buttonProps}
-      >
-        <LuHeart
-          className={cn(
-            'h-4 w-4 transition-colors',
-            isFavorite ? 'fill-current text-destructive' : '',
-          )}
-        />
-      </Button>
-    )
+    return isChecking
+      ? (
+          <Skeleton className="size-9 rounded-full shadow-sm" />
+        )
+      : (
+          <Button
+            variant="outline"
+            size="sm"
+            className="size-9 rounded-full bg-white/90 p-0 shadow-sm hover:bg-white"
+            {...buttonProps}
+          >
+            <LuHeart className={cn('h-4 w-4 transition-colors', isFavorite ? 'fill-current text-destructive' : '')} />
+          </Button>
+        )
   }
 
-  return (
-    <Button variant="outline" className="w-32" {...buttonProps}>
-      <LuHeart className={isFavorite ? 'fill-current text-destructive' : ''} />
-      {isFavorite ? '保存済み' : '保存する'}
-    </Button>
-  )
+  return isChecking
+    ? (
+        <Skeleton className="h-10 w-32" />
+      )
+    : (
+        <Button variant="outline" className="w-32" {...buttonProps}>
+          <LuHeart className={isFavorite ? 'fill-current text-destructive' : ''} />
+          {isFavorite ? '保存済み' : '保存する'}
+        </Button>
+      )
 }
