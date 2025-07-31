@@ -67,8 +67,8 @@ export default function StationAutocomplete({
       return [{
         id: station.id,
         name: station.name,
-        latitude: station.latitude,
-        longitude: station.longitude,
+        latitude: String(station.latitude),
+        longitude: String(station.longitude),
       }, ...filtered].slice(0, 5)
     })
   }, [onChange, setRecentStations])
