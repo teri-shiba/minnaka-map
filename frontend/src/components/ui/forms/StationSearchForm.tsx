@@ -8,7 +8,6 @@ import { toast } from 'sonner'
 import { Button } from '~/components/ui/buttons/Button'
 import { logger } from '~/lib/logger'
 import { stationSearchSchema } from '~/schemas/station-search.schema'
-import { saveSearchHistory } from '~/services/save-search-history'
 import StationAutocomplete from '../autocomplete/StationAutocomplete'
 import { AddFormButton } from '../buttons/AddFormButton'
 import { RemoveFormButton } from '../buttons/RemoveFormButton'
@@ -39,50 +38,45 @@ export default function StationSearchForm() {
 
   const watchedArea = form.watch('area')
 
-  const processSaveHistory = async (data: AreaFormValues): Promise<number | null> => {
+  const processValidData = async (data: AreaFormValues) => {
     try {
       const stationIds = data.area
         .filter(station => station.stationId !== null)
         .map(station => station.stationId as number)
 
-      const result = await saveSearchHistory(stationIds)
-      if (!result.success)
-        return null
+      if (typeof window !== 'undefined') {
+        const rawPrev = sessionStorage.getItem('pendingStationIds')
+        if (rawPrev) {
+          const prevIds = JSON.parse(rawPrev) as number[]
+          const sortedPrevIds = [...prevIds].sort((a, b) => a - b)
+          const sortedStationIds = [...stationIds].sort((a, b) => a - b)
 
-      return result.data.searchHistoryId
-    }
-    catch (error) {
-      // TODO2: エラーハンドリングの修正:「検索履歴保存に失敗しても検索は続行」とあるがそれではアプリケーションの設計上成り立たないのでどうするか考える
-      logger(
-        error,
-        { tags: {
-          component: 'StationSearchForm - processSaveHistory',
-        } },
-      )
-      return null
-    }
-  }
+          const isSameStationIds
+            = sortedPrevIds.length === sortedStationIds.length
+              && sortedPrevIds.every((prevStationId, i) =>
+                prevStationId === sortedStationIds[i])
 
-  const processValidData = async (data: AreaFormValues) => {
-    try {
+          if (!isSameStationIds) {
+            sessionStorage.removeItem('pendingSearchHistoryId')
+          }
+        }
+
+        sessionStorage.setItem('pendingStationIds', JSON.stringify(stationIds))
+      }
+
       const midpointResponse = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/midpoint`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         },
       )
 
       const midpointResult = await midpointResponse.json()
-      // TODO3: ErrorHandlerToast に踏襲する
       if (!midpointResponse.ok) {
         throw new Error('APIリクエストに失敗しました')
       }
-
-      const searchHistoryId = await processSaveHistory(data)
 
       const query: Record<string, string> = {
         lat: midpointResult.midpoint.latitude,
@@ -92,10 +86,6 @@ export default function StationSearchForm() {
 
       if (midpointResult.expires_at) {
         query.expires_at = midpointResult.expires_at
-      }
-
-      if (searchHistoryId) {
-        query.search_history_id = searchHistoryId.toString()
       }
 
       const qs = new URLSearchParams(query).toString()
