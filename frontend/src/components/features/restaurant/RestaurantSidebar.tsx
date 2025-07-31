@@ -13,14 +13,12 @@ import RestaurantPagination from './RestaurantPagination'
 interface RestaurantSidebarProps {
   restaurants: RestaurantListItem[]
   pagination: PageInfo
-  searchHistoryId?: string
   className?: string
 }
 
 export default function RestaurantSidebar({
   restaurants,
   pagination,
-  searchHistoryId,
   className,
 }: RestaurantSidebarProps) {
   const { totalCount, totalPages, currentPage } = pagination
@@ -50,7 +48,6 @@ export default function RestaurantSidebar({
                   <RestaurantCard
                     key={restaurant.id}
                     restaurant={restaurant}
-                    searchHistoryId={searchHistoryId}
                   />
                 ))}
 

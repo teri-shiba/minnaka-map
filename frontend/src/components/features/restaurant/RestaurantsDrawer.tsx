@@ -14,14 +14,12 @@ import RestaurantPagination from './RestaurantPagination'
 interface RestaurantsDrawerProps {
   restaurants: RestaurantListItem[]
   pagination: PageInfo
-  searchHistoryId?: string
   className?: string
 }
 
 export default function RestaurantsDrawer({
   restaurants,
   pagination,
-  searchHistoryId,
   className,
 }: RestaurantsDrawerProps) {
   const { currentPage, totalPages, totalCount } = pagination
@@ -91,7 +89,6 @@ export default function RestaurantsDrawer({
                     <RestaurantCard
                       key={restaurant.id}
                       restaurant={restaurant}
-                      searchHistoryId={searchHistoryId}
                     />
                   ))}
 
