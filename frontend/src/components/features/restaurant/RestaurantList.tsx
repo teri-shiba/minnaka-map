@@ -15,13 +15,11 @@ const RestaurantsDrawer = dynamic(
 interface RestaurantListProps {
   restaurants: RestaurantListItem[]
   pagination: PageInfo
-  searchHistoryId?: string
 }
 
 export default function RestaurantList({
   restaurants,
   pagination,
-  searchHistoryId,
 }: RestaurantListProps) {
   return (
     <>
@@ -29,7 +27,6 @@ export default function RestaurantList({
       <RestaurantSidebar
         restaurants={restaurants}
         pagination={pagination}
-        searchHistoryId={searchHistoryId}
         className="hidden md:block md:shrink-0"
       />
 
@@ -37,7 +34,6 @@ export default function RestaurantList({
       <RestaurantsDrawer
         restaurants={restaurants}
         pagination={pagination}
-        searchHistoryId={searchHistoryId}
         className="block md:hidden"
       />
     </>

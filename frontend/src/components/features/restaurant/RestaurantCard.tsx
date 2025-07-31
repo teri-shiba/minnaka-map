@@ -16,26 +16,21 @@ import FavoriteButton from './FavoriteButton'
 
 interface RestaurantCardProps {
   restaurant: RestaurantListItem
-  searchHistoryId?: string
   favoriteId?: number
   showFavoriteButton?: boolean
 }
 
 export default function RestaurantCard({
   restaurant,
-  searchHistoryId,
   favoriteId,
   showFavoriteButton = false,
 }: RestaurantCardProps) {
   const { id, name, imageUrl, genreName, station, close } = restaurant
-  const detailUrl = searchHistoryId
-    ? `restaurant/${id}?search_history_id=${searchHistoryId}`
-    : `restaurant/${id}`
 
   return (
     <div className="relative">
       <Link
-        href={detailUrl}
+        href={`restaurant/${id}`}
         className="group block"
       >
         <Card className="flex-row gap-2 [@media(max-width:335px)]:flex-col">
@@ -74,7 +69,7 @@ export default function RestaurantCard({
         </Card>
       </Link>
 
-      {showFavoriteButton && searchHistoryId && (
+      {showFavoriteButton && (
         <div
           className="absolute right-0 top-0 [@media(max-width:335px)]:right-1 [@media(max-width:335px)]:top-1"
           onClick={e => e.preventDefault()}
@@ -83,7 +78,6 @@ export default function RestaurantCard({
             initialIsFavorite={true}
             initialFavoriteId={favoriteId || null}
             hotPepperId={id}
-            searchHistoryId={searchHistoryId}
             compact={true}
           />
         </div>
