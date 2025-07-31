@@ -13,6 +13,7 @@ const ERROR_MESSAGE = {
   rate_limit_exceeded: 'アクセスが集中しています。しばらく時間をおいてお試しください。',
   server_error: 'レストラン検索サービスが一時的に利用できません。しばらく後にお試しください。',
   restaurant_fetch_failed: 'レストランデータの取得に失敗しました。条件を変えて再検索してください。',
+  auth_required_favorites: 'お気に入りリストを見るにはログインが必要です',
 } as const
 
 type ErrorType = keyof typeof ERROR_MESSAGE
