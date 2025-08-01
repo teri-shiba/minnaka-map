@@ -39,24 +39,22 @@ export default async function Result({ searchParams }: ResultPageProps) {
   })
 
   return (
-    <>
-      <div className="relative mx-auto h-[calc(100dvh-4rem)] max-w-screen-2xl overflow-hidden md:flex">
-        <div className="h-mobile-map w-full md:h-desktop-map md:w-3/5 md:flex-1">
-          {(maptilerApiKey && midpoint)
-            && (
-              <MapClient
-                apiKey={maptilerApiKey}
-                midpoint={midpoint}
-                restaurants={paginatedResult.items}
-              />
-            )}
-        </div>
-
-        <RestaurantList
-          restaurants={paginatedResult.items}
-          pagination={paginatedResult.pagination}
-        />
+    <div className="relative mx-auto h-[calc(100dvh-4rem)] max-w-screen-2xl overflow-hidden md:flex">
+      <div className="h-mobile-map w-full md:h-desktop-map md:w-3/5 md:flex-1">
+        {(maptilerApiKey && midpoint)
+          && (
+            <MapClient
+              apiKey={maptilerApiKey}
+              midpoint={midpoint}
+              restaurants={paginatedResult.items}
+            />
+          )}
       </div>
-    </>
+
+      <RestaurantList
+        restaurants={paginatedResult.items}
+        pagination={paginatedResult.pagination}
+      />
+    </div>
   )
 }
