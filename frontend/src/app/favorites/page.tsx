@@ -33,8 +33,9 @@ export default async function Favorites() {
                               <RestaurantCard
                                 key={favorite.id}
                                 restaurant={favorite.restaurant}
-                                favoriteId={favorite.id}
                                 showFavoriteButton={true}
+                                searchHistoryId={String(group.searchHistory.id)}
+                                favoriteId={favorite.id}
                               />
                             ))}
                           </div>
