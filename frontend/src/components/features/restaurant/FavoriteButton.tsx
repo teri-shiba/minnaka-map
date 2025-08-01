@@ -47,22 +47,24 @@ export default function FavoriteButton({
   const [isChecking, setIsChecking] = useState<boolean>(!initialHistoryId)
 
   useEffect(() => {
-    if (!isSignedIn || !historyId) {
-      setIsChecking(false)
-      return
-    }
+    (async () => {
+      if (!isSignedIn || !historyId) {
+        setIsChecking(false)
+        return
+      }
 
-    checkFavoriteStatus(hotPepperId, historyId)
-      .then((status) => {
+      try {
+        const status = await checkFavoriteStatus(hotPepperId, historyId)
         setIsFavorite(status.isFavorite)
         setFavoriteId(status.favoriteId ?? null)
-      })
-      .catch((err) => {
+      }
+      catch (err) {
         logger(err, { tags: { component: 'FavoriteButton - initCheck' } })
-      })
-      .finally(() => {
+      }
+      finally {
         setIsChecking(false)
-      })
+      }
+    })()
   }, [initialHistoryId, historyId, isSignedIn, hotPepperId])
 
   const handleClick = useCallback(async () => {
