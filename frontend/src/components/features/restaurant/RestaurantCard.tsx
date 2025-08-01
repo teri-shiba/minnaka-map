@@ -30,7 +30,7 @@ export default function RestaurantCard({
   const { id, name, imageUrl, genreName, station, close } = restaurant
 
   const href = searchHistoryId && favoriteId !== undefined
-    ? `restaurant/${id}/?historyId=${searchHistoryId}&favoriteId=${favoriteId}`
+    ? `restaurant/${id}/?historyId=${searchHistoryId}`
     : `restaurant/${id}`
 
   const isFromFavorites = Boolean(searchHistoryId && favoriteId !== undefined)
