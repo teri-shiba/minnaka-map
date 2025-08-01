@@ -81,6 +81,8 @@ export function useAuth() {
         await api.delete('/auth/sign_out')
         mutate('/current/user/show_status')
         resetUser()
+        sessionStorage.removeItem('pendingStationIds')
+        sessionStorage.removeItem('pendingSearchHistoryId')
         toast.success('ログアウトしました')
       }
       catch {
