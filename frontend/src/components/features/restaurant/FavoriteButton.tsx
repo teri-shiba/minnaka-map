@@ -47,21 +47,6 @@ export default function FavoriteButton({
   const [isChecking, setIsChecking] = useState<boolean>(!initialHistoryId)
 
   useEffect(() => {
-    console.log('FavoriteButton initialized:', {
-      hotPepperId,
-      initialHistoryId,
-      initialFavoriteId,
-      initialIsFavorite,
-      historyId,
-      favoriteId,
-      isFavorite,
-      isSignedIn
-    })
-  }, [])
-
-  useEffect(() => {
-    if (initialHistoryId)
-      return
     if (!isSignedIn || !historyId) {
       setIsChecking(false)
       return
