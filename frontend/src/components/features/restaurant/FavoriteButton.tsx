@@ -16,6 +16,9 @@ import { cn } from '~/utils/cn'
 interface FavoriteButtonProps {
   hotPepperId: string
   compact?: boolean
+  initialHistoryId?: string
+  initialFavoriteId?: number
+  initialIsFavorite?: boolean
 }
 
 interface FavoriteActionResult {
@@ -23,30 +26,38 @@ interface FavoriteActionResult {
   favoriteId?: number
 }
 
-export default function FavoriteButton({ hotPepperId, compact = false }: FavoriteButtonProps) {
+export default function FavoriteButton({
+  hotPepperId,
+  compact = false,
+  initialHistoryId,
+  initialFavoriteId,
+  initialIsFavorite,
+}: FavoriteButtonProps) {
   const setModalOpen = useSetAtom(authModalOpenAtom)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-
   const [userState] = useAtom(userStateAtom)
   const isSignedIn = userState.isSignedIn
 
-  const [isFavorite, setIsFavorite] = useState<boolean>(false)
-  const [favoriteId, setFavoriteId] = useState<number | null>(null)
-
   const [historyId, setHistoryId] = useState<string | null>(() =>
-    typeof window !== 'undefined' ? sessionStorage.getItem('pendingSearchHistoryId') : null,
+    initialHistoryId ?? (typeof window !== 'undefined' ? sessionStorage.getItem('pendingSearchHistoryId') : null),
   )
-  const [isChecking, setIsChecking] = useState<boolean>(true)
+  const [favoriteId, setFavoriteId] = useState<number | null>(initialFavoriteId ?? null)
+  const [isFavorite, setIsFavorite] = useState<boolean>(initialIsFavorite ?? false)
+
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isChecking, setIsChecking] = useState<boolean>(!initialHistoryId)
 
   useEffect(() => {
+    if (initialHistoryId)
+      return
     if (!isSignedIn || !historyId) {
+      setIsChecking(false)
       return
     }
 
     checkFavoriteStatus(hotPepperId, historyId)
       .then((status) => {
         setIsFavorite(status.isFavorite)
-        setFavoriteId(status.favoriteId)
+        setFavoriteId(status.favoriteId ?? null)
       })
       .catch((err) => {
         logger(err, { tags: { component: 'FavoriteButton - initCheck' } })
@@ -54,7 +65,7 @@ export default function FavoriteButton({ hotPepperId, compact = false }: Favorit
       .finally(() => {
         setIsChecking(false)
       })
-  }, [historyId, isSignedIn, hotPepperId])
+  }, [initialHistoryId, historyId, isSignedIn, hotPepperId])
 
   const handleClick = useCallback(async () => {
     if (isLoading)
@@ -66,22 +77,22 @@ export default function FavoriteButton({ hotPepperId, compact = false }: Favorit
       return
     }
 
-    const raw = sessionStorage.getItem('pendingStationIds')
-    const stationIds = raw ? JSON.parse(raw) as number[] : []
-    if (stationIds.length === 0) {
-      toast.error('お気に入り登録には、検索画面からもう一度検索してください')
-      return
-    }
 
-    let historyId = sessionStorage.getItem('pendingSearchHistoryId')
-    if (!historyId) {
+    let currentHistoryId = historyId
+    if (!currentHistoryId) {
+      const raw = sessionStorage.getItem('pendingStationIds')
+      const stationIds = raw ? JSON.parse(raw) as number[] : []
+      if (stationIds.length === 0) {
+        toast.error('お気に入り登録には、検索画面からもう一度検索してください')
+        return
+      }
       const response = await saveSearchHistory(stationIds)
       if (!response.success || response.data.searchHistoryId == null) {
         throw new Error('検索履歴の作成に失敗しました')
       }
-      historyId = String(response.data.searchHistoryId)
-      sessionStorage.setItem('pendingSearchHistoryId', historyId)
-      setHistoryId(historyId)
+      currentHistoryId = String(response.data.searchHistoryId)
+      sessionStorage.setItem('pendingSearchHistoryId', currentHistoryId)
+      setHistoryId(currentHistoryId)
     }
 
     setIsLoading(true)
@@ -89,7 +100,7 @@ export default function FavoriteButton({ hotPepperId, compact = false }: Favorit
     try {
       if (!isFavorite) {
         // 追加処理
-        const result: FavoriteActionResult = await addToFavorites(hotPepperId, Number(historyId))
+        const result: FavoriteActionResult = await addToFavorites(hotPepperId, Number(currentHistoryId))
         if (!result.success || !result.favoriteId)
           throw new Error('追加失敗')
         setIsFavorite(true)
@@ -122,16 +133,11 @@ export default function FavoriteButton({ hotPepperId, compact = false }: Favorit
     }
   }, [isSignedIn, isFavorite, favoriteId, hotPepperId, isLoading, setHistoryId, setModalOpen])
 
-  const buttonProps = {
-    onClick: handleClick,
-    disabled: isChecking || isLoading,
-  }
+  const buttonProps = { onClick: handleClick, disabled: isChecking || isLoading }
 
   if (compact) {
     return isChecking
-      ? (
-          <Skeleton className="size-9 rounded-full shadow-sm" />
-        )
+      ? <Skeleton className="size-9 rounded-full shadow-sm" />
       : (
           <Button
             variant="outline"
@@ -145,9 +151,7 @@ export default function FavoriteButton({ hotPepperId, compact = false }: Favorit
   }
 
   return isChecking
-    ? (
-        <Skeleton className="h-10 w-32" />
-      )
+    ? <Skeleton className="h-10 w-32" />
     : (
         <Button variant="outline" className="w-32" {...buttonProps}>
           <LuHeart className={isFavorite ? 'fill-current text-destructive' : ''} />
