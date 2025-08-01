@@ -9,18 +9,15 @@ import { getApiKey } from '~/services/get-api-key'
 
 interface RestaurantDetailPageProps {
   params: Promise<{ id: string }>
-  searchParams: { historyId?: string, favoriteId?: string }
+  searchParams: { historyId?: string }
 }
 
 export default async function RestaurantDetailPage({ params, searchParams }: RestaurantDetailPageProps) {
   const { id } = await params
-  const { historyId, favoriteId } = await searchParams
+  const { historyId } = await searchParams
 
   const restaurant = await fetchRestaurantDetail(id)
   const googleMapsApiKey = await getApiKey('googlemaps')
-
-  const isFromFavorites = Boolean(historyId && favoriteId)
-  const favoriteIdNumber = favoriteId ? Number(favoriteId) : undefined
 
   const {
     // 基本情報
@@ -78,8 +75,6 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
           <FavoriteButton
             hotPepperId={id}
             initialHistoryId={historyId}
-            initialFavoriteId={favoriteIdNumber}
-            initialIsFavorite={isFromFavorites}
           />
         </div>
       </div>
