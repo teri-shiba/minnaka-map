@@ -17,11 +17,15 @@ import FavoriteButton from './FavoriteButton'
 interface RestaurantCardProps {
   restaurant: RestaurantListItem
   showFavoriteButton?: boolean
+  searchHistoryId?: string
+  favoriteId?: number
 }
 
 export default function RestaurantCard({
   restaurant,
   showFavoriteButton = false,
+  searchHistoryId,
+  favoriteId
 }: RestaurantCardProps) {
   const { id, name, imageUrl, genreName, station, close } = restaurant
 
@@ -75,6 +79,9 @@ export default function RestaurantCard({
           <FavoriteButton
             hotPepperId={id}
             compact={true}
+            initialHistoryId={searchHistoryId}
+            initialFavoriteId={favoriteId}
+            initialIsFavorite={true}
           />
         </div>
       )}
