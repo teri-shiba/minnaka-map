@@ -93,7 +93,7 @@ export default function StationSearchForm() {
     }
     catch (error) {
       logger(error, { tags: { component: 'StationSearchForm - processValidData' } })
-      toast.error('フォームの送信に失敗しました') // TODO4: 失敗したからどうすればの文言が足りないが適切なものがわからない
+      toast.error('フォームの送信に失敗しました。時間を置いてから、再度お試しください。')
     }
   }
 
