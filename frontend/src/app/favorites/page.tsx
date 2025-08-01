@@ -1,6 +1,8 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import RestaurantCard from '~/components/features/restaurant/RestaurantCard'
 import Section from '~/components/layout/Section'
+import { Button } from '~/components/ui/buttons/Button'
 import { getFavoritesWithDetails } from '~/services/favorite-action'
 import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 
@@ -14,7 +16,7 @@ export default async function Favorites() {
 
   return (
     <>
-      <header className="flex h-36 flex-col items-center justify-center bg-secondary md:h-48">
+      <header className="flex h-32 flex-col items-center justify-center bg-secondary md:h-48">
         <h1>お気に入りリスト</h1>
       </header>
       <Section className="pt-8 md:pt-10">
@@ -43,17 +45,22 @@ export default async function Favorites() {
                       ))
                     )
                   : (
-                      <div className="">
-                        <p>まだお気に入りが登録されていません</p>
-                        <p>レストラン検索からお気に入りを追加してみよう</p>
+                      <div className="my-10 text-center">
+                        <h2 className="mb-2">まだお気に入りが登録されていません。</h2>
+                        <p className="mb-6">複数の駅で検索したお店を保存して、みんなにシェアしてみませんか？</p>
+                        <Button asChild size="lg">
+                          <Link href="/">今すぐ検索する</Link>
+                        </Button>
                       </div>
                     )
               )
             : (
-                // TODO: エラーハンドリングを再検討
-                <div className="">
-                  <p>お気に入り一覧の取得に失敗しました</p>
-                  <p>{favoritesResult.message}</p>
+                <div className="my-10 text-center">
+                  <h2 className="mb-2">お気に入りを読み込めませんでした。</h2>
+                  <p className="mb-6">時間をあけてから、再度お試しください。</p>
+                  <Button asChild size="lg">
+                    <Link href="/">トップページに戻る</Link>
+                  </Button>
                 </div>
               )}
         </div>
