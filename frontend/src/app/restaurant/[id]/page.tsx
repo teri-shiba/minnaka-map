@@ -9,12 +9,18 @@ import { getApiKey } from '~/services/get-api-key'
 
 interface RestaurantDetailPageProps {
   params: Promise<{ id: string }>
+  searchParams: { historyId?: string, favoriteId?: string }
 }
 
-export default async function RestaurantDetailPage({ params }: RestaurantDetailPageProps) {
+export default async function RestaurantDetailPage({ params, searchParams }: RestaurantDetailPageProps) {
   const { id } = await params
+  const { historyId, favoriteId } = await searchParams
+
   const restaurant = await fetchRestaurantDetail(id)
   const googleMapsApiKey = await getApiKey('googlemaps')
+
+  const isFromFavorites = Boolean(historyId && favoriteId)
+  const favoriteIdNumber = favoriteId ? Number(favoriteId) : undefined
 
   const {
     // 基本情報
@@ -69,7 +75,12 @@ export default async function RestaurantDetailPage({ params }: RestaurantDetailP
             <LuShare />
             シェアする
           </Button>
-          <FavoriteButton hotPepperId={id} />
+          <FavoriteButton
+            hotPepperId={id}
+            initialHistoryId={historyId}
+            initialFavoriteId={favoriteIdNumber}
+            initialIsFavorite={isFromFavorites}
+          />
         </div>
       </div>
       <div className="md:flex md:flex-row md:justify-between md:gap-6 md:pt-8">

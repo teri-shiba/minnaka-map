@@ -25,16 +25,19 @@ export default function RestaurantCard({
   restaurant,
   showFavoriteButton = false,
   searchHistoryId,
-  favoriteId
+  favoriteId,
 }: RestaurantCardProps) {
   const { id, name, imageUrl, genreName, station, close } = restaurant
 
+  const href = searchHistoryId && favoriteId !== undefined
+    ? `restaurant/${id}/?historyId=${searchHistoryId}&favoriteId=${favoriteId}`
+    : `restaurant/${id}`
+
+  const isFromFavorites = Boolean(searchHistoryId && favoriteId !== undefined)
+
   return (
     <div className="relative">
-      <Link
-        href={`restaurant/${id}`}
-        className="group block"
-      >
+      <Link href={href} className="group block">
         <Card className="flex-row gap-2 [@media(max-width:335px)]:flex-col">
           <div className="relative aspect-square size-32 shrink-0 overflow-hidden rounded-lg [@media(max-width:335px)]:w-full">
             <Image
@@ -81,7 +84,7 @@ export default function RestaurantCard({
             compact={true}
             initialHistoryId={searchHistoryId}
             initialFavoriteId={favoriteId}
-            initialIsFavorite={true}
+            initialIsFavorite={isFromFavorites}
           />
         </div>
       )}

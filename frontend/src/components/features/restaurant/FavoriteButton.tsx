@@ -31,7 +31,7 @@ export default function FavoriteButton({
   compact = false,
   initialHistoryId,
   initialFavoriteId,
-  initialIsFavorite,
+  initialIsFavorite = false,
 }: FavoriteButtonProps) {
   const setModalOpen = useSetAtom(authModalOpenAtom)
   const [userState] = useAtom(userStateAtom)
@@ -45,6 +45,19 @@ export default function FavoriteButton({
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isChecking, setIsChecking] = useState<boolean>(!initialHistoryId)
+
+  useEffect(() => {
+    console.log('FavoriteButton initialized:', {
+      hotPepperId,
+      initialHistoryId,
+      initialFavoriteId,
+      initialIsFavorite,
+      historyId,
+      favoriteId,
+      isFavorite,
+      isSignedIn
+    })
+  }, [])
 
   useEffect(() => {
     if (initialHistoryId)
@@ -76,7 +89,6 @@ export default function FavoriteButton({
       setModalOpen(true)
       return
     }
-
 
     let currentHistoryId = historyId
     if (!currentHistoryId) {
@@ -131,7 +143,7 @@ export default function FavoriteButton({
     finally {
       setIsLoading(false)
     }
-  }, [isSignedIn, isFavorite, favoriteId, hotPepperId, isLoading, setHistoryId, setModalOpen])
+  }, [isSignedIn, isFavorite, favoriteId, hotPepperId, historyId, isLoading, setHistoryId, setModalOpen])
 
   const buttonProps = { onClick: handleClick, disabled: isChecking || isLoading }
 
