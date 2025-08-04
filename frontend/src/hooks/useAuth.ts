@@ -83,6 +83,7 @@ export function useAuth() {
         resetUser()
         sessionStorage.removeItem('pendingStationIds')
         sessionStorage.removeItem('pendingSearchHistoryId')
+        // TODO: ErrorToastHandler にまとめることで、トースト発火→リダイレクトという変な挙動をなくす
         toast.success('ログアウトしました')
       }
       catch {
