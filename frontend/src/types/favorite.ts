@@ -14,6 +14,12 @@ export interface RawFavoriteGroup {
   favorites: RawFavorite[]
 }
 
+export interface RawFavoritePaginationMeta {
+  current_page: number
+  total_groups: number
+  has_more: boolean
+}
+
 export interface Favorite {
   id: number
   hotPepperId: string
@@ -51,4 +57,17 @@ export interface FavoritesWithDetails {
 export interface FavoriteGroupWithDetails {
   searchHistory: SearchHistory
   favorites: FavoritesWithDetails[]
+}
+
+export interface FavoritesPaginationMeta {
+  currentPage: number
+  totalGroups: number
+  hasMore: boolean
+}
+
+export interface PaginatedFavoritesResponse {
+  success: boolean
+  data: FavoriteGroupWithDetails[]
+  meta: FavoritesPaginationMeta
+  message?: string
 }
