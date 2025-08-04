@@ -19,7 +19,7 @@ export default async function Favorites() {
       <header className="flex h-32 flex-col items-center justify-center bg-secondary md:h-48">
         <h1>お気に入りリスト</h1>
       </header>
-      <Section className="pt-8 md:pt-10">
+      <Section className="py-8 md:py-10">
         <div className="mx-auto max-w-lg">
           {favoritesResult.success
             ? (
