@@ -152,7 +152,7 @@ export async function fetchRestaurantsByIds(
     return restaurants.map(transformToList)
   }
   catch (error) {
-    logger(error, { tags: { component: 'fetchRestaurantsByIds' }})
+    logger(error, { tags: { component: 'fetchRestaurantsByIds' } })
     return []
   }
 }
