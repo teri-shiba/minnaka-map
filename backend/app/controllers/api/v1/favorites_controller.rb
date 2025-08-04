@@ -16,8 +16,8 @@ class Api::V1::FavoritesController < Api::V1::BaseController
       meta: {
         current_page: page,
         total_groups: total_groups,
-        has_more: page * limit < total_groups
-      }
+        has_more: page * limit < total_groups,
+      },
     }, status: :ok
   rescue => e
     render json: {
