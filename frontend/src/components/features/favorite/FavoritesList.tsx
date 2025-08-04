@@ -3,6 +3,7 @@
 import type { FavoriteGroupWithDetails, FavoritesPaginationMeta } from '~/types/favorite'
 import Link from 'next/link'
 import { useState } from 'react'
+import { LuHeart } from 'react-icons/lu'
 import { Button } from '~/components/ui/buttons/Button'
 import { getFavoritesWithDetailsPaginated } from '~/services/favorite-action'
 import RestaurantCard from '../restaurant/RestaurantCard'
@@ -61,22 +62,45 @@ export default function FavoritesList({ initialData, initialMeta }: FavoriteList
         </section>
       ))}
 
-      <div className="">
-        {meta.totalGroups}
-        グループ中
-        {favorites.length}
-        グループ表示
+      <div className="flex flex-col items-center justify-center gap-4">
+        {meta.hasMore
+          ? (
+              <>
+                <p>
+                  {favorites.length}
+                  {' '}
+                  /
+                  {' '}
+                  {meta.totalGroups}
+                  {' '}
+                  グループを表示中
+                </p>
+                <Button
+                  onClick={loadMore}
+                  disabled={isLoading}
+                  size="lg"
+                >
+                  {isLoading ? '読み込み中...' : 'もっと見る'}
+                </Button>
+              </>
+            )
+          : (
+              <>
+                <div className="flex size-10 items-center justify-center rounded-full bg-red-50">
+                  <LuHeart className="fill-destructive text-destructive" />
+                </div>
+                <p>すべてのお気に入りを表示しました</p>
+                <Button
+                  variant="outline"
+                  disabled={isLoading}
+                  size="lg"
+                  asChild
+                >
+                  {isLoading ? '読み込み中...' : <Link href="/">別のエリアを探す</Link>}
+                </Button>
+              </>
+            )}
       </div>
-
-      {meta.hasMore && (
-        <Button
-          onClick={loadMore}
-          disabled={isLoading}
-          size="lg"
-        >
-          {isLoading ? '読み込み中...' : 'もっと見る'}
-        </Button>
-      )}
     </>
   )
 }
