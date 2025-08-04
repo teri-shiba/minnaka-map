@@ -20,7 +20,7 @@ export default function FavoritesList({ initialData, initialMeta }: FavoriteList
   const loadMore = async () => {
     setIsLoading(true)
 
-    const result = await getFavoritesWithDetailsPaginated(meta.currentPage + 1)
+    const result = await getFavoritesWithDetailsPaginated(meta.currentPage + 1, 3)
 
     if (result.success) {
       setFavorites(prev => [...prev, ...result.data])
