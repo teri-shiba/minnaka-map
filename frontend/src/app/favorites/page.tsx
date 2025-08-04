@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import RestaurantCard from '~/components/features/restaurant/RestaurantCard'
+import FavoritesList from '~/components/features/favorite/FavoritesList'
 import Section from '~/components/layout/Section'
 import { Button } from '~/components/ui/buttons/Button'
-import { getFavoritesWithDetails } from '~/services/favorite-action'
+import { getFavoritesWithDetailsPaginated } from '~/services/favorite-action'
 import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 
 export default async function Favorites() {
@@ -12,7 +12,7 @@ export default async function Favorites() {
     redirect('/?error=auth_required_favorites')
   }
 
-  const favoritesResult = await getFavoritesWithDetails()
+  const favoritesResult = await getFavoritesWithDetailsPaginated(1, 3)
 
   return (
     <>
@@ -23,36 +23,10 @@ export default async function Favorites() {
         <div className="mx-auto max-w-lg">
           {favoritesResult.success
             ? (
-                favoritesResult.data.length > 0
-                  ? (
-                      favoritesResult.data.map(group => (
-                        <section key={group.searchHistory.id}>
-                          <h2 className="text-center">
-                            {group.searchHistory.stationNames.join('・')}
-                          </h2>
-                          <div className="mb-6 space-y-4 border-b py-6 md:mb-10 md:py-10">
-                            {group.favorites.map(favorite => (
-                              <RestaurantCard
-                                key={favorite.id}
-                                restaurant={favorite.restaurant}
-                                showFavoriteButton={true}
-                                searchHistoryId={String(group.searchHistory.id)}
-                                favoriteId={favorite.id}
-                              />
-                            ))}
-                          </div>
-                        </section>
-                      ))
-                    )
-                  : (
-                      <div className="my-10 text-center">
-                        <h2 className="mb-2">まだお気に入りが登録されていません。</h2>
-                        <p className="mb-6">複数の駅で検索したお店を保存して、みんなにシェアしてみませんか？</p>
-                        <Button asChild size="lg">
-                          <Link href="/">今すぐ検索する</Link>
-                        </Button>
-                      </div>
-                    )
+                <FavoritesList
+                  initialData={favoritesResult.data}
+                  initialMeta={favoritesResult.meta}
+                />
               )
             : (
                 <div className="my-10 text-center">
