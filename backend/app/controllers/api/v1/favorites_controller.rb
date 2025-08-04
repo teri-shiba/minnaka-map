@@ -2,11 +2,22 @@ class Api::V1::FavoritesController < Api::V1::BaseController
   before_action :authenticate_user!
 
   def index
+    page = params[:page]&.to_i || 1
+    limit = params[:limit]&.to_i || 5
+
     favorites_by_search = current_user.user.favorites_by_search_history
+    total_groups = favorites_by_search.count
+
+    paginated_groups = favorites_by_search.to_a.slice((page - 1) * limit, limit) || []
 
     render json: {
       success: true,
-      data: serialize_favorites_by_search_history(favorites_by_search),
+      data: serialize_favorites_by_search_history(paginated_groups),
+      meta: {
+        current_page: page,
+        total_groups: total_groups,
+        has_more: page * limit < total_groups
+      }
     }, status: :ok
   rescue => e
     render json: {
