@@ -20,6 +20,7 @@ interface FetchRestaurantsByIds {
   longitude?: number
 }
 
+// TODO: エラーハンドリングがバラバラなので統一する
 export async function fetchRestaurants(
   opts: FetchRestaurantsOpts,
 ): Promise<PaginatedResult<RestaurantListItem>> {
@@ -117,10 +118,12 @@ export async function fetchRestaurantsByIds(
 ): Promise<RestaurantListItem[]> {
   try {
     const apiKey = await getApiKey('hotpepper')
+    const requestCount = Math.min(opts.restaurantIds.length, 100)
 
     const params: Record<string, string> = {
       key: apiKey,
-      id: opts.restaurantIds.join(','), // カンマ区切りで複数ID指定
+      id: opts.restaurantIds.join(','),
+      count: requestCount.toString(),
       format: 'json',
     }
 
@@ -143,12 +146,13 @@ export async function fetchRestaurantsByIds(
     }
 
     const data = await response.json()
+
     const restaurants: HotPepperRestaurant[] = data.results.shop || []
 
     return restaurants.map(transformToList)
   }
   catch (error) {
-    console.error('fetchRestaurantByIds 予期せぬエラーが発生:', error)
+    logger(error, { tags: { component: 'fetchRestaurantsByIds' }})
     return []
   }
 }
