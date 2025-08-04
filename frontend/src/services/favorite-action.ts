@@ -6,8 +6,11 @@ import type {
   FavoriteActionResponse,
   FavoriteGroup,
   FavoriteGroupWithDetails,
+  FavoritesPaginationMeta,
   FavoriteStatus,
+  PaginatedFavoritesResponse,
   RawFavoriteGroup,
+  RawFavoritePaginationMeta,
 } from '~/types/favorite'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { logger } from '~/lib/logger'
@@ -88,6 +91,66 @@ export async function getFavoritesWithDetails(): Promise<ApiResponse<FavoriteGro
   catch (error) {
     logger(error, { tags: { component: 'fetchFavoritesWithDetails' } })
     return { success: false, data: [], message: '予期しないエラーが発生しました' }
+  }
+}
+
+// ページネーション対応
+export async function getFavoritesWithDetailsPaginated(
+  page: number = 1,
+  limit: number = 5,
+): Promise<PaginatedFavoritesResponse> {
+  try {
+    const response = await apiFetch<ApiResponse<RawFavoriteGroup[]> & { meta: RawFavoritePaginationMeta }>(
+      `favorites?page=${page}&limit=${limit}`,
+      'GET',
+    )
+
+    if (!response.success) {
+      return {
+        success: false,
+        data: [],
+        meta: { currentPage: page, totalGroups: 0, hasMore: false },
+        message: response.message,
+      }
+    }
+
+    const hotPepperId = Array.from(
+      new Set(response.data.flatMap(group => group.favorites.map(fav => fav.hotpepper_id))),
+    )
+
+    const restaurantDetails = await fetchRestaurantsByIds({ restaurantIds: hotPepperId })
+    const restaurantMap = new Map<string, RestaurantListItem>(
+      restaurantDetails.map(res => [res.id, res]),
+    )
+
+    const groupsWithDetails = response.data.map(group => ({
+      searchHistory: {
+        id: group.search_history.id,
+        stationNames: group.search_history.station_names,
+      },
+      favorites: group.favorites.map(favorite => ({
+        id: favorite.id,
+        searchHistoryId: favorite.search_history_id,
+        restaurant: restaurantMap.get(favorite.hotpepper_id) ?? fallbackRestaurant(favorite.hotpepper_id),
+      })),
+    }))
+
+    const normalizedMeta: FavoritesPaginationMeta = {
+      currentPage: response.meta.current_page,
+      totalGroups: response.meta.total_groups,
+      hasMore: response.meta.has_more,
+    }
+
+    return { success: true, data: groupsWithDetails, meta: normalizedMeta }
+  }
+  catch (error) {
+    logger(error, { tags: { component: getFavoritesWithDetailsPaginated } })
+    return {
+      success: false,
+      data: [],
+      meta: { currentPage: page, totalGroups: 0, hasMore: false },
+      message: '予期しないエラーが発生しました',
+    }
   }
 }
 
