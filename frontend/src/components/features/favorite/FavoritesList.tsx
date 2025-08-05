@@ -55,14 +55,14 @@ export default function FavoritesList({ initialData, initialMeta }: FavoriteList
           ? (
               <>
                 <p>
-                  {`${favorites.length} / ${meta.totalGroups} グループを表示中`}
+                  {`全 ${favorites.length} 件中 ${meta.totalGroups} 件を表示中`}
                 </p>
                 <Button
                   onClick={loadMore}
                   disabled={isLoading}
                   size="lg"
                 >
-                  {isLoading ? '読み込み中...' : 'もっと見る'}
+                  {isLoading ? '読み込み中...' : 'さらに読み込む'}
                 </Button>
               </>
             )
