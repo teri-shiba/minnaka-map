@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { LuHeart } from 'react-icons/lu'
 import { Button } from '~/components/ui/buttons/Button'
 import { getFavoritesWithDetailsPaginated } from '~/services/favorite-action'
-import RestaurantCard from '../restaurant/RestaurantCard'
+import FavoriteGroup from './FavoriteGroup'
 
 interface FavoriteListProps {
   initialData: FavoriteGroupWithDetails[]
@@ -44,22 +44,10 @@ export default function FavoritesList({ initialData, initialMeta }: FavoriteList
   return (
     <>
       {favorites.map(group => (
-        <section key={group.searchHistory.id}>
-          <h2 className="text-center">
-            {group.searchHistory.stationNames.join('・')}
-          </h2>
-          <div className="mb-6 space-y-4 border-b py-6 md:mb-10 md:py-10">
-            {group.favorites.map(favorite => (
-              <RestaurantCard
-                key={favorite.id}
-                restaurant={favorite.restaurant}
-                showFavoriteButton={true}
-                searchHistoryId={String(group.searchHistory.id)}
-                favoriteId={favorite.id}
-              />
-            ))}
-          </div>
-        </section>
+        <FavoriteGroup
+          key={group.searchHistory.id}
+          group={group}
+        />
       ))}
 
       <div className="flex flex-col items-center justify-center gap-4">
@@ -67,13 +55,7 @@ export default function FavoritesList({ initialData, initialMeta }: FavoriteList
           ? (
               <>
                 <p>
-                  {favorites.length}
-                  {' '}
-                  /
-                  {' '}
-                  {meta.totalGroups}
-                  {' '}
-                  グループを表示中
+                  {`${favorites.length} / ${meta.totalGroups} グループを表示中`}
                 </p>
                 <Button
                   onClick={loadMore}
