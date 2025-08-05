@@ -5,7 +5,6 @@ import type {
   Favorite,
   FavoriteActionResponse,
   FavoriteGroup,
-  FavoriteGroupWithDetails,
   FavoritesPaginationMeta,
   FavoriteStatus,
   PaginatedFavoritesResponse,
@@ -60,40 +59,6 @@ export async function getFavorites(): Promise<ApiResponse<FavoriteGroup[]>> {
 }
 
 // 詳細情報付きのお気に入りを取得
-export async function getFavoritesWithDetails(): Promise<ApiResponse<FavoriteGroupWithDetails[]>> {
-  try {
-    const favoritesResponse = await getFavorites()
-
-    if (!favoritesResponse.success) {
-      return { success: false, data: [], message: favoritesResponse.message }
-    }
-
-    const hotPepperId = Array.from(
-      new Set(favoritesResponse.data.flatMap(group => group.favorites.map(fav => fav.hotPepperId))),
-    )
-
-    const restaurantDetails = await fetchRestaurantsByIds({ restaurantIds: hotPepperId })
-    const restaurantMap = new Map<string, RestaurantListItem>(
-      restaurantDetails.map(res => [res.id, res]),
-    )
-
-    const groupsWithDetails = favoritesResponse.data.map(group => ({
-      searchHistory: group.searchHistory,
-      favorites: group.favorites.map(favorite => ({
-        id: favorite.id,
-        searchHistoryId: favorite.searchHistoryId,
-        restaurant: restaurantMap.get(favorite.hotPepperId) ?? fallbackRestaurant(favorite.hotPepperId),
-      })),
-    }))
-
-    return { success: true, data: groupsWithDetails }
-  }
-  catch (error) {
-    logger(error, { tags: { component: 'fetchFavoritesWithDetails' } })
-    return { success: false, data: [], message: '予期しないエラーが発生しました' }
-  }
-}
-
 // ページネーション対応
 export async function getFavoritesWithDetailsPaginated(
   page: number = 1,
