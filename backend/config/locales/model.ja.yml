@@ -1,0 +1,24 @@
+ja:
+  activerecord:
+    models:
+      user: ユーザー
+      station: 駅
+      operator: 運営会社
+      favorite: お気に入り
+    attributes:
+      user:
+        name: 名前
+      user_auth:
+        email: メールアドレス
+      station:
+        name: 駅名
+        latitude: 緯度
+        longitude: 経度
+        name_hiragana: ひらがな
+        name_romaji: ローマ字
+        group_code: グループコード
+      operator:
+        name: 運営会社名
+        alias_name: 通称
+      favorite:
+        hotpepper_id: ホットペッパーお店ID
