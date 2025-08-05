@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :favorite do
-    user { nil }
-    search_history { nil }
-    hotpepper_id { "MyString" }
+    association :user
+    association :search_history
+    hotpepper_id { SecureRandom.alphanumeric(10) }
   end
 end
