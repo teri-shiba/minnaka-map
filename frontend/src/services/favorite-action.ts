@@ -16,20 +16,6 @@ import { logger } from '~/lib/logger'
 import { apiFetch } from './api-client'
 import { fetchRestaurantsByIds } from './fetch-restaurants'
 
-function fallbackRestaurant(hotPepperId: string): RestaurantListItem {
-  return {
-    id: hotPepperId,
-    name: 'レストラン情報取得エラー',
-    imageUrl: '',
-    genreName: '不明',
-    station: '不明',
-    close: '不明',
-    lat: 0,
-    lng: 0,
-    genreCode: 'unknown',
-  }
-}
-
 // すべてのお気に入りを取得
 export async function getFavorites(): Promise<ApiResponse<FavoriteGroup[]>> {
   try {
@@ -83,21 +69,41 @@ export async function getFavoritesWithDetailsPaginated(
       new Set(response.data.flatMap(group => group.favorites.map(fav => fav.hotpepper_id))),
     )
 
-    const restaurantDetails = await fetchRestaurantsByIds({ restaurantIds: hotPepperId })
+    const restaurantResult = await fetchRestaurantsByIds({ restaurantIds: hotPepperId })
+
+    if (!restaurantResult.success) {
+      logger(new Error(restaurantResult.error), { tags: { component: 'getFavoritesWithDetailsPaginated' } })
+      return {
+        success: false,
+        data: [],
+        meta: { currentPage: page, totalGroups: 0, hasMore: false },
+        message: 'レストラン情報の取得に失敗しました',
+      }
+    }
+
     const restaurantMap = new Map<string, RestaurantListItem>(
-      restaurantDetails.map(res => [res.id, res]),
+      restaurantResult.data.map(res => [res.id, res]),
     )
+
+    const isNotNull = <T>(value: T | null): value is T => value !== null
 
     const groupsWithDetails = response.data.map(group => ({
       searchHistory: {
         id: group.search_history.id,
         stationNames: group.search_history.station_names,
       },
-      favorites: group.favorites.map(favorite => ({
-        id: favorite.id,
-        searchHistoryId: favorite.search_history_id,
-        restaurant: restaurantMap.get(favorite.hotpepper_id) ?? fallbackRestaurant(favorite.hotpepper_id),
-      })),
+      favorites: group.favorites
+        .map((favorite) => {
+          const restaurant = restaurantMap.get(favorite.hotpepper_id)
+          if (!restaurant)
+            return null
+          return {
+            id: favorite.id,
+            searchHistoryId: favorite.search_history_id,
+            restaurant,
+          }
+        })
+        .filter(isNotNull),
     }))
 
     const normalizedMeta: FavoritesPaginationMeta = {

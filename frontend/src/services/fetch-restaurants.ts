@@ -113,9 +113,10 @@ export async function fetchRestaurants(
   }
 }
 
+// TODO: リファクタリング - 返り値の型が統一されていない
 export async function fetchRestaurantsByIds(
   opts: FetchRestaurantsByIds,
-): Promise<RestaurantListItem[]> {
+): Promise<{ success: true, data: RestaurantListItem[] } | { success: false, error: string }> {
   try {
     const apiKey = await getApiKey('hotpepper')
     const requestCount = Math.min(opts.restaurantIds.length, 100)
@@ -141,18 +142,29 @@ export async function fetchRestaurantsByIds(
     })
 
     if (!response.ok) {
-      console.error('fetchRestaurantByIds Error:', response.status)
-      return []
+      const errorMessage = `HotPepper API request failed: ${response.status} ${response.statusText}`
+      logger(new Error(errorMessage), {
+        tags: {
+          component: 'fetchRestaurantsByIds',
+          statusCode: response.status,
+          restaurantIds: opts.restaurantIds,
+        },
+      })
+      return { success: false, error: errorMessage }
     }
 
     const data = await response.json()
-
     const restaurants: HotPepperRestaurant[] = data.results.shop || []
 
-    return restaurants.map(transformToList)
+    return { success: true, data: restaurants.map(transformToList) }
   }
   catch (error) {
-    logger(error, { tags: { component: 'fetchRestaurantsByIds' } })
-    return []
+    logger(error, {
+      tags: {
+        component: 'fetchRestaurantsByIds',
+        restaurantIds: opts.restaurantIds,
+      },
+    })
+    return { success: false, error: 'レストラン情報の取得に失敗しました' }
   }
 }
