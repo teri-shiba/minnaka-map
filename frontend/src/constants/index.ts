@@ -5,15 +5,15 @@ import type { AuthProvider } from '~/types/auth-provider'
 // ========================================================
 export const API_SERVICES = {
   hotpepper: {
-    endpoint: '/api_keys/hotpepper',
+    endpoint: 'api_keys/hotpepper',
     serviceName: 'HotPepper',
   },
   maptiler: {
-    endpoint: '/api_keys/maptiler',
+    endpoint: 'api_keys/maptiler',
     serviceName: 'MapTiler',
   },
   googlemaps: {
-    endpoint: '/api_keys/googlemaps',
+    endpoint: 'api_keys/googlemaps',
     serviceName: 'GoogleMaps',
   },
 } as const
