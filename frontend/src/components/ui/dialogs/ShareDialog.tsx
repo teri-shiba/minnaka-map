@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { useCallback, useMemo, useState } from 'react'
 import { FaXTwitter } from 'react-icons/fa6'
 import { LuCopy, LuMail, LuShare } from 'react-icons/lu'
@@ -16,9 +17,9 @@ interface ShareDialogProps {
 
 export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogProps) {
   const [open, setOpen] = useState<boolean>(false)
-  const [currentUrl] = useState<string>(() => {
-    return typeof window !== 'undefined' ? window.location.href : ''
-  })
+  const pathname = usePathname()
+  const origin = typeof window !== 'undefined' ? window.location.origin : ''
+  const currentUrl = useMemo(() => `${origin}${pathname}`, [origin, pathname])
   const { share, isMobile } = useShare()
 
   const shareData = useMemo(() => ({
