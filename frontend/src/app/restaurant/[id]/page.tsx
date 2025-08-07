@@ -71,6 +71,7 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
           <ShareDialog
             restaurantName={name}
             restaurantAddress={address}
+            station={station}
           />
           <FavoriteButton
             hotPepperId={id}
@@ -79,14 +80,14 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
         </div>
       </div>
       <div className="md:flex md:flex-row md:justify-between md:gap-6 md:pt-8">
-        <div className="mx-auto mb-6 max-w-96 md:mb-0 md:h-[168px] md:w-[223px] md:shrink-0">
-          <div className="relative overflow-hidden rounded-lg bg-gray-100">
+        <div className="mx-auto mb-6 md:mb-0 md:shrink-0">
+          <div className="relative max-w-96 overflow-hidden rounded-lg bg-gray-100 md:w-[223px]">
             <Image
               src={imageUrl || '/placeholder.svg'}
               alt={name}
               width={223}
               height={168}
-              className="size-full object-cover blur-[0.5px] brightness-105"
+              className="aspect-3/2 size-full object-cover blur-[0.5px] brightness-105 md:aspect-square"
             />
             <div
               className="absolute inset-0"
