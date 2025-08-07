@@ -1,5 +1,6 @@
 import Image from 'next/image'
-import { LuArrowUpRight, LuBookmark, LuShare } from 'react-icons/lu'
+import { LuArrowUpRight, LuShare } from 'react-icons/lu'
+import FavoriteButton from '~/components/features/restaurant/FavoriteButton'
 import Section from '~/components/layout/Section'
 import { Button } from '~/components/ui/buttons/Button'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '~/components/ui/table/Table'
@@ -8,10 +9,13 @@ import { getApiKey } from '~/services/get-api-key'
 
 interface RestaurantDetailPageProps {
   params: Promise<{ id: string }>
+  searchParams: { historyId?: string }
 }
 
-export default async function RestaurantDetailPage({ params }: RestaurantDetailPageProps) {
+export default async function RestaurantDetailPage({ params, searchParams }: RestaurantDetailPageProps) {
   const { id } = await params
+  const { historyId } = await searchParams
+
   const restaurant = await fetchRestaurantDetail(id)
   const googleMapsApiKey = await getApiKey('googlemaps')
 
@@ -68,10 +72,10 @@ export default async function RestaurantDetailPage({ params }: RestaurantDetailP
             <LuShare />
             シェアする
           </Button>
-          <Button variant="outline" className="w-32">
-            <LuBookmark />
-            保存する
-          </Button>
+          <FavoriteButton
+            hotPepperId={id}
+            initialHistoryId={historyId}
+          />
         </div>
       </div>
       <div className="md:flex md:flex-row md:justify-between md:gap-6 md:pt-8">
@@ -107,6 +111,7 @@ export default async function RestaurantDetailPage({ params }: RestaurantDetailP
                   <TableCell>
                     {address}
                     <div className="relative mt-4 h-44 w-full md:h-96">
+                      {/* eslint-disable-next-line react-dom/no-missing-iframe-sandbox */}
                       <iframe
                         src={mapUrl}
                         width="600"
@@ -114,7 +119,6 @@ export default async function RestaurantDetailPage({ params }: RestaurantDetailP
                         style={{ border: 0 }}
                         allowFullScreen
                         referrerPolicy="no-referrer-when-downgrade"
-                        sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
                         className="absolute left-0 top-0 size-full"
                       >
                       </iframe>

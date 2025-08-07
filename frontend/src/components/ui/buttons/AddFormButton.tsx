@@ -11,7 +11,7 @@ interface AddFormButtonProps {
 export function AddFormButton({ fields, append }: AddFormButtonProps) {
   const handleAddForm = () => {
     if (fields.length < 6) {
-      append({ areaValue: '', latitude: null, longitude: null })
+      append({ areaValue: '', stationId: null, latitude: null, longitude: null })
     }
   }
 

@@ -14,6 +14,13 @@ interface FetchRestaurantsOpts {
   itemsPerPage?: number
 }
 
+interface FetchRestaurantsByIds {
+  restaurantIds: string[]
+  latitude?: number
+  longitude?: number
+}
+
+// TODO: エラーハンドリングがバラバラなので統一する
 export async function fetchRestaurants(
   opts: FetchRestaurantsOpts,
 ): Promise<PaginatedResult<RestaurantListItem>> {
@@ -39,7 +46,7 @@ export async function fetchRestaurants(
     }
 
     const searchParams = new URLSearchParams(params)
-    const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}?${searchParams}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}/?${searchParams}`, {
       next: {
         revalidate: CACHE_DURATION.RESTAURANT_INFO,
         tags: [`restaurants-${opts.latitude}-${opts.longitude}-${opts.genre || 'all'}`],
@@ -103,5 +110,61 @@ export async function fetchRestaurants(
   catch (error) {
     logger(error, { tags: { component: 'fetchRestaurants' } })
     redirect('/?error=restaurant_fetch_failed')
+  }
+}
+
+// TODO: リファクタリング - 返り値の型が統一されていない
+export async function fetchRestaurantsByIds(
+  opts: FetchRestaurantsByIds,
+): Promise<{ success: true, data: RestaurantListItem[] } | { success: false, error: string }> {
+  try {
+    const apiKey = await getApiKey('hotpepper')
+    const requestCount = Math.min(opts.restaurantIds.length, 100)
+
+    const params: Record<string, string> = {
+      key: apiKey,
+      id: opts.restaurantIds.join(','),
+      count: requestCount.toString(),
+      format: 'json',
+    }
+
+    if (opts.latitude && opts.longitude) {
+      params.lat = opts.latitude.toString()
+      params.lng = opts.longitude.toString()
+    }
+
+    const searchParams = new URLSearchParams(params)
+    const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}/?${searchParams}`, {
+      next: {
+        revalidate: CACHE_DURATION.RESTAURANT_INFO,
+        tags: [`restaurants-ids-${opts.restaurantIds.join('-')}`],
+      },
+    })
+
+    if (!response.ok) {
+      const errorMessage = `HotPepper API request failed: ${response.status} ${response.statusText}`
+      logger(new Error(errorMessage), {
+        tags: {
+          component: 'fetchRestaurantsByIds',
+          statusCode: response.status,
+          restaurantIds: opts.restaurantIds,
+        },
+      })
+      return { success: false, error: errorMessage }
+    }
+
+    const data = await response.json()
+    const restaurants: HotPepperRestaurant[] = data.results.shop || []
+
+    return { success: true, data: restaurants.map(transformToList) }
+  }
+  catch (error) {
+    logger(error, {
+      tags: {
+        component: 'fetchRestaurantsByIds',
+        restaurantIds: opts.restaurantIds,
+      },
+    })
+    return { success: false, error: 'レストラン情報の取得に失敗しました' }
   }
 }

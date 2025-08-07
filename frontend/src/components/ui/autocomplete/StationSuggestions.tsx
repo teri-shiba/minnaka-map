@@ -78,7 +78,11 @@ export default function StationSuggestions({
             <CommandItem
               key={station.id}
               onMouseDown={e => e.preventDefault()}
-              onSelect={() => onSelect(station as StationProps)}
+              onSelect={() => onSelect({
+                ...station,
+                latitude: Number(station.latitude),
+                longitude: Number(station.longitude),
+              })}
               className="cursor-pointer hover:bg-secondary"
             >
               {station.name}

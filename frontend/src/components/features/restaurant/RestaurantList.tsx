@@ -17,7 +17,10 @@ interface RestaurantListProps {
   pagination: PageInfo
 }
 
-export default function RestaurantList({ restaurants, pagination }: RestaurantListProps) {
+export default function RestaurantList({
+  restaurants,
+  pagination,
+}: RestaurantListProps) {
   return (
     <>
       {/* PC */}
