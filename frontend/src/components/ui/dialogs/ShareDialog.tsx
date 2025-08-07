@@ -1,21 +1,13 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
-import { FaXTwitter } from "react-icons/fa6"
-import { Button } from '../buttons/Button'
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from './Dialog'
+import { useEffect, useState } from 'react'
+import { FaXTwitter } from 'react-icons/fa6'
 import { LuCopy, LuMail, LuShare } from 'react-icons/lu'
-import { useShare } from '~/hooks/useShare'
 import { toast } from 'sonner'
+import { useShare } from '~/hooks/useShare'
+import { Button } from '../buttons/Button'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './Dialog'
 
 interface ShareDialogProps {
   restaurantName: string
@@ -24,19 +16,27 @@ interface ShareDialogProps {
 
 export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogProps) {
   const [open, setOpen] = useState<boolean>(false)
+  const [currentUrl, setCurrentUrl] = useState<string>('')
   const { share } = useShare()
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setCurrentUrl(window.location.href)
+    }
+  }, [])
 
   const shareData = {
     title: restaurantName,
     text: `${restaurantAddress}をチェック`,
-    url: window.location.href,
+    url: currentUrl,
   }
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(window.location.href)
+      await navigator.clipboard.writeText(currentUrl)
       toast.success('リンクをコピーしました')
-    } catch (error) {
+    }
+    catch (error) {
       toast.error('リンクのコピーに失敗しました')
       console.error('Failed to copy link:', error)
     }
@@ -46,7 +46,7 @@ export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogPr
   const handleEmailShare = async () => {
     const subject = encodeURIComponent(`${restaurantName}の情報`)
     const body = encodeURIComponent(
-      `${restaurantName}をチェックしてみてください！\n\n${restaurantAddress}\n\n${window.location.href}`
+      `${restaurantName}をチェックしてみてください！\n\n${restaurantAddress}\n\n${currentUrl}`,
     )
     window.open(`mailto:?subject=${subject}&body=${body}`)
   }
@@ -54,9 +54,8 @@ export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogPr
   // TODO: テキスト変更
   const handleXShare = async () => {
     const text = encodeURIComponent(`${restaurantName}をチェック！`)
-    const url = encodeURIComponent(window.location.href)
+    const url = encodeURIComponent(currentUrl)
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`)
-
   }
 
   const handleMainShare = async () => {
@@ -92,25 +91,25 @@ export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogPr
           <Button
             variant="outline"
             onClick={handleCopyLink}
-            className="text-sm flex h-auto items-center py-3"
+            className="flex h-auto items-center py-3 text-sm"
           >
-            <LuCopy className='size-3 inline-block' />
+            <LuCopy className="inline-block size-3" />
             <span>リンクをコピー</span>
           </Button>
           <Button
             variant="outline"
             onClick={handleEmailShare}
-            className="text-sm flex h-auto items-center py-3"
+            className="flex h-auto items-center py-3 text-sm"
           >
-            <LuMail className='size-3 inline-block' />
+            <LuMail className="inline-block size-3" />
             <span>メール</span>
           </Button>
           <Button
             variant="outline"
             onClick={handleXShare}
-            className="text-sm flex h-auto items-center py-3"
+            className="flex h-auto items-center py-3 text-sm"
           >
-            <FaXTwitter className='size-3 inline-block' />
+            <FaXTwitter className="inline-block size-3" />
             <span>Twitter</span>
           </Button>
         </div>
