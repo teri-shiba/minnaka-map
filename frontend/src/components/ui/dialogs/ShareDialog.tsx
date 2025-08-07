@@ -19,6 +19,7 @@ export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogPr
   const [currentUrl, setCurrentUrl] = useState<string>('')
   const { share } = useShare()
 
+  // TODO: fix Lint Error
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setCurrentUrl(window.location.href)
@@ -43,7 +44,7 @@ export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogPr
   }
 
   // TODO: テキスト変更
-  const handleEmailShare = async () => {
+  const handleEmailShare = () => {
     const subject = encodeURIComponent(`${restaurantName} - みんなかマップ`)
     const body = encodeURIComponent(
       `店名: ${restaurantName}\n住所: ${restaurantAddress}\nURL: ${currentUrl}`,
@@ -52,14 +53,19 @@ export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogPr
   }
 
   // TODO: テキスト変更
-  const handleXShare = async () => {
+  const handleXShare = () => {
     const text = encodeURIComponent(`${restaurantName}をチェック！`)
     const url = encodeURIComponent(currentUrl)
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`)
   }
 
-  const handleMainShare = async () => {
-    share(shareData)
+  const handleMainShare = async (e: React.MouseEvent) => {
+    e.preventDefault()
+
+    if (!currentUrl)
+      return
+
+    await share(shareData)
   }
 
   return (
