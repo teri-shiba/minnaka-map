@@ -47,7 +47,7 @@ export function ShareDialog({ restaurantName, restaurantAddress, station }: Shar
       `${shareData.title}\n${shareData.text}\n${shareData.station}\n\n${shareData.url}`,
     )
     window.location.href = `mailto:?subject=${subject}&body=${body}`
-  }, [restaurantName, restaurantAddress, currentUrl])
+  }, [restaurantName, shareData])
 
   // TODO: テキスト変更
   const handleXShare = useCallback(() => {
