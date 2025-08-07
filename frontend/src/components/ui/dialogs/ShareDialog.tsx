@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { FaXTwitter } from 'react-icons/fa6'
 import { LuCopy, LuMail, LuShare } from 'react-icons/lu'
 import { toast } from 'sonner'
@@ -16,15 +16,10 @@ interface ShareDialogProps {
 
 export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogProps) {
   const [open, setOpen] = useState<boolean>(false)
-  const [currentUrl, setCurrentUrl] = useState<string>('')
+  const [currentUrl] = useState<string>(() => {
+    return typeof window !== 'undefined' ? window.location.href : ''
+  })
   const { share, isMobile } = useShare()
-
-  // TODO: fix Lint Error
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setCurrentUrl(window.location.href)
-    }
-  }, [])
 
   const shareData = {
     title: restaurantName,
