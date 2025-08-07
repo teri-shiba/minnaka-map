@@ -14,6 +14,9 @@ Rails.application.routes.draw do
       resources :midpoint, only: [:create]
       post "/validate_coordinates", to: "midpoint#validate"
 
+      resources :search_histories, only: [:create]
+      resources :favorites, only: [:index, :create, :destroy]
+
       namespace :user do
         resource :confirmations, only: [:update]
       end

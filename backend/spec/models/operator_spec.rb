@@ -13,7 +13,6 @@ RSpec.describe Operator, type: :model do
 
   describe "バリデーション" do
     it { should validate_presence_of(:name) }
-    # it { should validate_uniqueness_of(:name) }
     it { should validate_presence_of(:alias_name) }
   end
 

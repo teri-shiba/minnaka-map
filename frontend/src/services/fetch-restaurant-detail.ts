@@ -14,7 +14,7 @@ export async function fetchRestaurantDetail(id: string): Promise<RestaurantDetai
       format: 'json',
     })
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}?${searchParams}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}/?${searchParams}`, {
       next: {
         revalidate: CACHE_DURATION.RESTAURANT_INFO,
         tags: [`restaurant-detail-${id}`],

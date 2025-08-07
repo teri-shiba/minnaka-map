@@ -23,8 +23,8 @@ export default function StationSearchForm() {
     resolver: zodResolver(stationSearchSchema),
     defaultValues: {
       area: [
-        { areaValue: '', latitude: null, longitude: null },
-        { areaValue: '', latitude: null, longitude: null },
+        { areaValue: '', stationId: null, latitude: null, longitude: null },
+        { areaValue: '', stationId: null, latitude: null, longitude: null },
       ],
     },
     mode: 'onSubmit',
@@ -37,38 +37,63 @@ export default function StationSearchForm() {
   })
 
   const watchedArea = form.watch('area')
-  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+
   const processValidData = async (data: AreaFormValues) => {
     try {
-      const response = await fetch(`${baseURL}/midpoint`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      })
+      const stationIds = data.area
+        .filter(station => station.stationId !== null)
+        .map(station => station.stationId as number)
 
-      const result = await response.json()
-      if (!response.ok) {
+      if (typeof window !== 'undefined') {
+        const rawPrev = sessionStorage.getItem('pendingStationIds')
+        if (rawPrev) {
+          const prevIds = JSON.parse(rawPrev) as number[]
+          const sortedPrevIds = [...prevIds].sort((a, b) => a - b)
+          const sortedStationIds = [...stationIds].sort((a, b) => a - b)
+
+          const isSameStationIds
+            = sortedPrevIds.length === sortedStationIds.length
+              && sortedPrevIds.every((prevStationId, i) =>
+                prevStationId === sortedStationIds[i])
+
+          if (!isSameStationIds) {
+            sessionStorage.removeItem('pendingSearchHistoryId')
+          }
+        }
+
+        sessionStorage.setItem('pendingStationIds', JSON.stringify(stationIds))
+      }
+
+      const midpointResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/midpoint`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        },
+      )
+
+      const midpointResult = await midpointResponse.json()
+      if (!midpointResponse.ok) {
         throw new Error('APIリクエストに失敗しました')
       }
 
       const query: Record<string, string> = {
-        lat: result.midpoint.latitude,
-        lng: result.midpoint.longitude,
-        signature: result.signature,
+        lat: midpointResult.midpoint.latitude,
+        lng: midpointResult.midpoint.longitude,
+        signature: midpointResult.signature,
       }
 
-      if (result.expires_at) {
-        query.expires_at = result.expires_at
+      if (midpointResult.expires_at) {
+        query.expires_at = midpointResult.expires_at
       }
 
       const qs = new URLSearchParams(query).toString()
       router.push(`/result?${qs}`)
     }
     catch (error) {
-      logger(error, { tags: { component: 'StationSearchForm' } })
-      toast.error('フォームの送信に失敗しました')
+      logger(error, { tags: { component: 'StationSearchForm - processValidData' } })
+      toast.error('フォームの送信に失敗しました。時間を置いてから、再度お試しください。')
     }
   }
 
@@ -125,10 +150,11 @@ export default function StationSearchForm() {
                         <StationAutocomplete
                           {...field}
                           value={field.value}
-                          onChange={(value, latitude, longitude) => {
+                          onChange={(value, stationId, latitude, longitude) => {
                             field.onChange(value)
-                            form.setValue(`area.${index}.latitude`, Number(latitude))
-                            form.setValue(`area.${index}.longitude`, Number(longitude))
+                            form.setValue(`area.${index}.stationId`, stationId || null)
+                            form.setValue(`area.${index}.latitude`, latitude ? Number(latitude) : null)
+                            form.setValue(`area.${index}.longitude`, longitude ? Number(longitude) : null)
                           }}
                           placeholder={`${index + 1}人目の出発駅`}
                           excludedStations={excludedStations}

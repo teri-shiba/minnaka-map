@@ -81,6 +81,9 @@ export function useAuth() {
         await api.delete('/auth/sign_out')
         mutate('/current/user/show_status')
         resetUser()
+        sessionStorage.removeItem('pendingStationIds')
+        sessionStorage.removeItem('pendingSearchHistoryId')
+        // TODO: ErrorToastHandler にまとめることで、トースト発火→リダイレクトという変な挙動をなくす
         toast.success('ログアウトしました')
       }
       catch {
