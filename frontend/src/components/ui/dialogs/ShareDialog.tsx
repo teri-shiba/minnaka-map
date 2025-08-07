@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { FaXTwitter } from 'react-icons/fa6'
 import { LuCopy, LuMail, LuShare } from 'react-icons/lu'
 import { toast } from 'sonner'
@@ -21,13 +21,13 @@ export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogPr
   })
   const { share, isMobile } = useShare()
 
-  const shareData = {
+  const shareData = useMemo(() => ({
     title: restaurantName,
     text: `${restaurantAddress}をチェック`,
     url: currentUrl,
-  }
+  }), [restaurantName, restaurantAddress, currentUrl])
 
-  const handleCopyLink = async () => {
+  const handleCopyLink = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(currentUrl)
       toast.success('リンクをコピーしました')
@@ -36,25 +36,25 @@ export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogPr
       toast.error('リンクのコピーに失敗しました')
       console.error('Failed to copy link:', error)
     }
-  }
+  }, [currentUrl])
 
   // TODO: テキスト変更
-  const handleEmailShare = () => {
+  const handleEmailShare = useCallback(() => {
     const subject = encodeURIComponent(`${restaurantName} - みんなかマップ`)
     const body = encodeURIComponent(
       `店名: ${restaurantName}\n住所: ${restaurantAddress}\nURL: ${currentUrl}`,
     )
     window.location.href = `mailto:?subject=${subject}&body=${body}`
-  }
+  }, [restaurantName, restaurantAddress, currentUrl])
 
   // TODO: テキスト変更
-  const handleXShare = () => {
+  const handleXShare = useCallback(() => {
     const text = encodeURIComponent(`${restaurantName}をチェック！`)
     const url = encodeURIComponent(currentUrl)
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`)
-  }
+  }, [restaurantName, currentUrl])
 
-  const handleMainShare = async (e: React.MouseEvent) => {
+  const handleMainShare = useCallback(async (e: React.MouseEvent) => {
     if (!currentUrl)
       return
 
@@ -62,7 +62,25 @@ export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogPr
       e.preventDefault()
 
     await share(shareData)
-  }
+  }, [currentUrl, isMobile, shareData, share])
+
+  const options = useMemo(() => [
+    {
+      icon: LuCopy,
+      label: 'リンクをコピーする',
+      onClick: handleCopyLink,
+    },
+    {
+      icon: LuMail,
+      label: 'メールでシェアする',
+      onClick: handleEmailShare,
+    },
+    {
+      icon: FaXTwitter,
+      label: 'X でシェアする',
+      onClick: handleXShare,
+    },
+  ], [handleCopyLink, handleEmailShare, handleXShare])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -72,7 +90,7 @@ export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogPr
           シェアする
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[470px]">
+      <DialogContent className="w-[calc(100vw-3rem)] sm:max-w-[470px]">
         <DialogHeader>
           <DialogTitle className="mx-auto">
             <div className="flex items-center gap-2 py-2">
@@ -89,31 +107,18 @@ export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogPr
             気になるお店をみんなにシェアしよう！
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-3 gap-3">
-          <Button
-            variant="outline"
-            onClick={handleCopyLink}
-            className="flex h-auto items-center py-3 text-sm"
-          >
-            <LuCopy className="inline-block size-3" />
-            <span>リンクをコピー</span>
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleEmailShare}
-            className="flex h-auto items-center py-3 text-sm"
-          >
-            <LuMail className="inline-block size-3" />
-            <span>メール</span>
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleXShare}
-            className="flex h-auto items-center py-3 text-sm"
-          >
-            <FaXTwitter className="inline-block size-3" />
-            <span>Twitter</span>
-          </Button>
+        <div className="flex flex-col gap-3">
+          {options.map(({ icon: Icon, label, onClick }) => (
+            <Button
+              key={label}
+              variant="outline"
+              className="flex h-auto items-center py-3 text-sm"
+              onClick={onClick}
+            >
+              <Icon className="inline-block size-3" />
+              {label}
+            </Button>
+          ))}
         </div>
       </DialogContent>
     </Dialog>
