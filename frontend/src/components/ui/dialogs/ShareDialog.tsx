@@ -49,9 +49,8 @@ export function ShareDialog({ restaurantName, restaurantAddress, station }: Shar
     window.location.href = `mailto:?subject=${subject}&body=${body}`
   }, [restaurantName, shareData])
 
-  // TODO: テキスト変更
   const handleXShare = useCallback(() => {
-    const text = encodeURIComponent(`${restaurantName}をチェック！`)
+    const text = encodeURIComponent(`「${restaurantName}」に集まろう！\nみんなのまんなか #みんなかマップ`)
     const url = encodeURIComponent(currentUrl)
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`)
   }, [restaurantName, currentUrl])
