@@ -17,7 +17,7 @@ interface ShareDialogProps {
 export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogProps) {
   const [open, setOpen] = useState<boolean>(false)
   const [currentUrl, setCurrentUrl] = useState<string>('')
-  const { share } = useShare()
+  const { share, isMobile } = useShare()
 
   // TODO: fix Lint Error
   useEffect(() => {
@@ -60,10 +60,11 @@ export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogPr
   }
 
   const handleMainShare = async (e: React.MouseEvent) => {
-    e.preventDefault()
-
     if (!currentUrl)
       return
+
+    if (typeof navigator !== 'undefined' && 'share' in navigator && isMobile)
+      e.preventDefault()
 
     await share(shareData)
   }
