@@ -44,11 +44,11 @@ export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogPr
 
   // TODO: テキスト変更
   const handleEmailShare = async () => {
-    const subject = encodeURIComponent(`${restaurantName}の情報`)
+    const subject = encodeURIComponent(`${restaurantName} - みんなかマップ`)
     const body = encodeURIComponent(
-      `${restaurantName}をチェックしてみてください！\n\n${restaurantAddress}\n\n${currentUrl}`,
+      `店名: ${restaurantName}\n住所: ${restaurantAddress}\nURL: ${currentUrl}`,
     )
-    window.open(`mailto:?subject=${subject}&body=${body}`)
+    window.location.href = `mailto:?subject=${subject}&body=${body}`
   }
 
   // TODO: テキスト変更
