@@ -1,8 +1,8 @@
 import Image from 'next/image'
-import { LuArrowUpRight, LuShare } from 'react-icons/lu'
+import { LuArrowUpRight } from 'react-icons/lu'
 import FavoriteButton from '~/components/features/restaurant/FavoriteButton'
 import Section from '~/components/layout/Section'
-import { Button } from '~/components/ui/buttons/Button'
+import { ShareDialog } from '~/components/ui/dialogs/ShareDialog'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '~/components/ui/table/Table'
 import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
 import { getApiKey } from '~/services/get-api-key'
@@ -68,10 +68,10 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
           </ul>
         </div>
         <div className="mb-4 ml-auto flex gap-4">
-          <Button variant="outline" className="w-32">
-            <LuShare />
-            シェアする
-          </Button>
+          <ShareDialog
+            restaurantName={name}
+            restaurantAddress={address}
+          />
           <FavoriteButton
             hotPepperId={id}
             initialHistoryId={historyId}
