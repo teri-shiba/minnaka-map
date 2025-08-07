@@ -9,6 +9,7 @@ interface ShareData {
 
 interface UseShareReturn {
   share: (data: ShareData) => Promise<void>
+  isMobile: boolean
 }
 
 export function useShare(): UseShareReturn {
@@ -36,5 +37,5 @@ export function useShare(): UseShareReturn {
       }
     }
   }, [isMobile])
-  return { share }
+  return { share, isMobile }
 }
