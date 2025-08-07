@@ -13,9 +13,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 interface ShareDialogProps {
   restaurantName: string
   restaurantAddress: string
+  station: string
 }
 
-export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogProps) {
+export function ShareDialog({ restaurantName, restaurantAddress, station }: ShareDialogProps) {
   const [open, setOpen] = useState<boolean>(false)
   const pathname = usePathname()
   const origin = typeof window !== 'undefined' ? window.location.origin : ''
@@ -23,10 +24,11 @@ export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogPr
   const { share, isMobile } = useShare()
 
   const shareData = useMemo(() => ({
-    title: restaurantName,
-    text: `${restaurantAddress}をチェック`,
-    url: currentUrl,
-  }), [restaurantName, restaurantAddress, currentUrl])
+    title: `店名: ${restaurantName}`,
+    text: `住所: ${restaurantAddress}`,
+    station: `最寄駅: ${station}`,
+    url: `URL: ${currentUrl}`,
+  }), [restaurantName, restaurantAddress, station, currentUrl])
 
   const handleCopyLink = useCallback(async () => {
     try {
@@ -39,11 +41,10 @@ export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogPr
     }
   }, [currentUrl])
 
-  // TODO: テキスト変更
   const handleEmailShare = useCallback(() => {
     const subject = encodeURIComponent(`${restaurantName} - みんなかマップ`)
     const body = encodeURIComponent(
-      `店名: ${restaurantName}\n住所: ${restaurantAddress}\nURL: ${currentUrl}`,
+      `${shareData.title}\n${shareData.text}\n${shareData.station}\n\n${shareData.url}`,
     )
     window.location.href = `mailto:?subject=${subject}&body=${body}`
   }, [restaurantName, restaurantAddress, currentUrl])
@@ -101,7 +102,7 @@ export function ShareDialog({ restaurantName, restaurantAddress }: ShareDialogPr
                 width={24}
                 height={24}
               />
-              <h2>このお店をシェアする</h2>
+              <h2>このお店をシェア</h2>
             </div>
           </DialogTitle>
           <DialogDescription className="text-center">
