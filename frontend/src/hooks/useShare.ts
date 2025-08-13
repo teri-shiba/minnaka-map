@@ -2,11 +2,11 @@ import { useCallback } from 'react'
 import { useMediaQuery } from '~/hooks/useMediaQuery'
 import { logger } from '~/lib/logger'
 
+export type SharePayload = Pick<ShareData, 'title' | 'text' | 'url'>
+
 type ShareResult =
   | { readonly ok: true }
   | { readonly ok: false, readonly reason: 'unsupported' | 'failed' }
-
-type SharePayload = Pick<ShareData, 'title' | 'text' | 'url'>
 
 interface UseShareReturn {
   readonly share: (data: SharePayload) => Promise<ShareResult>

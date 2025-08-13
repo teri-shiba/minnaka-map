@@ -1,5 +1,6 @@
 'use client'
 
+import type { SharePayload } from '~/hooks/useShare'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useCallback, useMemo, useState } from 'react'
@@ -32,13 +33,13 @@ export function ShareDialog({
     return new URL(pathname, window.location.origin).toString()
   }, [pathname])
 
-  const sharePayload = useMemo<Pick<ShareData, 'title' | 'text' | 'url'>>(
+  const sharePayload: SharePayload = useMemo(
     () => ({
       title: `${restaurantName} [みんなかマップ]`,
       text: `店名: ${restaurantName}\n住所: ${restaurantAddress}\n最寄駅: ${station}`,
-      url: `currentUrl`,
+      url: currentUrl,
     }),
-    [restaurantName, restaurantAddress, station],
+    [restaurantName, restaurantAddress, station, currentUrl],
   )
 
   const handleCopyLink = useCallback(async () => {
