@@ -6,7 +6,8 @@ import { useCallback, useMemo, useState } from 'react'
 import { FaXTwitter } from 'react-icons/fa6'
 import { LuCopy, LuMail, LuShare } from 'react-icons/lu'
 import { toast } from 'sonner'
-import { useShare } from '~/hooks/useShare'
+import useShare from '~/hooks/useShare'
+import { logger } from '~/lib/logger'
 import { Button } from '../buttons/Button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './Dialog'
 
@@ -16,19 +17,29 @@ interface ShareDialogProps {
   station: string
 }
 
-export function ShareDialog({ restaurantName, restaurantAddress, station }: ShareDialogProps) {
+export function ShareDialog({
+  restaurantName,
+  restaurantAddress,
+  station,
+}: ShareDialogProps) {
   const [open, setOpen] = useState<boolean>(false)
-  const pathname = usePathname()
-  const origin = typeof window !== 'undefined' ? window.location.origin : ''
-  const currentUrl = useMemo(() => `${origin}${pathname}`, [origin, pathname])
-  const { share, isMobile } = useShare()
+  const { share, canNativeShare, isMobile } = useShare()
 
-  const shareData = useMemo(() => ({
-    title: `店名: ${restaurantName}`,
-    text: `住所: ${restaurantAddress}`,
-    station: `最寄駅: ${station}`,
-    url: `URL: ${currentUrl}`,
-  }), [restaurantName, restaurantAddress, station, currentUrl])
+  const pathname = usePathname()
+  const currentUrl = useMemo(() => {
+    if (typeof window === 'undefined')
+      return ''
+    return new URL(pathname, window.location.origin).toString()
+  }, [pathname])
+
+  const sharePayload = useMemo<Pick<ShareData, 'title' | 'text' | 'url'>>(
+    () => ({
+      title: `${restaurantName} [みんなかマップ]`,
+      text: `店名: ${restaurantName}\n住所: ${restaurantAddress}\n最寄駅: ${station}`,
+      url: `currentUrl`,
+    }),
+    [restaurantName, restaurantAddress, station],
+  )
 
   const handleCopyLink = useCallback(async () => {
     try {
@@ -37,33 +48,39 @@ export function ShareDialog({ restaurantName, restaurantAddress, station }: Shar
     }
     catch (error) {
       toast.error('リンクのコピーに失敗しました')
-      console.error('Failed to copy link:', error)
+      logger(error, { tags: { component: 'handleCopyLink' } })
     }
   }, [currentUrl])
 
   const handleEmailShare = useCallback(() => {
-    const subject = encodeURIComponent(`${restaurantName} - みんなかマップ`)
+    const subject = encodeURIComponent(`${restaurantName} [みんなかマップ]`)
     const body = encodeURIComponent(
-      `${shareData.title}\n${shareData.text}\n${shareData.station}\n\n${shareData.url}`,
+      `${sharePayload.text}\n\n${sharePayload.url}`,
     )
     window.location.href = `mailto:?subject=${subject}&body=${body}`
-  }, [restaurantName, shareData])
+  }, [restaurantName, sharePayload])
 
   const handleXShare = useCallback(() => {
     const text = encodeURIComponent(`「${restaurantName}」に集まろう！\nみんなのまんなか #みんなかマップ`)
     const url = encodeURIComponent(currentUrl)
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`)
+    const intent = `https://twitter.com/intent/tweet?text=${text}&url=${url}`
+    window.open(intent, '_blank', 'noopener,noreferrer')
   }, [restaurantName, currentUrl])
 
-  const handleMainShare = useCallback(async (e: React.MouseEvent) => {
-    if (!currentUrl)
-      return
+  const handleMainShare = useCallback(
+    async (e: React.MouseEvent) => {
+      if (!currentUrl)
+        return
 
-    if (typeof navigator !== 'undefined' && 'share' in navigator && isMobile)
-      e.preventDefault()
-
-    await share(shareData)
-  }, [currentUrl, isMobile, shareData, share])
+      if (canNativeShare && isMobile) {
+        e.preventDefault()
+        const response = await share(sharePayload)
+        if (!response.ok)
+          setOpen(true)
+      }
+    },
+    [currentUrl, canNativeShare, isMobile, sharePayload, share],
+  )
 
   const options = useMemo(() => [
     {
