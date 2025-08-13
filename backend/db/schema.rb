@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_08_05_064317) do
+ActiveRecord::Schema[7.2].define(version: 2025_08_13_062052) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "uuid-ossp"
@@ -51,6 +51,21 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_05_064317) do
     t.bigint "station_id", null: false
     t.index ["search_history_id"], name: "index_search_history_start_stations_on_search_history_id"
     t.index ["station_id"], name: "index_search_history_start_stations_on_station_id"
+  end
+
+  create_table "shared_favorite_lists", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "search_history_id", null: false
+    t.string "title", null: false
+    t.uuid "share_uuid", default: -> { "uuid_generate_v4()" }, null: false
+    t.boolean "is_public", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["is_public", "created_at"], name: "index_shared_favorite_lists_on_is_public_and_created_at"
+    t.index ["search_history_id"], name: "index_shared_favorite_lists_on_search_history_id"
+    t.index ["share_uuid"], name: "index_shared_favorite_lists_on_share_uuid", unique: true
+    t.index ["user_id", "created_at"], name: "index_shared_favorite_lists_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_shared_favorite_lists_on_user_id"
   end
 
   create_table "stations", force: :cascade do |t|
@@ -107,6 +122,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_05_064317) do
   add_foreign_key "search_histories", "users"
   add_foreign_key "search_history_start_stations", "search_histories"
   add_foreign_key "search_history_start_stations", "stations"
+  add_foreign_key "shared_favorite_lists", "search_histories"
+  add_foreign_key "shared_favorite_lists", "users"
   add_foreign_key "stations", "operators"
   add_foreign_key "user_auths", "users"
 end
