@@ -16,6 +16,7 @@ Rails.application.routes.draw do
 
       resources :search_histories, only: [:create]
       resources :favorites, only: [:index, :create, :destroy]
+      resources :shared_lists, only: [:create, :show], param: :share_uuid
 
       namespace :user do
         resource :confirmations, only: [:update]
