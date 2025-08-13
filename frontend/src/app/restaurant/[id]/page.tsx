@@ -1,8 +1,8 @@
 import Image from 'next/image'
-import { LuArrowUpRight, LuShare } from 'react-icons/lu'
+import { LuArrowUpRight } from 'react-icons/lu'
 import FavoriteButton from '~/components/features/restaurant/FavoriteButton'
 import Section from '~/components/layout/Section'
-import { Button } from '~/components/ui/buttons/Button'
+import { ShareDialog } from '~/components/ui/dialogs/ShareDialog'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '~/components/ui/table/Table'
 import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
 import { getApiKey } from '~/services/get-api-key'
@@ -68,10 +68,11 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
           </ul>
         </div>
         <div className="mb-4 ml-auto flex gap-4">
-          <Button variant="outline" className="w-32">
-            <LuShare />
-            シェアする
-          </Button>
+          <ShareDialog
+            restaurantName={name}
+            restaurantAddress={address}
+            station={station}
+          />
           <FavoriteButton
             hotPepperId={id}
             initialHistoryId={historyId}
@@ -79,14 +80,14 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
         </div>
       </div>
       <div className="md:flex md:flex-row md:justify-between md:gap-6 md:pt-8">
-        <div className="mx-auto mb-6 max-w-96 md:mb-0 md:h-[168px] md:w-[223px] md:shrink-0">
-          <div className="relative overflow-hidden rounded-lg bg-gray-100">
+        <div className="mx-auto mb-6 md:mb-0 md:shrink-0">
+          <div className="relative max-w-96 overflow-hidden rounded-lg bg-gray-100 md:w-[223px]">
             <Image
               src={imageUrl || '/placeholder.svg'}
               alt={name}
               width={223}
               height={168}
-              className="size-full object-cover blur-[0.5px] brightness-105"
+              className="aspect-3/2 size-full object-cover blur-[0.5px] brightness-105 md:aspect-square"
             />
             <div
               className="absolute inset-0"
