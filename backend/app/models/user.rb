@@ -2,6 +2,7 @@ class User < ApplicationRecord
   has_many :user_auth, dependent: :destroy
   has_many :search_histories, dependent: :destroy
   has_many :favorites, dependent: :destroy
+  has_many :shared_favorite_lists, dependent: :destroy
 
   validates :name, presence: true
 
