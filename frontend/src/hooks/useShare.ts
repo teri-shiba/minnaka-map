@@ -1,5 +1,6 @@
-import { useCallback } from 'react'
-import { useMediaQuery } from './useMediaQuery'
+import { useCallback, useMemo } from 'react'
+import { logger } from '~/lib/logger'
+import { useMediaQuery } from '~/hooks/useMediaQuery'
 
 interface ShareData {
   title: string
@@ -7,35 +8,59 @@ interface ShareData {
   url: string
 }
 
+type ShareResult =
+  | { readonly ok: true }
+  | { readonly ok: false, readonly reason: 'unsupported' | 'failed' }
+
+type SharePayload = Pick<ShareData, 'title' | 'text' | 'url'>
+
 interface UseShareReturn {
-  share: (data: ShareData) => Promise<void>
-  isMobile: boolean
+  readonly share: (data: SharePayload) => Promise<ShareResult>
+  readonly isMobile: boolean
+  readonly canNativeShare: boolean
 }
 
 export function useShare(): UseShareReturn {
   const isMobile = useMediaQuery('(max-width: 768px)')
 
-  const share = useCallback(async (data: ShareData) => {
-    if (
-      typeof navigator !== 'undefined'
-      && 'share' in navigator
-      && isMobile
-    ) {
+  const canNativeShare = useMemo(
+    () => typeof navigator !== 'undefined' && 'share' in navigator,
+    [],
+  )
+
+  const share = useCallback(
+    async (data: SharePayload): Promise<ShareResult> => {
+      if (!(canNativeShare && isMobile)) {
+        return { ok: false, reason: 'unsupported' }
+      }
       try {
         await navigator.share({
           title: data.title,
           text: data.text,
           url: data.url,
         })
+        return { ok: true }
       }
-      catch (error) {
-        if (error instanceof Error && error.name === 'AbortError')
-          return
+      catch (error: unknown) {
+        if (
+          error
+          && typeof error === 'object'
+          && 'name' in error
+          && (error as { name?: string }).name === 'AbortError'
+        ) {
+          return { ok: true }
+        }
 
-        // TODO: エラーハンドリングの修正
-        console.warn('Web Share API failed, falling back to custom dialog:', error)
+        logger(error, {
+          message: 'share failed',
+          tags: { component: 'useShare' },
+        })
+
+        return { ok: false, reason: 'failed' }
       }
-    }
-  }, [isMobile])
-  return { share, isMobile }
+    },
+    [canNativeShare, isMobile],
+  )
+
+  return { canNativeShare, share, isMobile }
 }
