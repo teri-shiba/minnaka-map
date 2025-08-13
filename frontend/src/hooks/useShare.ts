@@ -1,12 +1,6 @@
-import { useCallback, useMemo } from 'react'
-import { logger } from '~/lib/logger'
+import { useCallback } from 'react'
 import { useMediaQuery } from '~/hooks/useMediaQuery'
-
-interface ShareData {
-  title: string
-  text: string
-  url: string
-}
+import { logger } from '~/lib/logger'
 
 type ShareResult =
   | { readonly ok: true }
@@ -20,13 +14,10 @@ interface UseShareReturn {
   readonly canNativeShare: boolean
 }
 
-export function useShare(): UseShareReturn {
+export default function useShare(): UseShareReturn {
   const isMobile = useMediaQuery('(max-width: 768px)')
 
-  const canNativeShare = useMemo(
-    () => typeof navigator !== 'undefined' && 'share' in navigator,
-    [],
-  )
+  const canNativeShare = typeof navigator !== 'undefined' && 'share' in navigator
 
   const share = useCallback(
     async (data: SharePayload): Promise<ShareResult> => {
@@ -34,11 +25,7 @@ export function useShare(): UseShareReturn {
         return { ok: false, reason: 'unsupported' }
       }
       try {
-        await navigator.share({
-          title: data.title,
-          text: data.text,
-          url: data.url,
-        })
+        await navigator.share(data)
         return { ok: true }
       }
       catch (error: unknown) {
