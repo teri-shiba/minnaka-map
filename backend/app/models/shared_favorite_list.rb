@@ -9,7 +9,15 @@ class SharedFavoriteList < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   scope :by_user, ->(user_id) { where(user_id: user_id) }
 
+  before_validation :ensure_share_uuid, on: :create
+
   def to_param
     share_uuid
   end
+
+  private
+
+    def ensure_share_uuid
+      self.share_uuid ||= SecureRandom.uuid
+    end
 end
