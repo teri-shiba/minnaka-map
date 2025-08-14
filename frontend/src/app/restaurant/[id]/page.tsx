@@ -2,7 +2,7 @@ import Image from 'next/image'
 import { LuArrowUpRight } from 'react-icons/lu'
 import FavoriteButton from '~/components/features/restaurant/FavoriteButton'
 import Section from '~/components/layout/Section'
-import { ShareDialog } from '~/components/ui/dialogs/ShareDialog'
+import ShareRestaurantDialog from '~/components/ui/dialogs/ShareRestaurantDialog'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '~/components/ui/table/Table'
 import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
 import { getApiKey } from '~/services/get-api-key'
@@ -68,7 +68,7 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
           </ul>
         </div>
         <div className="mb-4 ml-auto flex gap-4">
-          <ShareDialog
+          <ShareRestaurantDialog
             restaurantName={name}
             restaurantAddress={address}
             station={station}
