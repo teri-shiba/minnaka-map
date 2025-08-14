@@ -9,7 +9,8 @@ interface SharedListPageProps {
 }
 
 export default async function SharedListPage({ params }: SharedListPageProps) {
-  const sharedListResult = await fetchSharedList(params.shareUuid)
+  const { shareUuid } = await params
+  const sharedListResult = await fetchSharedList(shareUuid)
 
   if (!sharedListResult.success)
     notFound()
