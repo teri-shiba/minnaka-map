@@ -137,7 +137,7 @@ export async function fetchRestaurantsByIds(
     const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}/?${searchParams}`, {
       next: {
         revalidate: CACHE_DURATION.RESTAURANT_INFO,
-        tags: [`restaurants-ids-${opts.restaurantIds.join('-')}`],
+        tags: [`restaurants-by-ids`],
       },
     })
 
