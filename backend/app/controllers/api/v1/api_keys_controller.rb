@@ -30,6 +30,6 @@ class Api::V1::ApiKeysController < ApplicationController
     end
 
     def render_error(message, status)
-      render json: { error: message }, status: :status
+      render json: { error: message }, status: status
     end
 end
