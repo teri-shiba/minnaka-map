@@ -37,12 +37,20 @@ class Api::V1::SharedListsController < Api::V1::BaseController
       render_error("共有リストが見つかりません", :not_found)
     end
 
+    def render_success(data: nil, status: :ok)
+      render json: { success: true, data: data }, status: status
+    end
+
+    def render_error(message, status)
+      render json: { success: false, message: message }, status: status
+    end
+
     def shared_list_data
       {
         title: @shared_list.title,
         created_at: @shared_list.created_at,
         search_history: {
-          id: @shared_list.search_history_id,
+          id: @shared_list.search_history.id,
           station_names: @shared_list.search_history.station_names,
         },
         favorites: @shared_list.search_history.favorites.map do |favorite|
