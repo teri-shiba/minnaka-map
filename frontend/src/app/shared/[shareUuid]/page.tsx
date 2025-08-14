@@ -1,5 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import RestaurantCard from '~/components/features/restaurant/RestaurantCard'
+import Section from '~/components/layout/Section'
 import { fetchRestaurantsByIds } from '~/services/fetch-restaurants'
 import { fetchSharedList } from '~/services/fetch-shared-list'
 
@@ -24,21 +25,25 @@ export default async function SharedListPage({ params }: SharedListPageProps) {
 
   return (
     <>
-      <header>
-        <h1>{sharedListData.title}</h1>
-        <p>
-          おすすめのレストラン
+      <header className="flex h-32 flex-col items-center justify-center bg-secondary md:h-48">
+        <h1 className="px-5 text-lg font-bold sm:text-2xl">
+          {sharedListData.title}
+          のまんなかのお店
+          {' '}
           {sharedListData.favorites.length}
-        </p>
+          選
+        </h1>
       </header>
-      <div className="">
-        {restaurants.map(restaurant => (
-          <RestaurantCard
-            key={restaurant.id}
-            restaurant={restaurant}
-          />
-        ))}
-      </div>
+      <Section className="py-8 md:py-10">
+        <div className="mx-auto max-w-lg space-y-4">
+          {restaurants.map(restaurant => (
+            <RestaurantCard
+              key={restaurant.id}
+              restaurant={restaurant}
+            />
+          ))}
+        </div>
+      </Section>
     </>
   )
 }
