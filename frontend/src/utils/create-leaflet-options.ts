@@ -14,7 +14,7 @@ export function createLeafletOptions(
   }
 
   return {
-    zoom: isMobile ? 14 : 15,
+    zoom: isMobile ? 15 : 17,
     minZoom: 14,
     maxZoom: 18,
     zoomSnap: 1,
