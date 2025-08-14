@@ -17,7 +17,6 @@ class Api::V1::SharedListsController < Api::V1::BaseController
         data: {
           share_uuid: @shared_list.share_uuid,
           title: @shared_list.title,
-          share_url: "#{request.base_url}/shared/#{@shared_list.share_uuid}",
         },
       )
     else
