@@ -7,6 +7,7 @@ import { apiFetch } from './api-client'
 export interface SharedListData {
   share_uuid: string
   title: string
+  is_existing: boolean
 }
 
 interface CreateSharedListResponse {

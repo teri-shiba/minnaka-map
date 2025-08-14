@@ -4,24 +4,9 @@ class Api::V1::SharedListsController < Api::V1::BaseController
 
   def create
     @search_history = current_user.user.search_histories.find(params[:search_history_id])
+    @shared_list, @is_existing = find_or_create_shared_list(@search_history)
 
-    title = @search_history.station_names.join("・")
-
-    @shared_list = current_user.user.shared_favorite_lists.build(
-      search_history: @search_history,
-      title: title,
-    )
-
-    if @shared_list.save
-      render_success(
-        data: {
-          share_uuid: @shared_list.share_uuid,
-          title: @shared_list.title,
-        },
-      )
-    else
-      render_error(@shared_list.errors.full_messages.join(", "), :unprocessable_entity)
-    end
+    render_success(data: shared_list_response)
   end
 
   def show
@@ -29,6 +14,43 @@ class Api::V1::SharedListsController < Api::V1::BaseController
   end
 
   private
+
+    def find_or_create_shared_list(search_history)
+      existing_list = find_existing_shared_list(search_history)
+      return [existing_list, true] if existing_list
+
+      new_list = create_new_shared_list(search_history)
+      [new_list, false]
+    end
+
+    def find_existing_shared_list(search_history)
+      current_user.user.shared_favorite_lists.
+        where(search_history: search_history, is_public: true).
+        first
+    end
+
+    def create_new_shared_list(search_history)
+      title = search_history.station_names.join("・")
+      shared_list = current_user.user.shared_favorite_lists.build(
+        search_history: search_history,
+        title: title,
+      )
+
+      unless shared_list.save
+        render_error(shared_list.errors.full_messages.join(", "), :unprocessable_entity)
+        return
+      end
+
+      shared_list
+    end
+
+    def shared_list_response
+      {
+        share_uuid: @shared_list.share_uuid,
+        title: @shared_list.title,
+        is_existing: @is_existing,
+      }
+    end
 
     def set_shared_list
       @shared_list = SharedFavoriteList.public_lists.find_by!(share_uuid: params[:share_uuid])
