@@ -47,8 +47,8 @@ export default function ShareFavoriteListDialog({
       if (!shareUrl || !title)
         return
 
-      const subject = encodeURIComponent(`${title}で集まるおすすめリスト [みんなかマップ]`)
-      const body = encodeURIComponent(`${title}から集まるのにおすすめのレストランを今すぐチェックしよう！\n\n詳細はこちら：\n${shareUrl}`)
+      const subject = encodeURIComponent(`${title}のまんなかのお店 [みんなかマップ]`)
+      const body = encodeURIComponent(`${title}のまんなかのお店を今すぐチェックしよう！\n\n詳細はこちら：\n${shareUrl}`)
       window.location.href = `mailto:?subject=${subject}&body=${body}`
     },
     [shareUrl, title],
@@ -59,7 +59,7 @@ export default function ShareFavoriteListDialog({
       if (!shareUrl || !title)
         return
 
-      const text = encodeURIComponent(`「${title}」から集まるおすすめのレストランリストをシェア！\nみんなのまんなか #みんなかマップ`)
+      const text = encodeURIComponent(`「${title}」のまんなかのお店をシェア！\nみんなのまんなか #みんなかマップ`)
       const url = encodeURIComponent(shareUrl)
       const intent = `https://twitter.com/intent/tweet?text=${text}&url=${url}`
       window.open(intent, '_blank', 'noopener,noreferrer')
@@ -108,11 +108,11 @@ export default function ShareFavoriteListDialog({
                 width={24}
                 height={24}
               />
-              <h2>リストをシェア</h2>
+              <h2 className="text-xl">お気に入りリストをシェア</h2>
             </div>
           </DialogTitle>
           <DialogDescription className="text-center">
-            おすすめリストをシェアしよう！
+            お気に入りしたお店をみんなにシェアしよう！
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3">
