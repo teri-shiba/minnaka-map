@@ -9,8 +9,8 @@ class Api::V1::SharedListsController < Api::V1::BaseController
     app_user = current_user.user
     search_history = app_user.search_histories.find(search_history_id)
 
-    shared_list = app_user.shared_favorite_lists.
-                    public_lists.
+    shared_list = SharedFavoriteList.public_lists.
+                    owned_by(app_user).
                     find_by(search_history: search_history)
     is_existing = shared_list.present?
 
