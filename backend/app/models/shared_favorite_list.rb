@@ -2,18 +2,21 @@ class SharedFavoriteList < ApplicationRecord
   belongs_to :user
   belongs_to :search_history
 
+  scope :owned_by, ->(user) { where(user_id: user.respond_to?(:id) ? user.id : user) }
+  scope :public_lists, -> { where(is_public: true) }
+
   validates :title, presence: true, length: { maximum: 255 }
   validates :share_uuid, presence: true, uniqueness: true
-
-  scope :by_user, ->(user_id) { where(user_id: user_id) }
-  scope :recent, -> { order(created_at: :desc) }
-  scope :public_lists, -> { where(is_public: true) }
+  validates :search_history_id,
+            uniqueness: {
+              scope: :user_id,
+              conditions: -> { where(is_public: true) },
+              message: "の公開リストはすでに存在します",
+            }
 
   before_validation :ensure_share_uuid, on: :create
 
-  def to_param
-    share_uuid
-  end
+  def to_param = share_uuid
 
   private
 
