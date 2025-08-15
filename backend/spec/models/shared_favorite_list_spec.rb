@@ -34,26 +34,9 @@ RSpec.describe SharedFavoriteList, type: :model do
   end
 
   describe "スコープメソッド" do
-    let!(:public_list) do
-      create(:shared_favorite_list,
-             user:,
-             search_history: create(:search_history, user:),
-             is_public: true)
-    end
-
-    let!(:private_list) do
-      create(:shared_favorite_list,
-             user:,
-             search_history: create(:search_history, user:),
-             is_public: false)
-    end
-
-    let!(:_sentinel_other) do
-      other = create(:user)
-      create(:shared_favorite_list,
-             user: other,
-             search_history: create(:search_history, user: other))
-    end
+    let!(:public_list)  { create(:shared_favorite_list, :public,  user:) }
+    let!(:private_list) { create(:shared_favorite_list, :private, user:) }
+    let!(:_sentinel_other) { create(:shared_favorite_list) }
 
     describe ".owned_by" do
       it "ユーザーIDを渡すと、そのユーザーのリストだけ返す" do
