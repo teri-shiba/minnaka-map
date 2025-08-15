@@ -9,30 +9,6 @@ RSpec.describe SharedFavoriteList, type: :model do
     it { should belong_to(:search_history).required(true) }
   end
 
-  describe "バリデーション" do
-    subject { create(:shared_favorite_list, user:, search_history:) }
-
-    it { should validate_presence_of(:title) }
-    it { should validate_length_of(:title).is_at_most(255) }
-    it { should validate_uniqueness_of(:share_uuid).ignoring_case_sensitivity }
-  end
-
-  describe "ファクトリ" do
-    subject(:shared_list) { create(:shared_favorite_list, user:, search_history:) }
-
-    it "有効なファクトリを持つこと" do
-      expect(build(:shared_favorite_list)).to be_valid
-    end
-
-    it "user, search_history, title が正しく設定されること" do
-      aggregate_failures do
-        expect(shared_list.user).to eq(user)
-        expect(shared_list.search_history).to eq(search_history)
-        expect(shared_list.title).to be_present
-      end
-    end
-  end
-
   describe "スコープメソッド" do
     let!(:public_list)  { create(:shared_favorite_list, :public,  user:) }
     let!(:private_list) { create(:shared_favorite_list, :private, user:) }
@@ -59,6 +35,22 @@ RSpec.describe SharedFavoriteList, type: :model do
     end
   end
 
+  describe "バリデーション" do
+    subject { create(:shared_favorite_list, user:, search_history:) }
+
+    it { should validate_presence_of(:title) }
+    it { should validate_length_of(:title).is_at_most(255) }
+    it { should validate_uniqueness_of(:share_uuid).ignoring_case_sensitivity }
+  end
+
+  describe "#to_param" do
+    subject(:shared_list) { create(:shared_favorite_list, user:, search_history:) }
+
+    it "share_uuid を返すこと" do
+      expect(shared_list.to_param).to eq(shared_list.share_uuid)
+    end
+  end
+
   describe "コールバック" do
     describe "share_uuid の自動生成" do
       it "作成時に share_uuid が自動生成されること" do
@@ -79,11 +71,19 @@ RSpec.describe SharedFavoriteList, type: :model do
     end
   end
 
-  describe "#to_param" do
+  describe "ファクトリ" do
     subject(:shared_list) { create(:shared_favorite_list, user:, search_history:) }
 
-    it "share_uuid を返すこと" do
-      expect(shared_list.to_param).to eq(shared_list.share_uuid)
+    it "有効なファクトリを持つこと" do
+      expect(build(:shared_favorite_list)).to be_valid
+    end
+
+    it "user, search_history, title が正しく設定されること" do
+      aggregate_failures do
+        expect(shared_list.user).to eq(user)
+        expect(shared_list.search_history).to eq(search_history)
+        expect(shared_list.title).to be_present
+      end
     end
   end
 end
