@@ -73,7 +73,7 @@ RSpec.describe SharedFavoriteList, type: :model do
 
         expect { shared_list.save! }.to change { shared_list.share_uuid }.from(nil)
         expect(shared_list.share_uuid).to be_present
-        expect(shared_list.share_uuid).to match(/\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i)
+        expect(shared_list.share_uuid).to be_uuid
       end
 
       it "share_uuid がすでに設定されている場合は変更しないこと" do
