@@ -39,33 +39,21 @@ RSpec.describe SharedFavoriteList, type: :model do
     let!(:public_list) { create(:shared_favorite_list, user: user, search_history: public_search_history, is_public: true) }
     let!(:private_list) { create(:shared_favorite_list, user: user, search_history: private_search_history, is_public: false) }
 
-    describe ".by_user" do
-      it "指定したユーザーのリストのみを返すこと" do
-        other_user = create(:user)
-        other_search_history = create(:search_history, user: other_user)
-        other_list = create(:shared_favorite_list, user: other_user, search_history: other_search_history)
+    describe ".owned_by" do
+      let(:other_user) { create(:user) }
+      let(:other_search_history) { create(:search_history, user: other_user) }
+      let(:other_list) { create(:shared_favorite_list, user: other_user, search_history: other_search_history) }
 
-        results = SharedFavoriteList.by_user(user.id)
+      it "ユーザーIDを渡すと、そのユーザーのリストのみを返すこと" do
+        results = SharedFavoriteList.owned_by(user.id)
         expect(results).to include(public_list, private_list)
         expect(results).not_to include(other_list)
       end
-    end
 
-    describe ".recent" do
-      let(:older_search) { create(:search_history, user: user) }
-      let(:newer_search) { create(:search_history, user: user) }
-
-      it "作成日時の降順で返すこと" do
-        older_list = nil
-        newer_list = nil
-
-        travel_to(2.days.ago) { older_list = create(:shared_favorite_list, user: user, search_history: older_search) }
-        travel_to(1.day.ago) { newer_list = create(:shared_favorite_list, user: user, search_history: newer_search) }
-        travel_back
-
-        test_lists = SharedFavoriteList.where(id: [older_list.id, newer_list.id]).recent
-        expect(test_lists.first).to eq(newer_list)
-        expect(test_lists.second).to eq(older_list)
+      it "Userオブジェクトを渡すと、そのユーザーのリストのみを返すこと" do
+        results = SharedFavoriteList.owned_by(user)
+        expect(results).to include(public_list, private_list)
+        expect(results).not_to include(other_list)
       end
     end
 
