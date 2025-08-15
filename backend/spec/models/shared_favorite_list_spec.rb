@@ -18,42 +18,52 @@ RSpec.describe SharedFavoriteList, type: :model do
   end
 
   describe "ファクトリ" do
+    subject(:shared_list) { create(:shared_favorite_list, user:, search_history:) }
+
     it "有効なファクトリを持つこと" do
-      shared_list = build(:shared_favorite_list)
-      expect(shared_list).to be_valid
+      expect(build(:shared_favorite_list)).to be_valid
     end
 
     it "user, search_history, title が正しく設定されること" do
-      shared_list = create(:shared_favorite_list, user:, search_history:)
-
-      expect(shared_list.user).to eq(user)
-      expect(shared_list.search_history).to eq(search_history)
-      expect(shared_list.title).to be_present
+      aggregate_failures do
+        expect(shared_list.user).to eq(user)
+        expect(shared_list.search_history).to eq(search_history)
+        expect(shared_list.title).to be_present
+      end
     end
   end
 
   describe "スコープメソッド" do
-    let(:public_search_history) { create(:search_history, user:) }
-    let(:private_search_history) { create(:search_history, user:) }
+    let!(:public_list) do
+      create(:shared_favorite_list,
+             user:,
+             search_history: create(:search_history, user:),
+             is_public: true)
+    end
 
-    let!(:public_list) { create(:shared_favorite_list, user:, search_history: public_search_history, is_public: true) }
-    let!(:private_list) { create(:shared_favorite_list, user:, search_history: private_search_history, is_public: false) }
+    let!(:private_list) do
+      create(:shared_favorite_list,
+             user:,
+             search_history: create(:search_history, user:),
+             is_public: false)
+    end
+
+    let!(:_sentinel_other) do
+      other = create(:user)
+      create(:shared_favorite_list,
+             user: other,
+             search_history: create(:search_history, user: other))
+    end
 
     describe ".owned_by" do
-      let(:other_user) { create(:user) }
-      let(:other_search_history) { create(:search_history, user: other_user) }
-      let(:other_list) { create(:shared_favorite_list, user: other_user, search_history: other_search_history) }
-
-      it "ユーザーIDを渡すと、そのユーザーのリストのみを返すこと" do
+      it "ユーザーIDを渡すと、そのユーザーのリストだけ返す" do
         results = SharedFavoriteList.owned_by(user.id)
-        expect(results).to include(public_list, private_list)
-        expect(results).not_to include(other_list)
+        expect(results).to contain_exactly(public_list, private_list)
       end
 
-      it "Userオブジェクトを渡すと、そのユーザーのリストのみを返すこと" do
+      it "Userオブジェクトを渡すと、そのユーザーのリストだけ返す" do
         results = SharedFavoriteList.owned_by(user)
-        expect(results).to include(public_list, private_list)
-        expect(results).not_to include(other_list)
+        expect(results).to contain_exactly(public_list, private_list)
       end
     end
 
@@ -87,9 +97,9 @@ RSpec.describe SharedFavoriteList, type: :model do
   end
 
   describe "#to_param" do
-    it "share_uuid を返すこと" do
-      shared_list = create(:shared_favorite_list, user:, search_history:)
+    subject(:shared_list) { create(:shared_favorite_list, user:, search_history:) }
 
+    it "share_uuid を返すこと" do
       expect(shared_list.to_param).to eq(shared_list.share_uuid)
     end
   end
