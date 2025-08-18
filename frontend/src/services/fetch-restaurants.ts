@@ -20,7 +20,14 @@ interface FetchRestaurantsByIds {
   longitude?: number
 }
 
-// TODO: エラーハンドリングがバラバラなので統一する
+type ServiceSuccess<T> = { success: true, data: T }
+type ServiceFailure = {
+  success: false,
+  message: string,
+  cause?: 'RATE_LIMIT' | 'SERVER_ERROR' | 'REQUEST_FAILED' | 'NETWORK'
+}
+type ServiceResult<T> = ServiceSuccess<T> | ServiceFailure
+
 export async function fetchRestaurants(
   opts: FetchRestaurantsOpts,
 ): Promise<PaginatedResult<RestaurantListItem>> {
