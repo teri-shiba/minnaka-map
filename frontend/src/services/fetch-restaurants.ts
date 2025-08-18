@@ -30,9 +30,9 @@ type ServiceResult<T> = ServiceSuccess<T> | ServiceFailure
 
 export async function fetchRestaurants(
   opts: FetchRestaurantsOpts,
-): Promise<PaginatedResult<RestaurantListItem>> {
+): Promise<ServiceResult<PaginatedResult<RestaurantListItem>>> {
   try {
-    const page = opts.page || 1
+    const page = Math.max(1, Math.floor(opts.page ?? 1))
     const itemsPerPage = Math.min(opts.itemsPerPage || 10, 100)
     const start = (page - 1) * itemsPerPage + 1
 
