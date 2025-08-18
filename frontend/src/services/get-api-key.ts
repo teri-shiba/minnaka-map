@@ -11,8 +11,9 @@ export async function getApiKey(service: SupportedService): Promise<string> {
 
   try {
     const response = await fetch(`${process.env.API_BASE_URL}/${config.endpoint}`, {
-      next: { revalidate: 3600 },
+      method: 'GET',
       headers: { Accept: 'application/json' },
+      next: { revalidate: 3600 },
     })
 
     if (!response.ok) {
