@@ -1,6 +1,5 @@
 import type { PaginatedResult } from '~/types/pagination'
 import type { HotPepperRestaurant, RestaurantListItem } from '~/types/restaurant'
-import { redirect } from 'next/navigation'
 import { CACHE_DURATION } from '~/constants'
 import { logger } from '~/lib/logger'
 import { transformToList } from '~/types/restaurant'
@@ -67,26 +66,24 @@ export async function fetchRestaurants(
     })
 
     if (!response.ok) {
-      if (response.status === 429) {
-        logger(
-          new Error(`HotPepper API rate limit exceeded: ${response.status}`),
-          { tags: { component: 'fetchRestaurants' } },
-        )
-        redirect('/?error=rate_limit_exceeded')
-      }
-      else if (response.status >= 500) {
-        logger(
-          new Error(`HotPepper API server error: response.status >= 500`),
-          { tags: { component: 'fetchRestaurants' } },
-        )
-        redirect('/?error=server_error')
-      }
-      else {
-        logger(
-          new Error(`HotPepper API request failed: !response.ok`),
-          { tags: { component: 'fetchRestaurants' } },
-        )
-        redirect('/?error=restaurant_fetch_failed')
+      const status = response.status
+      const cause: ServiceFailure['cause']
+        = status === 429 ? 'RATE_LIMIT' : status >= 500 ? 'SERVER_ERROR' : 'REQUEST_FAILED'
+
+      logger(
+        new Error(`HotPepper API request failed: ${status}`),
+        { tags: { component: 'fetchRestaurants', statusCode: status } },
+      )
+
+      return {
+        success: false,
+        message:
+        cause === 'RATE_LIMIT'
+          ? 'HotPepper API のレート制限に達しました'
+          : cause === 'SERVER_ERROR'
+            ? 'HotPepper API サーバーエラーが発生しました'
+            : '店舗情報の取得に失敗しました',
+        cause,
       }
     }
 
@@ -122,14 +119,17 @@ export async function fetchRestaurants(
   }
   catch (error) {
     logger(error, { tags: { component: 'fetchRestaurants' } })
-    redirect('/?error=restaurant_fetch_failed')
+    return {
+      success: false,
+      message: 'ネットワークエラーが発生しました',
+      cause: 'NETWORK',
+    }
   }
 }
 
-// TODO: リファクタリング - 返り値の型が統一されていない
 export async function fetchRestaurantsByIds(
   opts: FetchRestaurantsByIds,
-): Promise<{ success: true, data: RestaurantListItem[] } | { success: false, error: string }> {
+): Promise<ServiceResult<RestaurantListItem[]>> {
   try {
     const apiKey = await getApiKey('hotpepper')
     const requestCount = Math.min(opts.restaurantIds.length, 100)
@@ -155,15 +155,20 @@ export async function fetchRestaurantsByIds(
     })
 
     if (!response.ok) {
-      const errorMessage = `HotPepper API request failed: ${response.status} ${response.statusText}`
-      logger(new Error(errorMessage), {
+      const status = response.status
+      logger(new Error(`HotPepper API (by ids) failed: ${status}`), {
         tags: {
           component: 'fetchRestaurantsByIds',
-          statusCode: response.status,
+          statusCode: status,
           restaurantIds: opts.restaurantIds,
         },
       })
-      return { success: false, error: errorMessage }
+
+      return {
+        success: false,
+        message: `店舗情報の取得に失敗しました (HTTP ${status})`,
+        cause: status >= 500 ? 'SERVER_ERROR' : 'REQUEST_FAILED',
+      }
     }
 
     const data = await response.json()
@@ -175,9 +180,13 @@ export async function fetchRestaurantsByIds(
     logger(error, {
       tags: {
         component: 'fetchRestaurantsByIds',
-        restaurantIds: opts.restaurantIds,
+        ids: opts.restaurantIds,
       },
     })
-    return { success: false, error: 'レストラン情報の取得に失敗しました' }
+    return {
+      success: false,
+      message: 'ネットワークエラーが発生しました',
+      cause: 'NETWORK',
+    }
   }
 }
