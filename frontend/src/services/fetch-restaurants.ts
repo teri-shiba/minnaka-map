@@ -32,8 +32,7 @@ export async function fetchRestaurants(
 ): Promise<ServiceResult<PaginatedResult<RestaurantListItem>>> {
   try {
     const page = Math.max(1, Math.floor(opts.page ?? 1))
-    const itemsPerPageRaw = opts.itemsPerPage ?? 10
-    const itemsPerPage = Math.min(itemsPerPageRaw, 100)
+    const itemsPerPage = Math.min(opts.itemsPerPage ?? 10, 100)
     const start = (page - 1) * itemsPerPage + 1
 
     const apiKey = await getApiKey('hotpepper')
@@ -88,8 +87,8 @@ export async function fetchRestaurants(
     }
 
     const data = await response.json()
-    const restaurants: HotPepperRestaurant[] = data.results.shop || []
-    const totalCount = Number(data.results.results_available) || 0
+    const restaurants: HotPepperRestaurant[] = data?.results?.shop ?? []
+    const totalCount = Number(data?.results?.results_available ?? 0) || 0
     const totalPages = Math.ceil(totalCount / itemsPerPage)
 
     return {
