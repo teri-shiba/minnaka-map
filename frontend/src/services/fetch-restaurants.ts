@@ -131,7 +131,15 @@ export async function fetchRestaurantsByIds(
       return { success: true, data: [] }
 
     const apiKey = await getApiKey('hotpepper')
-    const requestCount = Math.min(opts.restaurantIds.length, 100)
+
+    // HotPepper: id指定は、1リクエスト最大20件
+    const CHUNK_SIZE = 20
+    const chunkCount = Math.ceil(slicedIds.length / CHUNK_SIZE)
+    const chunks = Array.from({ length: chunkCount }, (_, i) => {
+      const startIndex = i * CHUNK_SIZE
+      const endIndex = startIndex + CHUNK_SIZE
+      return (slicedIds.slice(startIndex, endIndex))
+    })
 
     const params: Record<string, string> = {
       key: apiKey,
