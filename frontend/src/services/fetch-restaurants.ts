@@ -20,10 +20,10 @@ interface FetchRestaurantsByIds {
   longitude?: number
 }
 
-type ServiceSuccess<T> = { success: true, data: T }
-type ServiceFailure = {
-  success: false,
-  message: string,
+interface ServiceSuccess<T> { success: true, data: T }
+interface ServiceFailure {
+  success: false
+  message: string
   cause?: 'RATE_LIMIT' | 'SERVER_ERROR' | 'REQUEST_FAILED' | 'NETWORK'
 }
 type ServiceResult<T> = ServiceSuccess<T> | ServiceFailure
@@ -41,11 +41,11 @@ export async function fetchRestaurants(
 
     const params: Record<string, string> = {
       key: apiKey,
-      lat: opts.latitude.toString(),
-      lng: opts.longitude.toString(),
-      range: '5',
-      start: start.toString(),
-      count: itemsPerPage.toString(),
+      lat: String(opts.latitude),
+      lng: String(opts.longitude),
+      range: '5', // 3000m
+      start: String(start),
+      count: String(itemsPerPage),
       format: 'json',
     }
 
@@ -57,7 +57,9 @@ export async function fetchRestaurants(
     const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}/?${searchParams}`, {
       next: {
         revalidate: CACHE_DURATION.RESTAURANT_INFO,
-        tags: [`restaurants-${opts.latitude}-${opts.longitude}-${opts.genre || 'all'}`],
+        tags: [
+          `restaurants-${opts.latitude}-${opts.longitude}-${opts.genre || 'all'}`,
+        ],
       },
     })
 
@@ -137,8 +139,8 @@ export async function fetchRestaurantsByIds(
     }
 
     if (opts.latitude && opts.longitude) {
-      params.lat = opts.latitude.toString()
-      params.lng = opts.longitude.toString()
+      params.lat = String(opts.latitude)
+      params.lng = String(opts.longitude)
     }
 
     const searchParams = new URLSearchParams(params)
