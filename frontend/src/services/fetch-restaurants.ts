@@ -33,7 +33,8 @@ export async function fetchRestaurants(
 ): Promise<ServiceResult<PaginatedResult<RestaurantListItem>>> {
   try {
     const page = Math.max(1, Math.floor(opts.page ?? 1))
-    const itemsPerPage = Math.min(opts.itemsPerPage || 10, 100)
+    const itemsPerPageRaw = opts.itemsPerPage ?? 10
+    const itemsPerPage = Math.min(itemsPerPageRaw, 100)
     const start = (page - 1) * itemsPerPage + 1
 
     const apiKey = await getApiKey('hotpepper')
