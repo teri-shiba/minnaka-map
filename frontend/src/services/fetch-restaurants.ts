@@ -91,30 +91,19 @@ export async function fetchRestaurants(
     const restaurants: HotPepperRestaurant[] = data.results.shop || []
     const totalCount = Number(data.results.results_available) || 0
     const totalPages = Math.ceil(totalCount / itemsPerPage)
-    const transformedRestaurants = restaurants.map(transformToList)
-
-    if (restaurants.length === 0) {
-      return {
-        items: [],
-        pagination: {
-          currentPage: page,
-          totalPages: 0,
-          totalCount: 0,
-          itemsPerPage,
-        },
-        hasMore: false,
-      }
-    }
 
     return {
-      items: transformedRestaurants,
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalCount,
-        itemsPerPage,
-      },
-      hasMore: page < totalPages,
+      success: true,
+      data: {
+        items: restaurants.map(transformToList),
+        pagination: {
+          currentPage: page,
+          totalPages,
+          totalCount,
+          itemsPerPage,
+        },
+        hasMore: page < totalPages,
+      }
     }
   }
   catch (error) {
@@ -131,12 +120,16 @@ export async function fetchRestaurantsByIds(
   opts: FetchRestaurantsByIds,
 ): Promise<ServiceResult<RestaurantListItem[]>> {
   try {
+    const ids = opts.restaurantIds
+    if (ids.length === 0)
+      return { success: true, data: [] }
+
     const apiKey = await getApiKey('hotpepper')
     const requestCount = Math.min(opts.restaurantIds.length, 100)
 
     const params: Record<string, string> = {
       key: apiKey,
-      id: opts.restaurantIds.join(','),
+      id: ids.join(','),
       count: requestCount.toString(),
       format: 'json',
     }
@@ -150,18 +143,14 @@ export async function fetchRestaurantsByIds(
     const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}/?${searchParams}`, {
       next: {
         revalidate: CACHE_DURATION.RESTAURANT_INFO,
-        tags: [`restaurants-by-ids`],
+        tags: ['hotpepper:restaurants-by-ids', `ids:${ids.join('-')}`],
       },
     })
 
     if (!response.ok) {
       const status = response.status
       logger(new Error(`HotPepper API (by ids) failed: ${status}`), {
-        tags: {
-          component: 'fetchRestaurantsByIds',
-          statusCode: status,
-          restaurantIds: opts.restaurantIds,
-        },
+        tags: { component: 'fetchRestaurantsByIds', statusCode: status, ids },
       })
 
       return {
