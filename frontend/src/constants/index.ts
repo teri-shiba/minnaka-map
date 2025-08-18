@@ -66,7 +66,7 @@ export const PAGINATION = {
 // Cache
 // ========================================================
 export const CACHE_DURATION = {
-  /** 24H (60 * 60 * 24) **/
+  /* 24H (60 * 60 * 24) */
   RESTAURANT_INFO: 60 * 60 * 24,
 } as const
 
