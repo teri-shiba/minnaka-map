@@ -49,16 +49,19 @@ export async function fetchRestaurants(
       format: 'json',
     }
 
-    if (opts.genre) {
+    if (opts.genre)
       params.genre = opts.genre
-    }
 
     const searchParams = new URLSearchParams(params)
     const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}/?${searchParams}`, {
       next: {
         revalidate: CACHE_DURATION.RESTAURANT_INFO,
         tags: [
-          `restaurants-${opts.latitude}-${opts.longitude}-${opts.genre || 'all'}`,
+          'hotpepper:restaurants',
+          `lat:${opts.latitude}`,
+          `lng:${opts.longitude}`,
+          `genre:${opts.genre ?? 'all'}`,
+          `page:${page}`,
         ],
       },
     })
