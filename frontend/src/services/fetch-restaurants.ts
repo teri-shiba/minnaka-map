@@ -17,6 +17,8 @@ interface FetchRestaurantsByIds {
   restaurantIds: string[]
   latitude?: number
   longitude?: number
+  offset?: number
+  limit?: number
 }
 
 interface ServiceSuccess<T> { success: true, data: T }
@@ -119,8 +121,13 @@ export async function fetchRestaurantsByIds(
   opts: FetchRestaurantsByIds,
 ): Promise<ServiceResult<RestaurantListItem[]>> {
   try {
-    const ids = opts.restaurantIds
-    if (ids.length === 0)
+    const { restaurantIds, offset = 0, limit } = opts
+
+    const slicedIds = limit === undefined
+      ? restaurantIds.slice(offset)
+      : restaurantIds.slice(offset, offset + limit)
+
+    if (slicedIds.length === 0)
       return { success: true, data: [] }
 
     const apiKey = await getApiKey('hotpepper')
