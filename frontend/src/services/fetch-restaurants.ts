@@ -5,6 +5,16 @@ import { logger } from '~/lib/logger'
 import { transformToList } from '~/types/restaurant'
 import { getApiKey } from './get-api-key'
 
+interface ServiceSuccess<T> { success: true, data: T }
+interface ServiceFailure {
+  success: false
+  message: string
+  cause?: 'RATE_LIMIT' | 'SERVER_ERROR' | 'REQUEST_FAILED' | 'NETWORK'
+}
+type ServiceResult<T> = ServiceSuccess<T> | ServiceFailure
+
+type NonEmptyArray<T> = [T, ...T[]]
+
 interface FetchRestaurantsOpts {
   latitude: number
   longitude: number
@@ -14,20 +24,10 @@ interface FetchRestaurantsOpts {
 }
 
 interface FetchRestaurantsByIds {
-  restaurantIds: string[]
-  latitude?: number
-  longitude?: number
+  restaurantIds: NonEmptyArray<string>
   offset?: number
   limit?: number
 }
-
-interface ServiceSuccess<T> { success: true, data: T }
-interface ServiceFailure {
-  success: false
-  message: string
-  cause?: 'RATE_LIMIT' | 'SERVER_ERROR' | 'REQUEST_FAILED' | 'NETWORK'
-}
-type ServiceResult<T> = ServiceSuccess<T> | ServiceFailure
 
 export async function fetchRestaurants(
   opts: FetchRestaurantsOpts,
@@ -104,7 +104,7 @@ export async function fetchRestaurants(
           itemsPerPage,
         },
         hasMore: page < totalPages,
-      }
+      },
     }
   }
   catch (error) {
@@ -132,7 +132,7 @@ export async function fetchRestaurantsByIds(
 
     const apiKey = await getApiKey('hotpepper')
 
-    // HotPepper: id指定は、1リクエスト最大20件
+    // HotPepper: id 指定は 1 リクエスト最大 20 件
     const CHUNK_SIZE = 20
     const chunkCount = Math.ceil(slicedIds.length / CHUNK_SIZE)
     const chunks = Array.from({ length: chunkCount }, (_, i) => {
@@ -141,43 +141,86 @@ export async function fetchRestaurantsByIds(
       return (slicedIds.slice(startIndex, endIndex))
     })
 
-    const params: Record<string, string> = {
-      key: apiKey,
-      id: ids.join(','),
-      count: requestCount.toString(),
-      format: 'json',
-    }
+    const perChunkResults = await Promise.all(
+      chunks.map(async (chunkIds) => {
+        if (chunkIds.length === 0)
+          return { ok: true as const, items: [] as HotPepperRestaurant[], chunkIds }
 
-    if (opts.latitude && opts.longitude) {
-      params.lat = String(opts.latitude)
-      params.lng = String(opts.longitude)
-    }
+        const params: Record<string, string> = {
+          key: apiKey,
+          id: chunkIds.join(','),
+          count: String(chunkIds.length),
+          format: 'json',
+        }
 
-    const searchParams = new URLSearchParams(params)
-    const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}/?${searchParams}`, {
-      next: {
-        revalidate: CACHE_DURATION.RESTAURANT_INFO,
-        tags: ['hotpepper:restaurants-by-ids', `ids:${ids.join('-')}`],
-      },
-    })
+        const searchParams = new URLSearchParams(params)
 
-    if (!response.ok) {
-      const status = response.status
-      logger(new Error(`HotPepper API (by ids) failed: ${status}`), {
-        tags: { component: 'fetchRestaurantsByIds', statusCode: status, ids },
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}/?${searchParams.toString()}`, {
+            next: {
+              revalidate: CACHE_DURATION.RESTAURANT_INFO,
+              tags: ['hotpepper:restaurants:by-ids'],
+            },
+          })
+
+          if (!response.ok)
+            return { ok: false as const, status: response.status, chunkIds }
+
+          const data = await response.json()
+          const restaurants: HotPepperRestaurant[] = data?.results?.shop ?? []
+          return { ok: true as const, items: restaurants, chunkIds }
+        }
+        catch {
+          return { ok: false as const, status: 0, chunkIds } // 0 = ネットワーク層
+        }
+      }),
+    )
+
+    const succeeded = perChunkResults.filter(result => result.ok) as Array<{ ok: true, items: HotPepperRestaurant[], chunkIds: string[] }>
+    const failed = perChunkResults.filter(result => !result.ok) as Array<{ ok: false, status: number, chunkIds: string[] }>
+
+    if (succeeded.length === 0) {
+      const statusList = failed.map(f => f.status)
+      const cause: ServiceFailure['cause']
+        = statusList.includes(429)
+          ? 'RATE_LIMIT'
+          : statusList.some(status => status >= 500)
+            ? 'SERVER_ERROR'
+            : statusList.some(status => status > 0)
+              ? 'REQUEST_FAILED'
+              : 'NETWORK'
+
+      logger(new Error(`HotPepper API (by ids) all failed`), {
+        tags: { component: 'fetchRestaurantsByIds', statusList, slicedIds },
       })
 
       return {
         success: false,
-        message: `店舗情報の取得に失敗しました (HTTP ${status})`,
-        cause: status >= 500 ? 'SERVER_ERROR' : 'REQUEST_FAILED',
+        message: cause === 'RATE_LIMIT'
+          ? 'HotPepper API のレート制限に達しました'
+          : cause === 'SERVER_ERROR'
+            ? 'HotPepper API サーバーエラーが発生しました'
+            : '店舗情報の取得に失敗しました',
+        cause,
       }
     }
 
-    const data = await response.json()
-    const restaurants: HotPepperRestaurant[] = data.results.shop || []
+    const allRestaurants = succeeded.flatMap(result => result.items)
 
-    return { success: true, data: restaurants.map(transformToList) }
+    const orderById = new Map<string, number>()
+    slicedIds.forEach((id, index) => orderById.set(id, index))
+
+    const items = allRestaurants
+      .map(transformToList)
+      .sort((leftItem, rightItem) => (orderById.get(leftItem.id)! - orderById.get(rightItem.id)!))
+
+    if (items.length !== slicedIds.length) {
+      logger(new Error('Some HotPepper ids were not returned'), {
+        tags: { component: 'fetchRestaurantsByIds', requested: slicedIds.length, returned: items.length },
+      })
+    }
+
+    return { success: true, data: items }
   }
   catch (error) {
     logger(error, {
