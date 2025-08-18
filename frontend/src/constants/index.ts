@@ -16,7 +16,10 @@ export const API_SERVICES = {
     endpoint: 'api_keys/googlemaps',
     serviceName: 'GoogleMaps',
   },
-} as const
+} as const satisfies Record<
+  string,
+  { readonly endpoint: string, readonly serviceName: string }
+>
 
 export type SupportedService = keyof typeof API_SERVICES
 
