@@ -26,7 +26,7 @@ export type SupportedService = keyof typeof API_SERVICES
 // =========================================================
 // Authentication Providers
 // =========================================================
-export const AUTH_ŻROVIDERS = [
+export const AUTH_PROVIDERS = [
   {
     name: 'Google',
     iconImg: '/icon_Google.webp',
@@ -66,7 +66,8 @@ export const PAGINATION = {
 // Cache
 // ========================================================
 export const CACHE_DURATION = {
-  RESTAURANT_INFO: 86400, // 24H (60 * 60 * 24)
+  /** 24H (60 * 60 * 24) **/
+  RESTAURANT_INFO: 60 * 60 * 24,
 } as const
 
 // ========================================================
