@@ -26,7 +26,7 @@ export type SupportedService = keyof typeof API_SERVICES
 // =========================================================
 // Authentication Providers
 // =========================================================
-export const AUTH_PROVIDERS: readonly AuthProvider[] = [
+export const AUTH_ŻROVIDERS = [
   {
     name: 'Google',
     iconImg: '/icon_Google.webp',
@@ -37,7 +37,7 @@ export const AUTH_PROVIDERS: readonly AuthProvider[] = [
     iconImg: '/icon_LINE.webp',
     authUrl: 'line',
   },
-] as const
+] as const satisfies ReadonlyArray<AuthProvider>
 
 // ========================================================
 // Geography & Location
