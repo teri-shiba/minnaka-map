@@ -20,8 +20,8 @@ export default function StationAutocomplete({
   onChange,
   excludedStations,
 }: StationAutocompleteProps) {
-  const [isFocused, setIsFocused] = useState<boolean>(false)
-  const [isSelected, setIsSelected] = useState<boolean>(false)
+  const [isFocused, setIsFocused] = useState(false)
+  const [isSelected, setIsSelected] = useState(false)
   const [recentStations, setRecentStations, refreshRecentStations] = useLocalStorage<SavedStation[]>(
     'recentStations',
     [],
