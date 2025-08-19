@@ -48,6 +48,8 @@ export default async function Result({ searchParams }: ResultPageProps) {
     redirect(`/?error=${key}`)
   }
 
+  const { items, pagination } = restaurantsResult.data
+
 
   const maptilerApiKey = await getApiKey('maptiler')
 
@@ -60,14 +62,14 @@ export default async function Result({ searchParams }: ResultPageProps) {
             <MapClient
               apiKey={maptilerApiKey}
               midpoint={midpoint}
-              restaurants={restaurantsResult.items}
+              restaurants={items}
             />
           )}
       </div>
 
       <RestaurantList
-        restaurants={restaurantsResult.items}
-        pagination={restaurantsResult.pagination}
+        restaurants={items}
+        pagination={pagination}
       />
     </div>
   )
