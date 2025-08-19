@@ -10,13 +10,16 @@ export interface SharedListData {
   is_existing: boolean
 }
 
-interface CreateSharedListResponse {
-  success: boolean
-  data?: SharedListData
-  message?: string
+// TODO: // TODO: fetch-restaurant.ts でも同じものを使ったので共通化を検討する
+interface ServiceSuccess<T> { success: true, data: T }
+interface ServiceFailure {
+  success: false
+  message: string
+  cause?: 'NOT_FOUND' | 'RATE_LIMIT' | 'SERVER_ERROR' | 'REQUEST_FAILED' | 'NETWORK'
 }
+export type ServiceResult<T> = ServiceSuccess<T> | ServiceFailure
 
-export async function createSharedList(searchHistoryId: number): Promise<CreateSharedListResponse> {
+export async function createSharedList(searchHistoryId: number): Promise<ServiceResult<SharedListData>> {
   try {
     const response = await apiFetch<ApiResponse<SharedListData>>(
       'shared_lists',
