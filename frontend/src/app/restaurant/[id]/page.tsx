@@ -1,14 +1,15 @@
 import Image from 'next/image'
+import { redirect } from 'next/navigation'
 import { LuArrowUpRight } from 'react-icons/lu'
 import FavoriteButton from '~/components/features/restaurant/FavoriteButton'
 import Section from '~/components/layout/Section'
 import ShareRestaurantDialog from '~/components/ui/dialogs/ShareRestaurantDialog'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '~/components/ui/table/Table'
 import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
-import { getApiKey } from '~/services/get-api-key'
+import { getGoogleMapsEmbedUrl } from '~/services/get-google-maps-embed-url'
 
 interface RestaurantDetailPageProps {
-  params: Promise<{ id: string }>
+  params: { id: string }
   searchParams: { historyId?: string }
 }
 
@@ -16,8 +17,10 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
   const { id } = await params
   const { historyId } = await searchParams
 
-  const restaurant = await fetchRestaurantDetail(id)
-  const googleMapsApiKey = await getApiKey('googlemaps')
+  // TODO: fetchRestaurantDetail のレスポンスを修正しないと(!result.success)は使えないかも
+  const result = await fetchRestaurantDetail(id)
+  if (!result.success)
+    redirect('/?error=restaurant_fetch_failed')
 
   const {
     // 基本情報
@@ -42,10 +45,14 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
     nonSmoking,
     wifi,
     parking,
-  } = restaurant
+  } = result
 
-  const query = encodeURIComponent(`${name} ${address}`)
-  const mapUrl = `https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${query}`
+  // GoogleMaps表示成功
+  const mapEmbedUrl = await getGoogleMapsEmbedUrl(`${name} ${address}`)
+
+  // GoogleMaps表示失敗
+  const mapSearch = new URL('https://www.google.com/maps/search/')
+  mapSearch.search = new URLSearchParams({ api: '1', query: `${name} ${address}` }).toString()
 
   return (
     <Section className="mb-6 md:mb-8">
@@ -112,17 +119,32 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
                   <TableCell>
                     {address}
                     <div className="relative mt-4 h-44 w-full md:h-96">
-                      {/* eslint-disable-next-line react-dom/no-missing-iframe-sandbox */}
-                      <iframe
-                        src={mapUrl}
-                        width="600"
-                        height="338"
-                        style={{ border: 0 }}
-                        allowFullScreen
-                        referrerPolicy="no-referrer-when-downgrade"
-                        className="absolute left-0 top-0 size-full"
-                      >
-                      </iframe>
+                      { }
+                      {mapEmbedUrl
+                        ? (
+                            /* eslint-disable-next-line react-dom/no-missing-iframe-sandbox */
+                            <iframe
+                              src={mapEmbedUrl}
+                              width="600"
+                              height="338"
+                              style={{ border: 0 }}
+                              allowFullScreen
+                              referrerPolicy="no-referrer-when-downgrade"
+                              className="absolute left-0 top-0 size-full"
+                            />
+                          )
+                        : (
+                            <a
+                              href={mapSearch.toString()}
+                              aria-label="GoogleMapsで場所を開（新しいタブで開きます）"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sky-600 hover:underline"
+                            >
+                              Google Maps で場所を開く
+                              <LuArrowUpRight className="inline-block size-4 pl-0.5 align-bottom md:align-text-bottom" />
+                            </a>
+                          )}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -151,9 +173,9 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
                   <TableCell>
                     <a
                       href={urls}
+                      aria-label="ホットペッパーグルメ店舗ページ（新しいタブで開きます）"
                       target="_blank"
                       rel="noopener noreferrer"
-                      aria-label="ホットペッパーグルメ店舗ページ（新しいタブで開きます）"
                       className="text-sky-600 hover:underline"
                     >
                       ホットペッパーグルメ店舗ページ
