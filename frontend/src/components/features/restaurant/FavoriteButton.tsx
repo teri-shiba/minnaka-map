@@ -41,12 +41,12 @@ export default function FavoriteButton({
     initialHistoryId ?? (typeof window !== 'undefined' ? sessionStorage.getItem('pendingSearchHistoryId') : null),
   )
   const [favoriteId, setFavoriteId] = useState<number | null>(initialFavoriteId ?? null)
-  const [isFavorite, setIsFavorite] = useState<boolean>(initialIsFavorite ?? false)
+  const [isFavorite, setIsFavorite] = useState(initialIsFavorite ?? false)
 
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const isFromFavoritesPage = Boolean(initialHistoryId && initialFavoriteId !== undefined)
-  const [isChecking, setIsChecking] = useState<boolean>(!initialHistoryId)
+  const [isChecking, setIsChecking] = useState(!initialHistoryId)
 
   useEffect(() => {
     const initCheck = async () => {
