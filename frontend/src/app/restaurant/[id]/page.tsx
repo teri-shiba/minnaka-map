@@ -9,15 +9,17 @@ import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
 import { getGoogleMapsEmbedUrl } from '~/services/get-google-maps-embed-url'
 
 interface RestaurantDetailPageProps {
-  params: { id: string }
-  searchParams: { historyId?: string }
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ historyId?: string }>
 }
 
 export default async function RestaurantDetailPage({ params, searchParams }: RestaurantDetailPageProps) {
   const { id } = await params
-  const { historyId } = await searchParams
+  const sp = await searchParams
+  const raw = sp.historyId
+  const historyId = Array.isArray(raw) ? raw[0] : raw
 
-  // TODO: fetchRestaurantDetail のレスポンスを修正しないと(!result.success)は使えないかも
+  // TODO: fetchRestaurantDetail のレスポンスを修正しないと(!result.success)はエラーなので修正した後再度確認
   const result = await fetchRestaurantDetail(id)
   if (!result.success)
     redirect('/?error=restaurant_fetch_failed')
