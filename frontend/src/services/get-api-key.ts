@@ -16,12 +16,8 @@ export async function getApiKey(service: SupportedService): Promise<string> {
       'GET',
     )
 
-    if (!isApiSuccess(response)) {
-      const message = getApiErrorMessage(response)
-      const error = new Error(`${config.serviceName} APIキー取得失敗: ${message}`)
-      logger(error, { tags: { component: 'getApiKey' }, service: config.serviceName })
-      throw error
-    }
+    if (!isApiSuccess(response))
+      throw new Error(`${config.serviceName} APIキー取得失敗: ${getApiErrorMessage(response)}`)
 
     return response.data.api_key
   }
