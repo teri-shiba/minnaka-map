@@ -36,36 +36,35 @@ export default function ShareFavoriteListDialog({
       }
       catch (error) {
         toast.error('リンクのコピーに失敗しました')
-        logger(error, { tags: { component: 'handleCopyLink - ShareFavoriteListDialog' } })
+        logger(error, { tags: { component: 'ShareFavoriteListDialog', action: 'copy' } })
       }
     },
     [shareUrl],
   )
 
-  const handleEmailShare = useCallback(
-    () => {
-      if (!shareUrl || !title)
-        return
+  // TODO: 正しく起動するのかチェックする
+  const handleEmailShare = useCallback(() => {
+    if (!shareUrl || !title)
+      return
 
-      const subject = encodeURIComponent(`${title}のまんなかのお店 [みんなかマップ]`)
-      const body = encodeURIComponent(`${title}のまんなかのお店を今すぐチェックしよう！\n\n詳細はこちら：\n${shareUrl}`)
-      window.location.href = `mailto:?subject=${subject}&body=${body}`
-    },
-    [shareUrl, title],
-  )
+    const subject = `${title}のまんなかのお店 [みんなかマップ]`
+    const body = `${title}のまんなかのお店を今すぐチェックしよう！\n\n詳細はこちら：\n${shareUrl}`
+    const mailto = new URL('mailto:')
+    mailto.search = new URLSearchParams({ subject, body }).toString()
+    window.location.href = mailto.toString()
+  }, [shareUrl, title])
 
-  const handleXShare = useCallback(
-    () => {
-      if (!shareUrl || !title)
-        return
+  const handleXShare = useCallback(() => {
+    if (!shareUrl || !title)
+      return
 
-      const text = encodeURIComponent(`「${title}」のまんなかのお店をシェア！\nみんなのまんなか #みんなかマップ`)
-      const url = encodeURIComponent(shareUrl)
-      const intent = `https://twitter.com/intent/tweet?text=${text}&url=${url}`
-      window.open(intent, '_blank', 'noopener,noreferrer')
-    },
-    [shareUrl, title],
-  )
+    const intent = new URL('https://twitter.com/intent/tweet')
+    intent.search = new URLSearchParams({
+      text: `「${title}」のまんなかのお店をシェア！\nみんなのまんなか #みんなかマップ`,
+      url: shareUrl,
+    }).toString()
+    window.open(intent.toString(), '_blank', 'noopener,noreferrer')
+  }, [shareUrl, title])
 
   const options = useMemo(() => [
     {
