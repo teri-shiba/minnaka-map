@@ -25,6 +25,7 @@ class Api::V1::ApiKeysController < ApplicationController
 
   private
 
+    # TODO: response_helper に置き換える
     def render_success(api_key:)
       render json: { api_key: api_key }, status: :ok
     end
