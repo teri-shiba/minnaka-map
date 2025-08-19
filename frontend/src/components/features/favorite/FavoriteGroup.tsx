@@ -69,7 +69,7 @@ export default function FavoriteGroup({ group }: FavoriteGroupProps) {
       setShareDialogOpen(true)
     }
     catch (error) {
-      logger(error, { tags: { component: 'handleShare - FavoriteGroup' } })
+      logger(error, { tags: { component: 'FavoriteGroup', action: 'handleShare' } })
       toast.error('予期しないエラーが発生しました')
     }
     finally {
