@@ -78,7 +78,7 @@ export default function FavoriteGroup({ group }: FavoriteGroupProps) {
   }, [canNativeShare, group.searchHistory.id, isMobile, share])
 
   return (
-    <section key={group.searchHistory.id}>
+    <section>
       <h2 className="text-center">
         {group.searchHistory.stationNames.join('・')}
       </h2>
