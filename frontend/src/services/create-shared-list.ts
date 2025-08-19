@@ -2,6 +2,7 @@
 
 import type { ApiResponse } from '~/types/api-response'
 import { logger } from '~/lib/logger'
+import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
 import { apiFetch } from './api-client'
 
 export interface SharedListData {
@@ -10,7 +11,7 @@ export interface SharedListData {
   is_existing: boolean
 }
 
-// TODO: // TODO: fetch-restaurant.ts でも同じものを使ったので共通化を検討する
+// TODO: fetch-restaurant.ts でも同じものを使ったので共通化を検討する
 interface ServiceSuccess<T> { success: true, data: T }
 interface ServiceFailure {
   success: false
@@ -27,17 +28,25 @@ export async function createSharedList(searchHistoryId: number): Promise<Service
       { search_history_id: searchHistoryId },
     )
 
-    if (!response.success) {
-      return { success: false, message: response.message || 'シェアリストの作成に失敗しました' }
-    }
+    if (!isApiSuccess(response))
+      return { success: false, message: getApiErrorMessage(response), cause: 'REQUEST_FAILED' }
 
-    return {
-      success: true,
-      data: response.data,
-    }
+    return { success: true, data: response.data }
   }
   catch (error) {
-    logger(error, { tags: { component: 'createSharedList' } })
-    return { success: false, message: '予期しないエラーが発生しました' }
+    logger(error, { tags: { component: 'createSharedList', searchHistoryId } })
+
+    const message = String((error as Error)?.message ?? '')
+
+    if (/\b404\b/.test(message))
+      return { success: false, message: 'シェアリストが見つかりません', cause: 'NOT_FOUND' }
+
+    if (/\b429\b/.test(message))
+      return { success: false, message: 'アクセスが集中しています。時間をあけてお試しください。', cause: 'RATE_LIMIT' }
+
+    if (/\b5\d\d\b/.test(message))
+      return { success: false, message: 'サーバーエラーが発生しました', cause: 'SERVER_ERROR' }
+
+    return { success: false, message: '予期しないエラーが発生しました', cause: 'REQUEST_FAILED' }
   }
 }
