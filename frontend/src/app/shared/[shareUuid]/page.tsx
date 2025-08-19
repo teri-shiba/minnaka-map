@@ -6,11 +6,11 @@ import { fetchRestaurantsByIds } from '~/services/fetch-restaurants'
 import { fetchSharedList } from '~/services/fetch-shared-list'
 
 interface SharedListPageProps {
-  params: { shareUuid: string }
+  params: Promise<{ shareUuid: string }>
 }
 
 export default async function SharedListPage({ params }: SharedListPageProps) {
-  const { shareUuid } = params
+  const { shareUuid } = await params
 
   const sharedListResult = await fetchSharedList(shareUuid)
   if (!sharedListResult.success)
