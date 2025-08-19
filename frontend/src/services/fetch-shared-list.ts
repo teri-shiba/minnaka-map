@@ -2,6 +2,7 @@
 
 import type { ApiResponse } from '~/types/api-response'
 import { logger } from '~/lib/logger'
+import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
 import { apiFetch } from './api-client'
 
 interface SharedListData {
@@ -17,40 +18,45 @@ interface SharedListData {
   }>
 }
 
-interface SharedListResponse {
-  success: boolean
-  data: SharedListData
-  message?: string
+// TODO: fetch-restaurant.ts でも同じものを使ったので共通化を検討する
+interface ServiceSuccess<T> { success: true, data: T }
+interface ServiceFailure {
+  success: false
+  message: string
+  cause?: 'NOT_FOUND' | 'RATE_LIMIT' | 'SERVER_ERROR' | 'REQUEST_FAILED' | 'NETWORK'
 }
+export type ServiceResult<T> = ServiceSuccess<T> | ServiceFailure
 
-export async function fetchSharedList(shareUuid: string): Promise<SharedListResponse> {
+// TODO: shareUuid -> uuid にしたい
+export async function fetchSharedList(shareUuid: string): Promise<ServiceResult<SharedListData>> {
   try {
     const response = await apiFetch<ApiResponse<SharedListData>>(
       `shared_lists/${shareUuid}`,
       'GET',
     )
 
-    if (!response.success) {
-      return {
-        success: false,
-        data: {} as SharedListData,
-        message: response.message || 'データの取得に失敗しました',
-      }
-    }
+    if (!isApiSuccess(response))
+      return { success: false, message: getApiErrorMessage(response) }
 
     return { success: true, data: response.data }
   }
   catch (error) {
-    logger(error, { tags: { component: 'fetchSharedList' } })
+    logger(error, { tags: { component: 'fetchSharedList', shareUuid } })
 
-    const errorMessage = error instanceof Error && error.message.includes('404')
-      ? 'シェアリストが見つかりません'
-      : '予期しないエラーが発生しました'
+    if (error instanceof TypeError)
+      return { success: false, message: 'ネットワークエラーが発生しました', cause: 'NETWORK' }
 
-    return {
-      success: false,
-      data: {} as SharedListData,
-      message: errorMessage,
-    }
+    const message = String((error as Error)?.message ?? '')
+
+    if (/\b404\b/.test(message))
+      return { success: false, message: 'シェアリストが見つかりません', cause: 'NOT_FOUND' }
+
+    if (/\b429\b/.test(message))
+      return { success: false, message: 'アクセスが集中しています。時間をあけてお試しください。', cause: 'RATE_LIMIT' }
+
+    if (/\b5\d\d\b/.test(message))
+      return { success: false, message: 'サーバーエラーが発生しました', cause: 'SERVER_ERROR' }
+
+    return { success: false, message: '予期しないエラーが発生しました', cause: 'REQUEST_FAILED' }
   }
 }
