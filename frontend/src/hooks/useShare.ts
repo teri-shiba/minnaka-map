@@ -32,9 +32,9 @@ export default function useShare(): UseShareReturn {
 
   const share = useCallback(
     async (data: SharePayload): Promise<ShareResult> => {
-      if (!(canNativeShare && isMobile)) {
+      if (!(canNativeShare && isMobile))
         return { ok: false, reason: 'unsupported' }
-      }
+
       try {
         await navigator.share(data)
         return { ok: true }
