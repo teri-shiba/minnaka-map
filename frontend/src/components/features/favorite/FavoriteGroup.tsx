@@ -19,12 +19,12 @@ interface FavoriteGroupProps {
 const INITIAL_DISPLAY_COUNT = 3
 
 export default function FavoriteGroup({ group }: FavoriteGroupProps) {
-  const [showAll, setShowAll] = useState<boolean>(false)
+  const [showAll, setShowAll] = useState(false)
   const { share, canNativeShare, isMobile } = useShare()
-  const [isSharing, setIsSharing] = useState<boolean>(false)
-  const [shareDialogOpen, setShareDialogOpen] = useState<boolean>(false)
+  const [isSharing, setIsSharing] = useState(false)
+  const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const [shareData, setShareData] = useState<SharedListData | null> (null)
-  const [shareUrl, setShareUrl] = useState<string>('')
+  const [shareUrl, setShareUrl] = useState('')
 
   const displayFavorites = showAll
     ? group.favorites
