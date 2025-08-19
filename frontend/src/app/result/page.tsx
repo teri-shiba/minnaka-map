@@ -38,21 +38,25 @@ export default async function Result({ searchParams }: ResultPageProps) {
   })
 
   if (!restaurantsResult.success) {
-    const key =
-    restaurantsResult.cause === "RATE_LIMIT"
-    ? 'rate_limit_exceeded'
-    : restaurantsResult.cause === 'SERVER_ERROR'
-      ? 'server_error'
-      : 'restaurant_fetch_failed'
+    const key
+    = restaurantsResult.cause === 'RATE_LIMIT'
+      ? 'rate_limit_exceeded'
+      : restaurantsResult.cause === 'SERVER_ERROR'
+        ? 'server_error'
+        : 'restaurant_fetch_failed'
 
     redirect(`/?error=${key}`)
   }
 
   const { items, pagination } = restaurantsResult.data
 
-
-  const maptilerApiKey = await getApiKey('maptiler')
-
+  let maptilerApiKey: string | null = null
+  try {
+    maptilerApiKey = await getApiKey('maptiler')
+  }
+  catch {
+    maptilerApiKey = null
+  }
 
   return (
     <div className="relative mx-auto h-[calc(100dvh-4rem)] max-w-screen-2xl overflow-hidden md:flex">
