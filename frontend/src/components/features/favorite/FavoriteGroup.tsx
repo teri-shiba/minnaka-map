@@ -42,7 +42,7 @@ export default function FavoriteGroup({ group }: FavoriteGroupProps) {
       const result = await createSharedList(group.searchHistory.id)
 
       if (!result.success) {
-        toast.error('シェア作成に失敗しました')
+        toast.error(result.message || 'シェア作成に失敗しました')
         return
       }
 
