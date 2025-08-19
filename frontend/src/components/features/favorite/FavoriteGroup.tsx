@@ -46,25 +46,26 @@ export default function FavoriteGroup({ group }: FavoriteGroupProps) {
         return
       }
 
-      const generateShareUrl = new URL(
-        `/shared/${result.data!.share_uuid}`,
+      const { share_uuid, title } = result.data
+      const generatedUrl = new URL(
+        `/shared/${share_uuid}`,
         process.env.NEXT_PUBLIC_FRONT_BASE_URL,
       ).toString()
 
-      const sharePayload = {
-        title: `${result.data!.title}のおすすめリスト`,
-        text: `${result.data!.title}のおすすめレストランをチェック！`,
-        url: generateShareUrl,
+      const payload = {
+        title: `${title}のおすすめリスト`,
+        text: `${title}のおすすめレストランをチェック！`,
+        url: generatedUrl,
       }
 
       if (canNativeShare && isMobile) {
-        const response = await share(sharePayload)
+        const response = await share(payload)
         if (response.ok)
           return
       }
 
-      setShareData(result.data!)
-      setShareUrl(generateShareUrl)
+      setShareData(result.data)
+      setShareUrl(generatedUrl)
       setShareDialogOpen(true)
     }
     catch (error) {
