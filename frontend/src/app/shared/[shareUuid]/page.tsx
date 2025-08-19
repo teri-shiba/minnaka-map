@@ -1,3 +1,4 @@
+import type { RestaurantListItem } from '~/types/restaurant'
 import { notFound, redirect } from 'next/navigation'
 import RestaurantCard from '~/components/features/restaurant/RestaurantCard'
 import Section from '~/components/layout/Section'
@@ -10,18 +11,25 @@ interface SharedListPageProps {
 
 export default async function SharedListPage({ params }: SharedListPageProps) {
   const { shareUuid } = params
+
   const sharedListResult = await fetchSharedList(shareUuid)
   if (!sharedListResult.success)
     notFound()
 
-  const hotPepperId = sharedListResult.data.favorites.map(favorite => favorite.hotpepper_id)
-  const restaurantsResult = await fetchRestaurantsByIds({ restaurantIds: hotPepperId })
-
-  if (!restaurantsResult.success)
-    redirect('/?error=restaurant_fetch_failed')
-
   const { data: sharedListData } = sharedListResult
-  const restaurants = restaurantsResult.data
+  const favoriteIds = sharedListData.favorites.map(f => f.hotpepper_id)
+
+  let restaurants: RestaurantListItem[] = []
+  if (favoriteIds.length > 0) {
+    const [first, ...rest] = favoriteIds
+    const restaurantIds: [string, ...string[]] = [first, ...rest]
+    const response = await fetchRestaurantsByIds({ restaurantIds })
+
+    if (!response.success)
+      redirect('/?error=restaurant_fetch_failed')
+
+    restaurants = response.data
+  }
 
   return (
     <>
