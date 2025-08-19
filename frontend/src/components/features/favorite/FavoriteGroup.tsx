@@ -35,7 +35,7 @@ export default function FavoriteGroup({ group }: FavoriteGroupProps) {
 
   const handleToggle = useCallback(() => setShowAll(prev => !prev), [])
 
-  const handleShare = async () => {
+  const handleShare = useCallback(async () => {
     setIsSharing(true)
 
     try {
@@ -74,7 +74,7 @@ export default function FavoriteGroup({ group }: FavoriteGroupProps) {
     finally {
       setIsSharing(false)
     }
-  }
+  }, [canNativeShare, group.searchHistory.id, isMobile, share])
 
   return (
     <section key={group.searchHistory.id}>
