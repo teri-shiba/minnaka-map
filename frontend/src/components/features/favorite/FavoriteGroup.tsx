@@ -2,7 +2,7 @@
 
 import type { SharedListData } from '~/services/create-shared-list'
 import type { FavoriteGroupWithDetails } from '~/types/favorite'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { LuChevronDown, LuChevronUp } from 'react-icons/lu'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/buttons/Button'
@@ -32,6 +32,8 @@ export default function FavoriteGroup({ group }: FavoriteGroupProps) {
 
   const hasMore = group.favorites.length > INITIAL_DISPLAY_COUNT
   const remainingCount = group.favorites.length - INITIAL_DISPLAY_COUNT
+
+  const handleToggle = useCallback(() => setShowAll(prev => !prev), [])
 
   const handleShare = async () => {
     setIsSharing(true)
@@ -105,7 +107,7 @@ export default function FavoriteGroup({ group }: FavoriteGroupProps) {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setShowAll(!showAll)}
+              onClick={handleToggle}
               className="font-normal"
             >
               {showAll ? <LuChevronUp /> : <LuChevronDown />}
