@@ -36,7 +36,7 @@ export async function fetchSharedList(shareUuid: string): Promise<ServiceResult<
     )
 
     if (!isApiSuccess(response))
-      return { success: false, message: getApiErrorMessage(response) }
+      return { success: false, message: getApiErrorMessage(response), cause: 'REQUEST_FAILED' }
 
     return { success: true, data: response.data }
   }
