@@ -103,8 +103,8 @@ export default function FavoriteGroup({ group }: FavoriteGroupProps) {
           />
         ))}
 
-        <div className="text-center">
-          {hasMore && (
+        {hasMore && (
+          <div className="text-center">
             <Button
               variant="outline"
               size="sm"
@@ -116,8 +116,8 @@ export default function FavoriteGroup({ group }: FavoriteGroupProps) {
                 {`他 ${remainingCount} 件を${showAll ? '非表示' : '表示'}`}
               </span>
             </Button>
-          )}
-        </div>
+          </div>
+        )}
 
       </div>
     </section>
