@@ -128,6 +128,7 @@ export async function fetchRestaurantsByIds(
     const apiKey = await getApiKey('hotpepper')
 
     const CHUNK_SIZE = 20
+
     const chunkCount = Math.ceil(slicedIds.length / CHUNK_SIZE)
     const chunks = Array.from({ length: chunkCount }, (_, i) => {
       const startIndex = i * CHUNK_SIZE
@@ -140,22 +141,23 @@ export async function fetchRestaurantsByIds(
         if (chunkIds.length === 0)
           return { ok: true as const, items: [] as HotPepperRestaurant[], chunkIds }
 
-        const params: Record<string, string> = {
+        const params = new URLSearchParams({
           key: apiKey,
           id: chunkIds.join(','),
           count: String(chunkIds.length),
           format: 'json',
-        }
-
-        const searchParams = new URLSearchParams(params)
+        })
 
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}/?${searchParams.toString()}`, {
-            next: {
-              revalidate: CACHE_DURATION.RESTAURANT_INFO,
-              tags: ['hotpepper:restaurants:by-ids'],
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}/?${params}`,
+            {
+              next: {
+                revalidate: CACHE_DURATION.RESTAURANT_INFO,
+                tags: ['hotpepper:restaurants:by-ids'],
+              },
             },
-          })
+          )
 
           if (!response.ok)
             return { ok: false as const, status: response.status, chunkIds }
@@ -170,8 +172,17 @@ export async function fetchRestaurantsByIds(
       }),
     )
 
-    const succeeded = perChunkResults.filter(result => result.ok) as Array<{ ok: true, items: HotPepperRestaurant[], chunkIds: string[] }>
-    const failed = perChunkResults.filter(result => !result.ok) as Array<{ ok: false, status: number, chunkIds: string[] }>
+    const succeeded = perChunkResults.filter(result => result.ok) as Array<{
+      ok: true
+      items: HotPepperRestaurant[]
+      chunkIds: string[]
+    }>
+
+    const failed = perChunkResults.filter(result => !result.ok) as Array<{
+      ok: false
+      status: number
+      chunkIds: string[]
+    }>
 
     if (succeeded.length === 0) {
       const statusList = failed.map(f => f.status)
@@ -206,7 +217,10 @@ export async function fetchRestaurantsByIds(
 
     const items = allRestaurants
       .map(transformToList)
-      .sort((leftItem, rightItem) => (orderById.get(leftItem.id)! - orderById.get(rightItem.id)!))
+      .sort(
+        (leftItem, rightItem) =>
+          (orderById.get(leftItem.id)! - orderById.get(rightItem.id)!),
+      )
 
     if (items.length !== slicedIds.length) {
       logger(new Error('Some HotPepper ids were not returned'), {
