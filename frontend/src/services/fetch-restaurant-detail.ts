@@ -1,7 +1,7 @@
 'use server'
 
 import type { HotPepperRestaurant, RestaurantDetailItem } from '~/types/restaurant'
-import type { ServiceResult } from '~/types/service-result'
+import type { ServiceCause, ServiceResult } from '~/types/service-result'
 import { CACHE_DURATION } from '~/constants'
 import { logger } from '~/lib/logger'
 import { transformToDetail } from '~/types/restaurant'
@@ -25,7 +25,7 @@ export async function fetchRestaurantDetail(id: string): Promise<ServiceResult<R
 
     if (!response.ok) {
       const status = response.status
-      const cause
+      const cause: ServiceCause
         = status === 429
           ? 'RATE_LIMIT'
           : status >= 500
@@ -62,10 +62,19 @@ export async function fetchRestaurantDetail(id: string): Promise<ServiceResult<R
   }
   catch (error) {
     logger(error, { tags: { component: 'fetchRestaurantDetail', id } })
+
+    if (error instanceof TypeError) {
+      return {
+        success: false,
+        message: 'ネットワークエラーが発生しました',
+        cause: 'NETWORK',
+      }
+    }
+
     return {
       success: false,
-      message: 'ネットワークエラーが発生しました',
-      cause: 'NETWORK',
+      message: '店舗の取得に失敗しました',
+      cause: 'REQUEST_FAILED',
     }
   }
 }
