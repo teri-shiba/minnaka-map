@@ -32,6 +32,10 @@ class Api::V1::SharedListsController < Api::V1::BaseController
                     includes(search_history: :favorites).
                     find_by!(share_uuid: params[:share_uuid])
 
+    if shared_list.search_history.favorites.empty?
+      return render_error("共有リストが見つかりません", :not_found)
+    end
+
     render_success(data: SharedFavoriteListShowSerializer.new(shared_list).serializable_hash)
   rescue ActiveRecord::RecordNotFound
     render_error("共有リストが見つかりません", :not_found)
