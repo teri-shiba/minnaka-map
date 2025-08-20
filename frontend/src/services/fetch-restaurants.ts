@@ -66,10 +66,9 @@ export async function fetchRestaurants(
       const cause: ServiceCause
         = status === 429 ? 'RATE_LIMIT' : status >= 500 ? 'SERVER_ERROR' : 'REQUEST_FAILED'
 
-      logger(
-        new Error(`HotPepper API request failed: ${status}`),
-        { tags: { component: 'fetchRestaurants', statusCode: status } },
-      )
+      logger(new Error(`HotPepper API request failed: ${status}`), {
+        tags: { component: 'fetchRestaurants', statusCode: status },
+      })
 
       return {
         success: false,
@@ -112,7 +111,7 @@ export async function fetchRestaurants(
   }
 }
 
-// TODO: エラーが多発しているので修正する [shareUuid]/page.tsx, favorite-action.ts
+// HotPepper: id 指定は 1 リクエスト最大 20 件
 export async function fetchRestaurantsByIds(
   opts: FetchRestaurantsByIds,
 ): Promise<ServiceResult<RestaurantListItem[]>> {
@@ -128,13 +127,12 @@ export async function fetchRestaurantsByIds(
 
     const apiKey = await getApiKey('hotpepper')
 
-    // HotPepper: id 指定は 1 リクエスト最大 20 件
     const CHUNK_SIZE = 20
     const chunkCount = Math.ceil(slicedIds.length / CHUNK_SIZE)
     const chunks = Array.from({ length: chunkCount }, (_, i) => {
       const startIndex = i * CHUNK_SIZE
       const endIndex = startIndex + CHUNK_SIZE
-      return (slicedIds.slice(startIndex, endIndex))
+      return slicedIds.slice(startIndex, endIndex)
     })
 
     const perChunkResults = await Promise.all(
@@ -220,10 +218,7 @@ export async function fetchRestaurantsByIds(
   }
   catch (error) {
     logger(error, {
-      tags: {
-        component: 'fetchRestaurantsByIds',
-        ids: opts.restaurantIds,
-      },
+      tags: { component: 'fetchRestaurantsByIds', ids: opts.restaurantIds },
     })
     return {
       success: false,
