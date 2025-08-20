@@ -1,16 +1,9 @@
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 import FavoritesList from '~/components/features/favorite/FavoritesList'
 import { Button } from '~/components/ui/buttons/Button'
 import { getFavoritesWithDetailsPaginated } from '~/services/favorite-action'
-import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 
 export default async function Favorites() {
-  const authData = await getAuthFromCookie()
-  if (!authData) {
-    redirect('/?error=auth_required_favorites')
-  }
-
   const favoritesResult = await getFavoritesWithDetailsPaginated(1, 3)
 
   return (
