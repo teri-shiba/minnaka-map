@@ -15,7 +15,7 @@ import type { RestaurantListItem } from '~/types/restaurant'
 import type { ServiceResult } from '~/types/service-result'
 import { logger } from '~/lib/logger'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
-import { apiFetch } from './api-client'
+import { apiFetch, handleApiError } from './api-client'
 import { fetchRestaurantsByIds } from './fetch-restaurants'
 
 // すべてのお気に入りを取得
@@ -41,8 +41,10 @@ export async function getFavorites(): Promise<ServiceResult<FavoriteGroup[]>> {
     return { success: true, data: normalizedData }
   }
   catch (error) {
-    logger(error, { tags: { component: 'fetchFavorites' } })
-    return { success: false, message: '予期しないエラーが発生しました', cause: 'NETWORK' }
+    return handleApiError(error, {
+      component: 'getFavorites',
+      defaultMessage: '予期しないエラーが発生しました',
+    })
   }
 }
 
@@ -123,12 +125,16 @@ export async function getFavoritesWithDetailsPaginated(
     return { success: true, data: groupsWithDetails, meta: normalizedMeta }
   }
   catch (error) {
-    logger(error, { tags: { component: getFavoritesWithDetailsPaginated } })
+    const failure = handleApiError(error, {
+      component: 'getFavoritesWithDetailsPaginated',
+      defaultMessage: '予期しないエラーが発生しました',
+    })
+
     return {
       success: false,
       data: [],
       meta: { currentPage: page, totalGroups: 0, hasMore: false },
-      message: '予期しないエラーが発生しました',
+      message: failure.message,
     }
   }
 }
@@ -190,8 +196,11 @@ export async function addToFavorites(
     return { success: true, favoriteId: response.data.id }
   }
   catch (error) {
-    logger(error, { tags: { component: 'addToFavorites' } })
-    return { success: false, message: '予期しないエラーが発生しました' }
+    const failure = handleApiError(error, {
+      component: 'addToFavorites',
+      defaultMessage: 'お気に入りの追加に失敗しました',
+    })
+    return { success: false, message: failure.message }
   }
 }
 
@@ -211,7 +220,10 @@ export async function removeFromFavorites(
     return { success: true }
   }
   catch (error) {
-    logger(error, { tags: { component: 'removeFromFavorites' } })
-    return { success: false, message: '予期しないエラーが発生しました' }
+    const failure = handleApiError(error, {
+      component: 'removeFromFavorites',
+      defaultMessage: 'お気に入りの削除に失敗しました',
+    })
+    return { success: false, message: failure.message }
   }
 }
