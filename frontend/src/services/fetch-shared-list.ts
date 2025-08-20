@@ -1,6 +1,7 @@
 'use server'
 
 import type { ApiResponse } from '~/types/api-response'
+import type { ServiceResult } from '~/types/service-result'
 import { logger } from '~/lib/logger'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
 import { apiFetch } from './api-client'
@@ -18,20 +19,10 @@ interface SharedListData {
   }>
 }
 
-// TODO: fetch-restaurant.ts でも同じものを使ったので共通化を検討する
-interface ServiceSuccess<T> { success: true, data: T }
-interface ServiceFailure {
-  success: false
-  message: string
-  cause?: 'NOT_FOUND' | 'RATE_LIMIT' | 'SERVER_ERROR' | 'REQUEST_FAILED' | 'NETWORK'
-}
-export type ServiceResult<T> = ServiceSuccess<T> | ServiceFailure
-
-// TODO: shareUuid -> uuid にしたい
-export async function fetchSharedList(shareUuid: string): Promise<ServiceResult<SharedListData>> {
+export async function fetchSharedList(uuid: string): Promise<ServiceResult<SharedListData>> {
   try {
     const response = await apiFetch<ApiResponse<SharedListData>>(
-      `shared_lists/${shareUuid}`,
+      `shared_lists/${uuid}`,
       'GET',
     )
 
@@ -41,7 +32,7 @@ export async function fetchSharedList(shareUuid: string): Promise<ServiceResult<
     return { success: true, data: response.data }
   }
   catch (error) {
-    logger(error, { tags: { component: 'fetchSharedList', shareUuid } })
+    logger(error, { tags: { component: 'fetchSharedList', uuid } })
 
     if (error instanceof TypeError)
       return { success: false, message: 'ネットワークエラーが発生しました', cause: 'NETWORK' }
