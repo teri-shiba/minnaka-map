@@ -37,7 +37,7 @@ async function getAuthHeader(): Promise<HeadersInit> {
 
 export async function apiFetch<T = any>(
   path: string,
-  method: 'GET' | 'POST' | 'DELETE' = 'GET',
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'GET',
   body?: any,
 ): Promise<T> {
   const url = `${process.env.API_BASE_URL}/${path}`
