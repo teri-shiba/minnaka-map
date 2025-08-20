@@ -19,6 +19,7 @@ export default async function Result({ searchParams }: ResultPageProps) {
 
   const { lat, lng } = await parseAndValidateCoordinates(params)
 
+  // TODO: ApiResponse の型定義が必要か確認 -> `verifyCoordsSignature`
   const midpoint = await verifyCoordsSignature({
     latitude: lat,
     longitude: lng,
