@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { LuArrowUpRight } from 'react-icons/lu'
 import FavoriteButton from '~/components/features/restaurant/FavoriteButton'
 import Section from '~/components/layout/Section'
@@ -17,10 +17,20 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
   const { id } = await params
   const { historyId } = await searchParams
 
-  // TODO: fetchRestaurantDetail のレスポンスを修正しないと(!result.success)はエラーなので修正した後再度確認
   const result = await fetchRestaurantDetail(id)
-  if (!result.success)
-    redirect('/?error=restaurant_fetch_failed')
+  if (!result.success) {
+    if (result.cause === 'NOT_FOUND')
+      notFound()
+
+    const error
+      = result.cause === 'RATE_LIMIT'
+        ? 'rate_limit_exceeded'
+        : result.cause === 'SERVER_ERROR'
+          ? 'server_error'
+          : 'restaurant_fetch_failed'
+
+    redirect(`/?error=${error}`)
+  }
 
   const {
     // 基本情報
@@ -47,10 +57,8 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
     parking,
   } = result.data
 
-  // GoogleMaps表示成功
+  // Google Maps：埋め込みが取れたら iframe、それ以外は検索リンク
   const mapEmbedUrl = await getGoogleMapsEmbedUrl(`${name} ${address}`)
-
-  // GoogleMaps表示失敗
   const mapSearch = new URL('https://www.google.com/maps/search/')
   mapSearch.search = new URLSearchParams({ api: '1', query: `${name} ${address}` }).toString()
 
@@ -136,7 +144,7 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
                         : (
                             <a
                               href={mapSearch.toString()}
-                              aria-label="GoogleMapsで場所を開（新しいタブで開きます）"
+                              aria-label="Google Mapsで場所を開く（新しいタブ）"
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-sky-600 hover:underline"
@@ -173,7 +181,7 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
                   <TableCell>
                     <a
                       href={urls}
-                      aria-label="ホットペッパーグルメ店舗ページ（新しいタブで開きます）"
+                      aria-label="ホットペッパーグルメ店舗ページ（新しいタブ）"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sky-600 hover:underline"
