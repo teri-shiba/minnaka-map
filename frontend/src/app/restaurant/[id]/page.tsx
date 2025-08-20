@@ -45,7 +45,7 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
     nonSmoking,
     wifi,
     parking,
-  } = result
+  } = result.data
 
   // GoogleMaps表示成功
   const mapEmbedUrl = await getGoogleMapsEmbedUrl(`${name} ${address}`)
