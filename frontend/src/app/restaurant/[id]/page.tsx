@@ -15,9 +15,7 @@ interface RestaurantDetailPageProps {
 
 export default async function RestaurantDetailPage({ params, searchParams }: RestaurantDetailPageProps) {
   const { id } = await params
-  const sp = await searchParams
-  const raw = sp.historyId
-  const historyId = Array.isArray(raw) ? raw[0] : raw
+  const { historyId } = await searchParams
 
   // TODO: fetchRestaurantDetail のレスポンスを修正しないと(!result.success)はエラーなので修正した後再度確認
   const result = await fetchRestaurantDetail(id)
