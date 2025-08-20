@@ -1,6 +1,7 @@
 'use server'
 
 import type { ApiResponse } from '~/types/api-response'
+import type { ServiceResult } from '~/types/service-result'
 import { logger } from '~/lib/logger'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
 import { apiFetch } from './api-client'
@@ -10,15 +11,6 @@ export interface SharedListData {
   title: string
   is_existing: boolean
 }
-
-// TODO: fetch-restaurant.ts でも同じものを使ったので共通化を検討する
-interface ServiceSuccess<T> { success: true, data: T }
-interface ServiceFailure {
-  success: false
-  message: string
-  cause?: 'NOT_FOUND' | 'RATE_LIMIT' | 'SERVER_ERROR' | 'REQUEST_FAILED' | 'NETWORK'
-}
-export type ServiceResult<T> = ServiceSuccess<T> | ServiceFailure
 
 export async function createSharedList(searchHistoryId: number): Promise<ServiceResult<SharedListData>> {
   try {

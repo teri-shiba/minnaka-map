@@ -1,17 +1,12 @@
+'use server'
+
 import type { PaginatedResult } from '~/types/pagination'
 import type { HotPepperRestaurant, RestaurantListItem } from '~/types/restaurant'
+import type { ServiceCause, ServiceResult } from '~/types/service-result'
 import { CACHE_DURATION } from '~/constants'
 import { logger } from '~/lib/logger'
 import { transformToList } from '~/types/restaurant'
 import { getApiKey } from './get-api-key'
-
-interface ServiceSuccess<T> { success: true, data: T }
-interface ServiceFailure {
-  success: false
-  message: string
-  cause?: 'RATE_LIMIT' | 'SERVER_ERROR' | 'REQUEST_FAILED' | 'NETWORK'
-}
-type ServiceResult<T> = ServiceSuccess<T> | ServiceFailure
 
 type NonEmptyArray<T> = [T, ...T[]]
 
@@ -68,7 +63,7 @@ export async function fetchRestaurants(
 
     if (!response.ok) {
       const status = response.status
-      const cause: ServiceFailure['cause']
+      const cause: ServiceCause
         = status === 429 ? 'RATE_LIMIT' : status >= 500 ? 'SERVER_ERROR' : 'REQUEST_FAILED'
 
       logger(
@@ -117,6 +112,7 @@ export async function fetchRestaurants(
   }
 }
 
+// TODO: エラーが多発しているので修正する [shareUuid]/page.tsx, favorite-action.ts
 export async function fetchRestaurantsByIds(
   opts: FetchRestaurantsByIds,
 ): Promise<ServiceResult<RestaurantListItem[]>> {
@@ -181,7 +177,7 @@ export async function fetchRestaurantsByIds(
 
     if (succeeded.length === 0) {
       const statusList = failed.map(f => f.status)
-      const cause: ServiceFailure['cause']
+      const cause: ServiceCause
         = statusList.includes(429)
           ? 'RATE_LIMIT'
           : statusList.some(status => status >= 500)
