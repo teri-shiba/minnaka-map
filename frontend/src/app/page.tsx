@@ -100,9 +100,9 @@ export default function Home() {
             />
             <h3 className="mb-2 text-lg text-secondary-foreground">デートの場所選びに</h3>
             <p className="text-center text-sm leading-6 text-secondary-foreground">
-              みんなの中間地点と周辺の飲食店を提案。
-              <br />
               ふたりの中間地点とおすすめ飲食店を提案。
+              <br />
+              素敵なデートスポットが簡単に見つかるので、
               <br />
               思い出に残るデートが実現できます。
             </p>
