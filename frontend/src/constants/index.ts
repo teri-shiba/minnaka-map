@@ -25,6 +25,13 @@ export const dynamicPaths = {
 export type StaticEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS]
 
 // ===============================================
+// EXTERNAL API Paths
+// ===============================================
+export const EXTERNAL_ENDPOINT = {
+  HOTPEPPER_GURUMET_V1: '/hotpepper/gourmet/v1/',
+} as const
+
+// ===============================================
 // API Services Configuration
 // ===============================================
 export const API_SERVICES = {
