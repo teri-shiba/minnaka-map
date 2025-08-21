@@ -4,6 +4,8 @@ import type { ServiceFailure } from '~/types/service-result'
 import { logger } from '~/lib/logger'
 import { getAuthFromCookie } from './get-auth-from-cookie'
 
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+
 interface ErrorHandlingOptions {
   component: string
   defaultMessage: string
@@ -57,7 +59,7 @@ async function getAuthHeader(
 
 export async function apiFetch<T = any>(
   path: string,
-  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'GET',
+  method: HttpMethod = 'GET',
   body?: any,
   options: ApiFetchOptions = {},
 ): Promise<T> {
