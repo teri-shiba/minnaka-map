@@ -6,7 +6,7 @@ import type { AuthProvider } from '~/types/auth-provider'
 export const API_PREFIX = '/api/v1' as const
 
 export const API_ENDPOINTS = {
-  STATION: '/stations',
+  STATIONS: '/stations',
   MIDPOINT: '/midpoint',
   VALIDATE_COORDINATES: 'validate_coordinates',
   AUTH: '/auth',
