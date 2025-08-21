@@ -23,7 +23,6 @@ export async function fetchSharedList(uuid: string): Promise<ServiceResult<Share
     const response = await apiFetch<ApiResponse<SharedListData>>(
       `shared_lists/${uuid}`,
       'GET',
-      undefined,
       { withAuth: false },
     )
 

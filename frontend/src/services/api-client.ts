@@ -20,8 +20,8 @@ interface ApiFetchOptions {
 
 export class ApiError extends Error {
   readonly status: number
-  readonly body: string
-  constructor(status: number, message: string, body: string) {
+  readonly body?: string
+  constructor(status: number, message: string, body?: string) {
     super(message)
     this.name = 'ApiError'
     this.status = status

@@ -13,7 +13,6 @@ export async function getApiKey(service: SupportedService): Promise<string> {
     const response = await apiFetch<ApiResponse<{ api_key: string }>>(
       config.endpoint,
       'GET',
-      undefined,
       {
         withAuth: false,
         extraHeaders: {
