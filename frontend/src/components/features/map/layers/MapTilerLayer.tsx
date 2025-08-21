@@ -23,7 +23,9 @@ export default function MapTilerLayer({ apiKey }: ApiKeyProps) {
       return
     }
 
-    const styleUrl = `https://api.maptiler.com/maps/${styleId}/style.json?key=${apiKey}`
+    const styleUrlObj = new URL(`https://api.maptiler.com/maps/${styleId}/style.json`)
+    styleUrlObj.searchParams.set('key', apiKey)
+    const styleUrl = styleUrlObj.toString()
 
     const layer = new MaptilerLayer({
       apiKey,
