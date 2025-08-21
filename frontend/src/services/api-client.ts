@@ -11,10 +11,15 @@ interface ErrorHandlingOptions {
   extraContext?: Record<string, any>
 }
 
+interface ApiFetchOptions {
+  readonly withAuth?: boolean
+  readonly extraHeaders?: HeadersInit
+}
+
 export class ApiError extends Error {
   readonly status: number
-  readonly body?: string
-  constructor(status: number, message: string, body?: string) {
+  readonly body: string
+  constructor(status: number, message: string, body: string) {
     super(message)
     this.name = 'ApiError'
     this.status = status
@@ -22,13 +27,28 @@ export class ApiError extends Error {
   }
 }
 
-async function getAuthHeader(): Promise<HeadersInit> {
+async function getAuthHeader(
+  method: string,
+  withAuth: boolean,
+  extraHeaders?: HeadersInit,
+): Promise<HeadersInit> {
+  const base: HeadersInit = {}
+
+  if (method !== 'GET')
+    base['Content-Type'] = 'application/json'
+
+  if (extraHeaders)
+    Object.assign(base, extraHeaders)
+
+  if (!withAuth)
+    return base
+
   const auth = await getAuthFromCookie()
   if (!auth)
-    return {}
+    return base
 
   return {
-    'Content-Type': 'application/json',
+    ...base,
     'access-token': auth.accessToken,
     'client': auth.client,
     'uid': auth.uid,
@@ -39,9 +59,11 @@ export async function apiFetch<T = any>(
   path: string,
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'GET',
   body?: any,
+  options: ApiFetchOptions = {},
 ): Promise<T> {
+  const { withAuth = true, extraHeaders } = options
   const url = `${process.env.API_BASE_URL}/${path}`
-  const headers = await getAuthHeader()
+  const headers = await getAuthHeader(method, withAuth, extraHeaders)
 
   try {
     const response = await fetch(url, {
@@ -51,14 +73,22 @@ export async function apiFetch<T = any>(
     })
 
     if (!response.ok) {
-      const text = await response.text()
-      throw new Error(`${method} ${url} failed: ${response.status} ${text}`)
+      const text = await response.text().catch(() => '')
+      const error = new ApiError(response.status, `${method} ${url} failed`, text)
+
+      logger(error, {
+        tags: { component: 'apiFetch', path, method, status: response.status, withAuth },
+      })
+
+      throw error
     }
 
     return await response.json() as T
   }
   catch (error) {
-    logger(error, { tags: { component: 'api-client' } })
+    if (!(error instanceof ApiError)) {
+      logger(error, { tags: { component: 'api-client', path, method, withAuth } })
+    }
     throw error
   }
 }
@@ -69,7 +99,9 @@ export function handleApiError(
 ): ServiceFailure {
   const { component, defaultMessage, notFoundMessage, extraContext } = options
 
-  logger(error, { tags: { component, ...extraContext } })
+  if (!(error instanceof ApiError)) {
+    logger(error, { tags: { component, ...extraContext } })
+  }
 
   if (error instanceof ApiError) {
     if (error.status === 404)

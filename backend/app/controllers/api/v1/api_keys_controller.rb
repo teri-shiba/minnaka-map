@@ -1,4 +1,6 @@
 class Api::V1::ApiKeysController < Api::V1::BaseController
+  before_action :verify_internal_token!
+
   SUPPORTED_SERVICE = {
     "hotpepper" => :hotpepper,
     "maptiler" => :map_tiler,
@@ -23,4 +25,20 @@ class Api::V1::ApiKeysController < Api::V1::BaseController
       render_error("APIキーが設定されていません", :internal_server_error)
     end
   end
+
+  private
+
+    def verify_internal_token!
+      provided_token = request.headers["X-Internal-Token"].to_s
+      expected_token = Rails.application.credentials.internal_api_token.to_s
+
+      is_valid = provided_token.present? &&
+                 expected_token.present? &&
+                 ActiveSupport::SecurityUtils.secure_compare(provided_token, expected_token)
+
+      unless is_valid
+        Rails.logger.warn "invalid internal token attempt from #{request.remote_ip}"
+        render_error("Forbidden", :forbidden)
+      end
+    end
 end
