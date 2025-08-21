@@ -3,9 +3,10 @@
 import type { PaginatedResult } from '~/types/pagination'
 import type { HotPepperRestaurant, RestaurantListItem } from '~/types/restaurant'
 import type { ServiceCause, ServiceResult } from '~/types/service-result'
-import { CACHE_DURATION } from '~/constants'
+import { CACHE_DURATION, EXTERNAL_ENDPOINT } from '~/constants'
 import { logger } from '~/lib/logger'
 import { transformToList } from '~/types/restaurant'
+import { externalHref } from '~/utils/external-url'
 import { getApiKey } from './get-api-key'
 
 type NonEmptyArray<T> = [T, ...T[]]
@@ -47,8 +48,13 @@ export async function fetchRestaurants(
     if (opts.genre)
       params.genre = opts.genre
 
-    const searchParams = new URLSearchParams(params)
-    const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}/?${searchParams}`, {
+    const url = externalHref(
+      process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL,
+      EXTERNAL_ENDPOINT.HOTPEPPER_GURUMET_V1,
+      params,
+    )
+
+    const response = await fetch(url, {
       next: {
         revalidate: CACHE_DURATION.RESTAURANT_INFO,
         tags: [
@@ -149,15 +155,18 @@ export async function fetchRestaurantsByIds(
         })
 
         try {
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}/?${params}`,
-            {
-              next: {
-                revalidate: CACHE_DURATION.RESTAURANT_INFO,
-                tags: ['hotpepper:restaurants:by-ids'],
-              },
-            },
+          const url = externalHref(
+            process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL,
+            EXTERNAL_ENDPOINT.HOTPEPPER_GURUMET_V1,
+            params,
           )
+
+          const response = await fetch(url, {
+            next: {
+              revalidate: CACHE_DURATION.RESTAURANT_INFO,
+              tags: ['hotpepper:restaurants:by-ids'],
+            },
+          })
 
           if (!response.ok)
             return { ok: false as const, status: response.status, chunkIds }
