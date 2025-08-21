@@ -3,9 +3,10 @@
 import { useAtom } from 'jotai'
 import Image from 'next/image'
 import { useState } from 'react'
-import { AUTH_PROVIDERS } from '~/constants'
+import { AUTH_PROVIDERS, dynamicPaths } from '~/constants'
 import logoMark from '~/public/logo_mark.webp'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
+import { apiHref } from '~/utils/api-url'
 import { Button } from '../buttons/Button'
 import LoginForm from '../forms/LoginForm'
 import SignUpForm from '../forms/SignUpForm'
@@ -70,7 +71,7 @@ export function AuthDrawer() {
             {AUTH_PROVIDERS.map(provider => (
               <a
                 key={provider.name}
-                href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/provider/${provider.authUrl}`}
+                href={apiHref(dynamicPaths.oauthProvider(provider.authUrl))}
                 className="flex h-auto w-full items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent max-[383px]:[&:not(:last-child)]:mb-3"
               >
                 <Image
