@@ -65,7 +65,7 @@ export function useAuth() {
   const login = useCallback(
     async (email: string, password: string) => {
       try {
-        await api.post('/auth/sign_in', { email, password })
+        await api.post(API_ENDPOINTS.AUTH_SIGN_IN, { email, password })
         await mutate(API_ENDPOINTS.CURRENT_USER_STATUS)
         toast.success('ログインに成功しました')
       }
@@ -79,7 +79,8 @@ export function useAuth() {
   const logout = useCallback(
     async () => {
       try {
-        await api.delete('/auth/sign_out')
+        // TODO: ログアウトって delete でいいの？
+        await api.delete(API_ENDPOINTS.AUTH_SIGN_OUT)
         mutate(API_ENDPOINTS.CURRENT_USER_STATUS)
         resetUser()
         sessionStorage.removeItem('pendingStationIds')
