@@ -12,6 +12,9 @@ export const API_ENDPOINTS = {
   AUTH: '/auth',
   PROVIDER: '/provider',
   CURRENT_USER_STATUS: '/current/user/show_status',
+  AUTH_SIGN_IN: '/auth/sign_in',
+  AUTH_SIGN_OUT: '/auth/sign_out',
+  USER_CONFIRMATIONS: '/user/confirmations',
 } as const
 
 export const dynamicPaths = {
