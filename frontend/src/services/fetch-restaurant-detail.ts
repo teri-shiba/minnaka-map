@@ -2,7 +2,7 @@
 
 import type { HotPepperRestaurant, RestaurantDetailItem } from '~/types/restaurant'
 import type { ServiceCause, ServiceResult } from '~/types/service-result'
-import { CACHE_DURATION, EXTERNAL_ENDPOINT } from '~/constants'
+import { CACHE_DURATION, EXTERNAL_ENDPOINTS } from '~/constants'
 import { logger } from '~/lib/logger'
 import { transformToDetail } from '~/types/restaurant'
 import { externalHref } from '~/utils/external-url'
@@ -19,7 +19,7 @@ export async function fetchRestaurantDetail(id: string): Promise<ServiceResult<R
 
     const url = externalHref(
       process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL,
-      EXTERNAL_ENDPOINT.HOTPEPPER_GURUMET_V1,
+      EXTERNAL_ENDPOINTS.HOTPEPPER_GOURMET_V1,
       params,
     )
 
