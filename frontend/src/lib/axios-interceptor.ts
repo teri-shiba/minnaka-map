@@ -1,8 +1,9 @@
 import axios from 'axios'
 import { toast } from 'sonner'
+import { apiBaseHref } from '~/utils/api-url'
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: apiBaseHref(),
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
   timeout: 5000,
