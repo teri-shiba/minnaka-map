@@ -27,8 +27,8 @@ export type StaticEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS]
 // ===============================================
 // EXTERNAL API Paths
 // ===============================================
-export const EXTERNAL_ENDPOINT = {
-  HOTPEPPER_GURUMET_V1: '/hotpepper/gourmet/v1/',
+export const EXTERNAL_ENDPOINTS = {
+  HOTPEPPER_GOURMET_V1: '/hotpepper/gourmet/v1/',
 } as const
 
 // ===============================================

@@ -3,7 +3,7 @@
 import type { PaginatedResult } from '~/types/pagination'
 import type { HotPepperRestaurant, RestaurantListItem } from '~/types/restaurant'
 import type { ServiceCause, ServiceResult } from '~/types/service-result'
-import { CACHE_DURATION, EXTERNAL_ENDPOINT } from '~/constants'
+import { CACHE_DURATION, EXTERNAL_ENDPOINTS } from '~/constants'
 import { logger } from '~/lib/logger'
 import { transformToList } from '~/types/restaurant'
 import { externalHref } from '~/utils/external-url'
@@ -50,7 +50,7 @@ export async function fetchRestaurants(
 
     const url = externalHref(
       process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL,
-      EXTERNAL_ENDPOINT.HOTPEPPER_GURUMET_V1,
+      EXTERNAL_ENDPOINTS.HOTPEPPER_GOURMET_V1,
       params,
     )
 
@@ -157,7 +157,7 @@ export async function fetchRestaurantsByIds(
         try {
           const url = externalHref(
             process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL,
-            EXTERNAL_ENDPOINT.HOTPEPPER_GURUMET_V1,
+            EXTERNAL_ENDPOINTS.HOTPEPPER_GOURMET_V1,
             params,
           )
 
