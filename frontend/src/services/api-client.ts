@@ -13,7 +13,9 @@ interface ErrorHandlingOptions {
   extraContext?: Record<string, any>
 }
 
-interface ApiFetchOptions {
+interface ApiRequestOptions {
+  readonly method?: HttpMethod
+  readonly body?: unknown
   readonly withAuth?: boolean
   readonly extraHeaders?: HeadersInit
 }
@@ -29,63 +31,68 @@ export class ApiError extends Error {
   }
 }
 
-async function getAuthHeader(
-  method: string,
-  withAuth: boolean,
-  extraHeaders?: HeadersInit,
-): Promise<HeadersInit> {
-  const base: HeadersInit = {}
-
-  if (method !== 'GET')
-    base['Content-Type'] = 'application/json'
-
-  if (extraHeaders)
-    Object.assign(base, extraHeaders)
-
-  if (!withAuth)
-    return base
-
+async function addAuthHeaders(headers: Headers): Promise<void> {
   const auth = await getAuthFromCookie()
   if (!auth)
-    return base
+    return
 
-  return {
-    ...base,
-    'access-token': auth.accessToken,
-    'client': auth.client,
-    'uid': auth.uid,
-  }
+  headers.set('access-token', auth.accessToken)
+  headers.set('client', auth.client)
+  headers.set('uid', auth.uid)
 }
 
 export async function apiFetch<T = any>(
   path: string,
-  method: HttpMethod = 'GET',
-  body?: any,
-  options: ApiFetchOptions = {},
+  options: ApiRequestOptions = {},
 ): Promise<T> {
-  const { withAuth = true, extraHeaders } = options
+  const {
+    method = 'GET',
+    body,
+    withAuth = false,
+    extraHeaders,
+  } = options
+
   const url = `${process.env.API_BASE_URL}/${path}`
-  const headers = await getAuthHeader(method, withAuth, extraHeaders)
+
+  const headers = new Headers({ Accept: 'application/json' })
+  if (method !== 'GET')
+    headers.set('Content-Type', 'application/json')
+  if (extraHeaders)
+    new Headers(extraHeaders).forEach((value, headerName) => headers.set(headerName, value))
+  if (withAuth)
+    await addAuthHeaders(headers)
 
   try {
     const response = await fetch(url, {
       method,
       headers,
-      body: body ? JSON.stringify(body) : undefined,
+      body: body != null ? JSON.stringify(body) : undefined,
     })
 
     if (!response.ok) {
-      const text = await response.text().catch(() => '')
+      const text = await response.text().catch(() => undefined)
       const error = new ApiError(response.status, `${method} ${url} failed`, text)
 
-      logger(error, {
+      logger(`${method} ${path} failed`, {
         tags: { component: 'apiFetch', path, method, status: response.status, withAuth },
       })
 
       throw error
     }
 
-    return await response.json() as T
+    const contentType = response.headers.get('content-type') ?? ''
+    const isText = contentType.includes('text/')
+    const isNoContent = response.status === 204
+
+    if (isText) {
+      const text = await response.text()
+      return text as unknown as T
+    }
+
+    if (isNoContent)
+      return null as T
+
+    return (await response.json()) as T
   }
   catch (error) {
     if (!(error instanceof ApiError)) {
@@ -95,6 +102,22 @@ export async function apiFetch<T = any>(
   }
 }
 
+// 認証付き
+export function apiFetchAuth<T = unknown>(
+  path: string,
+  options: Omit<ApiRequestOptions, 'withAuth'> = {},
+): Promise<T> {
+  return apiFetch<T>(path, { ...options, withAuth: true })
+}
+
+// 認証なし
+export function apiFetchPublic<T = unknown>(
+  path: string,
+  options: Omit<ApiRequestOptions, 'withAuth'> = {},
+): Promise<T> {
+  return apiFetch<T>(path, { ...options, withAuth: false })
+}
+
 export function handleApiError(
   error: unknown,
   options: ErrorHandlingOptions,
@@ -102,10 +125,14 @@ export function handleApiError(
   const { component, defaultMessage, notFoundMessage, extraContext } = options
 
   if (!(error instanceof ApiError)) {
-    logger(error, { tags: { component, ...extraContext } })
+    logger('handleApiError: non-ApiError', { tags: { component, ...extraContext } })
   }
 
   if (error instanceof ApiError) {
+    if (error.status === 401)
+      return { success: false, message: '認証が必要です', cause: 'UNAUTHORIZED' }
+    if (error.status === 403)
+      return { success: false, message: '権限がありません', cause: 'FORBIDDEN' }
     if (error.status === 404)
       return { success: false, message: notFoundMessage ?? 'リソースが見つかりません', cause: 'NOT_FOUND' }
     if (error.status === 429)
