@@ -11,6 +11,7 @@ export const API_ENDPOINTS = {
   VALIDATE_COORDINATES: 'validate_coordinates',
   AUTH: '/auth',
   PROVIDER: '/provider',
+  CURRENT_USER_STATUS: '/current/user/show_status',
 } as const
 
 export const dynamicPaths = {
