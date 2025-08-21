@@ -2,9 +2,10 @@
 
 import type { HotPepperRestaurant, RestaurantDetailItem } from '~/types/restaurant'
 import type { ServiceCause, ServiceResult } from '~/types/service-result'
-import { CACHE_DURATION } from '~/constants'
+import { CACHE_DURATION, EXTERNAL_ENDPOINT } from '~/constants'
 import { logger } from '~/lib/logger'
 import { transformToDetail } from '~/types/restaurant'
+import { externalHref } from '~/utils/external-url'
 import { getApiKey } from './get-api-key'
 
 export async function fetchRestaurantDetail(id: string): Promise<ServiceResult<RestaurantDetailItem>> {
@@ -16,7 +17,13 @@ export async function fetchRestaurantDetail(id: string): Promise<ServiceResult<R
       format: 'json',
     })
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL}/?${params}`, {
+    const url = externalHref(
+      process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL,
+      EXTERNAL_ENDPOINT.HOTPEPPER_GURUMET_V1,
+      params,
+    )
+
+    const response = await fetch(url, {
       next: {
         revalidate: CACHE_DURATION.RESTAURANT_INFO,
         tags: ['hotpepper:restaurant-detail', `id:${id}`],
