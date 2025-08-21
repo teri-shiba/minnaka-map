@@ -2,6 +2,7 @@
 
 import type { ServiceFailure } from '~/types/service-result'
 import { logger } from '~/lib/logger'
+import { apiUrl } from '~/utils/api-url'
 import { getAuthFromCookie } from './get-auth-from-cookie'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -52,7 +53,7 @@ export async function apiFetch<T = any>(
     extraHeaders,
   } = options
 
-  const url = `${process.env.API_BASE_URL}/${path}`
+  const url = apiUrl(path).toString()
 
   const headers = new Headers({ Accept: 'application/json' })
   if (method !== 'GET')
