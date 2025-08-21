@@ -4,6 +4,8 @@ export type ServiceCause =
   | 'SERVER_ERROR'
   | 'REQUEST_FAILED'
   | 'NOT_FOUND'
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN'
 
 export interface ServiceSuccess<T> {
   readonly success: true
