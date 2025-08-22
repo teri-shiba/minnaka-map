@@ -47,7 +47,7 @@ export async function verifyCoordsSignature(
     })
 
     if (!result.valid)
-      return { success: false, message: '是票の検証に失敗しました', cause: 'REQUEST_FAILED' }
+      return { success: false, message: '座標の検証に失敗しました', cause: 'REQUEST_FAILED' }
 
     return { success: true, data: [opts.latitude, opts.longitude] }
   }
