@@ -1,37 +1,37 @@
+'use server'
+
 import type { SupportedService } from '~/constants'
+import type { ApiResponse } from '~/types/api-response'
 import { API_SERVICES } from '~/constants'
-import { logger } from '~/lib/logger'
+import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
+import { apiFetchPublic, handleApiError } from './api-client'
 
 export async function getApiKey(service: SupportedService): Promise<string> {
   const config = API_SERVICES[service]
-
-  if (!config) {
+  if (!config)
     throw new Error(`未対応のサービスです: ${service}`)
-  }
 
   try {
-    const response = await fetch(`${process.env.API_BASE_URL}/${config.endpoint}`, {
-      next: { revalidate: 3600 },
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await apiFetchPublic<ApiResponse<{ api_key: string }>>(
+      config.endpoint,
+      {
+        extraHeaders: { 'X-Internal-Token': process.env.INTERNAL_API_TOKEN! },
       },
-    })
+    )
 
-    if (!response.ok) {
-      throw new Error(`${config.serviceName} APIキー取得失敗: HTTP ${response.status}`)
-    }
+    if (!isApiSuccess(response))
+      throw new Error(`${config.serviceName} APIキー取得失敗: ${getApiErrorMessage(response)}`)
 
-    const data = await response.json()
-    return data.api_key
+    return response.data.api_key
   }
   catch (error) {
-    logger(error, {
-      service: config.serviceName,
-      tags: { component: 'getApiKey' },
+    const failure = handleApiError(error, {
+      component: 'getApiKey',
+      defaultMessage: `${config.serviceName} APIキー取得に失敗しました`,
+      notFoundMessage: `${config.serviceName} APIキーが見つかりません`,
+      extraContext: { service },
     })
 
-    throw error instanceof Error
-      ? error
-      : new Error(`${config.serviceName} APIキー取得で予期しないエラーが発生しました`)
+    throw new Error(`${config.serviceName} APIキー取得失敗: ${failure.message}`)
   }
 }

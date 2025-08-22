@@ -3,6 +3,7 @@ import { useResetAtom } from 'jotai/utils'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 import useSWR, { useSWRConfig } from 'swr'
+import { API_ENDPOINTS } from '~/constants'
 import api from '~/lib/axios-interceptor'
 import { userStateAtom } from '~/state/user-state.atom'
 
@@ -17,7 +18,7 @@ export function useAuth() {
     api.get(url).then(response => response.data)
 
   const { error, isLoading, isValidating } = useSWR(
-    '/current/user/show_status',
+    API_ENDPOINTS.CURRENT_USER_STATUS,
     fetcher,
     {
       onSuccess: (data) => {
@@ -64,8 +65,8 @@ export function useAuth() {
   const login = useCallback(
     async (email: string, password: string) => {
       try {
-        await api.post('/auth/sign_in', { email, password })
-        await mutate('/current/user/show_status')
+        await api.post(API_ENDPOINTS.AUTH_SIGN_IN, { email, password })
+        await mutate(API_ENDPOINTS.CURRENT_USER_STATUS)
         toast.success('ログインに成功しました')
       }
       catch {
@@ -78,8 +79,9 @@ export function useAuth() {
   const logout = useCallback(
     async () => {
       try {
-        await api.delete('/auth/sign_out')
-        mutate('/current/user/show_status')
+        // TODO: ログアウトって delete でいいの？
+        await api.delete(API_ENDPOINTS.AUTH_SIGN_OUT)
+        mutate(API_ENDPOINTS.CURRENT_USER_STATUS)
         resetUser()
         sessionStorage.removeItem('pendingStationIds')
         sessionStorage.removeItem('pendingSearchHistoryId')

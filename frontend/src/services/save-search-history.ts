@@ -1,38 +1,37 @@
 'use server'
 
 import type { ApiResponse } from '~/types/api-response'
-import { logger } from '~/lib/logger'
-import { apiFetch } from './api-client'
+import type { ServiceResult } from '~/types/service-result'
+import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
+import { apiFetchAuth, handleApiError } from './api-client'
 
 export async function saveSearchHistory(
   stationIds: number[],
-): Promise<ApiResponse<{ searchHistoryId: number | null }>> {
+): Promise<ServiceResult<{ searchHistoryId: number | null }>> {
   try {
-    const result = await apiFetch<ApiResponse<{ id: number }>>(
+    const response = await apiFetchAuth<ApiResponse<{ id: number }>>(
       'search_histories',
-      'POST',
-      { search_history: { station_ids: stationIds } },
+      {
+        method: 'POST',
+        body: {
+          search_history: { station_ids: stationIds },
+        },
+      },
     )
 
-    if (!result.success) {
-      return {
-        success: false,
-        data: { searchHistoryId: null },
-        message: result.message,
-      }
-    }
+    if (!isApiSuccess(response))
+      return { success: false, message: getApiErrorMessage(response), cause: 'REQUEST_FAILED' }
 
     return {
       success: true,
-      data: { searchHistoryId: result.data.id },
+      data: { searchHistoryId: response.data.id },
     }
   }
   catch (error) {
-    logger(error, { tags: { component: 'api-client' } })
-    return {
-      success: false,
-      data: { searchHistoryId: null },
-      message: '予期しないエラーが発生しました',
-    }
+    return handleApiError(error, {
+      component: 'saveSearchHistory',
+      defaultMessage: '検索履歴の保存に失敗しました',
+      extraContext: { stationIds },
+    })
   }
 }

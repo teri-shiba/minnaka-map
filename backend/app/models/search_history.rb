@@ -3,6 +3,7 @@ class SearchHistory < ApplicationRecord
   has_many :search_history_start_stations, dependent: :destroy
   has_many :favorites, dependent: :destroy
   has_many :start_stations, through: :search_history_start_stations, source: :station
+  has_many :shared_favorite_lists, dependent: :destroy
 
   def station_names
     start_stations.pluck(:name)

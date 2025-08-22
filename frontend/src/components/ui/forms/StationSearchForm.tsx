@@ -6,8 +6,10 @@ import { useRouter } from 'next/navigation'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/buttons/Button'
+import { API_ENDPOINTS } from '~/constants'
 import { logger } from '~/lib/logger'
 import { stationSearchSchema } from '~/schemas/station-search.schema'
+import { apiHref } from '~/utils/api-url'
 import StationAutocomplete from '../autocomplete/StationAutocomplete'
 import { AddFormButton } from '../buttons/AddFormButton'
 import { RemoveFormButton } from '../buttons/RemoveFormButton'
@@ -64,8 +66,9 @@ export default function StationSearchForm() {
         sessionStorage.setItem('pendingStationIds', JSON.stringify(stationIds))
       }
 
+      // TODO: クライアントフェッチなのに useSWR を使っていないのはなぜ？
       const midpointResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/midpoint`,
+        apiHref(API_ENDPOINTS.MIDPOINT),
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -18,7 +18,7 @@ interface ShareDialogProps {
   station: string
 }
 
-export function ShareDialog({
+export default function ShareRestaurantDialog({
   restaurantName,
   restaurantAddress,
   station,

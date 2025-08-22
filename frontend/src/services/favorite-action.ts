@@ -12,17 +12,19 @@ import type {
   RawFavoritePaginationMeta,
 } from '~/types/favorite'
 import type { RestaurantListItem } from '~/types/restaurant'
+import type { ServiceResult } from '~/types/service-result'
 import { logger } from '~/lib/logger'
-import { apiFetch } from './api-client'
+import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
+import { apiFetchAuth, handleApiError } from './api-client'
 import { fetchRestaurantsByIds } from './fetch-restaurants'
 
 // すべてのお気に入りを取得
-export async function getFavorites(): Promise<ApiResponse<FavoriteGroup[]>> {
+export async function getFavorites(): Promise<ServiceResult<FavoriteGroup[]>> {
   try {
-    const response = await apiFetch<ApiResponse<RawFavoriteGroup[]>>('favorites', 'GET')
+    const response = await apiFetchAuth<ApiResponse<RawFavoriteGroup[]>>('favorites')
 
-    if (!response.success)
-      return { success: false, data: [], message: response.message }
+    if (!isApiSuccess(response))
+      return { success: false, message: getApiErrorMessage(response), cause: 'REQUEST_FAILED' }
 
     const normalizedData: FavoriteGroup[] = response.data.map(group => ({
       searchHistory: {
@@ -39,51 +41,58 @@ export async function getFavorites(): Promise<ApiResponse<FavoriteGroup[]>> {
     return { success: true, data: normalizedData }
   }
   catch (error) {
-    logger(error, { tags: { component: 'fetchFavorites' } })
-    return { success: false, data: [], message: '予期しないエラーが発生しました' }
+    return handleApiError(error, {
+      component: 'getFavorites',
+      defaultMessage: '予期しないエラーが発生しました',
+    })
   }
 }
 
-// 詳細情報付きのお気に入りを取得
-// ページネーション対応
+// 詳細情報付きのお気に入りを取得（ページネーション対応）
 export async function getFavoritesWithDetailsPaginated(
   page: number = 1,
   limit: number = 5,
 ): Promise<PaginatedFavoritesResponse> {
   try {
-    const response = await apiFetch<ApiResponse<RawFavoriteGroup[]> & { meta: RawFavoritePaginationMeta }>(
+    const response = await apiFetchAuth<ApiResponse<RawFavoriteGroup[]> & { meta: RawFavoritePaginationMeta }>(
       `favorites?page=${page}&limit=${limit}`,
-      'GET',
     )
 
-    if (!response.success) {
+    if (!isApiSuccess(response)) {
       return {
         success: false,
         data: [],
         meta: { currentPage: page, totalGroups: 0, hasMore: false },
-        message: response.message,
+        message: getApiErrorMessage(response),
       }
     }
 
-    const hotPepperId = Array.from(
+    const hotPepperIds = Array.from(
       new Set(response.data.flatMap(group => group.favorites.map(fav => fav.hotpepper_id))),
     )
 
-    const restaurantResult = await fetchRestaurantsByIds({ restaurantIds: hotPepperId })
+    let restaurantMap = new Map<string, RestaurantListItem>()
+    if (hotPepperIds.length > 0) {
+      const [first, ...rest] = hotPepperIds
+      const restaurantIds: [string, ...string[]] = [first, ...rest]
+      const restaurantResult = await fetchRestaurantsByIds({ restaurantIds })
 
-    if (!restaurantResult.success) {
-      logger(new Error(restaurantResult.error), { tags: { component: 'getFavoritesWithDetailsPaginated' } })
-      return {
-        success: false,
-        data: [],
-        meta: { currentPage: page, totalGroups: 0, hasMore: false },
-        message: 'レストラン情報の取得に失敗しました',
+      if (!restaurantResult.success) {
+        logger(new Error(restaurantResult.message), {
+          tags: { component: 'getFavoritesWithDetailsPaginated' },
+        })
+        return {
+          success: false,
+          data: [],
+          meta: { currentPage: page, totalGroups: 0, hasMore: false },
+          message: 'レストラン情報の取得に失敗しました',
+        }
       }
-    }
 
-    const restaurantMap = new Map<string, RestaurantListItem>(
-      restaurantResult.data.map(res => [res.id, res]),
-    )
+      restaurantMap = new Map<string, RestaurantListItem>(
+        restaurantResult.data.map(res => [res.id, res]),
+      )
+    }
 
     const isNotNull = <T>(value: T | null): value is T => value !== null
 
@@ -115,12 +124,16 @@ export async function getFavoritesWithDetailsPaginated(
     return { success: true, data: groupsWithDetails, meta: normalizedMeta }
   }
   catch (error) {
-    logger(error, { tags: { component: getFavoritesWithDetailsPaginated } })
+    const failure = handleApiError(error, {
+      component: 'getFavoritesWithDetailsPaginated',
+      defaultMessage: '予期しないエラーが発生しました',
+    })
+
     return {
       success: false,
       data: [],
       meta: { currentPage: page, totalGroups: 0, hasMore: false },
-      message: '予期しないエラーが発生しました',
+      message: failure.message,
     }
   }
 }
@@ -165,21 +178,30 @@ export async function addToFavorites(
   searchHistoryId: number,
 ): Promise<FavoriteActionResponse> {
   try {
-    const response = await apiFetch<ApiResponse<{ id: number }>>('favorites', 'POST', {
-      favorite: {
-        search_history_id: searchHistoryId,
-        hotpepper_id: hotPepperId,
+    const response = await apiFetchAuth<ApiResponse<{ id: number }>>(
+      'favorites',
+      {
+        method: 'POST',
+        body: {
+          favorite: {
+            search_history_id: searchHistoryId,
+            hotpepper_id: hotPepperId,
+          },
+        },
       },
-    })
+    )
 
-    if (!response.success)
-      return { success: false, message: response.message }
+    if (!isApiSuccess(response))
+      return { success: false, message: getApiErrorMessage(response) }
 
     return { success: true, favoriteId: response.data.id }
   }
   catch (error) {
-    logger(error, { tags: { component: 'addToFavorites' } })
-    return { success: false, message: '予期しないエラーが発生しました' }
+    const failure = handleApiError(error, {
+      component: 'addToFavorites',
+      defaultMessage: 'お気に入りの追加に失敗しました',
+    })
+    return { success: false, message: failure.message }
   }
 }
 
@@ -188,15 +210,24 @@ export async function removeFromFavorites(
   favoriteId: number,
 ): Promise<FavoriteActionResponse> {
   try {
-    const response = await apiFetch<ApiResponse<null>>(`favorites/${favoriteId}`, 'DELETE')
+    const response = await apiFetchAuth<ApiResponse<null> | null>(
+      `favorites/${favoriteId}`,
+      { method: 'DELETE' },
+    )
 
-    if (!response.success)
-      return { success: false, message: response.message }
+    if (response === null)
+      return { success: true }
+
+    if (!isApiSuccess(response))
+      return { success: false, message: getApiErrorMessage(response) }
 
     return { success: true }
   }
   catch (error) {
-    logger(error, { tags: { component: 'removeFromFavorites' } })
-    return { success: false, message: '予期しないエラーが発生しました' }
+    const failure = handleApiError(error, {
+      component: 'removeFromFavorites',
+      defaultMessage: 'お気に入りの削除に失敗しました',
+    })
+    return { success: false, message: failure.message }
   }
 }

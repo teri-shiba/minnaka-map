@@ -14,13 +14,12 @@ interface ResultPageProps {
 export default async function Result({ searchParams }: ResultPageProps) {
   const params = await searchParams
 
-  if (!params.lat || !params.lng || !params.signature) {
+  if (!params.lat || !params.lng || !params.signature)
     redirect('/?error=missing_params')
-  }
 
   const { lat, lng } = await parseAndValidateCoordinates(params)
 
-  const maptilerApiKey = await getApiKey('maptiler')
+  // TODO: ApiResponse の型定義が必要か確認 -> `verifyCoordsSignature`
   const midpoint = await verifyCoordsSignature({
     latitude: lat,
     longitude: lng,
@@ -30,13 +29,35 @@ export default async function Result({ searchParams }: ResultPageProps) {
 
   const currentPage = Number(params.page) || 1
   const genreCode = params.genre
-  const paginatedResult = await fetchRestaurants({
+
+  const restaurantsResult = await fetchRestaurants({
     latitude: lat,
     longitude: lng,
     page: currentPage,
     itemsPerPage: 10,
     genre: genreCode,
   })
+
+  if (!restaurantsResult.success) {
+    const key
+    = restaurantsResult.cause === 'RATE_LIMIT'
+      ? 'rate_limit_exceeded'
+      : restaurantsResult.cause === 'SERVER_ERROR'
+        ? 'server_error'
+        : 'restaurant_fetch_failed'
+
+    redirect(`/?error=${key}`)
+  }
+
+  const { items, pagination } = restaurantsResult.data
+
+  let maptilerApiKey: string | null = null
+  try {
+    maptilerApiKey = await getApiKey('maptiler')
+  }
+  catch {
+    maptilerApiKey = null
+  }
 
   return (
     <div className="relative mx-auto h-[calc(100dvh-4rem)] max-w-screen-2xl overflow-hidden md:flex">
@@ -46,14 +67,14 @@ export default async function Result({ searchParams }: ResultPageProps) {
             <MapClient
               apiKey={maptilerApiKey}
               midpoint={midpoint}
-              restaurants={paginatedResult.items}
+              restaurants={items}
             />
           )}
       </div>
 
       <RestaurantList
-        restaurants={paginatedResult.items}
-        pagination={paginatedResult.pagination}
+        restaurants={items}
+        pagination={pagination}
       />
     </div>
   )

@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { useSWRConfig } from 'swr'
+import { API_ENDPOINTS } from '~/constants'
 import api from '~/lib/axios-interceptor'
 import { logger } from '~/lib/logger'
 import { userStateAtom } from '~/state/user-state.atom'
@@ -27,7 +28,7 @@ export default function useOAuthCallback() {
       if (status === 'success') {
         try {
           await toast.promise(
-            api.get('/current/user/show_status')
+            api.get(API_ENDPOINTS.CURRENT_USER_STATUS)
               .then((response) => {
                 if (response.data.login === false) {
                   throw new Error('未ログイン')
@@ -40,7 +41,7 @@ export default function useOAuthCallback() {
               error: '認証に失敗しました',
             },
           )
-          await mutate('/current/user/show_status')
+          await mutate(API_ENDPOINTS.CURRENT_USER_STATUS)
         }
         catch (error) {
           logger(error, { tags: { component: 'handleOAuthCallback' } })
