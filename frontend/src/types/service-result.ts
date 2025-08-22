@@ -1,11 +1,13 @@
 export type ServiceCause =
   | 'NETWORK'
-  | 'RATE_LIMIT'
   | 'SERVER_ERROR'
   | 'REQUEST_FAILED'
   | 'NOT_FOUND'
   | 'UNAUTHORIZED'
   | 'FORBIDDEN'
+  | 'INVALID_SIGNATURE'
+  | 'EXPIRED'
+  | 'RATE_LIMIT'
 
 export interface ServiceSuccess<T> {
   readonly success: true

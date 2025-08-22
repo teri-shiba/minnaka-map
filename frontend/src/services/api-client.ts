@@ -1,9 +1,10 @@
-'use server'
-
 import type { ServiceFailure } from '~/types/service-result'
+
+import type { QueryParams } from '~/utils/api-url'
 import { logger } from '~/lib/logger'
 import { apiUrl } from '~/utils/api-url'
 import { getAuthFromCookie } from './get-auth-from-cookie'
+import 'server-only'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
@@ -16,9 +17,12 @@ interface ErrorHandlingOptions {
 
 interface ApiRequestOptions {
   readonly method?: HttpMethod
+  readonly params?: QueryParams
   readonly body?: unknown
   readonly withAuth?: boolean
   readonly extraHeaders?: HeadersInit
+  readonly next?: NextFetchRequestConfig
+  readonly cache?: RequestCache
 }
 
 export class ApiError extends Error {
@@ -48,12 +52,15 @@ export async function apiFetch<T = any>(
 ): Promise<T> {
   const {
     method = 'GET',
+    params,
     body,
     withAuth = false,
     extraHeaders,
+    next,
+    cache,
   } = options
 
-  const url = apiUrl(path).toString()
+  const url = apiUrl(path, params).toString()
 
   const headers = new Headers({ Accept: 'application/json' })
   if (method !== 'GET')
@@ -63,12 +70,19 @@ export async function apiFetch<T = any>(
   if (withAuth)
     await addAuthHeaders(headers)
 
+  const init: RequestInit & { next?: NextFetchRequestConfig } = {
+    method,
+    headers,
+    body: body != null ? JSON.stringify(body) : undefined,
+  }
+
+  if (cache !== undefined)
+    init.cache = cache
+  if (next)
+    init.next = next
+
   try {
-    const response = await fetch(url, {
-      method,
-      headers,
-      body: body != null ? JSON.stringify(body) : undefined,
-    })
+    const response = await fetch(url, init)
 
     if (!response.ok) {
       const text = await response.text().catch(() => undefined)

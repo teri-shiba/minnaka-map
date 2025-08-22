@@ -14,6 +14,8 @@ const ERROR_MESSAGE = {
   server_error: 'レストラン検索サービスが一時的に利用できません。時間をあけてから、再度お試しください。',
   restaurant_fetch_failed: 'レストランデータの取得に失敗しました。時間をあけてから、再度お試しください。',
   auth_required_favorites: 'お気に入りリストを見るにはログインが必要です',
+  link_expired: 'リンクの有効期限が切れました。もう一度検索してください。',
+  network_error: 'ネットワークエラーが発生しました。時間をあけてから、再度お試しください。',
 } as const
 
 type ErrorType = keyof typeof ERROR_MESSAGE
