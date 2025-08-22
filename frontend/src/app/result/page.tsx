@@ -6,6 +6,7 @@ import { fetchRestaurants } from '~/services/fetch-restaurants'
 import { getApiKey } from '~/services/get-api-key'
 import { parseAndValidateCoordinates } from '~/services/parse-and-validate-coords'
 import { verifyCoordsSignature } from '~/services/verify-coords-signature'
+import { isServiceSuccess } from '~/types/service-result'
 
 interface ResultPageProps {
   searchParams: Promise<SearchParams & { page?: string }>
@@ -19,13 +20,27 @@ export default async function Result({ searchParams }: ResultPageProps) {
 
   const { lat, lng } = await parseAndValidateCoordinates(params)
 
-  // TODO: ApiResponse の型定義が必要か確認 -> `verifyCoordsSignature`
-  const midpoint = await verifyCoordsSignature({
+  const verifyResult = await verifyCoordsSignature({
     latitude: lat,
     longitude: lng,
     signature: params.signature,
     expires_at: params.expires_at,
   })
+
+  if (!isServiceSuccess(verifyResult)) {
+    const key
+      = verifyResult.cause === 'EXPIRED'
+        ? 'link_expired'
+        : verifyResult.cause === 'INVALID_SIGNATURE'
+          ? 'validation_failed'
+          : verifyResult.cause === 'NETWORK'
+            ? 'network_error'
+            : verifyResult.cause === 'SERVER_ERROR' ? 'validation_error' : 'validation_error'
+
+    redirect(`/?error=${key}`)
+  }
+
+  const midpoint = verifyResult.data
 
   const currentPage = Number(params.page) || 1
   const genreCode = params.genre
