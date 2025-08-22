@@ -1,5 +1,6 @@
 import type { ServiceFailure } from '~/types/service-result'
 
+import type { QueryParams } from '~/utils/api-url'
 import { logger } from '~/lib/logger'
 import { apiUrl } from '~/utils/api-url'
 import { getAuthFromCookie } from './get-auth-from-cookie'
@@ -16,11 +17,12 @@ interface ErrorHandlingOptions {
 
 interface ApiRequestOptions {
   readonly method?: HttpMethod
+  readonly params?: QueryParams
   readonly body?: unknown
   readonly withAuth?: boolean
   readonly extraHeaders?: HeadersInit
-  readonly cache?: RequestCache
   readonly next?: NextFetchRequestConfig
+  readonly cache?: RequestCache
 }
 
 export class ApiError extends Error {
@@ -50,14 +52,15 @@ export async function apiFetch<T = any>(
 ): Promise<T> {
   const {
     method = 'GET',
+    params,
     body,
     withAuth = false,
     extraHeaders,
-    cache,
     next,
+    cache,
   } = options
 
-  const url = apiUrl(path).toString()
+  const url = apiUrl(path, params).toString()
 
   const headers = new Headers({ Accept: 'application/json' })
   if (method !== 'GET')
