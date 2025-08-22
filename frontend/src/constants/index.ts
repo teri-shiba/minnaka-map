@@ -18,8 +18,7 @@ export const API_ENDPOINTS = {
 } as const
 
 export const dynamicPaths = {
-  authProvider: (provider: string) => `${API_ENDPOINTS.AUTH}/${provider}`,
-  oauthProvider: (provider: string) => `${API_ENDPOINTS.PROVIDER}/${provider}`,
+  oauthProvider: (provider: string) => `${API_ENDPOINTS.AUTH}/${provider}`,
 }
 
 export type StaticEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS]
