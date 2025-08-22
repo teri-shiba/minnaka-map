@@ -12,7 +12,7 @@ Rails.application.routes.draw do
 
       resources :stations, only: [:index]
       resources :midpoint, only: [:create]
-      post "/validate_coordinates", to: "midpoint#validate"
+      get "/validate_coordinates", to: "midpoint#validate"
 
       resources :search_histories, only: [:create]
       resources :favorites, only: [:index, :create, :destroy]
