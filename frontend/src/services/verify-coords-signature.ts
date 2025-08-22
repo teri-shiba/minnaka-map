@@ -1,8 +1,10 @@
+'use server'
+
 import type { LatLngExpression } from 'leaflet'
 import { redirect } from 'next/navigation'
 import { API_ENDPOINTS } from '~/constants'
 import { logger } from '~/lib/logger'
-import { apiUrl } from '~/utils/api-url'
+import { apiFetchPublic } from './api-client'
 
 interface ValidateCoordsRequest {
   latitude: string
@@ -28,17 +30,24 @@ export async function verifyCoordsSignature(opts: {
       ...(opts.expires_at ? { expires_at: opts.expires_at } : {}),
     }
 
-    const url = apiUrl(API_ENDPOINTS.VALIDATE_COORDINATES).toString()
-    const response = await fetch(url, {
-      next: { revalidate: 3600 },
+    // const url = apiUrl(API_ENDPOINTS.VALIDATE_COORDINATES).toString()
+    // const response = await fetch(url, {
+    //   next: { revalidate: 3600 },
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(body),
+    // })
+
+    await apiFetchPublic<null>(API_ENDPOINTS.VALIDATE_COORDINATES, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body,
+      next: { revalidate: 3600 },
     })
 
-    if (!response.ok) {
-      redirect('/?error=validation_failed')
-    }
+    // TODO: コンポーネントでリダイレクトを行う
+    // if (!response.ok) {
+    //   redirect('/?error=validation_failed')
+    // }
 
     return [opts.latitude, opts.longitude]
   }
