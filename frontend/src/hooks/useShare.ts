@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback } from 'react'
 import { useMediaQuery } from '~/hooks/useMediaQuery'
 import { logger } from '~/lib/logger'
@@ -14,6 +16,15 @@ interface UseShareReturn {
   readonly canNativeShare: boolean
 }
 
+function isAbortError(error: unknown): boolean {
+  return !!(
+    error
+    && typeof error === 'object'
+    && 'name' in error
+    && (error as { name?: string }).name === 'AbortError'
+  )
+}
+
 export default function useShare(): UseShareReturn {
   const isMobile = useMediaQuery('(max-width: 768px)')
 
@@ -21,22 +32,16 @@ export default function useShare(): UseShareReturn {
 
   const share = useCallback(
     async (data: SharePayload): Promise<ShareResult> => {
-      if (!(canNativeShare && isMobile)) {
+      if (!(canNativeShare && isMobile))
         return { ok: false, reason: 'unsupported' }
-      }
+
       try {
         await navigator.share(data)
         return { ok: true }
       }
       catch (error: unknown) {
-        if (
-          error
-          && typeof error === 'object'
-          && 'name' in error
-          && (error as { name?: string }).name === 'AbortError'
-        ) {
+        if (isAbortError(error))
           return { ok: true }
-        }
 
         logger(error, {
           message: 'share failed',

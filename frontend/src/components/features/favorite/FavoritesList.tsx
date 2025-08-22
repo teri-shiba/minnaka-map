@@ -12,10 +12,11 @@ interface FavoriteListProps {
   initialData: FavoriteGroupWithDetails[]
   initialMeta: FavoritesPaginationMeta
 }
+
 export default function FavoritesList({ initialData, initialMeta }: FavoriteListProps) {
   const [favorites, setFavorites] = useState(initialData)
   const [meta, setMeta] = useState(initialMeta)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const loadMore = async () => {
     setIsLoading(true)

@@ -1,6 +1,8 @@
 import type { LatLngExpression } from 'leaflet'
 import { redirect } from 'next/navigation'
+import { API_ENDPOINTS } from '~/constants'
 import { logger } from '~/lib/logger'
+import { apiUrl } from '~/utils/api-url'
 
 interface ValidateCoordsRequest {
   latitude: string
@@ -26,7 +28,8 @@ export async function verifyCoordsSignature(opts: {
       ...(opts.expires_at ? { expires_at: opts.expires_at } : {}),
     }
 
-    const response = await fetch(`${process.env.API_BASE_URL}/validate_coordinates`, {
+    const url = apiUrl(API_ENDPOINTS.VALIDATE_COORDINATES).toString()
+    const response = await fetch(url, {
       next: { revalidate: 3600 },
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

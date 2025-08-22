@@ -1,8 +1,39 @@
 import type { AuthProvider } from '~/types/auth-provider'
 
-// ========================================================
+// ===============================================
+// API Paths
+// ===============================================
+export const API_PREFIX = '/api/v1' as const
+
+export const API_ENDPOINTS = {
+  STATIONS: '/stations',
+  MIDPOINT: '/midpoint',
+  VALIDATE_COORDINATES: 'validate_coordinates',
+  AUTH: '/auth',
+  PROVIDER: '/provider',
+  CURRENT_USER_STATUS: '/current/user/show_status',
+  AUTH_SIGN_IN: '/auth/sign_in',
+  AUTH_SIGN_OUT: '/auth/sign_out',
+  USER_CONFIRMATIONS: '/user/confirmations',
+} as const
+
+export const dynamicPaths = {
+  authProvider: (provider: string) => `${API_ENDPOINTS.AUTH}/${provider}`,
+  oauthProvider: (provider: string) => `${API_ENDPOINTS.PROVIDER}/${provider}`,
+}
+
+export type StaticEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS]
+
+// ===============================================
+// EXTERNAL API Paths
+// ===============================================
+export const EXTERNAL_ENDPOINTS = {
+  HOTPEPPER_GOURMET_V1: '/hotpepper/gourmet/v1/',
+} as const
+
+// ===============================================
 // API Services Configuration
-// ========================================================
+// ===============================================
 export const API_SERVICES = {
   hotpepper: {
     endpoint: 'api_keys/hotpepper',
@@ -16,14 +47,17 @@ export const API_SERVICES = {
     endpoint: 'api_keys/googlemaps',
     serviceName: 'GoogleMaps',
   },
-} as const
+} as const satisfies Record<
+  string,
+  { readonly endpoint: string, readonly serviceName: string }
+>
 
 export type SupportedService = keyof typeof API_SERVICES
 
-// =========================================================
+// ===============================================
 // Authentication Providers
-// =========================================================
-export const AUTH_PROVIDERS: readonly AuthProvider[] = [
+// ===============================================
+export const AUTH_PROVIDERS = [
   {
     name: 'Google',
     iconImg: '/icon_Google.webp',
@@ -34,11 +68,11 @@ export const AUTH_PROVIDERS: readonly AuthProvider[] = [
     iconImg: '/icon_LINE.webp',
     authUrl: 'line',
   },
-] as const
+] as const satisfies ReadonlyArray<AuthProvider>
 
-// ========================================================
+// ===============================================
 // Geography & Location
-// ========================================================
+// ===============================================
 export const JAPAN_BOUNDS = {
   LAT_MIN: 26.0,
   LAT_MAX: 45.5,
@@ -46,9 +80,9 @@ export const JAPAN_BOUNDS = {
   LNG_MAX: 146.0,
 } as const
 
-// ========================================================
+// ===============================================
 // Pagination
-// ========================================================
+// ===============================================
 export const PAGINATION = {
   FIRST_PAGE: 1,
   SECOND_PAGE: 2,
@@ -59,24 +93,25 @@ export const PAGINATION = {
   ELLIPSIS_END_OFFSET: 2,
 } as const
 
-// ========================================================
+// ===============================================
 // Cache
-// ========================================================
+// ===============================================
 export const CACHE_DURATION = {
-  RESTAURANT_INFO: 86400, // 24H (60 * 60 * 24)
+  /* 24H (60 * 60 * 24) */
+  RESTAURANT_INFO: 60 * 60 * 24,
 } as const
 
-// ========================================================
+// ===============================================
 // Restaurant Marker Options
-// ========================================================
+// ===============================================
 export const ICON = {
   SIZE: [40, 44] as [number, number],
   ANCHOR: [20, 34] as [number, number],
 } as const
 
-// ========================================================
+// ===============================================
 // Display Restaurant Card on Map
-// ========================================================
+// ===============================================
 export const CARD_POSITION = {
   CARD_WIDTH: 240,
   CARD_HEIGHT: 280,
@@ -84,9 +119,9 @@ export const CARD_POSITION = {
   MARGIN: 10,
 } as const
 
-// ========================================================
+// ===============================================
 // Sort Restaurant
-// ========================================================
+// ===============================================
 export const SORT_GENRE = [
   { code: 'G001', name: '居酒屋' },
   { code: 'G002', name: 'ダイニングバー・バル' },

@@ -9,7 +9,7 @@ import { useAuth } from '~/hooks/useAuth'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './DropdownMenu'
 
 export default function UserMenu() {
-  const [open, setOpen] = useState<boolean>(false)
+  const [open, setOpen] = useState(false)
   const router = useRouter()
   const { logout } = useAuth()
 

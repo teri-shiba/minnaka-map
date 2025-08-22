@@ -5,6 +5,7 @@ ja:
       station: 駅
       operator: 運営会社
       favorite: お気に入り
+      shared_favorite_list: 共有お気に入りリスト
     attributes:
       user:
         name: 名前
@@ -22,3 +23,6 @@ ja:
         alias_name: 通称
       favorite:
         hotpepper_id: ホットペッパーお店ID
+      shared_favorite_list:
+        title: タイトル
+        is_public: 公開日
