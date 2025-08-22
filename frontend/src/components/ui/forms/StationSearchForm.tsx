@@ -6,10 +6,9 @@ import { useRouter } from 'next/navigation'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/buttons/Button'
-import { API_ENDPOINTS } from '~/constants'
+import { useMidpointMutation } from '~/hooks/useMidpointMutation'
 import { logger } from '~/lib/logger'
 import { stationSearchSchema } from '~/schemas/station-search.schema'
-import { apiHref } from '~/utils/api-url'
 import StationAutocomplete from '../autocomplete/StationAutocomplete'
 import { AddFormButton } from '../buttons/AddFormButton'
 import { RemoveFormButton } from '../buttons/RemoveFormButton'
@@ -21,6 +20,8 @@ const MAX_REQUIRED_FIELDS = 2
 
 export default function StationSearchForm() {
   const router = useRouter()
+  const { trigger: postMidpoint, isMutating } = useMidpointMutation()
+
   const form = useForm<AreaFormValues>({
     resolver: zodResolver(stationSearchSchema),
     defaultValues: {
@@ -66,29 +67,12 @@ export default function StationSearchForm() {
         sessionStorage.setItem('pendingStationIds', JSON.stringify(stationIds))
       }
 
-      // TODO: クライアントフェッチなのに useSWR を使っていないのはなぜ？
-      const midpointResponse = await fetch(
-        apiHref(API_ENDPOINTS.MIDPOINT),
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
-        },
-      )
-
-      const midpointResult = await midpointResponse.json()
-      if (!midpointResponse.ok) {
-        throw new Error('APIリクエストに失敗しました')
-      }
+      const midpointResult = await postMidpoint(data)
 
       const query: Record<string, string> = {
         lat: midpointResult.midpoint.latitude,
         lng: midpointResult.midpoint.longitude,
         signature: midpointResult.signature,
-      }
-
-      if (midpointResult.expires_at) {
-        query.expires_at = midpointResult.expires_at
       }
 
       const qs = new URLSearchParams(query).toString()
@@ -178,6 +162,7 @@ export default function StationSearchForm() {
 
         <Button
           type="submit"
+          disabled={isMutating}
           variant="default"
           size="lg"
           className="block w-full md:inline-block md:w-auto"

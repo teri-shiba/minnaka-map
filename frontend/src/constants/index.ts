@@ -8,7 +8,7 @@ export const API_PREFIX = '/api/v1' as const
 export const API_ENDPOINTS = {
   STATIONS: '/stations',
   MIDPOINT: '/midpoint',
-  VALIDATE_COORDINATES: 'validate_coordinates',
+  VALIDATE_COORDINATES: '/validate_coordinates',
   AUTH: '/auth',
   PROVIDER: '/provider',
   CURRENT_USER_STATUS: '/current/user/show_status',
@@ -18,8 +18,7 @@ export const API_ENDPOINTS = {
 } as const
 
 export const dynamicPaths = {
-  authProvider: (provider: string) => `${API_ENDPOINTS.AUTH}/${provider}`,
-  oauthProvider: (provider: string) => `${API_ENDPOINTS.PROVIDER}/${provider}`,
+  oauthProvider: (provider: string) => `${API_ENDPOINTS.AUTH}/${provider}`,
 }
 
 export type StaticEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS]
