@@ -35,11 +35,13 @@ export default function UserMenu() {
             お気に入り一覧
           </DropdownMenuItem>
         </Link>
-        <DropdownMenuItem>
-          <LuSettings className="size-4 text-slate-400" />
-          {' '}
-          設定
-        </DropdownMenuItem>
+        <Link href="/settings" onClick={() => setOpen(false)} className="block">
+          <DropdownMenuItem>
+            <LuSettings className="size-4 text-slate-400" />
+            {' '}
+            アカウント設定
+          </DropdownMenuItem>
+        </Link>
         <DropdownMenuItem onClick={handleLogout}>
           <LuLogOut className="size-4 text-slate-400" />
           {' '}
