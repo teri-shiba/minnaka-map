@@ -4,6 +4,7 @@ import type { ComponentProps, FormEvent } from 'react'
 import { useAtomValue } from 'jotai'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { useAuth } from '~/hooks/useAuth'
 import { userStateAtom } from '~/state/user-state.atom'
 import { cn } from '~/utils/cn'
 import { Button } from '../buttons/Button'
@@ -16,14 +17,14 @@ interface DeleteAccountFormProps extends ComponentProps<'form'> {
 
 export default function DeleteAccountForm({ className, onClose }: DeleteAccountFormProps) {
   const user = useAtomValue(userStateAtom)
+  const { deleteAccount } = useAuth()
   const [emailInput, setEmailInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
   const handleDeleteAccount = async (provider: string, value?: string) => {
-    // TODO: 削除API呼び出しを実装する
-    console.log('削除処理実行:', { provider, value })
-    toast.success('アカウントが削除されました')
-    onClose?.()
+    const result = await deleteAccount()
+    if (result.success)
+      onClose?.()
   }
 
   const handleSubmit = async (e: FormEvent) => {
