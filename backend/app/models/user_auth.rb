@@ -10,7 +10,7 @@ class UserAuth < ApplicationRecord
          :confirmable,
          :omniauthable, omniauth_providers: [:google_oauth2, :line]
 
-  belongs_to :user, optional: true
+  belongs_to :user, optional: true, dependent: :destroy
 
   def self.add_permitted_params
     [:name]
