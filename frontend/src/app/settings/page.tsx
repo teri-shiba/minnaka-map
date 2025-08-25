@@ -1,4 +1,4 @@
-import { Button } from '~/components/ui/buttons/Button'
+import { DeleteAccount } from '~/components/ui/DeleteAccount'
 
 export default function SettingsPage() {
   return (
@@ -8,14 +8,10 @@ export default function SettingsPage() {
       </header>
       <div className="mx-auto max-w-lg py-8 md:flex md:items-center md:justify-between md:py-10">
         <div>
-          <p className="text-lg font-bold py-1">アカウント削除</p>
-          <p className="text-sm">アカウントを削除すると復元はできません。</p>
+          <p className="py-1 text-lg font-bold">アカウント削除</p>
+          <p className="text-sm">削除すると復元はできません。</p>
         </div>
-        <Button
-          className="border border-destructive bg-white text-destructive hover:bg-destructive hover:text-white"
-        >
-          削除する
-        </Button>
+        <DeleteAccount />
       </div>
     </>
   )
