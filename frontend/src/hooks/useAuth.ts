@@ -30,6 +30,7 @@ export function useAuth() {
             id: data.id,
             name: data.name,
             email: data.email,
+            provider: data.provider,
             isSignedIn: true,
           })
         }
