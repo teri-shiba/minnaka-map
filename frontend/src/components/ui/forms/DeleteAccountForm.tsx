@@ -1,14 +1,17 @@
 'use client'
 
-import type { ComponentProps, FormEvent } from 'react'
+import type { ComponentProps } from 'react'
+import type { DeleteAccountFormValues } from '~/schemas/delete-account.schema'
+import type { ProviderId } from '~/types/auth-provider'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useAtomValue } from 'jotai'
-import { useState } from 'react'
-import { toast } from 'sonner'
+import { useForm } from 'react-hook-form'
 import { useAuth } from '~/hooks/useAuth'
+import { deleteAccountSchema } from '~/schemas/delete-account.schema'
 import { userStateAtom } from '~/state/user-state.atom'
 import { Button } from '../buttons/Button'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './Form'
 import { Input } from './Input'
-import { Label } from './Label'
 
 interface DeleteAccountFormProps extends ComponentProps<'form'> {
   onClose?: () => void
@@ -17,52 +20,30 @@ interface DeleteAccountFormProps extends ComponentProps<'form'> {
 export default function DeleteAccountForm({ onClose }: DeleteAccountFormProps) {
   const user = useAtomValue(userStateAtom)
   const { deleteAccount } = useAuth()
-  const [emailInput, setEmailInput] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleDeleteAccount = async (provider: string, value?: string) => {
+  const providerForValidation: ProviderId
+    = user.provider === 'email' ? 'email' : 'google_oauth2'
+
+  const isEmailProvider = providerForValidation === 'email'
+
+  const form = useForm<DeleteAccountFormValues>({
+    resolver: zodResolver(
+      deleteAccountSchema(providerForValidation, user.email ?? ''),
+    ),
+    defaultValues: { email: '' },
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+  })
+
+  const isSubmitting = form.formState.isSubmitting
+
+  const onSubmit = async () => {
     const result = await deleteAccount()
     if (result.success)
       onClose?.()
   }
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-
-    try {
-      switch (user.provider) {
-        case 'email':
-          if (emailInput.toLowerCase() === user.email.toLowerCase()) {
-            await handleDeleteAccount('email', emailInput)
-          }
-          else {
-            toast.error('メールアドレスが一致しません')
-          }
-          break
-        case 'google_oauth2':
-          await handleDeleteAccount('google_oauth2')
-          break
-        case 'line':
-          await handleDeleteAccount('line')
-          break
-
-        default:
-          toast.error('不明な認証方式です')
-      }
-    }
-    catch (error) {
-      console.error('削除処理エラー：', error)
-      toast.error('削除に失敗しました')
-    }
-    finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const handleCancel = () => {
-    onClose?.()
-  }
+  const handleCancel = () => onClose?.()
 
   const getEmailHint = (email: string) => {
     if (!email)
@@ -70,52 +51,68 @@ export default function DeleteAccountForm({ onClose }: DeleteAccountFormProps) {
 
     const [localPart, domain] = email.split('@')
 
+    if (!domain)
+      return
+
     if (localPart.length <= 3)
       return `${localPart}***@${domain}`
 
     return `${localPart.slice(0, 3)}***@${domain}`
   }
 
+  const disabledByAuth = !user.isSignedIn || !user.provider
+
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        {/* メール認証 */}
-        {user.provider === 'email' && (
-          <>
-            <Label htmlFor="email" className="text-xs font-normal text-gray-500">
-              ヒント：
-              {getEmailHint(user.email)}
-            </Label>
-            <Input
-              type="email"
-              id="email"
-              value={emailInput}
-              onChange={e => setEmailInput(e.target.value)}
-              className="mb-6 mt-2 h-auto py-3 focus-visible:ring-gray-500"
-              required
-            />
-          </>
-        )}
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          className="h-auto border border-destructive bg-white py-3 text-destructive hover:bg-white hover:text-destructive"
-          onClick={handleCancel}
-          disabled={isSubmitting}
-        >
-          キャンセル
-        </Button>
-        <Button
-          type="submit"
-          variant="destructive"
-          className="h-auto py-3"
-          disabled={isSubmitting || (user.provider === 'email' && !emailInput)}
-        >
-          {isSubmitting ? '処理中...' : '削除する'}
-        </Button>
-      </div>
-    </form>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="space-y-6">
+          {isEmailProvider && (
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-normal text-gray-500">
+                    ヒント:
+                    {' '}
+                    {getEmailHint(user.email)}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      id="email"
+                      placeholder="登録中のメールアドレスを入力"
+                      className="mb-6 mt-2 h-auto py-3 focus-visible:ring-gray-500"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            >
+            </FormField>
+          )}
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-auto border border-destructive bg-white py-3 text-destructive hover:bg-white hover:text-destructive"
+              onClick={handleCancel}
+              disabled={isSubmitting || disabledByAuth}
+            >
+              キャンセル
+            </Button>
+            <Button
+              type="submit"
+              variant="destructive"
+              className="h-auto py-3"
+              disabled={isSubmitting || disabledByAuth || (isEmailProvider && !form.watch('email'))}
+            >
+              {isSubmitting ? '処理中...' : '削除する'}
+            </Button>
+          </div>
+        </div>
+      </form>
+    </Form>
   )
 }
