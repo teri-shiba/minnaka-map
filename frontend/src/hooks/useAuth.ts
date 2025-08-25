@@ -79,7 +79,6 @@ export function useAuth() {
   const logout = useCallback(
     async () => {
       try {
-        // TODO: ログアウトって delete でいいの？
         await api.delete(API_ENDPOINTS.AUTH_SIGN_OUT)
         mutate(API_ENDPOINTS.CURRENT_USER_STATUS)
         resetUser()
