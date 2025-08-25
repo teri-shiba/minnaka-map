@@ -95,6 +95,30 @@ export function useAuth() {
     [mutate, resetUser],
   )
 
+  const deleteAccount = useCallback(
+    async () => {
+      try {
+        await api.delete('/auth')
+
+        await mutate(API_ENDPOINTS.CURRENT_USER_STATUS)
+        resetUser()
+        sessionStorage.removeItem('pendingStationIds')
+        sessionStorage.removeItem('pendingSearchHistoryIds')
+
+        toast.success('アカウントが削除されました')
+        // TODO: return 処理を後でリファクタリング
+        return { success: true }
+      }
+      catch (error) {
+        console.error('アカウント削除失敗:', error)
+        toast.error('アカウントの削除に失敗しました')
+        // TODO: return 処理を後でリファクタリング
+        return { success: false, error }
+      }
+    },
+    [mutate, resetUser],
+  )
+
   return {
     user,
     isLoading: loading,
@@ -102,5 +126,6 @@ export function useAuth() {
     signup,
     login,
     logout,
+    deleteAccount,
   }
 }
