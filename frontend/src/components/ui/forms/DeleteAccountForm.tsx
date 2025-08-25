@@ -6,7 +6,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { useAuth } from '~/hooks/useAuth'
 import { userStateAtom } from '~/state/user-state.atom'
-import { cn } from '~/utils/cn'
 import { Button } from '../buttons/Button'
 import { Input } from './Input'
 import { Label } from './Label'
@@ -15,7 +14,7 @@ interface DeleteAccountFormProps extends ComponentProps<'form'> {
   onClose?: () => void
 }
 
-export default function DeleteAccountForm({ className, onClose }: DeleteAccountFormProps) {
+export default function DeleteAccountForm({ onClose }: DeleteAccountFormProps) {
   const user = useAtomValue(userStateAtom)
   const { deleteAccount } = useAuth()
   const [emailInput, setEmailInput] = useState('')
@@ -78,8 +77,8 @@ export default function DeleteAccountForm({ className, onClose }: DeleteAccountF
   }
 
   return (
-    <form onSubmit={handleSubmit} className={cn('grid items-start gap-4', className)}>
-      <div className="grid gap-4">
+    <form onSubmit={handleSubmit}>
+      <div>
         {/* メール認証 */}
         {user.provider === 'email' && (
           <>
@@ -92,8 +91,7 @@ export default function DeleteAccountForm({ className, onClose }: DeleteAccountF
               id="email"
               value={emailInput}
               onChange={e => setEmailInput(e.target.value)}
-              className="h-auto py-3 focus-visible:ring-destructive"
-              placeholder="メールアドレスを入力してください"
+              className="mb-6 mt-2 h-auto py-3 focus-visible:ring-gray-500"
               required
             />
           </>

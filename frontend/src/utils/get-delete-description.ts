@@ -1,12 +1,12 @@
 export function getDeleteDescription(provider: string): string {
   switch (provider) {
     case 'email':
-      return '確認のため、登録中のメールアドレスを入力してください。'
+      return 'メールアドレスでログイン中です。'
     case 'google_oauth2':
-      return 'Google認証を行った後、アカウントをを削除します。'
+      return 'Googleアカウントでログイン中です。'
     case 'line':
-      return 'LINE認証を行った後、アカウントをを削除します。'
+      return 'LINEアカウントでログイン中です。'
     default:
-      return 'アカウントの削除を実行します。'
+      return ''
   }
 }

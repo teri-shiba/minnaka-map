@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { userStateAtom } from '~/state/user-state.atom'
 import { getDeleteDescription } from '~/utils/get-delete-description'
 import { Button } from '../buttons/Button'
-import { DialogDescription } from '../dialogs/Dialog'
 import DeleteAccountForm from '../forms/DeleteAccountForm'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from './Drawer'
 
@@ -23,16 +22,17 @@ export function DeleteAccountDrawer() {
         </Button>
       </DrawerTrigger>
       <DrawerContent className="mb-8">
-        <DrawerHeader className="flex flex-col space-y-2">
-          <DrawerTitle className="text-center">
+        <DrawerHeader>
+          <DrawerTitle className="text-left">
             アカウントを削除しようとしています
           </DrawerTitle>
-          <DialogDescription className="text-left text-foreground">
-            {getDeleteDescription(user.provider)}
-            <br />
-            この操作は戻すことができません。
-          </DialogDescription>
         </DrawerHeader>
+        <p className="pb-4 text-sm leading-6">
+          {getDeleteDescription(user.provider)}
+          <br />
+          この操作は取り消すことができません。
+          {user.provider === 'email' && '確認のため、登録中のメールアドレスを入力してください。'}
+        </p>
         <DeleteAccountForm onClose={() => setOpen(false)} />
       </DrawerContent>
     </Drawer>
