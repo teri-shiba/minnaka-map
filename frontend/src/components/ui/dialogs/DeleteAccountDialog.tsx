@@ -6,7 +6,7 @@ import { userStateAtom } from '~/state/user-state.atom'
 import { getDeleteDescription } from '~/utils/get-delete-description'
 import { Button } from '../buttons/Button'
 import DeleteAccountForm from '../forms/DeleteAccountForm'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './Dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './Dialog'
 
 export function DeleteAccountDialog() {
   const [open, setOpen] = useState(false)
@@ -21,16 +21,17 @@ export function DeleteAccountDialog() {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[470px]">
-        <DialogHeader className="flex flex-col space-y-3">
-          <DialogTitle className="text-center">
+        <DialogHeader>
+          <DialogTitle>
             アカウントを削除しようとしています
           </DialogTitle>
-          <DialogDescription className="leading-6 text-foreground">
-            {getDeleteDescription(user.provider)}
-            <br />
-            この操作は戻すことができません。
-          </DialogDescription>
         </DialogHeader>
+        <p className="text-sm leading-6">
+          {getDeleteDescription(user.provider)}
+          <br />
+          この操作は取り消すことができません。
+          {user.provider === 'email' && '確認のため、登録中のメールアドレスを入力してください。'}
+        </p>
         <DeleteAccountForm onClose={() => setOpen(false)} />
       </DialogContent>
     </Dialog>
