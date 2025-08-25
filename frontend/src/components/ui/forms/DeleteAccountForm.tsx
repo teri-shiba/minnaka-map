@@ -115,7 +115,7 @@ export default function DeleteAccountForm({ className, onClose }: DeleteAccountF
           className="h-auto py-3"
           disabled={isLoading || (user.provider === 'email' && !emailInput)}
         >
-          {isLoading ? '処理中...' : 'アカウントを削除する'}
+          {isLoading ? '処理中...' : '削除する'}
         </Button>
       </div>
     </form>

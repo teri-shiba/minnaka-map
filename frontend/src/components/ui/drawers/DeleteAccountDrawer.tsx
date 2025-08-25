@@ -25,7 +25,7 @@ export function DeleteAccountDrawer() {
       <DrawerContent className="mb-8">
         <DrawerHeader className="flex flex-col space-y-2">
           <DrawerTitle className="text-center">
-            アカウント削除
+            アカウントを削除しようとしています
           </DrawerTitle>
           <DialogDescription className="text-left text-foreground">
             {getDeleteDescription(user.provider)}
