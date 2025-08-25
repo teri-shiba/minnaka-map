@@ -1,12 +1,12 @@
 import { useCallback, useMemo, useSyncExternalStore } from 'react'
 
 interface UseMediaQueryOptions {
-  defaultMaches?: boolean
+  defaultMatches?: boolean
   noSsr?: boolean
 }
 
 export function useMediaQuery(query: string, options: UseMediaQueryOptions = {}): boolean {
-  const { defaultMaches = false, noSsr = false } = options
+  const { defaultMatches = false, noSsr = false } = options
 
   const mediaQueryList = useMemo(() => {
     if (typeof window === 'undefined')
@@ -24,16 +24,16 @@ export function useMediaQuery(query: string, options: UseMediaQueryOptions = {})
 
   const getSnapshot = useCallback(() => {
     if (!mediaQueryList)
-      return defaultMaches
+      return defaultMatches
     return mediaQueryList.matches
-  }, [mediaQueryList, defaultMaches])
+  }, [mediaQueryList, defaultMatches])
 
   const getServerSnapshot = useCallback(() => {
     if (noSsr && typeof window !== 'undefined') {
       return window.matchMedia(query).matches
     }
-    return defaultMaches
-  }, [defaultMaches, noSsr, query])
+    return defaultMatches
+  }, [defaultMatches, noSsr, query])
 
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 }
