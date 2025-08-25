@@ -18,7 +18,7 @@ export default function DeleteAccountForm({ onClose }: DeleteAccountFormProps) {
   const user = useAtomValue(userStateAtom)
   const { deleteAccount } = useAuth()
   const [emailInput, setEmailInput] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleDeleteAccount = async (provider: string, value?: string) => {
     const result = await deleteAccount()
@@ -28,7 +28,7 @@ export default function DeleteAccountForm({ onClose }: DeleteAccountFormProps) {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
+    setIsSubmitting(true)
 
     try {
       switch (user.provider) {
@@ -56,7 +56,7 @@ export default function DeleteAccountForm({ onClose }: DeleteAccountFormProps) {
       toast.error('削除に失敗しました')
     }
     finally {
-      setIsLoading(false)
+      setIsSubmitting(false)
     }
   }
 
@@ -103,7 +103,7 @@ export default function DeleteAccountForm({ onClose }: DeleteAccountFormProps) {
           variant="outline"
           className="h-auto border border-destructive bg-white py-3 text-destructive hover:bg-white hover:text-destructive"
           onClick={handleCancel}
-          disabled={isLoading}
+          disabled={isSubmitting}
         >
           キャンセル
         </Button>
@@ -111,9 +111,9 @@ export default function DeleteAccountForm({ onClose }: DeleteAccountFormProps) {
           type="submit"
           variant="destructive"
           className="h-auto py-3"
-          disabled={isLoading || (user.provider === 'email' && !emailInput)}
+          disabled={isSubmitting || (user.provider === 'email' && !emailInput)}
         >
-          {isLoading ? '処理中...' : '削除する'}
+          {isSubmitting ? '処理中...' : '削除する'}
         </Button>
       </div>
     </form>
