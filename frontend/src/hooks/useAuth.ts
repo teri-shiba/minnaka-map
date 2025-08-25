@@ -103,7 +103,7 @@ export function useAuth() {
         await mutate(API_ENDPOINTS.CURRENT_USER_STATUS)
         resetUser()
         sessionStorage.removeItem('pendingStationIds')
-        sessionStorage.removeItem('pendingSearchHistoryIds')
+        sessionStorage.removeItem('pendingSearchHistoryId')
 
         toast.success('アカウントが削除されました')
         // TODO: return 処理を後でリファクタリング
