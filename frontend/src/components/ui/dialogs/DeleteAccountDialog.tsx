@@ -23,7 +23,7 @@ export function DeleteAccountDialog() {
       <DialogContent className="sm:max-w-[470px]">
         <DialogHeader className="flex flex-col space-y-3">
           <DialogTitle className="text-center">
-            アカウント削除
+            アカウントを削除しようとしています
           </DialogTitle>
           <DialogDescription className="leading-6 text-foreground">
             {getDeleteDescription(user.provider)}
