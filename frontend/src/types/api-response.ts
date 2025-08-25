@@ -1,10 +1,3 @@
-// export interface ApiResponse<T> {
-//   success: boolean
-//   data: T
-//   message?: string
-// }
-
-// TODO: 型の変更による影響ファイルの修正が必要 < create-shared-list.ts / favorite-action.ts / fetch-shared-list.ts / save-search-history.ts >
 export interface ApiError {
   readonly message: string
   readonly details?: string
