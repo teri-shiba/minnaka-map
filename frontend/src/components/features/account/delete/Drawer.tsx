@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import { Button } from '~/ui/buttons/Button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '~/ui/drawers/Drawer'
-import DeleteAccountContent from './DeleteAccountContent'
+import DeleteAccountContent from './Content'
 
-export function DeleteAccountDrawer() {
+export default function DeleteAccountDrawer() {
   const [open, setOpen] = useState(false)
 
   return (

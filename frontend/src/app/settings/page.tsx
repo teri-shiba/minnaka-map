@@ -1,4 +1,4 @@
-import { DeleteAccount } from '~/components/features/account/delete/DeleteAccount'
+import { DeleteAccount } from '~/components/features/account/delete'
 import Section from '~/components/layout/Section'
 
 export default function SettingsPage() {
