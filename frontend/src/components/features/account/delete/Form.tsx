@@ -64,7 +64,7 @@ export default function DeleteAccountForm({ onClose }: DeleteAccountFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <div className="space-y-6">
           {isEmailProvider && (
             <FormField
@@ -80,6 +80,8 @@ export default function DeleteAccountForm({ onClose }: DeleteAccountFormProps) {
                   <FormControl>
                     <Input
                       type="email"
+                      inputMode="email"
+                      autoComplete="email"
                       id="email"
                       placeholder="登録中のメールアドレスを入力"
                       className="mb-6 mt-2 h-auto py-3 focus-visible:ring-gray-500"
