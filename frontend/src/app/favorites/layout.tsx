@@ -7,7 +7,7 @@ import Loading from '../loading'
 export default async function FavoritesLayout({ children }: { children: React.ReactNode }) {
   const authData = await getAuthFromCookie()
   if (!authData)
-    redirect('/?error=auth_required_favorites')
+    redirect('/?error=auth_required')
 
   return (
     <>

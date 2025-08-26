@@ -5,9 +5,12 @@ import { toast } from 'sonner'
 import useSWR, { useSWRConfig } from 'swr'
 import { API_ENDPOINTS } from '~/constants'
 import api from '~/lib/axios-interceptor'
+import { logger } from '~/lib/logger'
 import { userStateAtom } from '~/state/user-state.atom'
 
 const appOrigin = process.env.NEXT_PUBLIC_FRONT_BASE_URL
+
+type DeleteAccountResult = { success: true } | { success: false, error: unknown }
 
 export function useAuth() {
   const [user, setUser] = useAtom(userStateAtom)
@@ -30,6 +33,7 @@ export function useAuth() {
             id: data.id,
             name: data.name,
             email: data.email,
+            provider: data.provider,
             isSignedIn: true,
           })
         }
@@ -79,7 +83,6 @@ export function useAuth() {
   const logout = useCallback(
     async () => {
       try {
-        // TODO: ログアウトって delete でいいの？
         await api.delete(API_ENDPOINTS.AUTH_SIGN_OUT)
         mutate(API_ENDPOINTS.CURRENT_USER_STATUS)
         resetUser()
@@ -95,6 +98,31 @@ export function useAuth() {
     [mutate, resetUser],
   )
 
+  const deleteAccount = useCallback(async (): Promise<DeleteAccountResult> => {
+    try {
+      await api.delete('/auth')
+
+      await mutate(API_ENDPOINTS.CURRENT_USER_STATUS)
+      resetUser()
+      sessionStorage.removeItem('pendingStationIds')
+      sessionStorage.removeItem('pendingSearchHistoryId')
+
+      toast.success('アカウントが削除されました')
+      return { success: true }
+    }
+    catch (error) {
+      logger(error, {
+        component: 'useAuth.deleteAccount',
+        endpoint: '/auth',
+        action: 'DELETE',
+        userId: user?.id,
+        provider: user?.provider ?? 'unknown',
+      })
+      toast.error('アカウントの削除に失敗しました')
+      return { success: false, error }
+    }
+  }, [mutate, resetUser, user?.id, user?.provider])
+
   return {
     user,
     isLoading: loading,
@@ -102,5 +130,6 @@ export function useAuth() {
     signup,
     login,
     logout,
+    deleteAccount,
   }
 }
