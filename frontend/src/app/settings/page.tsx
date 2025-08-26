@@ -1,7 +1,13 @@
+import { redirect } from 'next/navigation'
 import { DeleteAccount } from '~/components/features/account/delete'
 import Section from '~/components/layout/Section'
+import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const authData = await getAuthFromCookie()
+  if (!authData)
+    redirect('/?error=auth_required')
+
   return (
     <>
       <header className="flex h-32 flex-col items-center justify-center bg-secondary md:h-48">
