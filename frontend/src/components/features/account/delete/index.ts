@@ -1,0 +1,5 @@
+export { default as DeleteAccountContent } from './Content'
+export { default as DeleteAccountDialog } from './Dialog'
+export { default as DeleteAccountDrawer } from './Drawer'
+export { default as DeleteAccountForm } from './Form'
+export { default as DeleteAccount } from './Responsive'
