@@ -5,6 +5,7 @@ export const initialUserState: UserState = {
   id: 0,
   name: '',
   email: '',
+  provider: null,
   isSignedIn: false,
 }
 
