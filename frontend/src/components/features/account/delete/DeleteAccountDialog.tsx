@@ -4,29 +4,29 @@ import { useAtomValue } from 'jotai'
 import { useState } from 'react'
 import { userStateAtom } from '~/state/user-state.atom'
 import { getDeleteDescription } from '~/utils/get-delete-description'
-import { Button } from '../buttons/Button'
-import DeleteAccountForm from '../forms/DeleteAccountForm'
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from './Drawer'
+import { Button } from '../../../ui/buttons/Button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../../ui/dialogs/Dialog'
+import DeleteAccountForm from './DeleteAccountForm'
 
-export function DeleteAccountDrawer() {
+export function DeleteAccountDialog() {
   const [open, setOpen] = useState(false)
   const user = useAtomValue(userStateAtom)
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
         <Button
           className="border border-destructive bg-white text-destructive hover:bg-destructive hover:text-white"
         >
           削除する
         </Button>
-      </DrawerTrigger>
-      <DrawerContent className="mb-8">
-        <DrawerHeader>
-          <DrawerTitle className="text-left">
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[470px]">
+        <DialogHeader>
+          <DialogTitle>
             アカウントを削除しようとしています
-          </DrawerTitle>
-        </DrawerHeader>
+          </DialogTitle>
+        </DialogHeader>
         <p className="pb-4 text-sm leading-6">
           {getDeleteDescription(user.provider)}
           <br />
@@ -34,7 +34,7 @@ export function DeleteAccountDrawer() {
           {user.provider === 'email' && '確認のため、登録中のメールアドレスを入力してください。'}
         </p>
         <DeleteAccountForm onClose={() => setOpen(false)} />
-      </DrawerContent>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   )
 }
