@@ -1,16 +1,12 @@
 'use client'
 
-import { useAtomValue } from 'jotai'
 import { useState } from 'react'
-import { userStateAtom } from '~/state/user-state.atom'
-import { getDeleteDescription } from '~/utils/get-delete-description'
-import { Button } from '../../../ui/buttons/Button'
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '../../../ui/drawers/Drawer'
-import DeleteAccountForm from './DeleteAccountForm'
+import { Button } from '~/ui/buttons/Button'
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '~/ui/drawers/Drawer'
+import DeleteAccountContent from './DeleteAccountContent'
 
 export function DeleteAccountDrawer() {
   const [open, setOpen] = useState(false)
-  const user = useAtomValue(userStateAtom)
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
@@ -27,13 +23,7 @@ export function DeleteAccountDrawer() {
             アカウントを削除しようとしています
           </DrawerTitle>
         </DrawerHeader>
-        <p className="pb-4 text-sm leading-6">
-          {getDeleteDescription(user.provider)}
-          <br />
-          この操作は取り消すことができません。
-          {user.provider === 'email' && '確認のため、登録中のメールアドレスを入力してください。'}
-        </p>
-        <DeleteAccountForm onClose={() => setOpen(false)} />
+        <DeleteAccountContent onClose={() => setOpen(false)} />
       </DrawerContent>
     </Drawer>
   )
