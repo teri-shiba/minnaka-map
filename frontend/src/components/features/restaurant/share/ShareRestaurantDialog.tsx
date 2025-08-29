@@ -7,10 +7,10 @@ import { useCallback, useMemo, useState } from 'react'
 import { FaXTwitter } from 'react-icons/fa6'
 import { LuCopy, LuMail, LuShare } from 'react-icons/lu'
 import { toast } from 'sonner'
+import { Button } from '~/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog'
 import useShare from '~/hooks/useShare'
 import { logger } from '~/lib/logger'
-import { Button } from '../button'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../dialog'
 
 interface ShareDialogProps {
   restaurantName: string

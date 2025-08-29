@@ -5,9 +5,9 @@ import { useCallback, useMemo } from 'react'
 import { FaXTwitter } from 'react-icons/fa6'
 import { LuCopy, LuMail, LuShare } from 'react-icons/lu'
 import { toast } from 'sonner'
+import { Button } from '~/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog'
 import { logger } from '~/lib/logger'
-import { Button } from '../button'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../dialog'
 
 interface ShareFavoriteListDialogProps {
   isOpen: boolean
@@ -42,7 +42,6 @@ export default function ShareFavoriteListDialog({
     [shareUrl],
   )
 
-  // TODO: 正しく起動するのかチェックする
   const handleEmailShare = useCallback(() => {
     if (!shareUrl || !title)
       return
