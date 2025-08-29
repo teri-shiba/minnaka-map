@@ -6,9 +6,9 @@ import { usePathname } from 'next/navigation'
 import { useAuth } from '~/hooks/useAuth'
 import logo from '~/public/logo.webp'
 import logoMark from '~/public/logo_mark.webp'
-import { Auth } from '~/ui/Auth'
 import UserMenu from '~/ui/dropdownmenu/UserMenu'
 import { Skeleton } from '~/components/ui/skeleton'
+import { Auth } from '../features/account/auth/Auth'
 
 interface logoImages {
   id: number
