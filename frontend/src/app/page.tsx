@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import StationSearchForm from '~/components/features/station/search/StationSearchForm'
 import Section from '~/components/layout/Section'
-import { GuideCarousel } from '~/components/ui/GuideCarousel'
+import { GuideCarousel } from '~/components/features/carousels/GuideCarousel'
 import useConfirmEmail from '~/hooks/useConfirmEmail'
 import useOAuthCallback from '~/hooks/useOAuthCallback'
 
