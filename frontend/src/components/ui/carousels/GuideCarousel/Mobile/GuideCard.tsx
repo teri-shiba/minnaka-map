@@ -2,7 +2,7 @@
 
 import type { CarouselData } from '~/data/carousel-data'
 import Image from 'next/image'
-import { Card, CardContent } from '~/ui/cards/Card'
+import { Card, CardContent } from '~/components/ui/card'
 
 interface GuideCardProps {
   data: CarouselData

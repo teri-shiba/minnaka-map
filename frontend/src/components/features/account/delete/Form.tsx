@@ -9,9 +9,9 @@ import { useForm } from 'react-hook-form'
 import { useAuth } from '~/hooks/useAuth'
 import { deleteAccountSchema } from '~/schemas/delete-account.schema'
 import { userStateAtom } from '~/state/user-state.atom'
-import { Button } from '~/ui/buttons/Button'
+import { Button } from '~/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/ui/forms/Form'
-import { Input } from '~/ui/forms/Input'
+import { Input } from '~/components/ui/input'
 
 interface DeleteAccountFormProps extends ComponentProps<'form'> {
   onClose?: () => void

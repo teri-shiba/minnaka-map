@@ -3,7 +3,7 @@ import { Suspense } from 'react'
 import Footer from '~/components/layout/Footer'
 import Header from '~/components/layout/Header'
 import ErrorToastHandler from '~/components/ui/toasts/ErrorToastHandler'
-import { Toaster } from '~/components/ui/toasts/Toast'
+import { Toaster } from '~/components/ui/toast'
 import '~/styles/globals.css'
 
 export const metadata: Metadata = {

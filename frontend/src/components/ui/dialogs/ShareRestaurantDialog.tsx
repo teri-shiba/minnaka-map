@@ -9,8 +9,8 @@ import { LuCopy, LuMail, LuShare } from 'react-icons/lu'
 import { toast } from 'sonner'
 import useShare from '~/hooks/useShare'
 import { logger } from '~/lib/logger'
-import { Button } from '../buttons/Button'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './Dialog'
+import { Button } from '../button'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../dialog'
 
 interface ShareDialogProps {
   restaurantName: string

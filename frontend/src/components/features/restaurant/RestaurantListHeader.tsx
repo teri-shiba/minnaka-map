@@ -1,8 +1,8 @@
 'use client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
-import { Button } from '~/components/ui/buttons/Button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/selects/Select'
+import { Button } from '~/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import { SORT_GENRE } from '~/constants'
 
 interface RestaurantListHeaderProps {

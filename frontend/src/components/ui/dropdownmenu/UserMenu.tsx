@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { HiUser } from 'react-icons/hi2'
 import { LuHeart, LuLogOut, LuSettings } from 'react-icons/lu'
 import { useAuth } from '~/hooks/useAuth'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './DropdownMenu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../dropdown-menu'
 
 export default function UserMenu() {
   const [open, setOpen] = useState(false)

@@ -1,5 +1,5 @@
 import { LuMinus } from 'react-icons/lu'
-import { Button } from './Button'
+import { Button } from '../button'
 
 interface FormRemoveButtonProps {
   index: number

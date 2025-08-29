@@ -7,9 +7,9 @@ import { useForm } from 'react-hook-form'
 import { useAuth } from '~/hooks/useAuth'
 import { logger } from '~/lib/logger'
 import { signupSchema } from '~/schemas/signup.schema'
-import { Button } from '../buttons/Button'
+import { Button } from '../button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from './Form'
-import { Input } from './Input'
+import { Input } from '../input'
 
 interface LoginFormProps {
   onSuccess?: () => void

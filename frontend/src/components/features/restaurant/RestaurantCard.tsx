@@ -4,13 +4,13 @@ import type { RestaurantListItem } from '~/types/restaurant'
 import Image from 'next/image'
 import Link from 'next/link'
 import { LuCalendarX2, LuTramFront } from 'react-icons/lu'
-import { Badge } from '~/ui/badges/badge'
+import { Badge } from '~/components/ui/badge'
 import {
   Card,
   CardContent,
   CardDescription,
   CardTitle,
-} from '~/ui/cards/Card'
+} from '~/components/ui/card'
 import { cn } from '~/utils/cn'
 import FavoriteButton from './FavoriteButton'
 
