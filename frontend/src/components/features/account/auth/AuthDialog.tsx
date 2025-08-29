@@ -3,21 +3,13 @@
 import { useAtom } from 'jotai'
 import Image from 'next/image'
 import { useState } from 'react'
+import { Button } from '~/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog'
 import { AUTH_PROVIDERS, dynamicPaths } from '~/constants'
-import logoMark from '~/public/logo_mark.webp'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
 import { apiHref } from '~/utils/api-url'
-import { Button } from '../button'
-import LoginForm from '../forms/LoginForm'
-import SignUpForm from '../forms/SignUpForm'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '../dialog'
+import LoginForm from './forms/LoginForm'
+import SignUpForm from './forms/SignUpForm'
 
 export function AuthDialog() {
   const [open, setOpen] = useAtom(authModalOpenAtom)
@@ -44,7 +36,7 @@ export function AuthDialog() {
             <div className="flex items-center gap-2 py-2">
               <Image
                 alt="mark"
-                src={logoMark}
+                src="/logo_mark.webp"
                 width={24}
                 height={24}
               />

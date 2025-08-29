@@ -1,10 +1,11 @@
 'use client'
+
 import type { FormEvent } from 'react'
 import type { SavedStation, StationProps } from '~/types/station'
 import { useCallback, useMemo, useRef, useState } from 'react'
+import { Command, CommandInput } from '~/components/ui/command'
 import { useLocalStorage } from '~/hooks/useLocalStorage'
 import useSearchStation from '~/hooks/useSearchStation'
-import { Command, CommandInput } from '../../../ui/command'
 import StationSuggestions from './StationSuggestions'
 
 interface StationAutocompleteProps {

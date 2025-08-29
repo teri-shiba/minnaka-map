@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { Suspense } from 'react'
 import Footer from '~/components/layout/Footer'
 import Header from '~/components/layout/Header'
-import ErrorToastHandler from '~/components/ui/toasts/ErrorToastHandler'
 import { Toaster } from '~/components/ui/toast'
+import ErrorToastHandler from '~/components/ui/toasts/ErrorToastHandler'
 import '~/styles/globals.css'
 
 export const metadata: Metadata = {

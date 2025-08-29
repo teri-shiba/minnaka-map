@@ -2,16 +2,8 @@
 
 import type { PageInfo } from '~/types/pagination'
 import { useMemo } from 'react'
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '~/components/ui/pagination'
 import { usePagination } from '~/hooks/usePagination'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '~/ui/pagination/Pagination'
 import { generatePaginationStructure } from '~/utils/pagination'
 
 interface RestaurantPaginationProps {

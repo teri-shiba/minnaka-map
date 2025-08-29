@@ -1,5 +1,7 @@
+'use clinet'
+
 import { LuMinus } from 'react-icons/lu'
-import { Button } from '../button'
+import { Button } from '~/components/ui/button'
 
 interface FormRemoveButtonProps {
   index: number

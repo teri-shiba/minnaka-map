@@ -1,18 +1,16 @@
 'use client'
-import type { StaticImageData } from 'next/image'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useAuth } from '~/hooks/useAuth'
-import logo from '~/public/logo.webp'
-import logoMark from '~/public/logo_mark.webp'
-import UserMenu from '~/ui/dropdownmenu/UserMenu'
 import { Skeleton } from '~/components/ui/skeleton'
+import { useAuth } from '~/hooks/useAuth'
+import UserMenu from '~/ui/dropdownmenu/UserMenu'
 import { Auth } from '../features/account/auth/Auth'
 
 interface logoImages {
   id: number
-  src: StaticImageData
+  src: string
   width: number
   height: number
   customClassName: string
@@ -27,14 +25,14 @@ export default function Header() {
   const logoImages: logoImages[] = [
     {
       id: 0,
-      src: logo,
+      src: '/logo.webp',
       width: 224,
       height: 29,
       customClassName: 'hidden md:block',
     },
     {
       id: 1,
-      src: logoMark,
+      src: '/logo_mark.webp',
       width: 28,
       height: 28,
       customClassName: 'block md:hidden',

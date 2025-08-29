@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import StationSearchForm from '~/components/features/station/search/Form'
+import StationSearchForm from '~/components/features/station/search/StationSearchForm'
 import Section from '~/components/layout/Section'
 import { GuideCarousel } from '~/components/ui/GuideCarousel'
 import useConfirmEmail from '~/hooks/useConfirmEmail'
