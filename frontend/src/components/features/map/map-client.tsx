@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic'
 import { Skeleton } from '~/components/ui/skeleton'
 import LoadingIcon from '~/public/figure_loading_circle.svg'
 
-const Map = dynamic(() => import('./Map'), {
+const Map = dynamic(() => import('./map'), {
   ssr: false,
   loading: () => (
     <div className="relative h-mobile-map w-full md:h-desktop-map">

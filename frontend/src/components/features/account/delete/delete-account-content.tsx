@@ -3,7 +3,7 @@
 import { useAtomValue } from 'jotai'
 import { userStateAtom } from '~/state/user-state.atom'
 import { getDeleteDescription } from '~/utils/get-delete-description'
-import DeleteAccountForm from './Form'
+import DeleteAccountForm from './delete-account-form'
 
 interface DeleteAccountContentProps {
   onClose: () => void

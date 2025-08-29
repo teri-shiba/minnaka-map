@@ -7,9 +7,9 @@ import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Button } from '~/components/ui/button'
 import { cn } from '~/utils/cn'
-import RestaurantCard from './RestaurantCard'
-import RestaurantListHeader from './RestaurantListHeader'
-import RestaurantPagination from './RestaurantPagination'
+import RestaurantCard from './restaurant-card'
+import RestaurantListHeader from './restaurant-list-header'
+import RestaurantPagination from './restaurant-pagination'
 
 interface RestaurantsDrawerProps {
   restaurants: RestaurantListItem[]

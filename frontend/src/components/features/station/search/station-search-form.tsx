@@ -10,10 +10,10 @@ import { Form, FormControl, FormField, FormItem } from '~/components/ui/form'
 import { useMidpointMutation } from '~/hooks/useMidpointMutation'
 import { logger } from '~/lib/logger'
 import { stationSearchSchema } from '~/schemas/station-search.schema'
-import { RemoveFormButton } from './/buttons/RemoveFormButton'
-import { AddFormButton } from './buttons/AddFormButton'
-import { ResetFormButton } from './buttons/ResetFormButton'
-import StationAutocomplete from './StationAutocomplete'
+import { AddFormButton } from './buttons/add-form-button'
+import { RemoveFormButton } from './buttons/remove-form-button'
+import { ResetFormButton } from './buttons/reset-form-button'
+import StationAutocomplete from './station-autocomplete'
 
 const MAX_AREA_FIELDS = 6
 const MAX_REQUIRED_FIELDS = 2

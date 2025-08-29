@@ -5,11 +5,11 @@ import type { RestaurantListItem } from '~/types/restaurant'
 import dynamic from 'next/dynamic'
 
 const RestaurantSidebar = dynamic(
-  () => import('./RestaurantSidebar'),
+  () => import('./restaurant-sidebar'),
 )
 
 const RestaurantsDrawer = dynamic(
-  () => import('./RestaurantsDrawer'),
+  () => import('./restaurant-drawer'),
 )
 
 interface RestaurantListProps {

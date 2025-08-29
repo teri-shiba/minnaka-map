@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import FavoritesList from '~/components/features/favorite/FavoritesList'
+import FavoritesList from '~/components/features/favorite/favorite-list'
 import { Button } from '~/components/ui/button'
 import { getFavoritesWithDetailsPaginated } from '~/services/favorite-action'
 

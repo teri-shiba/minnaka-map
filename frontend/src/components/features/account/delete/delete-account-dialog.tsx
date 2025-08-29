@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '~/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog'
-import DeleteAccountContent from './Content'
+import DeleteAccountContent from './delete-account-content'
 
 export default function DeleteAccountDialog() {
   const [open, setOpen] = useState(false)
