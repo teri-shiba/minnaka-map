@@ -20,7 +20,7 @@ const ERROR_MESSAGE = {
 
 type ErrorType = keyof typeof ERROR_MESSAGE
 
-export default function ErrorToastHandler() {
+export default function ErrorToastListener() {
   const searchParams = useSearchParams()
   const error = searchParams.get('error')
   const message = searchParams.get('message')
