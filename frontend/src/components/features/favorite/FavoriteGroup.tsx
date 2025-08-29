@@ -6,11 +6,11 @@ import { useCallback, useState } from 'react'
 import { LuChevronDown, LuChevronUp } from 'react-icons/lu'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
-import ShareFavoriteListDialog from '~/components/ui/dialogs/ShareFavoriteListDialog'
 import useShare from '~/hooks/useShare'
 import { logger } from '~/lib/logger'
 import { createSharedList } from '~/services/create-shared-list'
 import RestaurantCard from '../restaurant/RestaurantCard'
+import ShareFavoriteListDialog from './share/ShareFavoriteListDialog'
 
 interface FavoriteGroupProps {
   group: FavoriteGroupWithDetails
