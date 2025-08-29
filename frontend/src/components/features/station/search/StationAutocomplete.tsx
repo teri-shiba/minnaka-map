@@ -4,8 +4,8 @@ import type { SavedStation, StationProps } from '~/types/station'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { useLocalStorage } from '~/hooks/useLocalStorage'
 import useSearchStation from '~/hooks/useSearchStation'
-import { Command, CommandInput } from '../command'
-import StationSuggestions from './StationSuggestions'
+import { Command, CommandInput } from '../../../ui/command'
+import StationSuggestions from '../../../ui/autocomplete/StationSuggestions'
 
 interface StationAutocompleteProps {
   value: string

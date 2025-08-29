@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button } from '~/components/ui/buttons/Button'
+import { Button } from '~/components/ui/button'
 import { useMidpointMutation } from '~/hooks/useMidpointMutation'
 import { logger } from '~/lib/logger'
 import { stationSearchSchema } from '~/schemas/station-search.schema'
@@ -56,8 +56,8 @@ export default function StationSearchForm() {
 
           const isSameStationIds
             = sortedPrevIds.length === sortedStationIds.length
-              && sortedPrevIds.every((prevStationId, i) =>
-                prevStationId === sortedStationIds[i])
+            && sortedPrevIds.every((prevStationId, i) =>
+              prevStationId === sortedStationIds[i])
 
           if (!isSameStationIds) {
             sessionStorage.removeItem('pendingSearchHistoryId')

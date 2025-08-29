@@ -7,7 +7,7 @@ import { AUTH_PROVIDERS, dynamicPaths } from '~/constants'
 import logoMark from '~/public/logo_mark.webp'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
 import { apiHref } from '~/utils/api-url'
-import { Button } from '../buttons/Button'
+import { Button } from '../button'
 import LoginForm from '../forms/LoginForm'
 import SignUpForm from '../forms/SignUpForm'
 import {
@@ -17,7 +17,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from './Drawer'
+} from '../drawer'
 
 export function AuthDrawer() {
   const [open, setOpen] = useAtom(authModalOpenAtom)

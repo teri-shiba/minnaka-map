@@ -5,7 +5,7 @@ import type { FavoriteGroupWithDetails } from '~/types/favorite'
 import { useCallback, useState } from 'react'
 import { LuChevronDown, LuChevronUp } from 'react-icons/lu'
 import { toast } from 'sonner'
-import { Button } from '~/components/ui/buttons/Button'
+import { Button } from '~/components/ui/button'
 import ShareFavoriteListDialog from '~/components/ui/dialogs/ShareFavoriteListDialog'
 import useShare from '~/hooks/useShare'
 import { logger } from '~/lib/logger'
@@ -23,7 +23,7 @@ export default function FavoriteGroup({ group }: FavoriteGroupProps) {
   const { share, canNativeShare, isMobile } = useShare()
   const [isSharing, setIsSharing] = useState(false)
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
-  const [shareData, setShareData] = useState<SharedListData | null> (null)
+  const [shareData, setShareData] = useState<SharedListData | null>(null)
   const [shareUrl, setShareUrl] = useState('')
 
   const displayFavorites = showAll

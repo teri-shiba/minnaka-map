@@ -4,7 +4,7 @@ import { LuArrowUpRight } from 'react-icons/lu'
 import FavoriteButton from '~/components/features/restaurant/FavoriteButton'
 import Section from '~/components/layout/Section'
 import ShareRestaurantDialog from '~/components/ui/dialogs/ShareRestaurantDialog'
-import { Table, TableBody, TableCell, TableHead, TableRow } from '~/components/ui/table/Table'
+import { Table, TableBody, TableCell, TableHead, TableRow } from '~/components/ui/table'
 import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
 import { getGoogleMapsEmbedUrl } from '~/services/get-google-maps-embed-url'
 

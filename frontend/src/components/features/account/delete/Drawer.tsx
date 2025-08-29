@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '~/ui/buttons/Button'
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '~/ui/drawers/Drawer'
+import { Button } from '~/components/ui/button'
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '~/components/ui/drawer'
 import DeleteAccountContent from './Content'
 
 export default function DeleteAccountDrawer() {

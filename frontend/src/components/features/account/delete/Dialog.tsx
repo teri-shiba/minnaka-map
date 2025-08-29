@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '~/ui/buttons/Button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '~/ui/dialogs/Dialog'
+import { Button } from '~/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog'
 import DeleteAccountContent from './Content'
 
 export default function DeleteAccountDialog() {

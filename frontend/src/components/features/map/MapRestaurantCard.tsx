@@ -5,9 +5,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { memo, useCallback } from 'react'
 import { LuCalendarX2, LuTramFront, LuX } from 'react-icons/lu'
-import { Badge } from '~/components/ui/badges/badge'
-import { Button } from '~/components/ui/buttons/Button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/cards/Card'
+import { Badge } from '~/components/ui/badge'
+import { Button } from '~/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
 
 interface MapRestaurantCardProps {
   restaurant: RestaurantListItem

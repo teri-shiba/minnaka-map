@@ -5,7 +5,7 @@ import type { RestaurantListItem } from '~/types/restaurant'
 import { motion, useAnimationControls } from 'framer-motion'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Button } from '~/ui/buttons/Button'
+import { Button } from '~/components/ui/button'
 import { cn } from '~/utils/cn'
 import RestaurantCard from './RestaurantCard'
 import RestaurantListHeader from './RestaurantListHeader'
@@ -84,43 +84,43 @@ export default function RestaurantsDrawer({
         >
           {totalCount > 0
             ? (
-                <>
-                  {restaurants.map(restaurant => (
-                    <RestaurantCard
-                      key={restaurant.id}
-                      restaurant={restaurant}
-                    />
-                  ))}
+              <>
+                {restaurants.map(restaurant => (
+                  <RestaurantCard
+                    key={restaurant.id}
+                    restaurant={restaurant}
+                  />
+                ))}
 
-                  {totalPages > 1 && (
-                    <RestaurantPagination
-                      pagination={pagination}
-                    />
-                  )}
+                {totalPages > 1 && (
+                  <RestaurantPagination
+                    pagination={pagination}
+                  />
+                )}
 
-                  <p className="text-center text-xs text-muted-foreground">
-                    Powered by
-                    {' '}
-                    <a href="http://webservice.recruit.co.jp/" className="text-sky-600">
-                      ホットペッパーグルメ Webサービス
-                    </a>
-                  </p>
-                </>
-              )
+                <p className="text-center text-xs text-muted-foreground">
+                  Powered by
+                  {' '}
+                  <a href="http://webservice.recruit.co.jp/" className="text-sky-600">
+                    ホットペッパーグルメ Webサービス
+                  </a>
+                </p>
+              </>
+            )
             : (
-                <div className="text-center">
-                  <p className="text-sm leading-relaxed">
-                    お店が見つかりませんでした。
-                    <br />
-                    条件を変えて再検索してください。
-                  </p>
-                  <Link href="/" className="mt-4 inline-block">
-                    <Button>
-                      再検索する
-                    </Button>
-                  </Link>
-                </div>
-              )}
+              <div className="text-center">
+                <p className="text-sm leading-relaxed">
+                  お店が見つかりませんでした。
+                  <br />
+                  条件を変えて再検索してください。
+                </p>
+                <Link href="/" className="mt-4 inline-block">
+                  <Button>
+                    再検索する
+                  </Button>
+                </Link>
+              </div>
+            )}
         </div>
 
       </div>

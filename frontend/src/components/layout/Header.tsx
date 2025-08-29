@@ -8,7 +8,7 @@ import logo from '~/public/logo.webp'
 import logoMark from '~/public/logo_mark.webp'
 import { Auth } from '~/ui/Auth'
 import UserMenu from '~/ui/dropdownmenu/UserMenu'
-import { Skeleton } from '~/ui/skeleton/Skeleton'
+import { Skeleton } from '~/components/ui/skeleton'
 
 interface logoImages {
   id: number

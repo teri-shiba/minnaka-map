@@ -8,7 +8,7 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-} from '../../Carousel'
+} from '../../../carousel'
 import GuideCard from './GuideCard'
 
 const carouselOptions: Partial<EmblaOptionsType> = {
