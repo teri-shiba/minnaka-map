@@ -1,7 +1,7 @@
 import type { RestaurantListItem } from '~/types/restaurant'
 import { notFound, redirect } from 'next/navigation'
-import RestaurantCard from '~/components/features/restaurant/RestaurantCard'
-import Section from '~/components/layout/Section'
+import RestaurantCard from '~/components/features/restaurant/restaurant-card'
+import Section from '~/components/layout/section'
 import { fetchRestaurantsByIds } from '~/services/fetch-restaurants'
 import { fetchSharedList } from '~/services/fetch-shared-list'
 

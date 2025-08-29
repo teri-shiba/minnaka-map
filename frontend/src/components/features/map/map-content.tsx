@@ -3,9 +3,9 @@ import type { RestaurantListItem } from '~/types/restaurant'
 import { useCallback } from 'react'
 import { useMapEvent, ZoomControl } from 'react-leaflet'
 import { useMapCoordinates } from '~/hooks/useMapCoordinates'
-import MapTilerLayer from './layers/MapTilerLayer'
-import MidpointMarker from './markers/MidpointMarker'
-import RestaurantMarker from './markers/RestaurantMarker'
+import MapTilerLayer from './map-layer'
+import MidpointMarker from './midpoint-marker'
+import RestaurantMarker from './restaurant-marker'
 
 interface MapContentProps extends MapItems {
   selectedRestaurant: RestaurantListItem | null

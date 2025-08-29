@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from '~/components/ui/card'
 import { cn } from '~/utils/cn'
-import FavoriteButton from './FavoriteButton'
+import FavoriteButton from './favorite-button'
 
 interface RestaurantCardProps {
   restaurant: RestaurantListItem

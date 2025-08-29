@@ -1,9 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import StationSearchForm from '~/components/features/station/search/StationSearchForm'
-import Section from '~/components/layout/Section'
-import { GuideCarousel } from '~/components/features/carousels/GuideCarousel'
+import GuideCarousel from '~/components/features/carousels/guide-carousel'
+import StationSearchForm from '~/components/features/station/search/station-search-form'
+import Section from '~/components/layout/section'
 import useConfirmEmail from '~/hooks/useConfirmEmail'
 import useOAuthCallback from '~/hooks/useOAuthCallback'
 
@@ -123,7 +123,9 @@ export default function Home() {
       </Section>
 
       <Section className="relative mb-24">
-        <GuideCarousel />
+        <div className="section-guide">
+          <GuideCarousel className="sm:flex sm:items-center sm:justify-between" />
+        </div>
       </Section>
     </>
   )

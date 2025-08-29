@@ -4,13 +4,13 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import { carouselData } from '~/data/carousel-data'
 import { useCarousel } from '~/hooks/useCarousel'
-import GuideItem from './GuideItem'
+import GuideCarouselItem from './guide-carousel-item'
 
 const dataMap = new Map<number, typeof carouselData[0]>(
   carouselData.map(data => [data.id, data]),
 )
 
-export default function DesktopGuideCarousel({ className }: { className?: string }) {
+export default function GuideCarousel({ className }: { className?: string }) {
   const { activeStep, startSequenceFrom } = useCarousel(carouselData, {
     autoPlay: true,
     interval: 3000,
@@ -59,7 +59,7 @@ export default function DesktopGuideCarousel({ className }: { className?: string
           <span className="inline-block pl-1">の使い方</span>
         </h2>
         {carouselData.map(data => (
-          <GuideItem
+          <GuideCarouselItem
             key={data.id}
             data={data}
             isActive={activeStep === data.id}

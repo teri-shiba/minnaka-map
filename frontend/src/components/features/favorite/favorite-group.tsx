@@ -9,8 +9,8 @@ import { Button } from '~/components/ui/button'
 import useShare from '~/hooks/useShare'
 import { logger } from '~/lib/logger'
 import { createSharedList } from '~/services/create-shared-list'
-import RestaurantCard from '../restaurant/RestaurantCard'
-import ShareFavoriteListDialog from './share/ShareFavoriteListDialog'
+import RestaurantCard from '../restaurant/restaurant-card'
+import ShareFavoriteListDialog from './share/share-favorite-list-dialog'
 
 interface FavoriteGroupProps {
   group: FavoriteGroupWithDetails

@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Skeleton } from '~/components/ui/skeleton'
 import { useAuth } from '~/hooks/useAuth'
-import { Auth } from '../features/account/auth/Auth'
-import UserMenu from './UserMenu'
+import { Auth } from '../features/account/auth/auth'
+import UserMenu from './user-menu'
 
 interface logoImages {
   id: number

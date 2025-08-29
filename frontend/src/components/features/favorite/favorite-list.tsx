@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { LuHeart } from 'react-icons/lu'
 import { Button } from '~/components/ui/button'
 import { getFavoritesWithDetailsPaginated } from '~/services/favorite-action'
-import FavoriteGroup from './FavoriteGroup'
+import FavoriteGroup from './favorite-group'
 
 interface FavoriteListProps {
   initialData: FavoriteGroupWithDetails[]

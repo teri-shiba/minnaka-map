@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import { Suspense } from 'react'
 import ErrorToastListener from '~/components/error-toast-listener'
-import Footer from '~/components/layout/Footer'
-import Header from '~/components/layout/Header'
+import Footer from '~/components/layout/footer'
+import Header from '~/components/layout/header'
 import { Toaster } from '~/components/ui/toast'
 import '~/styles/globals.css'
 

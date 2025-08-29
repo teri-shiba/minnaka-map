@@ -1,4 +1,4 @@
-import Section from '~/components/layout/Section'
+import Section from '~/components/layout/section'
 import { Skeleton } from '~/components/ui/skeleton'
 
 export default async function Loading() {

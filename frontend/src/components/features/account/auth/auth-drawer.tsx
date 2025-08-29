@@ -8,8 +8,8 @@ import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, Dr
 import { AUTH_PROVIDERS, dynamicPaths } from '~/constants'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
 import { apiHref } from '~/utils/api-url'
-import LoginForm from './forms/LoginForm'
-import SignUpForm from './forms/SignUpForm'
+import LoginForm from './forms/login-form'
+import SignUpForm from './forms/signup-form'
 
 export function AuthDrawer() {
   const [open, setOpen] = useAtom(authModalOpenAtom)

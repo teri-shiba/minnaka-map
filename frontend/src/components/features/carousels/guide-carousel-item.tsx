@@ -9,7 +9,7 @@ interface GuideItemProps {
   isActive: boolean
   onClick: (id: number) => void
 }
-export default function GuideItem({ data, isActive, onClick }: GuideItemProps) {
+export default function GuideCarouselItem({ data, isActive, onClick }: GuideItemProps) {
   return (
     <motion.div
       className={cn(
