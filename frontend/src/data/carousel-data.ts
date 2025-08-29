@@ -1,12 +1,6 @@
-export interface CarouselData {
-  id: number
-  imageUrl: string
-  title: string
-  text: string
-}
+import type { CarouselData } from '~/types/carousel-data'
 
 // TODO: 画像データは、アプリ完成後に変更する
-
 export const carouselData: CarouselData[] = [
   {
     id: 1,

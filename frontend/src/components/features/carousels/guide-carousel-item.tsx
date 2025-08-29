@@ -1,6 +1,6 @@
 'use client'
 
-import type { CarouselData } from '~/data/carousel-data'
+import type { CarouselData } from '~/types/carousel-data'
 import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '~/utils/cn'
 
