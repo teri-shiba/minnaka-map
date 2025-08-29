@@ -5,7 +5,7 @@ import type { ComponentPropsWithoutRef, HTMLAttributes, RefObject } from 'react'
 import { Command as CommandPrimitive } from 'cmdk'
 import { memo } from 'react'
 
-import { Dialog, DialogContent } from '~/components/ui/dialogs/Dialog'
+import { Dialog, DialogContent } from '~/components/ui/dialog'
 import { cn } from '~/utils/cn'
 
 const Command = memo(({ ref, className, ...props }: ComponentPropsWithoutRef<typeof CommandPrimitive> & { ref?: RefObject<HTMLDivElement> }) => (
