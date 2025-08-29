@@ -1,10 +1,12 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import Image from 'next/image'
 import { carouselData } from '~/data/carousel-data'
 import { useCarousel } from '~/hooks/useCarousel'
-import GuideCarouselItem from './guide-carousel-item'
+import { cn } from '~/utils/cn'
+import GuideDescription from './guide-description'
+import GuideHeading from './guide-heading'
+import GuideImage from './guide-image'
 
 const dataMap = new Map<number, typeof carouselData[0]>(
   carouselData.map(data => [data.id, data]),
@@ -16,56 +18,53 @@ export default function GuideCarousel({ className }: { className?: string }) {
     interval: 3000,
   })
 
-  const current = dataMap.get(activeStep)
+  const current = dataMap.get(activeStep) ?? carouselData[0]
 
   return (
     <div className={className}>
-      {/* Images */}
-      <div className="w-1/2 text-center">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeStep}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="inline-block drop-shadow-xl"
-          >
-            <Image
-              alt={current?.title || ''}
-              src={current?.imageUrl || ''}
-              width={280}
-              height={560}
-              priority
-              className="rounded-lg"
-            />
-          </motion.div>
-        </AnimatePresence>
+      {/* SP */}
+      <div className="sm:hidden">
+        <GuideHeading />
+        <GuideImage
+          activeStep={activeStep}
+          current={current}
+        />
+        <GuideDescription data={current} />
       </div>
 
-      {/* Steps */}
-      <div className="flex w-1/2 flex-col gap-4">
-        <h2 className="mb-3 pl-5 text-2xl text-secondary-foreground">
-          <span className="inline-block align-text-top">
-            <Image
-              alt="minnaka map"
-              src="/logo.webp"
-              width={170}
-              height={30}
-              priority
-              className="w-60"
-            />
-          </span>
-          <span className="inline-block pl-1">の使い方</span>
-        </h2>
-        {carouselData.map(data => (
-          <GuideCarouselItem
-            key={data.id}
-            data={data}
-            isActive={activeStep === data.id}
-            onClick={startSequenceFrom}
-          />
-        ))}
+      {/* PC */}
+      <div className="hidden sm:flex sm:items-center">
+        <GuideImage
+          activeStep={activeStep}
+          current={current}
+        />
+        {/* Steps */}
+        <div className="flex w-1/2 flex-col gap-4">
+          <GuideHeading />
+
+          {carouselData.map(data => (
+            <motion.div
+              key={data.id}
+              className={cn(
+                'relative cursor-pointer rounded-lg p-5 transition-colors',
+                activeStep === data.id && 'bg-secondary',
+              )}
+              onClick={() => startSequenceFrom}
+            >
+              <GuideDescription data={data} />
+              <AnimatePresence>
+                {activeStep === data.id && (
+                  <motion.div
+                    className="absolute inset-0 -z-10 rounded-lg bg-secondary"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  />
+                )}
+              </AnimatePresence>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </div>
   )

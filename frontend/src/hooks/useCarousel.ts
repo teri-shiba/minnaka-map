@@ -1,4 +1,6 @@
-import type { CarouselData } from '~/data/carousel-data'
+'use client'
+
+import type { CarouselData } from '~/types/carousel-data'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface UseCarouselOptions {
