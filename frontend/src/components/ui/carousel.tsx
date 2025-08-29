@@ -6,7 +6,7 @@ import useEmblaCarousel from 'embla-carousel-react'
 import { createContext, use, useCallback, useEffect, useMemo, useSyncExternalStore } from 'react'
 import { LuArrowLeft, LuArrowRight } from 'react-icons/lu'
 
-import { Button } from '~/components/ui/buttons/Button'
+import { Button } from '~/components/ui/button'
 import { cn } from '~/utils/cn'
 
 type CarouselApi = UseEmblaCarouselType[1]
@@ -53,7 +53,7 @@ function Carousel({ ref, orientation = 'horizontal', opts, setApi, plugins, clas
 
   const canScrollPrev = useSyncExternalStore((callback) => {
     if (!api)
-      return () => {}
+      return () => { }
 
     api.on('select', callback)
     api.on('reInit', callback)
@@ -66,7 +66,7 @@ function Carousel({ ref, orientation = 'horizontal', opts, setApi, plugins, clas
 
   const canScrollNext = useSyncExternalStore((callback) => {
     if (!api)
-      return () => {}
+      return () => { }
 
     api.on('select', callback)
     api.on('reInit', callback)

@@ -1,9 +1,9 @@
-import type { ButtonProps } from '../buttons/Button'
+import type { ButtonProps } from './button'
 import Link from 'next/link'
 import * as React from 'react'
 import { LuChevronLeft, LuChevronRight, LuEllipsis } from 'react-icons/lu'
 import { cn } from '~/utils/cn'
-import { buttonVariants } from '../buttons/Button'
+import { buttonVariants } from './button'
 
 function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
   return (
@@ -36,7 +36,7 @@ PaginationItem.displayName = 'PaginationItem'
 type PaginationLinkProps = {
   isActive?: boolean
 } & Pick<ButtonProps, 'size'>
-& React.ComponentProps<typeof Link>
+  & React.ComponentProps<typeof Link>
 
 function PaginationLink({
   className,
