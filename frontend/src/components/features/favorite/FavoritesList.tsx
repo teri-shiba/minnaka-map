@@ -54,35 +54,35 @@ export default function FavoritesList({ initialData, initialMeta }: FavoriteList
       <div className="flex flex-col items-center justify-center gap-4">
         {meta.hasMore
           ? (
-            <>
-              <p>
-                {`全 ${favorites.length} 件中 ${meta.totalGroups} 件を表示中`}
-              </p>
-              <Button
-                onClick={loadMore}
-                disabled={isLoading}
-                size="lg"
-              >
-                {isLoading ? '読み込み中...' : 'さらに読み込む'}
-              </Button>
-            </>
-          )
+              <>
+                <p>
+                  {`全 ${favorites.length} 件中 ${meta.totalGroups} 件を表示中`}
+                </p>
+                <Button
+                  onClick={loadMore}
+                  disabled={isLoading}
+                  size="lg"
+                >
+                  {isLoading ? '読み込み中...' : 'さらに読み込む'}
+                </Button>
+              </>
+            )
           : (
-            <>
-              <div className="flex size-10 items-center justify-center rounded-full bg-red-50">
-                <LuHeart className="fill-destructive text-destructive" />
-              </div>
-              <p>すべてのお気に入りを表示しました</p>
-              <Button
-                variant="outline"
-                disabled={isLoading}
-                size="lg"
-                asChild
-              >
-                {isLoading ? '読み込み中...' : <Link href="/">別のエリアを探す</Link>}
-              </Button>
-            </>
-          )}
+              <>
+                <div className="flex size-10 items-center justify-center rounded-full bg-red-50">
+                  <LuHeart className="fill-destructive text-destructive" />
+                </div>
+                <p>すべてのお気に入りを表示しました</p>
+                <Button
+                  variant="outline"
+                  disabled={isLoading}
+                  size="lg"
+                  asChild
+                >
+                  {isLoading ? '読み込み中...' : <Link href="/">別のエリアを探す</Link>}
+                </Button>
+              </>
+            )}
       </div>
     </>
   )

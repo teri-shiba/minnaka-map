@@ -1,8 +1,8 @@
 'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import logo from '~/public/logo.webp'
 import { cn } from '~/utils/cn'
 
 interface NavItemProps {
@@ -30,7 +30,7 @@ export default function Footer() {
           <Link href="/" className="flex items-center space-x-2">
             <Image
               alt="minnaka map"
-              src={logo}
+              src="/logo.webp"
               width={224}
               height={29}
               className="block"

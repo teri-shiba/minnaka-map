@@ -43,48 +43,48 @@ export default function RestaurantSidebar({
       <div className="mt-4 space-y-4">
         {totalCount > 0
           ? (
-            <>
-              {restaurants.map(restaurant => (
-                <RestaurantCard
-                  key={restaurant.id}
-                  restaurant={restaurant}
-                />
-              ))}
-
-              <div className="mt-4 space-y-2 rounded-lg bg-gray-50/50 p-4">
-                {totalPages > 1 && (
-                  <RestaurantPagination
-                    pagination={pagination}
+              <>
+                {restaurants.map(restaurant => (
+                  <RestaurantCard
+                    key={restaurant.id}
+                    restaurant={restaurant}
                   />
-                )}
+                ))}
 
-                <p className="text-center text-xs text-muted-foreground">
-                  Powered by
-                  {' '}
-                  <a
-                    href="http://webservice.recruit.co.jp/"
-                    className="text-sky-600"
-                  >
-                    ホットペッパーグルメ Webサービス
-                  </a>
-                </p>
-              </div>
-            </>
-          )
+                <div className="mt-4 space-y-2 rounded-lg bg-gray-50/50 p-4">
+                  {totalPages > 1 && (
+                    <RestaurantPagination
+                      pagination={pagination}
+                    />
+                  )}
+
+                  <p className="text-center text-xs text-muted-foreground">
+                    Powered by
+                    {' '}
+                    <a
+                      href="http://webservice.recruit.co.jp/"
+                      className="text-sky-600"
+                    >
+                      ホットペッパーグルメ Webサービス
+                    </a>
+                  </p>
+                </div>
+              </>
+            )
           : (
-            <div className="text-center">
-              <p className="text-sm leading-relaxed">
-                お店が見つかりませんでした。
-                <br />
-                条件を変えて再検索してください。
-              </p>
-              <Link href="/" className="mt-4 inline-block">
-                <Button>
-                  再検索する
-                </Button>
-              </Link>
-            </div>
-          )}
+              <div className="text-center">
+                <p className="text-sm leading-relaxed">
+                  お店が見つかりませんでした。
+                  <br />
+                  条件を変えて再検索してください。
+                </p>
+                <Link href="/" className="mt-4 inline-block">
+                  <Button>
+                    再検索する
+                  </Button>
+                </Link>
+              </div>
+            )}
       </div>
 
     </div>

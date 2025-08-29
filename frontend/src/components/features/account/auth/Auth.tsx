@@ -1,9 +1,8 @@
 'use client'
 
 import { useMediaQuery } from '~/hooks/useMediaQuery'
-import { AuthDialog } from './dialogs/AuthDialog'
-
-import { AuthDrawer } from './drawers/AuthDrawer'
+import { AuthDialog } from './AuthDialog'
+import { AuthDrawer } from './AuthDrawer'
 
 export function Auth() {
   const isDesktop = useMediaQuery('(min-width: 768px)')

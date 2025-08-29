@@ -142,23 +142,23 @@ export default function FavoriteButton({
     return isChecking
       ? <Skeleton className="size-9 rounded-full shadow-sm" />
       : (
-        <Button
-          variant="outline"
-          size="sm"
-          className="size-9 rounded-full bg-white/90 p-0 shadow-sm hover:bg-white"
-          {...buttonProps}
-        >
-          <LuHeart className={cn('h-4 w-4 transition-colors', isFavorite ? 'fill-current text-destructive' : '')} />
-        </Button>
-      )
+          <Button
+            variant="outline"
+            size="sm"
+            className="size-9 rounded-full bg-white/90 p-0 shadow-sm hover:bg-white"
+            {...buttonProps}
+          >
+            <LuHeart className={cn('h-4 w-4 transition-colors', isFavorite ? 'fill-current text-destructive' : '')} />
+          </Button>
+        )
   }
 
   return isChecking
     ? <Skeleton className="h-10 w-32" />
     : (
-      <Button variant="outline" className="w-32" {...buttonProps}>
-        <LuHeart className={isFavorite ? 'fill-current text-destructive' : ''} />
-        {isFavorite ? '保存済み' : '保存する'}
-      </Button>
-    )
+        <Button variant="outline" className="w-32" {...buttonProps}>
+          <LuHeart className={isFavorite ? 'fill-current text-destructive' : ''} />
+          {isFavorite ? '保存済み' : '保存する'}
+        </Button>
+      )
 }

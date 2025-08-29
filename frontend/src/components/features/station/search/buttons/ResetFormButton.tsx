@@ -1,7 +1,9 @@
+'use client'
+
 import type { UseFormReturn } from 'react-hook-form'
 import type { AreaFormValues } from '~/schemas/station-search.schema'
 import { LuX } from 'react-icons/lu'
-import { Button } from '../button'
+import { Button } from '~/components/ui/button'
 
 interface ResetFormButtonProps {
   form: UseFormReturn<AreaFormValues>

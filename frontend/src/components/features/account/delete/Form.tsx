@@ -6,12 +6,12 @@ import type { ProviderId } from '~/types/auth-provider'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useAtomValue } from 'jotai'
 import { useForm } from 'react-hook-form'
+import { Button } from '~/components/ui/button'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form'
+import { Input } from '~/components/ui/input'
 import { useAuth } from '~/hooks/useAuth'
 import { deleteAccountSchema } from '~/schemas/delete-account.schema'
 import { userStateAtom } from '~/state/user-state.atom'
-import { Button } from '~/components/ui/button'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/ui/forms/Form'
-import { Input } from '~/components/ui/input'
 
 interface DeleteAccountFormProps extends ComponentProps<'form'> {
   onClose?: () => void

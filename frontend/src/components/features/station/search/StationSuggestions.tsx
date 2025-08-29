@@ -1,6 +1,8 @@
+'use client'
+
 import type { SavedStation, StationProps } from '~/types/station'
+import { CommandEmpty, CommandGroup, CommandItem, CommandList } from '~/components/ui/command'
 import Loading from '~/public/figure_loading_circle.svg'
-import { CommandEmpty, CommandGroup, CommandItem, CommandList } from '../command'
 
 interface StationSuggestionsProps {
   isLoading: boolean
