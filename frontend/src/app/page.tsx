@@ -1,20 +1,15 @@
 'use client'
 
 import Image from 'next/image'
+import StationSearchForm from '~/components/features/station/search/Form'
 import Section from '~/components/layout/Section'
-import StationSearchForm from '~/components/ui/forms/StationSearchForm'
 import { GuideCarousel } from '~/components/ui/GuideCarousel'
 import useConfirmEmail from '~/hooks/useConfirmEmail'
 import useOAuthCallback from '~/hooks/useOAuthCallback'
 
 export default function Home() {
-  // ↓ `useOAuthCallback()` と `useConfirmEmail()`
-  //    は、param を直接サーバーコンポーネントから受け取れば
-  //    サーバーコンポーネントにできるかも
-  // -------------------
   useOAuthCallback()
   useConfirmEmail()
-  // -------------------
 
   return (
     <>

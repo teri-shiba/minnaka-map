@@ -1,7 +1,7 @@
 import type { FieldArrayWithId, UseFieldArrayAppend } from 'react-hook-form'
 import type { AreaFormValues } from '~/schemas/station-search.schema'
 import { LuPlus } from 'react-icons/lu'
-import { Button } from '../button'
+import { Button } from '~/components/ui/button'
 
 interface AddFormButtonProps {
   fields: FieldArrayWithId<AreaFormValues>[]

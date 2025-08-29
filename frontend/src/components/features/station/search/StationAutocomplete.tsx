@@ -5,7 +5,7 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import { useLocalStorage } from '~/hooks/useLocalStorage'
 import useSearchStation from '~/hooks/useSearchStation'
 import { Command, CommandInput } from '../../../ui/command'
-import StationSuggestions from '../../../ui/autocomplete/StationSuggestions'
+import StationSuggestions from './StationSuggestions'
 
 interface StationAutocompleteProps {
   value: string
