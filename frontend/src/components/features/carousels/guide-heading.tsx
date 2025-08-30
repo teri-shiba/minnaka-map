@@ -3,7 +3,7 @@ import Image from 'next/image'
 export default function GuideHeading() {
   return (
     <>
-      <h2 className="pb-3 pl-5 text-center text-lg text-secondary-foreground sm:text-left sm:text-2xl">
+      <h2 className="pb-3 pl-5 text-center text-lg text-secondary-foreground sm:row-span-1 sm:pb-0 sm:text-left sm:text-2xl">
         <span className="inline-block align-text-bottom sm:align-text-top">
           <Image
             alt="minnaka map"
