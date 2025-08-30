@@ -122,9 +122,9 @@ export default function Home() {
         </div>
       </Section>
 
-      <Section className="relative mb-24">
+      <Section className="relative sm:mb-6">
         <div className="section-guide">
-          <GuideCarousel className="sm:flex sm:items-center sm:justify-between" />
+          <GuideCarousel />
         </div>
       </Section>
     </>

@@ -1,4 +1,4 @@
-import type { CarouselData } from '~/types/carousel-data'
+import type { CarouselData } from '~/types/carousel'
 
 // TODO: 画像データは、アプリ完成後に変更する
 export const carouselData: CarouselData[] = [

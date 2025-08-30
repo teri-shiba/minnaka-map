@@ -1,23 +1,18 @@
 'use client'
 
-import type { CarouselData } from '~/types/carousel-data'
+import type { CarouselData, CarouselResult } from '~/types/carousel'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-interface UseCarouselOptions {
+interface CarouselOptions {
   initialStep?: number
   autoPlay?: boolean
   interval?: number
 }
 
-interface UseCarouselResult {
-  activeStep: number
-  startSequenceFrom: (stepId: number) => void
-}
-
 export function useCarousel(
   carouselData: CarouselData[],
-  { initialStep = 1, autoPlay = true, interval = 3000 }: UseCarouselOptions = {},
-): UseCarouselResult {
+  { initialStep = 1, autoPlay = true, interval = 3000 }: CarouselOptions = {},
+): CarouselResult {
   const [activeStep, setActiveStep] = useState(initialStep)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
