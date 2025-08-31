@@ -80,9 +80,9 @@
     @apply absolute left-0 top-0 z-[-1]
            h-2/3 w-full rounded-2xl
            bg-cover bg-center opacity-50
-           md:-left-1/4 md:h-full md:w-1/2
-           md:rounded-[2rem] md:opacity-100
-           md:min-h-[46rem];
+           sm:-left-1/4 sm:h-full sm:w-1/2
+           sm:rounded-[2rem] sm:opacity-100
+           sm:min-h-[46rem];
     background-image: url("/image_guide_background.webp");
   }
 }
