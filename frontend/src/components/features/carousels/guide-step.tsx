@@ -9,13 +9,13 @@ import GuideDescription from './guide-description'
 export default function GuideStep({ activeStep, startSequenceFrom }: CarouselResult) {
   return (
     <>
-      {carouselData.map(data => {
+      {carouselData.map((data) => {
         const isActive = activeStep === data.id
         return (
           <motion.button
             key={data.id}
             className={cn(
-              'relative cursor-pointer rounded-lg p-5 transition-colors row-span-3',
+              'relative cursor-pointer rounded-lg px-5 transition-colors row-span-3 text-left',
               isActive && 'bg-secondary',
             )}
             onClick={() => startSequenceFrom(data.id)}
