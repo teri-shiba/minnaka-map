@@ -3,18 +3,17 @@ import Image from 'next/image'
 export default function GuideHeading() {
   return (
     <>
-      <h2 className="pb-3 pl-5 text-center text-lg text-secondary-foreground sm:row-span-1 sm:pb-0 sm:text-left sm:text-2xl">
-        <span className="inline-block align-text-bottom sm:align-text-top">
-          <Image
-            alt="minnaka map"
-            src="/logo.webp"
-            width={170}
-            height={30}
-            priority
-            className="w-44 sm:w-60"
-          />
-        </span>
-        <span className="inline-block pl-0.5 sm:pl-1">の使い方</span>
+      <h2 className="flex flex-wrap items-center justify-center gap-1 px-5 pb-4 text-lg text-secondary-foreground md:row-span-1 md:flex-nowrap md:justify-start md:pb-0 md:pl-5 md:text-2xl">
+        <Image
+          alt="minnaka map"
+          aria-label="minnaka map"
+          src="/logo.webp"
+          width={240}
+          height={30}
+          priority
+          className="w-full max-w-48 md:max-w-60"
+        />
+        <span className="shrink-0">の使い方</span>
       </h2>
     </>
   )

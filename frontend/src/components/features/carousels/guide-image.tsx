@@ -3,6 +3,7 @@
 import type { CarouselData } from '~/types/carousel'
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
+import { useMemo } from 'react'
 
 interface Props {
   activeStep: number
@@ -10,8 +11,12 @@ interface Props {
 }
 
 export default function GuideImage({ activeStep, current }: Props) {
+  const isPriority = useMemo(() => {
+    return typeof current.id === 'number' && current.id === activeStep
+  }, [activeStep, current])
+
   return (
-    <div className="text-center">
+    <div className="px-5 text-center md:px-0">
       <AnimatePresence mode="wait">
         <motion.div
           key={activeStep}
@@ -26,7 +31,9 @@ export default function GuideImage({ activeStep, current }: Props) {
             src={current.imageUrl || ''}
             width={280}
             height={560}
-            priority
+            priority={isPriority}
+            loading={isPriority ? 'eager' : 'lazy'}
+            decoding="async"
             className="relative aspect-[2/3] object-cover object-top md:aspect-auto md:object-none"
           />
         </motion.div>

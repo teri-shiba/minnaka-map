@@ -1,15 +1,24 @@
+'use client'
+
 import type { CarouselData } from '~/types/carousel'
 
 export default function GuideDescription({ data }: { data: CarouselData }) {
   return (
-    <div className="relative h-32 px-5 py-3 text-secondary-foreground sm:h-auto sm:px-0">
-      <h3 className="pb-1 text-center sm:flex sm:items-center sm:gap-2">
-        <span className="hidden sm:flex sm:size-9 sm:items-center sm:justify-center sm:rounded-md sm:bg-primary sm:text-white">
+    <div className="relative h-32 px-5 py-3 text-secondary-foreground md:h-auto md:p-0">
+      <h3 className="flex items-center justify-center gap-2 pb-2 text-center md:justify-start">
+        <span
+          aria-hidden="true"
+          className="grid size-7 place-items-center rounded-md bg-primary text-sm text-white sm:text-base md:size-9"
+        >
+          {data.id}
+        </span>
+        <span className="sr-only">
+          ステップ
           {data.id}
         </span>
         {data.title}
       </h3>
-      <p className="sm:pl-12 sm:text-sm">{data.text}</p>
+      <p className="text-sm leading-relaxed md:pl-12">{data.text}</p>
     </div>
   )
 }

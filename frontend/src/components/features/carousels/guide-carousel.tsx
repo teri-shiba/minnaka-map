@@ -15,6 +15,7 @@ export default function GuideCarousel() {
   const { activeStep, startSequenceFrom } = useCarousel(carouselData, {
     autoPlay: true,
     interval: 3000,
+    initialStep: 1,
   })
 
   const current = dataMap.get(activeStep) ?? carouselData[0]
@@ -22,7 +23,7 @@ export default function GuideCarousel() {
   return (
     <>
       {/* SP */}
-      <div className="sm:hidden">
+      <div className="md:hidden">
         <GuideHeading />
         <GuideImage
           activeStep={activeStep}
@@ -32,12 +33,12 @@ export default function GuideCarousel() {
       </div>
 
       {/* PC */}
-      <div className="hidden sm:grid sm:grid-cols-2">
+      <div className="hidden md:grid md:grid-cols-2">
         <GuideImage
           activeStep={activeStep}
           current={current}
         />
-        <div className="sm:grid sm:h-[560px] sm:grid-rows-10 sm:gap-6">
+        <div className="md:grid md:h-[560px] md:grid-rows-10">
           <GuideHeading />
           <GuideStep
             activeStep={activeStep}
