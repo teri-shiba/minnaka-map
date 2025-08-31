@@ -7,6 +7,30 @@ import Section from '~/components/layout/section'
 import useConfirmEmail from '~/hooks/useConfirmEmail'
 import useOAuthCallback from '~/hooks/useOAuthCallback'
 
+interface FeatureCard {
+  readonly src: string
+  readonly title: string
+  readonly description: string
+}
+
+const features: FeatureCard[] = [
+  {
+    src: '/image_feature_01.webp',
+    title: '友人との集まりに',
+    description: 'みんなの中間地点と周辺の飲食店を提案。集まる場所選びがスムーズに！楽しい時間の計画をお手伝いします。',
+  },
+  {
+    src: '/image_feature_02.webp',
+    title: 'デートの場所選びに',
+    description: 'ふたりの中間地点とおすすめ飲食店を提案。素敵なデートスポットが簡単に見つかるので、思い出に残るデートが実現できます。',
+  },
+  {
+    src: '/image_feature_03.webp',
+    title: 'ミーティングの場所設定に',
+    description: '参加者に最適な中間地点を特定。近くのカフェやレストランを表示するので、効率的な場所選定が可能です。',
+  },
+]
+
 export default function Home() {
   useOAuthCallback()
   useConfirmEmail()
@@ -68,57 +92,27 @@ export default function Home() {
           <span className="inline-block">集まろう！</span>
         </h2>
         <div className="grid grid-cols-1 gap-7 md:grid-cols-3 md:gap-6">
-          <div className="flex flex-col items-center justify-center">
-            <Image
-              alt="featureFriends"
-              src="/image_feature_01.webp"
-              width={170}
-              height={149}
-              className="mb-4"
-            />
-            <h3 className="mb-2 text-lg text-secondary-foreground">友人との集まりに</h3>
-            <p className="text-center text-sm leading-6 text-secondary-foreground">
-              みんなの中間地点と周辺の飲食店を提案。
-              <br />
-              集まる場所選びがスムーズに！
-              <br />
-              楽しい時間の計画をお手伝いします。
-            </p>
-          </div>
-          <div className="flex flex-col items-center justify-center">
-            <Image
-              alt="featureDate"
-              src="/image_feature_02.webp"
-              width={170}
-              height={148}
-              className="mb-4"
-            />
-            <h3 className="mb-2 text-lg text-secondary-foreground">デートの場所選びに</h3>
-            <p className="text-center text-sm leading-6 text-secondary-foreground">
-              ふたりの中間地点とおすすめ飲食店を提案。
-              <br />
-              素敵なデートスポットが簡単に見つかるので、
-              <br />
-              思い出に残るデートが実現できます。
-            </p>
-          </div>
-          <div className="flex flex-col items-center justify-center">
-            <Image
-              alt="featureBusiness"
-              src="/image_feature_03.webp"
-              width={170}
-              height={149}
-              className="mb-4"
-            />
-            <h3 className="mb-2 text-lg text-secondary-foreground">ミーティングの場所設定に</h3>
-            <p className="text-center text-sm leading-6 text-secondary-foreground">
-              参加者に最適な中間地点を特定。
-              <br />
-              近くのカフェやレストランを表示するので、
-              <br />
-              効率的な場所選定が可能です。
-            </p>
-          </div>
+          {features.map(data => (
+            <div
+              key={data.src}
+              className="flex flex-col items-center justify-center"
+            >
+              <Image
+                key={data.src}
+                alt={data.title}
+                src={data.src}
+                width={170}
+                height={149}
+                className="mb-4"
+              />
+              <h3 className="mb-2 text-lg text-secondary-foreground">
+                {data.title}
+              </h3>
+              <p className="text-center text-sm leading-6 text-secondary-foreground">
+                {data.description}
+              </p>
+            </div>
+          ))}
         </div>
       </Section>
 
