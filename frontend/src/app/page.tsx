@@ -17,17 +17,17 @@ const features: FeatureCard[] = [
   {
     src: '/image_feature_01.webp',
     title: '友人との集まりに',
-    description: 'みんなの中間地点と周辺の飲食店を提案。集まる場所選びがスムーズに！楽しい時間の計画をお手伝いします。',
+    description: 'みんなの中間地点と周辺の飲食店を提案。\n集まる場所選びがスムーズに！\n楽しい時間の計画をお手伝いします。',
   },
   {
     src: '/image_feature_02.webp',
     title: 'デートの場所選びに',
-    description: 'ふたりの中間地点とおすすめ飲食店を提案。素敵なデートスポットが簡単に見つかるので、思い出に残るデートが実現できます。',
+    description: 'ふたりの中間地点とおすすめ飲食店を提案。\n素敵なデートスポットが簡単に見つかるので、\n思い出に残るデートが実現できます。',
   },
   {
     src: '/image_feature_03.webp',
     title: 'ミーティングの場所設定に',
-    description: '参加者に最適な中間地点を特定。近くのカフェやレストランを表示するので、効率的な場所選定が可能です。',
+    description: '参加者に最適な中間地点を特定。\n近くのカフェやレストランを表示するので、\n効率的な場所選定が可能です。',
   },
 ]
 
@@ -91,7 +91,7 @@ export default function Home() {
           <span className="inline-block pl-1">で、</span>
           <span className="inline-block">集まろう！</span>
         </h2>
-        <div className="grid grid-cols-1 gap-7 md:grid-cols-3 md:gap-6">
+        <div className="grid grid-cols-1 gap-7 sm:gap-2 md:grid-cols-3 md:gap-6">
           {features.map(data => (
             <div
               key={data.src}
@@ -108,7 +108,7 @@ export default function Home() {
               <h3 className="mb-2 text-lg text-secondary-foreground">
                 {data.title}
               </h3>
-              <p className="text-center text-sm leading-6 text-secondary-foreground">
+              <p className="max-w-80 whitespace-pre-line text-sm leading-6 text-secondary-foreground md:text-center">
                 {data.description}
               </p>
             </div>
