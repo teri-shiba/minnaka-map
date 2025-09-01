@@ -6,11 +6,11 @@ import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, Pagi
 import { usePagination } from '~/hooks/usePagination'
 import { generatePaginationStructure } from '~/utils/pagination'
 
-interface RestaurantPaginationProps {
+interface Props {
   pagination: PageInfo
 }
 
-export default function RestaurantPagination({ pagination }: RestaurantPaginationProps) {
+export default function RestaurantPagination({ pagination }: Props) {
   const { currentPage, totalPages } = pagination
   const { createPageUrl, navigateToPage } = usePagination()
 

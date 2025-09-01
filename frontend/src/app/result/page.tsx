@@ -55,11 +55,11 @@ export default async function Result({ searchParams }: ResultPageProps) {
 
   if (!restaurantsResult.success) {
     const key
-    = restaurantsResult.cause === 'RATE_LIMIT'
-      ? 'rate_limit_exceeded'
-      : restaurantsResult.cause === 'SERVER_ERROR'
-        ? 'server_error'
-        : 'restaurant_fetch_failed'
+      = restaurantsResult.cause === 'RATE_LIMIT'
+        ? 'rate_limit_exceeded'
+        : restaurantsResult.cause === 'SERVER_ERROR'
+          ? 'server_error'
+          : 'restaurant_fetch_failed'
 
     redirect(`/?error=${key}`)
   }

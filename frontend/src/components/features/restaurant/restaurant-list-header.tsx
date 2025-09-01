@@ -1,15 +1,17 @@
 'use client'
+
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { Button } from '~/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import { SORT_GENRE } from '~/constants'
 
-interface RestaurantListHeaderProps {
+interface Props {
   totalCount: number
+  id?: string
 }
 
-export default function RestaurantListHeader({ totalCount }: RestaurantListHeaderProps) {
+export default function RestaurantListHeader({ totalCount, id }: Props) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const currentGenre = searchParams.get('genre')
@@ -41,7 +43,7 @@ export default function RestaurantListHeader({ totalCount }: RestaurantListHeade
 
   return (
     <div className="flex flex-col-reverse md:flex-row md:items-center md:justify-between">
-      <h2 className="text-base">
+      <h2 id={id} className="text-base">
         検索結果 全
         {totalCount}
         件
