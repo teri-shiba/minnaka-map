@@ -4,32 +4,9 @@ import Image from 'next/image'
 import GuideCarousel from '~/components/features/carousels/guide-carousel'
 import StationSearchForm from '~/components/features/station/search/station-search-form'
 import Section from '~/components/layout/section'
+import { features } from '~/data/features'
 import useConfirmEmail from '~/hooks/useConfirmEmail'
 import useOAuthCallback from '~/hooks/useOAuthCallback'
-
-interface FeatureCard {
-  readonly src: string
-  readonly title: string
-  readonly description: string
-}
-
-const features: FeatureCard[] = [
-  {
-    src: '/image_feature_01.webp',
-    title: '友人との集まりに',
-    description: 'みんなの中間地点と周辺の飲食店を提案。\n集まる場所選びがスムーズに！\n楽しい時間の計画をお手伝いします。',
-  },
-  {
-    src: '/image_feature_02.webp',
-    title: 'デートの場所選びに',
-    description: 'ふたりの中間地点とおすすめ飲食店を提案。\n素敵なデートスポットが簡単に見つかるので、\n思い出に残るデートが実現できます。',
-  },
-  {
-    src: '/image_feature_03.webp',
-    title: 'ミーティングの場所設定に',
-    description: '参加者に最適な中間地点を特定。\n近くのカフェやレストランを表示するので、\n効率的な場所選定が可能です。',
-  },
-]
 
 export default function Home() {
   useOAuthCallback()
@@ -92,24 +69,24 @@ export default function Home() {
           <span className="inline-block">集まろう！</span>
         </h2>
         <div className="grid grid-cols-1 gap-7 sm:gap-2 md:grid-cols-3 md:gap-6">
-          {features.map(data => (
+          {features.map(feature => (
             <div
-              key={data.src}
+              key={feature.src}
               className="flex flex-col items-center justify-center"
             >
               <Image
-                key={data.src}
-                alt={data.title}
-                src={data.src}
+                key={feature.src}
+                alt={feature.title}
+                src={feature.src}
                 width={170}
                 height={149}
                 className="mb-4"
               />
               <h3 className="mb-2 text-lg text-secondary-foreground">
-                {data.title}
+                {feature.title}
               </h3>
               <p className="max-w-80 whitespace-pre-line text-sm leading-6 text-secondary-foreground md:text-center">
-                {data.description}
+                {feature.description}
               </p>
             </div>
           ))}
