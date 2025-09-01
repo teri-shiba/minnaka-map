@@ -1,11 +1,12 @@
 'use client'
 
+import type { StepIndex } from '~/data/guide-carousel'
 import type { GuideCarousel } from '~/types/guide-carousel'
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 
 interface Props {
-  activeIndex: number
+  activeIndex: StepIndex
   current: GuideCarousel
 }
 
