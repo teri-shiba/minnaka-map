@@ -14,13 +14,6 @@ export default function GuideCarousel() {
 
   return (
     <>
-      {/* SP */}
-      <div className="md:hidden">
-        <GuideHeading />
-        <GuideImage activeIndex={activeIndex} current={current} />
-        <GuideDescription data={current} displayStep={displayStep} />
-      </div>
-
       {/* PC */}
       <div className="hidden md:grid md:grid-cols-2">
         <GuideImage activeIndex={activeIndex} current={current} />
@@ -28,6 +21,13 @@ export default function GuideCarousel() {
           <GuideHeading />
           <GuideStep activeIndex={activeIndex} startSequenceFrom={startSequenceFrom} />
         </div>
+      </div>
+
+      {/* SP */}
+      <div className="md:hidden">
+        <GuideHeading />
+        <GuideImage activeIndex={activeIndex} current={current} />
+        <GuideDescription data={current} displayStep={displayStep} />
       </div>
     </>
   )
