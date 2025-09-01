@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import GuideCarousel from '~/components/features/carousels/guide-carousel'
+import GuideCarousel from '~/components/features/guide-carousel/guide-carousel'
 import StationSearchForm from '~/components/features/station/search/station-search-form'
 import Section from '~/components/layout/section'
 import { features } from '~/data/features'
