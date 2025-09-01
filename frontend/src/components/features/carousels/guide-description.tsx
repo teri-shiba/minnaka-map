@@ -1,8 +1,13 @@
 'use client'
 
-import type { CarouselData } from '~/types/carousel'
+import type { GuideCarousel } from '~/types/guide-carousel'
 
-export default function GuideDescription({ data }: { data: CarouselData }) {
+interface Props {
+  data: GuideCarousel
+  displayStep: number
+}
+
+export default function GuideDescription({ data, displayStep }: Props) {
   return (
     <div className="relative h-32 px-5 py-3 text-secondary-foreground md:h-auto md:p-0">
       <h3 className="flex items-center justify-center gap-2 pb-2 text-center md:justify-start">
@@ -10,11 +15,11 @@ export default function GuideDescription({ data }: { data: CarouselData }) {
           aria-hidden="true"
           className="grid size-7 place-items-center rounded-md bg-primary text-sm text-white sm:text-base md:size-9"
         >
-          {data.id}
+          {displayStep}
         </span>
         <span className="sr-only">
           ステップ
-          {data.id}
+          {displayStep}
         </span>
         {data.title}
       </h3>

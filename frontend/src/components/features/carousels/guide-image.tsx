@@ -1,25 +1,20 @@
 'use client'
 
-import type { CarouselData } from '~/types/carousel'
+import type { GuideCarousel } from '~/types/guide-carousel'
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
-import { useMemo } from 'react'
 
 interface Props {
-  activeStep: number
-  current: CarouselData
+  activeIndex: number
+  current: GuideCarousel
 }
 
-export default function GuideImage({ activeStep, current }: Props) {
-  const isPriority = useMemo(() => {
-    return typeof current.id === 'number' && current.id === activeStep
-  }, [activeStep, current])
-
+export default function GuideImage({ activeIndex, current }: Props) {
   return (
     <div className="px-5 text-center md:px-0">
       <AnimatePresence mode="wait">
         <motion.div
-          key={activeStep}
+          key={activeIndex}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
@@ -31,9 +26,7 @@ export default function GuideImage({ activeStep, current }: Props) {
             src={current.imageUrl || ''}
             width={280}
             height={560}
-            priority={isPriority}
-            loading={isPriority ? 'eager' : 'lazy'}
-            decoding="async"
+            loading="lazy"
             className="relative aspect-[2/3] object-cover object-top md:aspect-auto md:object-none"
           />
         </motion.div>
