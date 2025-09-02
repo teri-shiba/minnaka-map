@@ -14,17 +14,30 @@ export default function RestaurantListFooter({ totalPages, isMobile, pagination 
   if (totalPages <= 1 && isMobile === false)
     return null
 
-  // TODO: ドロワーの時、高さが不足して表示されていない問題を解決する
+  const showPagination = totalPages > 1
+
   return (
-    <div className={cn(isMobile ? 'mt-4 space-y-2' : 'mt-4 space-y-2 rounded-lg bg-gray-50/50 p-4')}>
-      {totalPages > 1 && <RestaurantPagination pagination={pagination} />}
-      <p className="text-center text-xs text-muted-foreground">
-        Powered by
-        {' '}
-        <a href="http://webservice.recruit.co.jp/" className="text-sky-600">
-          ホットペッパーグルメ Webサービス
-        </a>
-      </p>
+    <div className="rounded-lg bg-gray-50 p-4">
+      <div className={cn(
+        'flex flex-col',
+        showPagination && 'divide-y divide-border',
+      )}
+      >
+        {showPagination && (
+          <div className="pb-2">
+            <RestaurantPagination pagination={pagination} />
+          </div>
+        )}
+        <div className={cn(showPagination && 'pt-2')}>
+          <p className="text-center text-xs text-muted-foreground">
+            Powered by
+            {' '}
+            <a href="http://webservice.recruit.co.jp/" className="text-sky-600">
+              ホットペッパーグルメ Webサービス
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   )
 }

@@ -25,7 +25,7 @@ export default function RestaurantListBody({ restaurants, totalCount, pagination
     return <RestaurantEmpty />
 
   return (
-    <div className="mt-4 space-y-4">
+    <div className="flex flex-col gap-4">
       {listItems}
       <RestaurantListFooter
         totalPages={pagination.totalPages}

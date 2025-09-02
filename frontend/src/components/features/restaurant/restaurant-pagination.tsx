@@ -33,7 +33,7 @@ export default function RestaurantPagination({ pagination }: Props) {
   }, [paginationStructure])
 
   return (
-    <Pagination className="md:border-b md:pb-2">
+    <Pagination>
       <PaginationContent>
         {/* 前へボタン */}
         <PaginationItem>

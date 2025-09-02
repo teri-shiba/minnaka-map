@@ -42,7 +42,7 @@ export default function RestaurantListHeader({ totalCount, id }: Props) {
   }
 
   return (
-    <div className="flex flex-col-reverse md:flex-row md:items-center md:justify-between">
+    <div className="flex flex-col-reverse gap-4 pb-4 md:flex-row md:items-center md:justify-between">
       <h2 id={id} className="text-base">
         検索結果 全
         {totalCount}
@@ -68,7 +68,7 @@ export default function RestaurantListHeader({ totalCount, id }: Props) {
 
       {/* SP: Button */}
       <div
-        className="hidden-scrollbar mb-4 block w-full overflow-x-scroll border-b py-4 md:hidden"
+        className="hidden-scrollbar block w-full overflow-x-scroll border-b py-4 md:hidden"
         style={{ touchAction: 'pan-x' }}
         onTouchStart={e => e.stopPropagation()}
         onTouchMove={e => e.stopPropagation()}
