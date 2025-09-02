@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss'
+import { DRAWER_DVH } from './src/constants/index'
 
 const config: Config = {
   darkMode: ['class'],
@@ -60,9 +61,12 @@ const config: Config = {
       },
       height: {
         'header': '4rem',
-        'drawer': '30dvh',
+        'drawer': `${DRAWER_DVH}dvh`,
         'mobile-map': 'calc(70dvh - theme(height.header))',
         'desktop-map': 'calc(100dvh - theme(height.header))',
+      },
+      minHeight: {
+        drawer: `${DRAWER_DVH}dvh`,
       },
       aspectRatio: {
         '3/2': '3 / 2',

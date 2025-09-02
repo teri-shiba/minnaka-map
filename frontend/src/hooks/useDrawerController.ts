@@ -2,22 +2,30 @@
 
 import { useAnimationControls } from 'framer-motion'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { DRAWER_RATIO } from '~/constants'
+
+const drawerPxFromViewport = (viewportHeight: number) => viewportHeight * DRAWER_RATIO
 
 export default function useDrawerController(enabled: boolean) {
   const contentRef = useRef<HTMLDivElement>(null)
   const [dragConstraints, setDragConstraints] = useState({ top: 0, bottom: 0 })
   const controls = useAnimationControls()
 
+  const measureDrawerPx = useCallback(() => {
+    const vh = window.visualViewport?.height ?? window.innerHeight
+    return drawerPxFromViewport(vh)
+  }, [])
+
   const recalc = useCallback(() => {
     if (!enabled || !contentRef.current)
       return
 
     const contentHeight = contentRef.current.offsetHeight
-    const modalViewHeight = window.innerHeight * 0.35
+    const modalViewHeight = measureDrawerPx()
     const dragDistance = Math.max(0, contentHeight - modalViewHeight)
 
     setDragConstraints({ top: -dragDistance, bottom: 0 })
-  }, [enabled])
+  }, [enabled, measureDrawerPx])
 
   useEffect(() => {
     if (!enabled || !contentRef.current)

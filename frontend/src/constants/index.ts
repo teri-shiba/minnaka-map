@@ -1,6 +1,12 @@
 import type { AuthProvider } from '~/types/auth-provider'
 
 // ===============================================
+// Drawer Dimensions
+// ===============================================
+export const DRAWER_DVH = 30 as const // 30dvh
+export const DRAWER_RATIO = DRAWER_DVH / 100 // 0.3
+
+// ===============================================
 // API Paths
 // ===============================================
 export const API_PREFIX = '/api/v1' as const
