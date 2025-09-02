@@ -3,7 +3,7 @@
 import type { RestaurantListItem } from '~/types/restaurant'
 import Image from 'next/image'
 import Link from 'next/link'
-import { memo, useCallback } from 'react'
+import { useCallback } from 'react'
 import { LuCalendarX2, LuTramFront, LuX } from 'react-icons/lu'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
@@ -14,7 +14,7 @@ interface MapRestaurantCardProps {
   onClose: () => void
 }
 
-function MapRestaurantCard({ restaurant, onClose }: MapRestaurantCardProps) {
+export default function MapRestaurantCard({ restaurant, onClose }: MapRestaurantCardProps) {
   const {
     id,
     name,
@@ -81,5 +81,3 @@ function MapRestaurantCard({ restaurant, onClose }: MapRestaurantCardProps) {
     </Link>
   )
 }
-
-export default memo(MapRestaurantCard)
