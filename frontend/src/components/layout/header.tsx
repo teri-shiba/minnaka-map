@@ -3,9 +3,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import Auth from '~/components/features/account/auth/auth'
 import { Skeleton } from '~/components/ui/skeleton'
 import { useAuth } from '~/hooks/useAuth'
+import { Auth } from '../features/account/auth/auth'
 import UserMenu from './user-menu'
 
 interface logoImages {
