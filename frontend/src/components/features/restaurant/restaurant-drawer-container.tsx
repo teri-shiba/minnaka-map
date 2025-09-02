@@ -28,8 +28,7 @@ export default function RestaurantDrawerContainer({
       drag="y"
       dragConstraints={dragConstraints}
       animate={controls}
-      className={cn('absolute z-40 h-drawer w-full', className)}
-      style={{ bottom: 'env(safe-area-inset-bottom, 0px)' }}
+      className={cn('absolute z-40 bottom-0 h-drawer w-full', className)}
       transition={{ type: 'spring', damping: 25, stiffness: 300 }}
       role="dialog"
       aria-modal="true"
@@ -37,7 +36,7 @@ export default function RestaurantDrawerContainer({
     >
       <div
         ref={contentRef}
-        className="rounded-t-[10px] border bg-background px-5 py-4"
+        className="min-h-drawer rounded-t-[10px] border bg-background px-5 py-4"
       >
         <div className="mx-auto mb-2 h-1 w-9 cursor-grabbing rounded-full bg-gray-200" />
         <div onTouchStart={e => e.stopPropagation()} style={{ touchAction: 'pan-y' }}>
