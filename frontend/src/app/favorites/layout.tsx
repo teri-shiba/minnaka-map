@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
-import Section from '~/components/layout/Section'
+import Section from '~/components/layout/section'
 import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import Loading from '../loading'
 

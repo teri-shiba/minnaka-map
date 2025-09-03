@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from 'next'
 import { Suspense } from 'react'
-import Footer from '~/components/layout/Footer'
-import Header from '~/components/layout/Header'
-import ErrorToastHandler from '~/components/ui/toasts/ErrorToastHandler'
-import { Toaster } from '~/components/ui/toasts/Toast'
+import ErrorToastListener from '~/components/error-toast-listener'
+import Footer from '~/components/layout/footer'
+import Header from '~/components/layout/header'
+import { Toaster } from '~/components/ui/toast'
 import '~/styles/globals.css'
 
 export const metadata: Metadata = {
@@ -27,7 +27,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         </main>
         <Toaster richColors />
         <Suspense fallback={null}>
-          <ErrorToastHandler />
+          <ErrorToastListener />
         </Suspense>
         <Footer />
       </body>
