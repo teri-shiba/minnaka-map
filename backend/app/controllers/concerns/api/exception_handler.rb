@@ -5,19 +5,17 @@ module Api
     extend ActiveSupport::Concern
 
     included do
+      rescue_from StandardError, with: :handle_internal_error
+
       rescue_from ActiveRecord::RecordInvalid, with: :handle_record_invalid
       rescue_from ActionController::ParameterMissing, with: :handle_param_missing
-      rescue_from StandardError, with: :handle_internal_error
     end
 
     private
 
       def handle_record_invalid(exception)
-        render_error(
-          "入力データが無効です",
-          :unprocessable_entity,
-          details: exception.record.errors.full_messages,
-        )
+        details = exception.record&.errors&.full_messages
+        render_error("入力データが無効です", :unprocessable_entity, details: details)
       end
 
       def handle_param_missing(exception)
