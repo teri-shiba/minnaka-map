@@ -1,10 +1,10 @@
 import Image from 'next/image'
 import { notFound, redirect } from 'next/navigation'
 import { LuArrowUpRight } from 'react-icons/lu'
-import FavoriteButton from '~/components/features/restaurant/FavoriteButton'
-import Section from '~/components/layout/Section'
-import ShareRestaurantDialog from '~/components/ui/dialogs/ShareRestaurantDialog'
-import { Table, TableBody, TableCell, TableHead, TableRow } from '~/components/ui/table/Table'
+import FavoriteButton from '~/components/features/restaurant/favorite-button'
+import ShareRestaurantDialog from '~/components/features/restaurant/share/share-restaurant-dialog'
+import Section from '~/components/layout/section'
+import { Table, TableBody, TableCell, TableHead, TableRow } from '~/components/ui/table'
 import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
 import { getGoogleMapsEmbedUrl } from '~/services/get-google-maps-embed-url'
 
@@ -130,7 +130,7 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
                       { }
                       {mapEmbedUrl
                         ? (
-                            /* eslint-disable-next-line react-dom/no-missing-iframe-sandbox */
+                          /* eslint-disable-next-line react-dom/no-missing-iframe-sandbox */
                             <iframe
                               src={mapEmbedUrl}
                               width="600"

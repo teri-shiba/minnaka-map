@@ -1,7 +1,9 @@
 import type { SearchParams } from '~/types/search-params'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import MapClient from '~/components/features/map/MapClient'
-import RestaurantList from '~/components/features/restaurant/RestaurantList'
+import Map from '~/components/features/map/map'
+import RestaurantList from '~/components/features/restaurant/restaurant-list'
+import { Button } from '~/components/ui/button'
 import { fetchRestaurants } from '~/services/fetch-restaurants'
 import { getApiKey } from '~/services/get-api-key'
 import { parseAndValidateCoordinates } from '~/services/parse-and-validate-coords'
@@ -55,36 +57,41 @@ export default async function Result({ searchParams }: ResultPageProps) {
 
   if (!restaurantsResult.success) {
     const key
-    = restaurantsResult.cause === 'RATE_LIMIT'
-      ? 'rate_limit_exceeded'
-      : restaurantsResult.cause === 'SERVER_ERROR'
-        ? 'server_error'
-        : 'restaurant_fetch_failed'
+      = restaurantsResult.cause === 'RATE_LIMIT'
+        ? 'rate_limit_exceeded'
+        : restaurantsResult.cause === 'SERVER_ERROR'
+          ? 'server_error'
+          : 'restaurant_fetch_failed'
 
     redirect(`/?error=${key}`)
   }
 
   const { items, pagination } = restaurantsResult.data
 
-  let maptilerApiKey: string | null = null
-  try {
-    maptilerApiKey = await getApiKey('maptiler')
-  }
-  catch {
-    maptilerApiKey = null
-  }
+  const mapTilerApiKey = await getApiKey('maptiler')
 
   return (
     <div className="relative mx-auto h-[calc(100dvh-4rem)] max-w-screen-2xl overflow-hidden md:flex">
       <div className="h-mobile-map w-full md:h-desktop-map md:w-3/5 md:flex-1">
-        {(maptilerApiKey && midpoint)
-          && (
-            <MapClient
-              apiKey={maptilerApiKey}
-              midpoint={midpoint}
-              restaurants={items}
-            />
-          )}
+        {(mapTilerApiKey && midpoint)
+          ? (
+              <Map
+                apiKey={mapTilerApiKey}
+                midpoint={midpoint}
+                restaurants={items}
+              />
+            )
+          : (
+              <div className="size-full place-content-center bg-gray-100">
+                <div className="flex flex-col items-center gap-1">
+                  <p>地図の取得に失敗しました。</p>
+                  <p className="pb-4">お手数ですが、トップページから再度お試しください。</p>
+                  <Button>
+                    <Link href="/">トップに戻る</Link>
+                  </Button>
+                </div>
+              </div>
+            )}
       </div>
 
       <RestaurantList

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Section from '~/components/layout/Section'
+import Section from '~/components/layout/section'
 
 export default function Terms() {
   return (

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
-import { DeleteAccount } from '~/components/features/account/delete'
-import Section from '~/components/layout/Section'
+import DeleteAccount from '~/components/features/account/delete/delete-account-responsive'
+
+import Section from '~/components/layout/section'
 import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 
 export default async function SettingsPage() {

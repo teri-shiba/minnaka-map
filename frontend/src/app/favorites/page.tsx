@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import FavoritesList from '~/components/features/favorite/FavoritesList'
-import { Button } from '~/components/ui/buttons/Button'
+import FavoritesList from '~/components/features/favorite/favorite-list'
+import { Button } from '~/components/ui/button'
 import { getFavoritesWithDetailsPaginated } from '~/services/favorite-action'
 
 export default async function Favorites() {
