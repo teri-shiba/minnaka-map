@@ -4,22 +4,27 @@ class SharedFavoriteListShowSerializer < ActiveModel::Serializer
   attributes :title, :created_at, :search_history, :favorites
 
   def created_at
-    object.created_at.iso8601
+    object.created_at&.iso8601
   end
 
   def search_history
-    {
-      id: object.search_history.id,
-      station_names: object.search_history.station_names,
-    }
+    sh = history
+    return nil unless sh
+
+    { id: sh.id, station_names: sh.station_names }
   end
 
   def favorites
-    object.search_history.favorites.map do |favorite|
-      {
-        id: favorite.id,
-        hotpepper_id: favorite.hotpepper_id,
-      }
-    end
+    return [] unless history
+
+    history.favorites.
+      pluck(:id, :hotpepper_id).
+      map {|id, hotpepper_id| { id:, hotpepper_id: } }
   end
+
+  private
+
+    def history
+      @history ||= object.search_history
+    end
 end
