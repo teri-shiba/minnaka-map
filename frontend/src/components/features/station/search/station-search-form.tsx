@@ -44,8 +44,8 @@ export default function StationSearchForm() {
   const processValidData = async (data: AreaFormValues) => {
     try {
       const stationIds = data.area
-        .filter(station => station.stationId !== null)
-        .map(station => station.stationId as number)
+        .filter(s => s.stationId !== null)
+        .map(s => s.stationId as number)
 
       if (typeof window !== 'undefined') {
         const rawPrev = sessionStorage.getItem('pendingStationIds')
@@ -67,7 +67,9 @@ export default function StationSearchForm() {
         sessionStorage.setItem('pendingStationIds', JSON.stringify(stationIds))
       }
 
-      const midpointResult = await postMidpoint(data)
+      const midpointResult = await postMidpoint({
+        area: { station_ids: stationIds },
+      })
 
       const query: Record<string, string> = {
         lat: midpointResult.midpoint.latitude,
