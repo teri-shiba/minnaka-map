@@ -1,5 +1,6 @@
 'use client'
 
+import type { ApiSuccess } from '~/types/api-response'
 import useSWRMutation from 'swr/mutation'
 import { API_ENDPOINTS } from '~/constants'
 import api from '~/lib/axios-interceptor'
@@ -21,8 +22,11 @@ async function postMidpoint(
   _key: string,
   { arg }: { arg: MidpointRequest },
 ): Promise<MidpointResult> {
-  const response = await api.post(API_ENDPOINTS.MIDPOINT, arg)
-  return response.data as MidpointResult
+  const response = await api.post<ApiSuccess<MidpointResult>>(
+    API_ENDPOINTS.MIDPOINT,
+    arg,
+  )
+  return response.data.data
 }
 
 export function useMidpointMutation() {

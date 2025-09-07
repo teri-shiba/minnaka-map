@@ -4,7 +4,10 @@ import { apiBaseHref } from '~/utils/api-url'
 
 const api = axios.create({
   baseURL: apiBaseHref(),
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
   withCredentials: true,
   timeout: 5000,
 })
@@ -14,6 +17,8 @@ api.interceptors.response.use(
   (error) => {
     if (axios.isAxiosError(error) && error.response) {
       const status = error.response.status
+      const apiError = (error.response.data as any)?.error
+
       switch (status) {
         case 400:
           toast.error('メールアドレスはすでに確認済みです')
@@ -25,12 +30,8 @@ api.interceptors.response.use(
           toast.error('認証エラーが発生しました。再ログインしてください。')
           break
         case 422:
-          {
-            const errors = error.response.data.errors
-            toast.error(errors.full_messages?.join(',') || 'バリデーションエラーです')
-          }
+          toast.error(apiError?.messages ?? 'バリデーションエラーです')
           break
-
         default:
           toast.error('サーバーエラーが発生しました')
       }
