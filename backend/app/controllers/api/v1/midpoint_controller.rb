@@ -12,16 +12,24 @@ class Api::V1::MidpointController < ApplicationController
     return render_error("not found ids", :unprocessable_entity, details: missing) if missing.any?
 
     center = calc_center(stations)
-    render_success(data: signed_midpoint_payload(center))
+    sig = SignCoordinatesService.new.call(center[0], center[1])
+
+    data = {
+      midpoint: { latitude: sig[:latitude], longitude: sig[:longitude] },
+      signature: sig[:signature],
+    }
+    data[:expires_at] = sig[:expires_at] if sig.has_key?(:expires_at)
+
+    render_success(data:)
   end
 
   def validate
-    lat_str    = params[:latitude]
-    lng_str    = params[:longitude]
+    lat        = params[:latitude]
+    lng        = params[:longitude]
     signature  = params[:signature]
     expires_at = params[:expires_at]
 
-    if verify_coordinates(lat_str, lng_str, signature, expires_at)
+    if VerifyCoordinatesService.new.call(lat, lng, signature, expires_at)
       render json: { valid: true }
     else
       render json: { valid: false }, status: :bad_request
@@ -43,17 +51,5 @@ class Api::V1::MidpointController < ApplicationController
     def calc_center(stations)
       coords = stations.map {|s| [s.latitude.to_f, s.longitude.to_f] }
       Geocoder::Calculations.geographic_center(coords)
-    end
-
-    def signed_midpoint_payload(center)
-      lat, lng = center
-      sig = sign_coordinates(lat, lng)
-
-      payload = {
-        midpoint: { latitude: sig[:latitude], longitude: sig[:longitude] },
-        signature: sig[:signature],
-      }
-      payload[:expires_at] = sig[:expires_at] if sig.has_key?(:expires_at)
-      payload
     end
 end
