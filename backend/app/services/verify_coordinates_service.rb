@@ -9,7 +9,7 @@ class VerifyCoordinatesService
     @clock      = clock
   end
 
-  def call(lat_str, lng_str, signature, expires_at)
+  def call(lat_str, lng_str, signature, expires_at = nil)
     if @production
       return false if expires_at.blank?
       return false if Time.zone.at(expires_at.to_i) < @clock.call
