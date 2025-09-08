@@ -14,11 +14,11 @@ RSpec.describe "Api::ResponseHelper", type: :controller do
     end
 
     def error
-      render_error("失敗しました", :unprocessable_entity, details: ["理由A", "理由B"])
+      render_error("失敗しました", details: ["理由A", "理由B"], status: :unprocessable_entity)
     end
 
     def bad_request
-      render_error("不正なリクエストです", :bad_request)
+      render_error("不正なリクエストです", status: :bad_request)
     end
   end
 
