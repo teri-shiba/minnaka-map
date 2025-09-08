@@ -5,11 +5,11 @@ class Api::V1::MidpointController < ApplicationController
     ids = normalize_station_ids(params)
 
     return render_error("station_ids is empty") if ids.blank?
-    return render_error("too many stations", :unprocessable_entity, details: ["max=#{MAX_STATIONS}"]) if ids.size > MAX_STATIONS
+    return render_error("too many stations", details: ["max=#{MAX_STATIONS}"], status: :unprocessable_entity) if ids.size > MAX_STATIONS
 
     stations = Station.where(id: ids).select(:id, :latitude, :longitude)
     missing = missing_ids(ids, stations)
-    return render_error("not found ids", :unprocessable_entity, details: missing) if missing.any?
+    return render_error("not found ids", details: missing, status: :unprocessable_entity) if missing.any?
 
     center = calc_center(stations)
     sig = SignCoordinatesService.new.call(center[0], center[1])
