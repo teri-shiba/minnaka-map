@@ -2,7 +2,6 @@ require "rails_helper"
 
 RSpec.describe "Overrides::Registrations", type: :request do
   describe "POST /api/v1/auth" do
-    # Faker を使ってランダムなテストデータを生成
     let(:user_name) { Faker::Name.name }
     let(:user_email) { Faker::Internet.unique.email }
     let(:user_password) { Faker::Internet.password(min_length: 8) }
@@ -17,13 +16,11 @@ RSpec.describe "Overrides::Registrations", type: :request do
       }
     end
 
-    # 異常系のパラメーターを意図的に作成
     let(:invalid_params_no_name) { valid_params.except(:name) }
     let(:invalid_params_invalid_email) { valid_params.merge(email: "invalid-email") }
 
-    # -- 正常系のテスト --
     context "正常なパラメータを送信した場合" do
-      subject(:make_request) { post api_v1_user_auth_registration_path, params: valid_params }
+      subject(:make_request) { post api_v1_user_auth_registration_path, params: valid_params, as: :json }
 
       it "リクエストが成功し、ステータスコード 200 が返ること" do
         make_request
@@ -64,11 +61,10 @@ RSpec.describe "Overrides::Registrations", type: :request do
       end
     end
 
-    # -- 異常系のテスト --
     context "パラメータから name が欠落している場合" do
-      subject(:make_request_without_name) { post api_v1_user_auth_registration_path, params: invalid_params_no_name }
+      subject(:make_request_without_name) { post api_v1_user_auth_registration_path, params: invalid_params_no_name, as: :json }
 
-      it "リクエストが失敗し、ステータスコード 500 が返ること（要確認/改善推奨）" do
+      it "name 欠落なら 422 が返ること" do
         make_request_without_name
         expect(response).to have_http_status(:unprocessable_entity)
       end
