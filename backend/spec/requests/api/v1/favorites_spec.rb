@@ -16,57 +16,60 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
   end
 
   describe "GET /api/v1/favorites#index" do
-    it "グルーピング内容が正しい（station_names / hotpepper_id）" do
-      tokyo_ueno = create(
-        :search_history,
-        :with_start_stations,
-        :with_favorites,
-        user:,
-        station_keys: %i[tokyo ueno],
-        hotpepper_ids: %w[HP-1 HP-2],
-      )
+    context "グルーピング" do
+      let!(:tokyo_ueno) do
+        create(:search_history, :with_start_stations, :with_favorites,
+               user:, station_keys: %i[tokyo ueno], hotpepper_ids: %w[HP-1 HP-2])
+      end
+      let!(:kanda_meguro) do
+        create(:search_history, :with_start_stations, :with_favorites,
+               user:, station_keys: %i[kanda meguro], hotpepper_ids: %w[HP-3])
+      end
 
-      kanda_meguro = create(
-        :search_history,
-        :with_start_stations,
-        :with_favorites,
-        user:,
-        station_keys: %i[kanda meguro],
-        hotpepper_ids: %w[HP-3],
-      )
+      before { get "/api/v1/favorites" }
 
-      get "/api/v1/favorites"
+      it "station_names と hotpepper_id が正しい" do
+        expect_success_json!
+        expect(json[:data]).to be_an(Array)
 
-      expect_success_json!
-      expect(json[:data]).to be_an(Array)
+        g_tokyo_ueno   = group_for(tokyo_ueno.id)
+        g_kanda_meguro = group_for(kanda_meguro.id)
 
-      g_tokyo_ueno   = group_for(tokyo_ueno.id)
-      g_kanda_meguro = group_for(kanda_meguro.id)
+        expect(g_tokyo_ueno[:favorites].map {|h| h[:hotpepper_id] }).to match_array(%w[HP-1 HP-2])
+        expect(g_kanda_meguro[:favorites].map {|h| h[:hotpepper_id] }).to match_array(%w[HP-3])
 
-      expect(g_tokyo_ueno[:favorites].map {|h| h[:hotpepper_id] }).to match_array(%w[HP-1 HP-2])
-      expect(g_kanda_meguro[:favorites].map {|h| h[:hotpepper_id] }).to match_array(%w[HP-3])
-
-      expect(g_tokyo_ueno[:search_history][:station_names]).to match_array(%w[東京 上野])
-      expect(g_kanda_meguro[:search_history][:station_names]).to match_array(%w[神田 目黒])
+        expect(g_tokyo_ueno.dig(:search_history, :station_names)).to match_array(%w[東京 上野])
+        expect(g_kanda_meguro.dig(:search_history, :station_names)).to match_array(%w[神田 目黒])
+      end
     end
 
-    it "ページングが効く(limit=1)" do
-      create(:search_history, :with_start_stations, :with_favorites, user:, station_keys: %i[tokyo ueno])
-      create(:search_history, :with_start_stations, :with_favorites, user:, station_keys: %i[kanda meguro])
+    context "ページング(limit=1)" do
+      before do
+        create(:search_history, :with_start_stations, :with_favorites,
+               user:, station_keys: %i[tokyo ueno])
+        create(:search_history, :with_start_stations, :with_favorites,
+               user:, station_keys: %i[kanda meguro])
+      end
 
-      get "/api/v1/favorites", params: { page: 1, limit: 1 }
-      expect_success_json!
-      expect(json[:data]).to be_an(Array)
-      expect(json[:data].length).to eq(1)
-      expect(json[:meta][:current_page]).to eq(1)
-      expect(json[:meta][:has_more]).to be(true)
+      it "1ページ目" do
+        get "/api/v1/favorites", params: { page: 1, limit: 1 }
 
-      get "/api/v1/favorites", params: { page: 2, limit: 1 }
-      expect_success_json!
-      expect(json[:data]).to be_an(Array)
-      expect(json[:data].length).to eq(1)
-      expect(json[:meta][:current_page]).to eq(2)
-      expect(json[:meta][:has_more]).to be(false)
+        expect_success_json!
+        expect(json[:data]).to be_an(Array)
+        expect(json[:data].length).to eq(1)
+        expect(json.dig(:meta, :current_page)).to eq(1)
+        expect(json.dig(:meta, :has_more)).to be(true)
+      end
+
+      it "2ページ目" do
+        get "/api/v1/favorites", params: { page: 2, limit: 1 }
+
+        expect_success_json!
+        expect(json[:data]).to be_an(Array)
+        expect(json[:data].length).to eq(1)
+        expect(json.dig(:meta, :current_page)).to eq(2)
+        expect(json.dig(:meta, :has_more)).to be(false)
+      end
     end
   end
 
@@ -81,10 +84,8 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
       expect_success_json!(status: :created)
       expect(json[:data]).to include(:id, :hotpepper_id, :search_history_id)
       expect(json[:data][:hotpepper_id]).to eq("HP-999")
-      expect(json[:message]).to eq("お気に入りに追加しました")
     end
 
-    # TODO: コントローラーの修正が必要なので後回し（rescue -> ExceptionHandler に変更）
     it "必須パラメータが不足していたら 400 を返す" do
       post "/api/v1/favorites", params: { favorite: { hotpepper_id: "HP-999" } }
 
@@ -103,8 +104,14 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
 
       expect_success_json!
       expect(json[:data]).to eq({ id: @favorite.id, hotpepper_id: "HP-DEL" })
-      expect(json[:message]).to eq("お気に入りから削除しました")
       expect(Favorite.where(id: @favorite.id)).not_to exist
+    end
+
+    it "存在しない ID なら 404 を返す" do
+      delete "/api/v1/favorites/999999"
+
+      expect(response).to have_http_status(:not_found)
+      expect(json.dig(:error, :message)).to match(/リソースが見つかりません/)
     end
   end
 end

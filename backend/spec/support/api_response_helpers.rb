@@ -1,11 +1,9 @@
-# frozen_string_literal: true
-
 module ApiResponseHelpers
   def json
     JSON.parse(response.body, symbolize_names: true)
   end
 
-  def expect_success_json!(status: :ok, data: nil)
+  def expect_success_json!(data: nil, status: :ok)
     expect(response).to have_http_status(status)
     expect(json[:success]).to be(true)
     expect(json[:data]).to eq(data) if data
