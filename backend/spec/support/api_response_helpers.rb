@@ -2,7 +2,7 @@
 
 module ApiResponseHelpers
   def json
-    @json ||= JSON.parse(response.body, symbolize_names: true)
+    JSON.parse(response.body, symbolize_names: true)
   end
 
   def expect_success_json!(status: :ok, data: nil)
