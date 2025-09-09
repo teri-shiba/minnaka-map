@@ -6,6 +6,10 @@ class SearchHistory < ApplicationRecord
   has_many :shared_favorite_lists, dependent: :destroy
 
   def station_names
-    start_stations.pluck(:name)
+    if association(:start_stations).loaded?
+      start_station.map(&:name).sort
+    else
+      start_station.order(:name).pluck(:name)
+    end
   end
 end
