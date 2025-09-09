@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_09_005603) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_09_063303) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "uuid-ossp"
@@ -49,6 +49,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_09_005603) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "station_id", null: false
+    t.index ["search_history_id", "station_id"], name: "index_shss_on_history_id_and_station_id_unique", unique: true
     t.index ["search_history_id"], name: "index_search_history_start_stations_on_search_history_id"
     t.index ["station_id"], name: "index_search_history_start_stations_on_station_id"
   end
