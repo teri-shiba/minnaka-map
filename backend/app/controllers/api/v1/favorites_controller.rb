@@ -1,6 +1,23 @@
 class Api::V1::FavoritesController < Api::V1::BaseController
   before_action :authenticate_user!
 
+  def status
+    search_history_id = params.require(:search_history_id)
+    hotpepper_id      = params.require(:hotpepper_id)
+
+    favorite = current_user.user.favorites.find_by(
+      search_history_id: search_history_id,
+      hotpepper_id: hotpepper_id,
+    )
+
+    render_success(
+      data: {
+        is_favorite: favorite.present?,
+        favorite_id: favorite&.id,
+      },
+    )
+  end
+
   def index
     page  = Integer(params[:page]  || 1, exception: false) || 1
     limit = Integer(params[:limit] || 5, exception: false) || 5
