@@ -13,6 +13,7 @@ import type {
 } from '~/types/favorite'
 import type { RestaurantListItem } from '~/types/restaurant'
 import type { ServiceResult } from '~/types/service-result'
+import { FAVORITE_GROUPS_PER_PAGE, FAVORITES_FIRST_PAGE } from '~/constants'
 import { logger } from '~/lib/logger'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
 import { camelizeKeysDeep } from '~/utils/case-convert'
@@ -51,8 +52,8 @@ export async function getFavorites(): Promise<ServiceResult<FavoriteGroup[]>> {
 
 // 詳細情報付きのお気に入りを取得（ページネーション対応）
 export async function getFavoritesWithDetailsPaginated(
-  page: number = 1,
-  limit: number = 5,
+  page: number = FAVORITES_FIRST_PAGE,
+  limit: number = FAVORITE_GROUPS_PER_PAGE,
 ): Promise<PaginatedFavoritesResponse> {
   try {
     const response = await apiFetchAuth<ApiResponse<RawFavoriteGroup[]> & { meta: RawFavoritePaginationMeta }>(

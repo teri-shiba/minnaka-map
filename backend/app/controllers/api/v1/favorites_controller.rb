@@ -1,6 +1,10 @@
 class Api::V1::FavoritesController < Api::V1::BaseController
   before_action :authenticate_user!
 
+  DEFAULT_PAGE = 1
+  DEFAULT_LIMIT = 3
+  MAX_LIMIT = 10
+
   def status
     search_history_id = params.require(:search_history_id)
     hotpepper_id      = params.require(:hotpepper_id)
@@ -19,8 +23,8 @@ class Api::V1::FavoritesController < Api::V1::BaseController
   end
 
   def index
-    page  = Integer(params[:page]  || 1, exception: false) || 1
-    limit = Integer(params[:limit] || 5, exception: false) || 5
+    page  = [Integer(params[:page], exception: false) || DEFAULT_PAGE, DEFAULT_PAGE].max
+    limit = (Integer(params[:limit], exception: false) || DEFAULT_LIMIT).clamp(1, MAX_LIMIT)
 
     groups       = current_user.user.favorites_by_search_history.to_a
     total_groups = groups.size
