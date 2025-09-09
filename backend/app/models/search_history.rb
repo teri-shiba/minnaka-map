@@ -7,9 +7,9 @@ class SearchHistory < ApplicationRecord
 
   def station_names
     if association(:start_stations).loaded?
-      start_station.map(&:name).sort
+      start_stations.map(&:name).sort
     else
-      start_station.order(:name).pluck(:name)
+      start_stations.order(:name).pluck(:name)
     end
   end
 end
