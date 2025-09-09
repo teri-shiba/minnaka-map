@@ -18,16 +18,23 @@ RSpec.describe SearchHistory, type: :model do
 
   describe "駅名一覧の取得" do
     let(:search_history) { create(:search_history) }
-    let!(:matsudo) { create(:station, **StationTestData::STATIONS[:matsudo], operator: operator) }
-    let!(:osaka) { create(:station, **StationTestData::STATIONS[:osaka], operator: operator) }
+    let!(:tokyo) { create(:station, **StationTestData::STATIONS[:tokyo], operator: operator) }
+    let!(:ueno) { create(:station, **StationTestData::STATIONS[:ueno], operator: operator) }
 
     before do
-      create(:search_history_start_station, search_history: search_history, station: matsudo)
-      create(:search_history_start_station, search_history: search_history, station: osaka)
+      create(:search_history_start_station, search_history: search_history, station: tokyo)
+      create(:search_history_start_station, search_history: search_history, station: ueno)
     end
 
     it "関連する駅の名前一覧を返すこと" do
-      expect(search_history.station_names).to contain_exactly("松戸", "大阪")
+      expect(search_history.station_names).to contain_exactly("東京", "上野")
+    end
+
+    it "includesで先読み済みならメモリから取得して昇順で返す" do
+      search_history_id = search_history.id
+      loaded = SearchHistory.includes(:start_stations).find(search_history_id)
+      expect(loaded.association(:start_stations)).to be_loaded
+      expect(loaded.station_names).to eq(["上野", "東京"].sort)
     end
   end
 end
