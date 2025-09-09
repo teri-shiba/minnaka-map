@@ -38,12 +38,14 @@ class Api::V1::SearchHistoriesController < Api::V1::BaseController
     end
 
     def find_existing_search_history
-      sorted_station_ids = station_ids.sort
+      ids = station_ids
+      return nil if ids.blank?
 
-      current_user.user.search_histories.find do |history|
-        history_station_ids = history.search_history_start_stations.pluck(:station_id).sort
-        history_station_ids == sorted_station_ids
-      end
+      current_user.user.search_histories.
+        join(:start_stations).
+        group("search_histories.id").
+        having("array_agg(DISTINCT station.id ORDER BY stations.id) = ARRAY[?]::int[]").
+        first
     end
 
     def create_start_station_associations(search_history)
@@ -63,10 +65,10 @@ class Api::V1::SearchHistoriesController < Api::V1::BaseController
     end
 
     def station_ids
-      @station_ids ||= Array(search_history_params[:station_ids])
-        .map(&:to_i)
-        .select(&:positive?)
-        .uniq
-        .sort
+      @station_ids ||= Array(search_history_params[:station_ids]).
+                         map(&:to_i).
+                         select(&:positive?).
+                         uniq.
+                         sort
     end
 end
