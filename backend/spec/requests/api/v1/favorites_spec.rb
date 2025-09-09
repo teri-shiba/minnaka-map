@@ -112,6 +112,46 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
     end
   end
 
+  describe "GET /api/v1/favorites#index パラメータ防御" do
+    before do
+      create(:search_history, :with_start_stations, :with_favorites, user: user)
+      create(:search_history, :with_start_stations, :with_favorites, user: user)
+    end
+
+    it "page=0 は 1 として扱う" do
+      get "/api/v1/favorites", params: { page: 0, limit: 1 }
+      expect_success_json!
+      expect(json.dig(:meta, :current_page)).to eq(1)
+      expect(json[:data].length).to eq(1)
+    end
+
+    it "page が不正文字列でも 1 として扱う" do
+      get "/api/v1/favorites", params: { page: "oops", limit: 1 }
+      expect_success_json!
+      expect(json.dig(:meta, :current_page)).to eq(1)
+    end
+
+    it "limit=0 は 1 に丸める" do
+      get "/api/v1/favorites", params: { page: 1, limit: 0 }
+      expect_success_json!
+      expect(json[:data].length).to eq(1)
+      expect(json.dig(:meta, :has_more)).to be(true)
+    end
+
+    it "limit が不正文字列でも デフォルト(3) を使う" do
+      get "/api/v1/favorites", params: { page: 1, limit: "NaN" }
+      expect_success_json!
+      expect(json[:data].length).to eq(2)
+      expect(json.dig(:meta, :has_more)).to be(false)
+    end
+
+    it "limit が上限(10)を超えたら 10 に丸める" do
+      get "/api/v1/favorites", params: { page: 1, limit: 9999 }
+      expect_success_json!
+      expect(json[:data].length).to be <= 10
+    end
+  end
+
   describe "POST /api/v1/favorites#create" do
     before { @history_tokyo_ueno = create(:search_history, user:) }
 
