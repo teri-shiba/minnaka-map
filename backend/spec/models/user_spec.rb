@@ -21,8 +21,8 @@ RSpec.describe User, type: :model do
 
   describe "関連付け" do
     context "UserAuth モデルとの関連" do
-      it { is_expected.to have_many(:user_auth) }
-      it { is_expected.to have_many(:user_auth).dependent(:destroy) }
+      it { is_expected.to have_many(:user_auths) }
+      it { is_expected.to have_many(:user_auths).dependent(:destroy) }
     end
   end
 

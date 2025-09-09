@@ -1,6 +1,6 @@
 class UserAuth < ApplicationRecord
   include DeviseTokenAuth::Concerns::User
-  belongs_to :user, optional: true
+  belongs_to :user
 
   # Include default devise modules. Others available are:
   # :lockable, :timeoutable, :trackable
