@@ -63,6 +63,10 @@ class Api::V1::SearchHistoriesController < Api::V1::BaseController
     end
 
     def station_ids
-      @station_ids ||= Array(search_history_params[:station_ids]).map(&:to_i).select(&:positive?)
+      @station_ids ||= Array(search_history_params[:station_ids])
+        .map(&:to_i)
+        .select(&:positive?)
+        .uniq
+        .sort
     end
 end
