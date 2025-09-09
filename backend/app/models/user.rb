@@ -7,7 +7,7 @@ class User < ApplicationRecord
   validates :name, presence: true
 
   def favorites_by_search_history
-    favorites.includes(:search_history).
+    favorites.includes(search_history: :start_stations).
       joins(:search_history).
       order(created_at: :desc).
       group_by(&:search_history).
