@@ -15,6 +15,45 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
     json[:data].find {|g| g.dig(:search_history, :id) == history_id }
   end
 
+  describe "GET /api/v1/favorites#status" do
+    let!(:history)  { create(:search_history, user:) }
+    let!(:favorite) { create(:favorite, user:, search_history: history, hotpepper_id: "HP-1") }
+
+    context "お気に入りが存在するとき" do
+      it "true と favorite_id を返す" do
+        get "/api/v1/favorites/status", params: { search_history_id: history.id, hotpepper_id: "HP-1" }
+
+        expect_success_json!
+        expect(json.dig(:data, :is_favorite)).to be(true)
+        expect(json.dig(:data, :favorite_id)).to eq(favorite.id)
+      end
+    end
+
+    context "お気に入りが存在しないとき" do
+      it "false と nil を返す" do
+        get "/api/v1/favorites/status", params: { search_history_id: history.id, hotpepper_id: "HP-NONE" }
+
+        expect_success_json!
+        expect(json.dig(:data, :is_favorite)).to be(false)
+        expect(json.dig(:data, :favorite_id)).to be_nil
+      end
+    end
+
+    context "必須パラメータが不足しているとき" do
+      it "hotpepper_id がなければ 400 を返す" do
+        get "/api/v1/favorites/status", params: { search_history_id: history.id }
+
+        expect_bad_request_json!(message: "必須パラメータが不足しています: hotpepper_id")
+      end
+
+      it "search_history_id がなければ 400 を返す" do
+        get "/api/v1/favorites/status", params: { hotpepper_id: "HP-1" }
+
+        expect_bad_request_json!(message: "必須パラメータが不足しています: search_history_id")
+      end
+    end
+  end
+
   describe "GET /api/v1/favorites#index" do
     context "グルーピング" do
       let!(:tokyo_ueno) do

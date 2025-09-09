@@ -15,6 +15,7 @@ import type { RestaurantListItem } from '~/types/restaurant'
 import type { ServiceResult } from '~/types/service-result'
 import { logger } from '~/lib/logger'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
+import { camelizeKeysDeep } from '~/utils/case-convert'
 import { apiFetchAuth, handleApiError } from './api-client'
 import { fetchRestaurantsByIds } from './fetch-restaurants'
 
@@ -144,27 +145,26 @@ export async function checkFavoriteStatus(
   searchHistoryId: string,
 ): Promise<FavoriteStatus> {
   try {
-    const favoritesResponse = await getFavorites()
+    const raw = await apiFetchAuth<
+      ApiResponse<{ is_favorite: boolean, favorite_id: number | null }>
+    >('favorites/status', {
+      params: { search_history_id: searchHistoryId, hotpepper_id: hotPepperId },
+    })
 
-    if (!favoritesResponse.success) {
-      return { isFavorite: false, favoriteId: null, message: favoritesResponse.message }
+    const response = camelizeKeysDeep(raw) as ApiResponse<{ isFavorite: boolean, favoriteId: number | null }>
+
+    if (!isApiSuccess(response)) {
+      return {
+        isFavorite: false,
+        favoriteId: null,
+        message: getApiErrorMessage(response as any),
+      }
     }
 
-    const matchedGroup = favoritesResponse.data.find(
-      group => group.searchHistory.id.toString() === searchHistoryId,
-    )
-
-    if (!matchedGroup)
-      return { isFavorite: false, favoriteId: null }
-
-    const matchedFavorite = matchedGroup.favorites.find(
-      favoriteItem => favoriteItem.hotPepperId === hotPepperId,
-    )
-
-    if (!matchedFavorite)
-      return { isFavorite: false, favoriteId: null }
-
-    return { isFavorite: true, favoriteId: matchedFavorite.id }
+    return {
+      isFavorite: response.data.isFavorite,
+      favoriteId: response.data.favoriteId,
+    }
   }
   catch (error) {
     logger(error, { tags: { component: 'checkFavoriteStatus' } })
