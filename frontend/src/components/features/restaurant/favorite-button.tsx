@@ -14,7 +14,7 @@ import { userStateAtom } from '~/state/user-state.atom'
 import { cn } from '~/utils/cn'
 
 interface FavoriteButtonProps {
-  hotPepperId: string
+  hotpepperId: string
   compact?: boolean
   initialHistoryId?: string
   initialFavoriteId?: number
@@ -27,7 +27,7 @@ interface FavoriteActionResult {
 }
 
 export default function FavoriteButton({
-  hotPepperId,
+  hotpepperId,
   compact = false,
   initialHistoryId,
   initialFavoriteId,
@@ -56,7 +56,7 @@ export default function FavoriteButton({
       }
 
       try {
-        const status = await checkFavoriteStatus(hotPepperId, historyId)
+        const status = await checkFavoriteStatus(hotpepperId, historyId)
         setIsFavorite(status.isFavorite)
         setFavoriteId(status.favoriteId ?? null)
       }
@@ -69,7 +69,7 @@ export default function FavoriteButton({
     }
 
     initCheck()
-  }, [initialHistoryId, historyId, isSignedIn, hotPepperId, isFromFavoritesPage])
+  }, [initialHistoryId, historyId, isSignedIn, hotpepperId, isFromFavoritesPage])
 
   const handleClick = useCallback(async () => {
     if (isLoading)
@@ -103,7 +103,7 @@ export default function FavoriteButton({
     try {
       if (!isFavorite) {
         // 追加処理
-        const result: FavoriteActionResult = await addToFavorites(hotPepperId, Number(currentHistoryId))
+        const result: FavoriteActionResult = await addToFavorites(hotpepperId, Number(currentHistoryId))
         if (!result.success || !result.favoriteId)
           throw new Error('追加失敗')
         setIsFavorite(true)
@@ -134,7 +134,7 @@ export default function FavoriteButton({
     finally {
       setIsLoading(false)
     }
-  }, [isSignedIn, isFavorite, favoriteId, hotPepperId, historyId, isLoading, setHistoryId, setModalOpen])
+  }, [isSignedIn, isFavorite, favoriteId, hotpepperId, historyId, isLoading, setHistoryId, setModalOpen])
 
   const buttonProps = { onClick: handleClick, disabled: isChecking || isLoading }
 

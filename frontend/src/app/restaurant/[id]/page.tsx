@@ -89,7 +89,7 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
             station={station}
           />
           <FavoriteButton
-            hotPepperId={id}
+            hotpepperId={id}
             initialHistoryId={historyId}
           />
         </div>
