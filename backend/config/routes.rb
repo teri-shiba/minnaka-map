@@ -15,7 +15,6 @@ Rails.application.routes.draw do
       get "/validate_coordinates", to: "midpoint#validate"
 
       resources :search_histories, only: [:create]
-      # resources :favorites, only: [:index, :create, :destroy]
       resources :favorites, only: [:index, :create, :destroy] do
         collection { get :status }
       end
