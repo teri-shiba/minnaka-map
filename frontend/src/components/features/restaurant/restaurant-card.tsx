@@ -80,7 +80,7 @@ export default function RestaurantCard({
           onClick={e => e.preventDefault()}
         >
           <FavoriteButton
-            hotPepperId={id}
+            hotpepperId={id}
             compact={true}
             initialHistoryId={searchHistoryId}
             initialFavoriteId={favoriteId}

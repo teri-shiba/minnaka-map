@@ -1,15 +1,13 @@
 'use server'
 
-import type { ApiResponse } from '~/types/api-response'
 import type {
-  Favorite,
   FavoriteActionResponse,
   FavoriteGroup,
-  FavoritesPaginationMeta,
   FavoriteStatus,
+  FavoritesWithDetails,
   PaginatedFavoritesResponse,
-
 } from '~/types/favorite'
+import type { CreateFavoriteRes, DeleteFavoriteRes, GetFavoritesPageRes, GetFavoritesRes, GetFavoriteStatusRes } from '~/types/favorite.dto'
 import type { RestaurantListItem } from '~/types/restaurant'
 import type { ServiceResult } from '~/types/service-result'
 import { FAVORITE_GROUPS_PER_PAGE, FAVORITES_FIRST_PAGE } from '~/constants'
@@ -18,15 +16,12 @@ import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
 import { apiFetchAuth, handleApiError } from './api-client'
 import { fetchRestaurantsByIds } from './fetch-restaurants'
 
-// TODO: ファイルを分割する
+// TODO: ファイルを分割する getFavorites, getFavoritesWithDetailsPaginated / checkFavoriteStatus / addToFavorites, removeFromFavorites
 // すべてのお気に入りを取得
 export async function getFavorites(): Promise<ServiceResult<FavoriteGroup[]>> {
   try {
-    // TODO: 型を作る
-    const response = await apiFetchAuth<ApiResponse<Array<{
-      searchHistory: { id: number, stationNames: string[] }
-      favorites: Array<{ id: number, hotpepperId: string, searchHistoryId: number }>
-    }>>>('favorites')
+    const response = await apiFetchAuth<GetFavoritesRes>
+    ('favorites')
 
     if (!isApiSuccess(response)) {
       return {
@@ -36,16 +31,7 @@ export async function getFavorites(): Promise<ServiceResult<FavoriteGroup[]>> {
       }
     }
 
-    const normalizedData: FavoriteGroup[] = response.data.map(group => ({
-      searchHistory: group.searchHistory,
-      favorites: group.favorites.map((fav): Favorite => ({
-        id: fav.id,
-        hotPepperId: fav.hotpepperId,
-        searchHistoryId: fav.searchHistoryId,
-      })),
-    }))
-
-    return { success: true, data: normalizedData }
+    return { success: true, data: response.data }
   }
   catch (error) {
     return handleApiError(error, {
@@ -61,10 +47,7 @@ export async function getFavoritesWithDetailsPaginated(
   limit: number = FAVORITE_GROUPS_PER_PAGE,
 ): Promise<PaginatedFavoritesResponse> {
   try {
-    const response = await apiFetchAuth<ApiResponse<Array<{
-      searchHistory: { id: number, stationNames: string[] }
-      favorites: Array<{ id: number, hotpepperId: string, searchHistoryId: number }>
-    }>> & { meta: FavoritesPaginationMeta }>(
+    const response = await apiFetchAuth<GetFavoritesPageRes>(
       `favorites?page=${page}&limit=${limit}`,
     )
 
@@ -72,18 +55,24 @@ export async function getFavoritesWithDetailsPaginated(
       return {
         success: false,
         data: [],
-        meta: { currentPage: page, totalGroups: 0, hasMore: false },
+        meta: {
+          currentPage: page,
+          totalGroups: 0,
+          hasMore: false,
+        },
         message: getApiErrorMessage(response),
       }
     }
 
-    const hotPepperIds = Array.from(
-      new Set(response.data.flatMap(group => group.favorites.map(fav => fav.hotpepperId))),
+    const hotpepperIds = Array.from(
+      new Set(
+        response.data.flatMap(g => g.favorites.map(f => f.hotpepperId)),
+      ),
     )
 
     let restaurantMap = new Map<string, RestaurantListItem>()
-    if (hotPepperIds.length > 0) {
-      const [first, ...rest] = hotPepperIds
+    if (hotpepperIds.length > 0) {
+      const [first, ...rest] = hotpepperIds
       const restaurantIds: [string, ...string[]] = [first, ...rest]
       const restaurantResult = await fetchRestaurantsByIds({ restaurantIds })
 
@@ -104,30 +93,21 @@ export async function getFavoritesWithDetailsPaginated(
       )
     }
 
-    const isNotNull = <T>(value: T | null): value is T => value !== null
-
     const groupsWithDetails = response.data.map(group => ({
-      searchHistory: {
-        id: group.searchHistory.id,
-        stationNames: group.searchHistory.stationNames,
-      },
-      favorites: group.favorites
-        .map((favorite) => {
-          const restaurant = restaurantMap.get(favorite.hotpepperId)
-          if (!restaurant)
-            return null
-          return {
-            id: favorite.id,
-            searchHistoryId: favorite.searchHistoryId,
-            restaurant,
-          }
-        })
-        .filter(isNotNull),
+      searchHistory: group.searchHistory,
+      favorites: group.favorites.flatMap<FavoritesWithDetails>((fav) => {
+        const restaurant = restaurantMap.get(fav.hotpepperId)
+        return restaurant
+          ? [{ id: fav.id, searchHistoryId: fav.searchHistoryId, restaurant }]
+          : []
+      }),
     }))
 
-    const normalizedMeta: FavoritesPaginationMeta = response.meta
-
-    return { success: true, data: groupsWithDetails, meta: normalizedMeta }
+    return {
+      success: true,
+      data: groupsWithDetails,
+      meta: response.meta,
+    }
   }
   catch (error) {
     const failure = handleApiError(error, {
@@ -150,9 +130,7 @@ export async function checkFavoriteStatus(
   searchHistoryId: string,
 ): Promise<FavoriteStatus> {
   try {
-    const response = await apiFetchAuth<
-      ApiResponse<{ isFavorite: boolean, favoriteId: number | null }>
-    >('favorites/status', {
+    const response = await apiFetchAuth<GetFavoriteStatusRes>('favorites/status', {
       params: { searchHistoryId, hotpepperId },
     })
 
@@ -164,10 +142,7 @@ export async function checkFavoriteStatus(
       }
     }
 
-    return {
-      isFavorite: response.data.isFavorite,
-      favoriteId: response.data.favoriteId,
-    }
+    return response.data
   }
   catch (error) {
     logger(error, { tags: { component: 'checkFavoriteStatus' } })
@@ -185,7 +160,7 @@ export async function addToFavorites(
   searchHistoryId: number,
 ): Promise<FavoriteActionResponse> {
   try {
-    const response = await apiFetchAuth<ApiResponse<{ id: number }>>(
+    const response = await apiFetchAuth<CreateFavoriteRes>(
       'favorites',
       {
         method: 'POST',
@@ -214,13 +189,10 @@ export async function removeFromFavorites(
   favoriteId: number,
 ): Promise<FavoriteActionResponse> {
   try {
-    const response = await apiFetchAuth<ApiResponse<null> | null>(
+    const response = await apiFetchAuth<DeleteFavoriteRes>(
       `favorites/${favoriteId}`,
       { method: 'DELETE' },
     )
-
-    if (response === null)
-      return { success: true }
 
     if (!isApiSuccess(response))
       return { success: false, message: getApiErrorMessage(response) }
