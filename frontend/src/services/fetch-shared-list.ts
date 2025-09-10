@@ -7,14 +7,14 @@ import { apiFetchPublic, handleApiError } from './api-client'
 
 interface SharedListData {
   title: string
-  created_at: string
-  search_history: {
+  createdAt: string
+  searchHistory: {
     id: number
-    station_names: string[]
+    stationNames: string[]
   }
   favorites: Array<{
     id: number
-    hotpepper_id: string
+    hotpepperId: string
   }>
 }
 

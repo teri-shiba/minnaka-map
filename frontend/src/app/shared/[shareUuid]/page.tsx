@@ -17,7 +17,7 @@ export default async function SharedListPage({ params }: SharedListPageProps) {
     notFound()
 
   const { data: sharedListData } = sharedListResult
-  const favoriteIds = sharedListData.favorites.map(f => f.hotpepper_id)
+  const favoriteIds = sharedListData.favorites.map(f => f.hotpepperId)
 
   let restaurants: RestaurantListItem[] = []
   if (favoriteIds.length > 0) {

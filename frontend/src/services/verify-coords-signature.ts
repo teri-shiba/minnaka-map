@@ -40,7 +40,7 @@ export async function verifyCoordsSignature(
         latitude: opts.latitude.toFixed(5),
         longitude: opts.longitude.toFixed(5),
         signature: opts.signature,
-        ...(opts.expires_at ? { expires_at: opts.expires_at } : {}),
+        ...(opts.expires_at ? { expiresAt: opts.expires_at } : {}),
       },
       cache,
       next: revalidateConfig,
