@@ -41,11 +41,14 @@ class Api::V1::SearchHistoriesController < Api::V1::BaseController
       ids = station_ids
       return nil if ids.blank?
 
+      # TODO(スケール&同時実行対策)→メモ確認
       current_user.user.search_histories.
-        join(:start_stations).
+        joins(:start_stations).
         group("search_histories.id").
-        having("array_agg(DISTINCT station.id ORDER BY stations.id) = ARRAY[?]::int[]").
-        first
+        having(
+          "ARRAY_AGG(DISTINCT stations.id ORDER BY stations.id) = ARRAY[?]::bigint[]",
+          ids,
+        ).first
     end
 
     def create_start_station_associations(search_history)
