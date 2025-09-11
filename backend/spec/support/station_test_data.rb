@@ -30,7 +30,7 @@ module StationTestData
     },
     kaminoge: {
       name: "上野毛",
-      name_hiragana: "kaminoge",
+      name_hiragana: "かみのげ",
       name_romaji: "kaminoge",
       latitude: "35.61199",
       longitude: "139.63891",
