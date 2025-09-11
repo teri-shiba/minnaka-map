@@ -4,12 +4,17 @@ module Api
 
     included do
       rescue_from StandardError, with: :handle_internal_error
+      rescue_from InvalidParamError, with: :handle_invalid_param
       rescue_from ActiveRecord::RecordInvalid, with: :handle_record_invalid
       rescue_from ActionController::ParameterMissing, with: :handle_param_missing
       rescue_from ActiveRecord::RecordNotFound, with: :handle_record_not_found
     end
 
     private
+
+      def handle_invalid_param(exception)
+        render_error(exception.message, details: exception.details, status: :unprocessable_entity)
+      end
 
       def handle_record_invalid(exception)
         details = exception.record&.errors&.full_messages
