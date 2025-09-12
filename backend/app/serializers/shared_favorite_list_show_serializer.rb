@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class SharedFavoriteListShowSerializer < ActiveModel::Serializer
   attributes :title, :created_at, :search_history, :favorites
 

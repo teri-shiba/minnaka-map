@@ -18,7 +18,7 @@ Rails.application.routes.draw do
       resources :favorites, only: [:index, :create, :destroy] do
         collection { get :status }
       end
-      resources :shared_lists, only: [:create, :show], param: :share_uuid
+      resources :shared_favorite_lists, only: [:create, :show], param: :share_uuid
 
       namespace :user do
         resource :confirmations, only: [:update]

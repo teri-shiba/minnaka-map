@@ -3,11 +3,22 @@ module ApiResponseHelpers
     JSON.parse(response.body, symbolize_names: true)
   end
 
+  def data
+    json.fetch(:data)
+  end
+
+  def error
+    json.fetch(:error)
+  end
+
   def expect_success_json!(data: nil, status: :ok)
     expect(response).to have_http_status(status)
     expect(json[:success]).to be(true)
     expect(json[:data]).to eq(data) if data
   end
+
+  def expect_status_ok! = expect_success_json!(status: :ok)
+  def expect_status_created! = expect_success_json!(status: :created)
 
   def expect_unprocessable_json!(message: nil, details: nil)
     expect(response).to have_http_status(:unprocessable_entity)
