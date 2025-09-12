@@ -60,17 +60,17 @@ class Api::V1::SearchHistoriesController < Api::V1::BaseController
       key = station_key
 
       ActiveRecord::Base.transaction do
-        if (existing = app_user.search_histories.find_by(station_key: key))
+        if (existing = current_app_user.search_histories.find_by(station_key: key))
           existing.update!(updated_at: Time.current)
           return existing
         end
 
         begin
-          history = app_user.search_histories.create!(station_key: key)
+          history = current_app_user.search_histories.create!(station_key: key)
           create_start_station_associations(history)
           history.reload
         rescue ActiveRecord::RecordNotUnique
-          history = app_user.search_histories.find_by!(station_key: key)
+          history = current_app_user.search_histories.find_by!(station_key: key)
           history.update!(updated_at: Time.current)
         end
 
@@ -95,9 +95,5 @@ class Api::V1::SearchHistoriesController < Api::V1::BaseController
 
     def station_key
       @station_key ||= station_ids.join("-")
-    end
-
-    def app_user
-      current_user.user
     end
 end

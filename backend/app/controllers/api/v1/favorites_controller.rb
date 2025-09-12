@@ -9,7 +9,7 @@ class Api::V1::FavoritesController < Api::V1::BaseController
     search_history_id = params.require(:search_history_id)
     hotpepper_id      = params.require(:hotpepper_id)
 
-    favorite = current_user.user.favorites.find_by(
+    favorite = current_app_user.favorites.find_by(
       search_history_id: search_history_id,
       hotpepper_id: hotpepper_id,
     )
@@ -26,7 +26,7 @@ class Api::V1::FavoritesController < Api::V1::BaseController
     page  = [Integer(params[:page], exception: false) || DEFAULT_PAGE, DEFAULT_PAGE].max
     limit = (Integer(params[:limit], exception: false) || DEFAULT_LIMIT).clamp(1, MAX_LIMIT)
 
-    groups       = current_user.user.favorites_by_search_history.to_a
+    groups       = current_app_user.favorites_by_search_history.to_a
     total_groups = groups.size
     slice        = groups.slice((page - 1) * limit, limit) || []
 
@@ -63,15 +63,15 @@ class Api::V1::FavoritesController < Api::V1::BaseController
   private
 
     def find_user_search_history
-      current_user.user.search_histories.find(favorite_params[:search_history_id])
+      current_app_user.search_histories.find(favorite_params[:search_history_id])
     end
 
     def find_user_favorite
-      current_user.user.favorites.find(params[:id])
+      current_app_user.favorites.find(params[:id])
     end
 
     def create_favorite(search_history)
-      current_user.user.favorites.create!(
+      current_app_user.favorites.create!(
         search_history:,
         hotpepper_id: favorite_params[:hotpepper_id],
       )
