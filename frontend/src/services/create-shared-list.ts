@@ -15,7 +15,7 @@ export interface SharedListData {
 export async function createSharedList(searchHistoryId: number): Promise<ServiceResult<SharedListData>> {
   try {
     const response = await apiFetchAuth<ApiResponse<SharedListData>>(
-      'shared_lists',
+      'shared_favorite_lists',
       {
         method: 'POST',
         body: { searchHistoryId },

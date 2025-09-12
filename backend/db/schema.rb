@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_11_053522) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_12_090417) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "uuid-ossp"
@@ -68,6 +68,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_11_053522) do
     t.index ["search_history_id"], name: "index_shared_favorite_lists_on_search_history_id"
     t.index ["share_uuid"], name: "index_shared_favorite_lists_on_share_uuid", unique: true
     t.index ["user_id", "created_at"], name: "index_shared_favorite_lists_on_user_id_and_created_at"
+    t.index ["user_id", "search_history_id"], name: "idx_unique_public_shared_list_per_user_history", unique: true, where: "(is_public = true)"
     t.index ["user_id"], name: "index_shared_favorite_lists_on_user_id"
   end
 
