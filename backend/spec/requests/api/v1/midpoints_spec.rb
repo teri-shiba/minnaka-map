@@ -1,22 +1,12 @@
 require "rails_helper"
 
-RSpec.describe "Api::V1::MidpointController", type: :request do
+RSpec.describe "Api::V1::MidpointsController", type: :request do
   include ActiveSupport::Testing::TimeHelpers
 
-  let!(:create_path) { "/api/v1/midpoint" }
-  let!(:validate_path) { "/api/v1/validate_coordinates" }
   let!(:secret) { "test-secret" }
 
   def hmac_for(*parts)
     OpenSSL::HMAC.hexdigest("SHA256", secret, parts.join(", "))
-  end
-
-  def stub_center!(lat, lng)
-    allow(Geocoder::Calculations).to receive(:geographic_center).and_return([lat, lng])
-  end
-
-  def post_midpoint(ids:)
-    post create_path, params: { area: { station_ids: ids } }
   end
 
   before do
@@ -27,19 +17,21 @@ RSpec.describe "Api::V1::MidpointController", type: :request do
     before { set_env!(env) }
 
     it "expires_at なしで返す（#{env}）" do
-      post_midpoint(ids: station_ids)
+      post api_v1_midpoint_path, params: { area: { station_ids: } }
 
       expected_sig = hmac_for("35.10000", "139.10000")
 
-      expect_success_json!
-      expect(json[:data][:midpoint]).to eq(latitude: "35.10000", longitude: "139.10000")
-      expect(json[:data][:signature]).to eq(expected_sig)
-      expect(json[:data].has_key?(:expires_at)).to be(false)
+      expect_status_ok!
+      expect(data[:midpoint]).to eq(latitude: "35.10000", longitude: "139.10000")
+      expect(data[:signature]).to eq(expected_sig)
+      expect(data.has_key?(:expires_at)).to be(false)
     end
   end
 
   describe "POST /api/v1/midpoint 成功" do
-    before { stub_center!(35.1, 139.1) }
+    before do
+      allow(Geocoder::Calculations).to receive(:geographic_center).and_return([35.1, 139.1])
+    end
 
     let!(:station_a) { create(:station, latitude: 35.0, longitude: 139.0) }
     let!(:station_b) { create(:station, latitude: 35.2, longitude: 139.2) }
@@ -55,15 +47,15 @@ RSpec.describe "Api::V1::MidpointController", type: :request do
 
       it "expires_at 付きで返す" do
         travel_to(now) do
-          post_midpoint(ids: station_ids)
+          post api_v1_midpoint_path, params: { area: { station_ids: } }
 
           expected_expires = (now + 1.hour).to_i
           expected_sig = hmac_for("35.10000", "139.10000", expected_expires.to_s)
 
-          expect_success_json!
-          expect(json[:data][:midpoint]).to eq(latitude: "35.10000", longitude: "139.10000")
-          expect(json[:data][:signature]).to eq(expected_sig)
-          expect(json[:data][:expires_at]).to eq(expected_expires)
+          expect_status_ok!
+          expect(data[:midpoint]).to eq(latitude: "35.10000", longitude: "139.10000")
+          expect(data[:signature]).to eq(expected_sig)
+          expect(data[:expires_at]).to eq(expected_expires)
         end
       end
     end
@@ -73,7 +65,7 @@ RSpec.describe "Api::V1::MidpointController", type: :request do
     context "station_ids が空のとき" do
       it "422 を返す" do
         allow(Station).to receive(:where)
-        post create_path, params: { area: { station_ids: [] } }
+        post api_v1_midpoint_path, params: { area: { station_ids: [] } }
         expect(Station).not_to have_received(:where)
         expect_unprocessable_json!(message: "station_ids is empty")
       end
@@ -82,7 +74,7 @@ RSpec.describe "Api::V1::MidpointController", type: :request do
     context "上限（MAX_STATIONS=6）を超過したとき" do
       it "422 を返す" do
         allow(Station).to receive(:where)
-        post create_path, params: { area: { station_ids: (1..7).to_a } }
+        post api_v1_midpoint_path, params: { area: { station_ids: (1..7).to_a } }
         expect(Station).not_to have_received(:where)
         expect_unprocessable_json!(message: "too many stations")
       end
@@ -90,13 +82,13 @@ RSpec.describe "Api::V1::MidpointController", type: :request do
 
     context "DB に存在しない id が含まれているとき" do
       it "422 を返し、details に欠番が入る" do
-        post create_path, params: { area: { station_ids: [9999] } }
+        post api_v1_midpoint_path, params: { area: { station_ids: [9999] } }
         expect_unprocessable_json!(message: "not found ids", details: [9999])
       end
     end
   end
 
-  describe "GET /api/v1/validate_coordinates" do
+  describe "GET /api/v1/midpoint/validate" do
     context "検証成功" do
       before { set_env!("test") }
 
@@ -105,7 +97,7 @@ RSpec.describe "Api::V1::MidpointController", type: :request do
         lng = "139.0"
         sig = hmac_for(lat, lng)
 
-        get validate_path, params: { latitude: lat, longitude: lng, signature: sig }
+        get validate_api_v1_midpoint_path, params: { latitude: lat, longitude: lng, signature: sig }
 
         expect(response).to have_http_status(:ok)
         expect(json).to eq(valid: true)
@@ -123,7 +115,7 @@ RSpec.describe "Api::V1::MidpointController", type: :request do
           lng = "0"
           sig = hmac_for(lat, lng, expired.to_s)
 
-          get validate_path, params: { latitude: lat, longitude: lng, signature: sig, expires_at: expired }
+          get validate_api_v1_midpoint_path, params: { latitude: lat, longitude: lng, signature: sig, expires_at: expired }
 
           expect(response).to have_http_status(:bad_request)
           expect(json).to eq(valid: false)

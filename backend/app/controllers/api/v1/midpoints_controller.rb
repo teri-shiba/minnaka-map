@@ -1,4 +1,4 @@
-class Api::V1::MidpointController < ApplicationController
+class Api::V1::MidpointsController < ApplicationController
   MAX_STATIONS = 6
 
   def create
