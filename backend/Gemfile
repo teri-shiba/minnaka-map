@@ -52,4 +52,5 @@ group :development, :test do
   gem "rubocop-rspec"
   gem "shoulda-matchers", "~> 6.0"
   gem "solargraph"
+  gem 'simplecov'
 end
