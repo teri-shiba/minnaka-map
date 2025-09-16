@@ -16,9 +16,12 @@ class Api::V1::MidpointsController < ApplicationController
 
     data = {
       midpoint: { latitude: sig[:latitude], longitude: sig[:longitude] },
-      signature: sig[:signature],
     }
-    data[:expires_at] = sig[:expires_at] if sig.has_key?(:expires_at)
+
+    if Rails.env.production?
+      data[:signature]  = sig[:signature]
+      data[:expires_at] = sig[:expires_at] if sig.has_key?(:expires_at)
+    end
 
     render_success(data:)
   end
