@@ -3,19 +3,20 @@ require "rails_helper"
 RSpec.describe "Api::V1::SearchHistoriesController", type: :request do
   include ActiveSupport::Testing::TimeHelpers
 
-  let(:path)         { "/api/v1/search_histories" }
   let!(:user)        { create(:user) }
   let!(:user_auth)   { create(:user_auth, user: user) }
-  let!(:auth_header) { user_auth.create_new_auth_token }
+  let!(:auth_headers) { user_auth.create_new_auth_token }
 
-  def post_create(ids, headers: auth_header)
-    post path, params: { search_history: { station_ids: ids } }, headers: headers
+  def post_create(ids, headers: auth_headers)
+    post api_v1_search_histories_path,
+         params: { search_history: { station_ids: ids } },
+         headers: headers
   end
 
   def expect_created_with_names(names)
     expect(response).to have_http_status(:created)
     expect(json[:success]).to be(true)
-    expect(json.dig(:data, :station_names)).to eq(Array(names).sort)
+    expect(data[:station_names]).to eq(Array(names).sort)
   end
 
   def stub_user_search_histories_race!(user:, key:, canonical:)
@@ -33,14 +34,16 @@ RSpec.describe "Api::V1::SearchHistoriesController", type: :request do
   describe "POST /api/v1/search_histories 正常系" do
     context "未認証" do
       it "401を返す" do
-        post path, params: { search_history: { station_ids: [] } }
+        post api_v1_search_histories_path,
+             params: { search_history: { station_ids: [] } }
+
         expect(response).to have_http_status(:unauthorized)
       end
     end
 
     context "認証済み" do
       context "駅IDが2件のとき（下限）" do
-        let!(:stations) { [create(:station, station_key: :tokyo), create(:station, station_key: :kanda)] }
+        let!(:stations) { create_list(:station, 2) }
         let(:requested_ids) { stations.map(&:id) }
 
         it "SearchHistory +1 / 関連 +2 / 201を返す" do
@@ -54,7 +57,7 @@ RSpec.describe "Api::V1::SearchHistoriesController", type: :request do
       end
 
       context "駅IDが6件のとき（上限）" do
-        let!(:stations) { %i[tokyo ueno kanda meguro kaminoge shibuya].map {|k| create(:station, station_key: k) } }
+        let!(:stations) { create_list(:station, 6) }
         let(:requested_ids) { stations.map(&:id) }
 
         it "SearchHistory +1 / 関連 +6 / 201を返す" do
@@ -80,7 +83,7 @@ RSpec.describe "Api::V1::SearchHistoriesController", type: :request do
           }.not_to change { [SearchHistory.count, SearchHistoryStartStation.count] }
 
           expect_created_with_names([tokyo.name, kanda.name])
-          expect(json.dig(:data, :id)).to eq(existing_history.id)
+          expect(data[:id]).to eq(existing_history.id)
         end
 
         it "updated_at が更新される" do
@@ -108,7 +111,7 @@ RSpec.describe "Api::V1::SearchHistoriesController", type: :request do
               post_create([kanda.id, tokyo.id])
             }.not_to change { [SearchHistory.count, SearchHistoryStartStation.count] }
             expect_created_with_names([tokyo.name, kanda.name])
-            expect(json.dig(:data, :id)).to eq(canonical.id)
+            expect(data[:id]).to eq(canonical.id)
           end
         end
       end
@@ -134,8 +137,8 @@ RSpec.describe "Api::V1::SearchHistoriesController", type: :request do
 
     context "駅IDが7件のとき（上限超過）" do
       it "422を返す" do
-        ids = (1..5).map {|_i| create(:station).id } + [tokyo.id, create(:station).id]
-        post_create(ids)
+        station_ids = create_list(:station, 7).map(&:id)
+        post_create(station_ids)
         expect_unprocessable_json!(message: "station_idsは2〜6件で指定してください")
       end
     end
