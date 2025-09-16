@@ -23,9 +23,10 @@ Rails.application.routes.draw do
       namespace :user do
         resource :confirmations, only: [:update]
       end
+
       namespace :current do
         resource :user, only: [:show] do
-          get :show_status, on: :member
+          get :show_status
         end
       end
     end
