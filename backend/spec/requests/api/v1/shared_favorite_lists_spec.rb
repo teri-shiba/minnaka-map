@@ -136,7 +136,6 @@ RSpec.describe "Api::V1::SharedFavoriteListsController", type: :request do
       end
     end
 
-    # どういう意味？
     context "search_history_idが未指定のとき" do
       let!(:auth_headers) { user_auth.create_new_auth_token }
 
