@@ -7,6 +7,10 @@ module ApiResponseHelpers
     json.fetch(:data)
   end
 
+  def meta
+    json.fetch(:meta)
+  end
+
   def error
     json.fetch(:error)
   end
