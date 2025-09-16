@@ -15,12 +15,12 @@ RSpec.describe SharedFavoriteList, type: :model do
     let!(:_sentinel_other) { create(:shared_favorite_list) }
 
     describe ".owned_by" do
-      it "ユーザーIDを渡すと、そのユーザーのリストだけ返す" do
+      it "ユーザー ID を渡すと、そのユーザーのリストだけ返す" do
         results = SharedFavoriteList.owned_by(user.id)
         expect(results).to contain_exactly(public_list, private_list)
       end
 
-      it "Userオブジェクトを渡すと、そのユーザーのリストだけ返す" do
+      it "User オブジェクトを渡すと、そのユーザーのリストだけ返す" do
         results = SharedFavoriteList.owned_by(user)
         expect(results).to contain_exactly(public_list, private_list)
       end

@@ -14,7 +14,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
     let!(:favorite) { create(:favorite, user:, search_history: history, hotpepper_id: "HP-1") }
 
     context "未認証のとき" do
-      it "401を返す" do
+      it "401 を返す" do
         get status_api_v1_favorites_path,
             params: { search_history_id: history.id, hotpepper_id: "HP-1" }
 
@@ -67,7 +67,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
 
   describe "GET /api/v1/favorites#index" do
     context "未認証のとき" do
-      it "401を返す" do
+      it "401 を返す" do
         get api_v1_favorites_path
         expect_unauthorized_json!
       end
@@ -100,7 +100,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
       end
     end
 
-    context "ページング(limit=1)" do
+    context "ページング (limit=1)" do
       before do
         create(:search_history, :with_start_stations, :with_favorites,
                user:, station_keys: %i[tokyo ueno])
@@ -108,7 +108,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
                user:, station_keys: %i[kanda meguro])
       end
 
-      it "1ページ目" do
+      it "1 ページ目" do
         get api_v1_favorites_path,
             params: { page: 1, limit: 1 },
             headers: auth_headers
@@ -120,7 +120,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
         expect(meta[:has_more]).to be(true)
       end
 
-      it "2ページ目" do
+      it "2 ページ目" do
         get api_v1_favorites_path,
             params: { page: 2, limit: 1 },
             headers: auth_headers
@@ -169,7 +169,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
       expect(meta[:has_more]).to be(true)
     end
 
-    it "limit が不正文字列でも デフォルト(3) を使う" do
+    it "limit が不正文字列でも デフォルト (3) を使う" do
       get api_v1_favorites_path,
           params: { page: 1, limit: "NaN" },
           headers: auth_headers
@@ -179,7 +179,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
       expect(meta[:has_more]).to be(false)
     end
 
-    it "limit が上限(10)を超えたら 10 に丸める" do
+    it "limit が上限 (10) を超えたら 10 に丸める" do
       get api_v1_favorites_path,
           params: { page: 1, limit: 9999 },
           headers: auth_headers
@@ -193,7 +193,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
     let!(:history_tokyo_ueno) { create(:search_history, user:) }
 
     context "未認証のとき" do
-      it "401を返す" do
+      it "401 を返す" do
         post api_v1_favorites_path,
              params: { favorite: { search_history_id: history_tokyo_ueno.id, hotpepper_id: "HP-999" } }
 
@@ -225,7 +225,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
     let!(:favorite) { create(:favorite, user:, search_history: history, hotpepper_id: "HP-DEL") }
 
     context "未認証のとき" do
-      it "401を返す" do
+      it "401 を返す" do
         delete api_v1_favorite_path(favorite)
 
         expect_unauthorized_json!
