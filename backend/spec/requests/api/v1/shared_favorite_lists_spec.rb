@@ -1,19 +1,17 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::SharedFavoriteListsController", type: :request do
-  include ActiveSupport::Testing::TimeHelpers
-
   let!(:user) { create(:user) }
   let!(:user_auth) { create(:user_auth, user:) }
   let!(:auth_headers) { user_auth.create_new_auth_token }
 
   describe "GET /api/v1/shared_favorite_lists#show" do
-    context "共有リストが存在し、お気に入りが1件以上あるとき" do
+    context "共有リストが存在し、お気に入りが 1 件以上あるとき" do
       let!(:search_history) { create(:search_history, :with_start_stations, user:, station_keys: %i[tokyo kanda]) }
       let!(:shared_favorite_list) { create(:shared_favorite_list, :public, user:, search_history:, title: "東京・神田") }
       let!(:favorite) { create(:favorite, search_history:, hotpepper_id: "HP-1") }
 
-      it "Serializerで定めた形式で、200を返す" do
+      it "Serializer で定めた形式で、200 を返す" do
         get api_v1_shared_favorite_list_path(shared_favorite_list)
 
         expect_status_ok!
@@ -29,8 +27,8 @@ RSpec.describe "Api::V1::SharedFavoriteListsController", type: :request do
       end
     end
 
-    context "share_uuidが存在しないとき" do
-      it "404とエラーメッセージを返す" do
+    context "share_uuid が存在しないとき" do
+      it "404 とエラーメッセージを返す" do
         get api_v1_shared_favorite_list_path("not-found-uuid")
         expect_not_found_json!(message: "共有リストが見つかりません")
       end
@@ -40,17 +38,17 @@ RSpec.describe "Api::V1::SharedFavoriteListsController", type: :request do
       let!(:search_history) { create(:search_history, user:) }
       let!(:private_list) { create(:shared_favorite_list, :private, user:, search_history:) }
 
-      it "404とエラーメッセージを返す" do
+      it "404 とエラーメッセージを返す" do
         get api_v1_shared_favorite_list_path(private_list)
         expect_not_found_json!(message: "共有リストが見つかりません")
       end
     end
 
-    context "共有リストはあるが、お気に入りが0件のとき" do
+    context "共有リストはあるが、お気に入りが 0 件のとき" do
       let!(:search_history) { create(:search_history, user:) }
       let!(:empty_list) { create(:shared_favorite_list, :public, user:, search_history:) }
 
-      it "404とエラーメッセージを返す" do
+      it "404 とエラーメッセージを返す" do
         get api_v1_shared_favorite_list_path(empty_list)
         expect_not_found_json!(message: "共有リストが見つかりません")
       end
@@ -61,7 +59,7 @@ RSpec.describe "Api::V1::SharedFavoriteListsController", type: :request do
     context "未認証のとき" do
       let!(:search_history) { create(:search_history, user:) }
 
-      it "401を返す" do
+      it "401 を返す" do
         post api_v1_shared_favorite_lists_path, params: { search_history_id: search_history.id }
 
         expect_unauthorized_json!
@@ -71,7 +69,7 @@ RSpec.describe "Api::V1::SharedFavoriteListsController", type: :request do
     context "公開済みの共有リストが未作成のとき" do
       let!(:search_history) { create(:search_history, :with_start_stations, user:, station_keys: %i[tokyo kanda]) }
 
-      it "201とレコードを作成する" do
+      it "201 とレコードを作成する" do
         expect {
           post api_v1_shared_favorite_lists_path,
                params: { search_history_id: search_history.id },
@@ -81,14 +79,14 @@ RSpec.describe "Api::V1::SharedFavoriteListsController", type: :request do
         expect_status_created!
       end
 
-      it "Serializerで定めた形式でデータを返す" do
+      it "Serializer で定めた形式でデータを返す" do
         post api_v1_shared_favorite_lists_path,
              params: { search_history_id: search_history.id },
              headers: auth_headers
 
         expect_status_created!
         expect(data).to match(
-          share_uuid: a_kind_of(String),
+          share_uuid: be_uuid,
           title: "東京・神田",
           is_existing: false,
         )
@@ -128,8 +126,21 @@ RSpec.describe "Api::V1::SharedFavoriteListsController", type: :request do
       end
     end
 
-    context "search_history_idが未指定のとき" do
-      it "400とエラーメッセージを返す" do
+    context "他ユーザーの search_history_id を指定したとき" do
+      let!(:other_user) { create(:user) }
+      let!(:other_history) { create(:search_history, user: other_user) }
+
+      it "404 を返す" do
+        post api_v1_shared_favorite_lists_path,
+             params: { search_history_id: other_history.id },
+             headers: auth_headers
+
+        expect_not_found_json!(message: "リソースが見つかりません")
+      end
+    end
+
+    context "search_history_id が未指定のとき" do
+      it "400 とエラーメッセージを返す" do
         post api_v1_shared_favorite_lists_path, params: {}, headers: auth_headers
 
         expect_bad_request_json!(message: "必須パラメータが不足しています: search_history_id")
