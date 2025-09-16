@@ -20,4 +20,27 @@ RSpec.describe "Api::V1::Current::UsersController", type: :request do
       end
     end
   end
+
+  describe "GET /api/v1/current/user/show_status" do
+    context "未認証のとき" do
+      it "200 で { login: false } を返す" do
+        get show_status_api_v1_current_user_path
+        expect(response).to have_http_status(:ok)
+        expect(json).to eq(login: false)
+      end
+    end
+
+    context "認証済みのとき" do
+      let!(:user_auth) { create(:user_auth) }
+      let!(:auth_headers) { user_auth.create_new_auth_token }
+
+      it "200で シリアライザー形式で返す" do
+        get show_status_api_v1_current_user_path,
+            headers: auth_headers
+
+        expect(response).to have_http_status(:ok)
+        expect(json.keys).to match_array(%i[id email name provider])
+      end
+    end
+  end
 end
