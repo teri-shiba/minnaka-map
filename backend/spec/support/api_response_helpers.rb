@@ -42,7 +42,7 @@ module ApiResponseHelpers
     expect_error_json!(status: :not_found, message:, details:)
   end
 
-  def expect_unauthorized_json!(message: "ログインもしくはアカウント登録してください")
+  def expect_unauthorized_json!(message: "ログインもしくはアカウント登録してください。")
     expect_error_json!(status: :unauthorized, message:)
   end
 
