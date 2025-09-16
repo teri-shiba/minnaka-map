@@ -13,6 +13,15 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
     let!(:history)  { create(:search_history, user:) }
     let!(:favorite) { create(:favorite, user:, search_history: history, hotpepper_id: "HP-1") }
 
+    context "未認証のとき" do
+      it "401を返す" do
+        get status_api_v1_favorites_path,
+            params: { search_history_id: history.id, hotpepper_id: "HP-1" }
+
+        expect_unauthorized_json!
+      end
+    end
+
     context "お気に入りが存在するとき" do
       it "true と favorite_id を返す" do
         get status_api_v1_favorites_path,
@@ -57,6 +66,13 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
   end
 
   describe "GET /api/v1/favorites#index" do
+    context "未認証のとき" do
+      it "401を返す" do
+        get api_v1_favorites_path
+        expect_unauthorized_json!
+      end
+    end
+
     context "グルーピング" do
       let!(:tokyo_ueno) do
         create(:search_history, :with_start_stations, :with_favorites,
@@ -174,11 +190,20 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
   end
 
   describe "POST /api/v1/favorites#create" do
-    before { @history_tokyo_ueno = create(:search_history, user:) }
+    let!(:history_tokyo_ueno) { create(:search_history, user:) }
+
+    context "未認証のとき" do
+      it "401を返す" do
+        post api_v1_favorites_path,
+             params: { favorite: { search_history_id: history_tokyo_ueno.id, hotpepper_id: "HP-999" } }
+
+        expect_unauthorized_json!
+      end
+    end
 
     it "お気に入りを作成して 201 を返す" do
       post api_v1_favorites_path,
-           params: { favorite: { search_history_id: @history_tokyo_ueno.id, hotpepper_id: "HP-999" } },
+           params: { favorite: { search_history_id: history_tokyo_ueno.id, hotpepper_id: "HP-999" } },
            headers: auth_headers
 
       expect_status_created!
@@ -199,6 +224,14 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
     let!(:history) { create(:search_history, user:) }
     let!(:favorite) { create(:favorite, user:, search_history: history, hotpepper_id: "HP-DEL") }
 
+    context "未認証のとき" do
+      it "401を返す" do
+        delete api_v1_favorite_path(favorite)
+
+        expect_unauthorized_json!
+      end
+    end
+
     it "お気に入りを削除して 200 を返す" do
       delete api_v1_favorite_path(favorite), headers: auth_headers
 
@@ -210,8 +243,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
     it "存在しない ID なら 404 を返す" do
       delete api_v1_favorite_path(9_999_999), headers: auth_headers
 
-      expect(response).to have_http_status(:not_found)
-      expect(error[:message]).to match(/リソースが見つかりません/)
+      expect_not_found_json!(message: "リソースが見つかりません")
     end
   end
 end
