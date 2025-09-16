@@ -14,7 +14,7 @@ export const API_PREFIX = '/api/v1' as const
 export const API_ENDPOINTS = {
   STATIONS: '/stations',
   MIDPOINT: '/midpoint',
-  VALIDATE_COORDINATES: '/validate_coordinates',
+  VALIDATE_COORDINATES: '/midpoint/validate',
   AUTH: '/auth',
   PROVIDER: '/provider',
   CURRENT_USER_STATUS: '/current/user/show_status',
