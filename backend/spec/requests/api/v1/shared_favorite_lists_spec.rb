@@ -5,6 +5,7 @@ RSpec.describe "Api::V1::SharedFavoriteListsController", type: :request do
 
   let!(:user) { create(:user) }
   let!(:user_auth) { create(:user_auth, user:) }
+  let!(:auth_headers) { user_auth.create_new_auth_token }
 
   describe "GET /api/v1/shared_favorite_lists#show" do
     context "共有リストが存在し、お気に入りが1件以上あるとき" do
@@ -68,7 +69,6 @@ RSpec.describe "Api::V1::SharedFavoriteListsController", type: :request do
     end
 
     context "公開済みの共有リストが未作成のとき" do
-      let!(:auth_headers) { user_auth.create_new_auth_token }
       let!(:search_history) { create(:search_history, :with_start_stations, user:, station_keys: %i[tokyo kanda]) }
 
       it "201とレコードを作成する" do
@@ -111,8 +111,6 @@ RSpec.describe "Api::V1::SharedFavoriteListsController", type: :request do
     end
 
     context "同じ user * search_history の公開リストが既にあるとき" do
-      let!(:auth_headers) { user_auth.create_new_auth_token }
-
       let!(:search_history) { create(:search_history, :with_start_stations, user:, station_keys: %i[tokyo kanda]) }
       let!(:existing) { create(:shared_favorite_list, :public, user:, search_history:, title: "既存タイトル") }
 
@@ -131,8 +129,6 @@ RSpec.describe "Api::V1::SharedFavoriteListsController", type: :request do
     end
 
     context "search_history_idが未指定のとき" do
-      let!(:auth_headers) { user_auth.create_new_auth_token }
-
       it "400とエラーメッセージを返す" do
         post api_v1_shared_favorite_lists_path, params: {}, headers: auth_headers
 
