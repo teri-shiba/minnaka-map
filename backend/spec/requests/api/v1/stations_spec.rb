@@ -2,8 +2,8 @@ require "rails_helper"
 
 RSpec.describe "Api::V1::StationsController", type: :request do
   describe "GET /api/v1/stations" do
-    context "query が空白／未指定のとき" do
-      it "stations: []（未指定）" do
+    context "クエリが空白もしくは未指定のとき" do
+      it "stations: []（未指定）を返す" do
         get api_v1_stations_path
         expect(response).to have_http_status(:ok)
         expect(json).to eq(stations: [])
@@ -16,10 +16,10 @@ RSpec.describe "Api::V1::StationsController", type: :request do
       end
     end
 
-    context "query が与えられたとき" do
+    context "クエリが与えられたとき" do
       let!(:s_main) { create(:station, name: "新宿") }
       let!(:s_west) { create(:station, name: "新宿西口") }
-      let!(:s_3rd) { create(:station, name: "新宿三丁目") }
+      let!(:s_3rd)  { create(:station, name: "新宿三丁目") }
 
       it "Station.search_by_name(q).limit(5) の結果を返す" do
         allow(Station).to receive(:search_by_name).
@@ -30,9 +30,18 @@ RSpec.describe "Api::V1::StationsController", type: :request do
         expect(response).to have_http_status(:ok)
 
         expect(json).to have_key(:stations)
-        expect(json[:stations].map { _1[:id] }).
+        expect(json[:stations].map {|st| st[:id] }).
           to contain_exactly(s_main.id, s_west.id, s_3rd.id)
         expect(json[:stations]).to all(include(:id, :name, :latitude, :longitude))
+      end
+
+      it "一致結果が0件なら stations: [] を返す" do
+        allow(Station).to receive(:search_by_name).with("存在しない").
+                            and_return(Station.none)
+
+        get api_v1_stations_path, params: { q: "存在しない" }
+        expect(response).to have_http_status(:ok)
+        expect(json).to eq(stations: [])
       end
 
       it "結果が6件以上でも最大5件に制限される" do
@@ -41,6 +50,7 @@ RSpec.describe "Api::V1::StationsController", type: :request do
                             and_return(Station.where(id: over_limit_stations.map(&:id)))
 
         get api_v1_stations_path, params: { q: "あ" }
+        expect(response).to have_http_status(:ok)
         expect(json[:stations].size).to eq(5)
       end
     end
