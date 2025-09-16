@@ -4,7 +4,7 @@ RSpec.describe "Api::V1::SearchHistoriesController", type: :request do
   include ActiveSupport::Testing::TimeHelpers
 
   let!(:user)        { create(:user) }
-  let!(:user_auth)   { create(:user_auth, user: user) }
+  let!(:user_auth)   { create(:user_auth, user:) }
   let!(:auth_headers) { user_auth.create_new_auth_token }
 
   def post_create(ids, headers: auth_headers)
@@ -14,8 +14,7 @@ RSpec.describe "Api::V1::SearchHistoriesController", type: :request do
   end
 
   def expect_created_with_names(names)
-    expect(response).to have_http_status(:created)
-    expect(json[:success]).to be(true)
+    expect_status_created!
     expect(data[:station_names]).to eq(Array(names).sort)
   end
 
@@ -37,7 +36,7 @@ RSpec.describe "Api::V1::SearchHistoriesController", type: :request do
         post api_v1_search_histories_path,
              params: { search_history: { station_ids: [] } }
 
-        expect(response).to have_http_status(:unauthorized)
+        expect_unauthorized_json!
       end
     end
 
