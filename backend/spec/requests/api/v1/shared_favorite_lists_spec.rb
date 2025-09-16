@@ -9,7 +9,6 @@ RSpec.describe "Api::V1::SharedFavoriteListsController", type: :request do
   describe "GET /api/v1/shared_favorite_lists#show" do
     context "共有リストが存在し、お気に入りが1件以上あるとき" do
       let!(:search_history) { create(:search_history, :with_start_stations, user:, station_keys: %i[tokyo kanda]) }
-
       let!(:shared_favorite_list) { create(:shared_favorite_list, :public, user:, search_history:, title: "東京・神田") }
       let!(:favorite) { create(:favorite, search_history:, hotpepper_id: "HP-1") }
 
@@ -32,9 +31,7 @@ RSpec.describe "Api::V1::SharedFavoriteListsController", type: :request do
     context "share_uuidが存在しないとき" do
       it "404とエラーメッセージを返す" do
         get api_v1_shared_favorite_list_path("not-found-uuid")
-
-        expect(response).to have_http_status(:not_found)
-        expect(error[:message]).to eq("共有リストが見つかりません")
+        expect_not_found_json!(message: "共有リストが見つかりません")
       end
     end
 
@@ -44,20 +41,17 @@ RSpec.describe "Api::V1::SharedFavoriteListsController", type: :request do
 
       it "404とエラーメッセージを返す" do
         get api_v1_shared_favorite_list_path(private_list)
-
-        expect(response).to have_http_status(:not_found)
-        expect(error[:message]).to eq("共有リストが見つかりません")
+        expect_not_found_json!(message: "共有リストが見つかりません")
       end
     end
 
     context "共有リストはあるが、お気に入りが0件のとき" do
       let!(:search_history) { create(:search_history, user:) }
       let!(:empty_list) { create(:shared_favorite_list, :public, user:, search_history:) }
+
       it "404とエラーメッセージを返す" do
         get api_v1_shared_favorite_list_path(empty_list)
-
-        expect(response).to have_http_status(:not_found)
-        expect(error[:message]).to eq("共有リストが見つかりません")
+        expect_not_found_json!(message: "共有リストが見つかりません")
       end
     end
   end
@@ -69,7 +63,7 @@ RSpec.describe "Api::V1::SharedFavoriteListsController", type: :request do
       it "401を返す" do
         post api_v1_shared_favorite_lists_path, params: { search_history_id: search_history.id }
 
-        expect(response).to have_http_status(:unauthorized)
+        expect_unauthorized_json!
       end
     end
 
