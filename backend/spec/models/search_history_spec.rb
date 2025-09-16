@@ -30,7 +30,7 @@ RSpec.describe SearchHistory, type: :model do
       expect(search_history.station_names).to contain_exactly("東京", "上野")
     end
 
-    it "includesで先読み済みならメモリから取得して昇順で返す" do
+    it "includes で先読み済みならメモリから取得して昇順で返す" do
       search_history_id = search_history.id
       loaded = SearchHistory.includes(:start_stations).find(search_history_id)
       expect(loaded.association(:start_stations)).to be_loaded

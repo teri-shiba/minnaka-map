@@ -35,7 +35,7 @@ RSpec.describe "Api::V1::StationsController", type: :request do
         expect(json[:stations]).to all(include(:id, :name, :latitude, :longitude))
       end
 
-      it "一致結果が0件なら stations: [] を返す" do
+      it "一致結果が 0 件なら stations: [] を返す" do
         allow(Station).to receive(:search_by_name).with("存在しない").
                             and_return(Station.none)
 
@@ -44,7 +44,7 @@ RSpec.describe "Api::V1::StationsController", type: :request do
         expect(json).to eq(stations: [])
       end
 
-      it "結果が6件以上でも最大5件に制限される" do
+      it "結果が 6 件以上でも最大 5 件に制限される" do
         over_limit_stations = create_list(:station, 6)
         allow(Station).to receive(:search_by_name).with("あ").
                             and_return(Station.where(id: over_limit_stations.map(&:id)))

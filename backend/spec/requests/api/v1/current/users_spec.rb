@@ -34,7 +34,7 @@ RSpec.describe "Api::V1::Current::UsersController", type: :request do
       let!(:user_auth) { create(:user_auth) }
       let!(:auth_headers) { user_auth.create_new_auth_token }
 
-      it "200で シリアライザー形式で返す" do
+      it "200 で シリアライザー形式で返す" do
         get show_status_api_v1_current_user_path,
             headers: auth_headers
 
