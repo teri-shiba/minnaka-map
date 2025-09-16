@@ -26,7 +26,7 @@ module Api
       end
 
       def handle_record_not_found(exception)
-        render_error("リソースが見つかりません #{exception.model}", status: :not_found)
+        render_error("リソースが見つかりません", status: :not_found)
       end
 
       def handle_internal_error(exception)
