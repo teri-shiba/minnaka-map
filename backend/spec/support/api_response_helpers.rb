@@ -66,3 +66,7 @@ module ApiResponseHelpers
       end
     end
 end
+
+RSpec.configure do |config|
+  config.include ApiResponseHelpers, type: :request
+end
