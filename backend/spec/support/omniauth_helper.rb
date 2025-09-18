@@ -25,6 +25,8 @@ module OmniauthHelpers
           "omniauth.params" => { "namespace_name" => "api_v1",
                                  "resource_class" => "UserAuth" },
         }
+
+    expect(response).to be_redirect
   end
 
   def parse_location!
@@ -50,6 +52,7 @@ RSpec.configure do |config|
     begin
       ex.run
     ensure
+      OmniAuth.config.mock_auth.clear
       OmniAuth.config.test_mode = prev
     end
   end
