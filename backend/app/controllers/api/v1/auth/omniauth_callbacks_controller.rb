@@ -1,5 +1,7 @@
 class Api::V1::Auth::OmniauthCallbacksController < DeviseTokenAuth::OmniauthCallbacksController
   def omniauth_success
+    log_ci_debug("omniauth_success start", auth_hash.present?) if Rails.env.test?
+
     return if prevent_duplicate_email_redirect
 
     resource_from_auth_hash
@@ -16,10 +18,12 @@ class Api::V1::Auth::OmniauthCallbacksController < DeviseTokenAuth::OmniauthCall
 
     set_token_in_cookie(@resource, @token) if DeviseTokenAuth.cookie_enabled
 
+    log_ci_debug("omniauth_success redirect", @resource.persisted?) if Rails.env.test?
     redirect_to "#{Settings.front_domain}/?status=success", allow_other_host: true
   end
 
   def omniauth_failure
+    log_ci_debug("omniauth_failure", "failure triggered") if Rails.env.test?
     redirect_to "#{Settings.front_domain}/?status=error", allow_other_host: true
   end
 
@@ -40,6 +44,8 @@ class Api::V1::Auth::OmniauthCallbacksController < DeviseTokenAuth::OmniauthCall
       email_exists = resource_class.exists?(email: email)
 
       if new_sns_user && email_exists
+        log_ci_debug("duplicate_email_redirect", "#{provider}:#{email}") if Rails.env.test?
+
         attr = UserAuth.human_attribute_name(:email)
         suffix = I18n.t("activerecord.errors.models.user_auth.attributes.email.taken")
         message = "#{attr}#{suffix}"
@@ -64,9 +70,16 @@ class Api::V1::Auth::OmniauthCallbacksController < DeviseTokenAuth::OmniauthCall
           password: set_random_password,
           user: user,
         )
+        log_ci_debug("resource_created", "new user: #{user.name}") if Rails.env.test?
+      else
+        log_ci_debug("resource_found", "existing uid: #{@resource.uid}") if Rails.env.test?
       end
 
       assign_provider_attrs(@resource, auth_hash)
       @resource
+    end
+
+    def log_ci_debug(event, details)
+      Rails.logger.debug "=== CI Debug [#{event}] #{details} ===" if ENV["CI"] || Rails.env.test?
     end
 end

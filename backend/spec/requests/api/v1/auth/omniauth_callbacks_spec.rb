@@ -1,72 +1,143 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
-  before do
-    allow(DeviseTokenAuth).to receive(:cookie_enabled).and_return(false)
-    Rails.application.env_config["devise.mapping"] = Devise.mappings[:user_auth]
-  end
+  let(:front_domain) { Settings.front_domain }
 
-  describe "成功フロー（新規／既存）" do
-    context "新規作成のとき" do
-      it "User と UserAuth を作成して、success に 302 リダイレクト" do
-        auth = build_auth(
-          uid: "uid-#{SecureRandom.hex(4)}",
-          email: "new-#{SecureRandom.hex(6)}@example.com",
-          name: "テスト太郎",
-        )
-        start_omniauth_flow(provider: :google_oauth2, auth_hash: auth)
+  describe "GET /api/v1/auth/google_oauth2/callback" do
+    let(:provider) { "google_oauth2" }
+    let(:uid) { "123456789" }
+    let(:email) { "google@example.com" }
+    let(:name) { "Google User" }
+
+    before do
+      set_omniauth_mock(provider, uid:, email:, name:)
+    end
+
+    context "新規ユーザーのとき" do
+      it "User と UserAuth を作成し、リダイレクトすること" do
         expect {
-          post omniauth_success_callback_path(:google_oauth2)
+          get "/api/v1/auth/#{provider}/callback"
         }.to change { User.count }.by(1).
                and change { UserAuth.count }.by(1)
 
-        expect_front_redirect(status: "success")
-        expect(session["dta.omniauth.auth"]).to be_nil
+        expect(response).to redirect_to("#{front_domain}/?status=success")
+      end
+
+      it "作成された User と UserAuth の属性が正しいこと" do
+        get "/api/v1/auth/#{provider}/callback"
+
+        created_user = User.last
+        created_user_auth = UserAuth.last
+
+        expect(created_user.name).to eq(name)
+        expect(created_user_auth.provider).to eq(provider)
+        expect(created_user_auth.uid).to eq(uid)
+        expect(created_user_auth.email).to eq(email)
+        expect(created_user_auth.user).to eq(created_user)
       end
     end
 
-    context "既存: provider+uid がすでに存在するとき" do
-      let!(:exist) { create(:user_auth, provider: "google_oauth2", uid: "uid-exist", email: "exist@example.com") }
+    context "既存ユーザーのとき" do
+      let!(:existing_user) { create(:user, name: "Existing User") }
+      let!(:existing_user_auth) { create(:user_auth, provider:, uid:, email:, user: existing_user) }
 
-      it "レコードは増加せず success パラメータで 302 リダイレクト" do
-        auth = build_auth(uid: exist.uid, email: exist.email, name: "既存ユーザー")
-        start_omniauth_flow(provider: :google_oauth2, auth_hash: auth)
+      it "新しいレコードを作成せず、成功ページにリダイレクトすること" do
         expect {
-          post omniauth_success_callback_path(:google_oauth2)
-        }.to not_change { User.count }.
-               and not_change { UserAuth.count }
+          get "/api/v1/auth/#{provider}/callback"
+        }.to not_change { User.count }.and not_change { UserAuth.count }
 
-        expect_front_redirect(status: "success")
+        expect(response).to redirect_to("#{front_domain}/?status=success")
+      end
+    end
+
+    context "メールアドレスが既に登録済みのとき" do
+      let!(:existing_user) { create(:user) }
+      let!(:existing_user_auth) { create(:user_auth, email:, user: existing_user) }
+
+      it "エラーメッセージと共にエラーページにリダイレクトすること" do
+        expect {
+          get "/api/v1/auth/#{provider}/callback"
+        }.to not_change { User.count }.and not_change { UserAuth.count }
+
+        expect(response).to have_http_status(:redirect)
+
+        uri = URI.parse(response.location)
+        params = CGI.parse(uri.query)
+
+        expect(params["status"]).to eq(["error"])
+
+        expected_message = "#{UserAuth.human_attribute_name(:email)}" \
+                         "#{I18n.t("activerecord.errors.models.user_auth.attributes.email.taken")}"
+        expect(params["message"].first).to eq(expected_message)
       end
     end
   end
 
-  describe "ガード・分岐" do
-    context "登録時のメールアドレスが他認証で使用されているとき (email 既存・ uid 新規)" do
-      before { create(:user_auth, email: "duplicate@example.com") }
+  describe "GET /api/v1/auth/line/callback" do
+    let(:provider) { "line" }
+    let(:uid) { "987654321" }
+    let(:email) { "line@example.com" }
+    let(:name) { "LINE User" }
 
-      it "レコードは増加せず、error パラメータで 302 リダイレクト" do
-        auth = build_auth(uid: "uid-new", email: "duplicate@example.com", name: "重複ユーザー")
-        start_omniauth_flow(provider: :google_oauth2, auth_hash: auth)
+    before do
+      set_omniauth_mock(provider, uid:, email:, name:)
+    end
+
+    context "新規ユーザーのとき" do
+      it "User と UserAuth を作成し、リダイレクトすること" do
         expect {
-          post omniauth_success_callback_path(:google_oauth2)
-        }.to not_change { User.count }.
-               and not_change { UserAuth.count }
+          get "/api/v1/auth/#{provider}/callback"
+        }.to change { User.count }.by(1).and change { UserAuth.count }.by(1)
 
-        message = "#{UserAuth.human_attribute_name(:email)}" \
-                  "#{I18n.t("activerecord.errors.models.user_auth.attributes.email.taken")}"
+        expect(response).to redirect_to("#{front_domain}/?status=success")
 
-        expect_front_redirect(status: "error", message:)
+        created_user_auth = UserAuth.last
+        expect(created_user_auth.provider).to eq(provider)
+        expect(created_user_auth.uid).to eq(uid)
+      end
+    end
+
+    context "既存ユーザーのとき" do
+      let!(:existing_user) { create(:user, name: "Existing User") }
+      let!(:existing_user_auth) { create(:user_auth, provider:, uid:, email:, user: existing_user) }
+
+      it "新しいレコードを作成せず、成功ページにリダイレクトすること" do
+        expect {
+          get "/api/v1/auth/#{provider}/callback"
+        }.to not_change { User.count }.and not_change { UserAuth.count }
+
+        expect(response).to redirect_to("#{front_domain}/?status=success")
+      end
+    end
+
+    context "メールアドレスが既に登録済みのとき" do
+      let!(:existing_user) { create(:user) }
+      let!(:existing_user_auth) { create(:user_auth, email:, user: existing_user) }
+
+      it "エラーメッセージと共にエラーページにリダイレクトすること" do
+        expect {
+          get "/api/v1/auth/#{provider}/callback"
+        }.to not_change { User.count }.and not_change { UserAuth.count }
+
+        expect(response).to have_http_status(:redirect)
+
+        uri = URI.parse(response.location)
+        params = CGI.parse(uri.query)
+
+        expect(params["status"]).to eq(["error"])
+
+        expected_message = "#{UserAuth.human_attribute_name(:email)}" \
+                         "#{I18n.t("activerecord.errors.models.user_auth.attributes.email.taken")}"
+        expect(params["message"].first).to eq(expected_message)
       end
     end
   end
 
-  describe "失敗フロー" do
-    context "/api/v1/auth/failure のとき" do
-      it "error パラメータで 302 リダイレクト" do
-        get api_v1_auth_failure_path
-        expect_front_redirect(status: "error")
-      end
+  describe "GET /api/v1/auth/failure" do
+    it "エラーページにリダイレクトすること" do
+      get "/api/v1/auth/failure"
+
+      expect(response).to redirect_to("#{front_domain}/?status=error")
     end
   end
 end
