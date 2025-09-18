@@ -16,7 +16,7 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
         )
         start_omniauth_flow(provider: :google_oauth2, auth_hash: auth)
         expect {
-          get omniauth_success_callback_path(:google_oauth2)
+          post omniauth_success_callback_path(:google_oauth2)
         }.to change { User.count }.by(1).
                and change { UserAuth.count }.by(1)
 
@@ -32,7 +32,7 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
         auth = build_auth(uid: exist.uid, email: exist.email, name: "既存ユーザー")
         start_omniauth_flow(provider: :google_oauth2, auth_hash: auth)
         expect {
-          get omniauth_success_callback_path(:google_oauth2)
+          post omniauth_success_callback_path(:google_oauth2)
         }.to not_change { User.count }.
                and not_change { UserAuth.count }
 
@@ -49,7 +49,7 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
         auth = build_auth(uid: "uid-new", email: "duplicate@example.com", name: "重複ユーザー")
         start_omniauth_flow(provider: :google_oauth2, auth_hash: auth)
         expect {
-          get omniauth_success_callback_path(:google_oauth2)
+          post omniauth_success_callback_path(:google_oauth2)
         }.to not_change { User.count }.
                and not_change { UserAuth.count }
 
