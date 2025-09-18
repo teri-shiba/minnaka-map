@@ -45,7 +45,9 @@ jobs:
           bundle exec rails db:migrate RAILS_ENV=test
 
       - name: Run rspec
-        run: bundle exec rspec
+        run: bundle exec rspec --format documentation
+        env:
+          RSPEC_DEBUG: "1"
 
   RuboCop:
     runs-on: ubuntu-latest

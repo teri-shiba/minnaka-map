@@ -26,6 +26,9 @@ module OmniauthHelpers
                                  "resource_class" => "UserAuth" },
         }
 
+    if ENV["RSPEC_DEBUG"] == "1"
+      warn "[DEBUG] redirect_callbacks: status=#{response.status} location=#{response.location.inspect}"
+    end
     expect(response).to be_redirect
   end
 
@@ -36,6 +39,11 @@ module OmniauthHelpers
 
   def expect_front_redirect(status:, message: nil)
     expect(response).to have_http_status(:found)
+
+    if ENV["RSPEC_DEBUG"] == "1"
+      warn "[DEBUG] front_redirect: status=#{response.status} location=#{response.location.inspect}"
+    end
+
     uri, q = parse_location!
     expect(uri.path).to eq("/")
     expect(q["status"]).to eq(status)
@@ -45,6 +53,12 @@ end
 
 RSpec.configure do |config|
   config.include OmniauthHelpers, type: :request
+
+  config.before(:suite) do
+    next unless ENV["RSPEC_DEBUG"] == "1"
+
+    $stdout.puts "[DEBUG] OmniAuth.allowed_request_methods=#{OmniAuth.config.allowed_request_methods.inspect}"
+  end
 
   config.around(:each, type: :request) do |ex|
     prev = OmniAuth.config.test_mode
