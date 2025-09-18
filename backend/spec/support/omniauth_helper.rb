@@ -1,70 +1,123 @@
 module OmniauthHelpers
-  def omniauth_callback_path_for(action, provider)
-    url_for(only_path: true,
-            controller: "api/v1/auth/omniauth_callbacks",
-            action: action,
-            provider: provider)
+  def set_omniauth_mock(provider, options = {})
+    auth_hash = build_default_options.merge(options)
+    mock_auth_hash = build_mock_auth_hash(provider, auth_hash)
+    setup_controller_mock(mock_auth_hash)
+
+    log_mock_setup(provider, mock_auth_hash) if Rails.env.test?
   end
 
-  def omniauth_redirect_callback_path(provider)
-    omniauth_callback_path_for(:redirect_callbacks, provider)
-  end
+  private
 
-  def omniauth_success_callback_path(provider)
-    omniauth_callback_path_for(:omniauth_success, provider)
-  end
-
-  def build_auth(uid:, email:, name:, provider: "google_oauth2")
-    OmniAuth::AuthHash.new(provider:, uid:, info: { email:, name: })
-  end
-
-  def start_omniauth_flow(provider:, auth_hash:)
-    get omniauth_redirect_callback_path(provider),
-        env: {
-          "omniauth.auth" => auth_hash,
-          "omniauth.params" => { "namespace_name" => "api_v1",
-                                 "resource_class" => "UserAuth" },
-        }
-
-    warn "[DEBUG] redirect_callbacks: status=#{response.status} location=#{response.location.inspect}" if ENV["RSPEC_DEBUG"] == "1"
-  end
-
-  def parse_location!
-    uri = URI(response.location)
-    [uri, Rack::Utils.parse_nested_query(uri.query)]
-  end
-
-  def expect_front_redirect(status:, message: nil)
-    expect(response).to have_http_status(:found)
-
-    if ENV["RSPEC_DEBUG"] == "1"
-      warn "[DEBUG] front_redirect: status=#{response.status} location=#{response.location.inspect}"
+    def build_default_options
+      {
+        uid: SecureRandom.uuid,
+        email: Faker::Internet.email,
+        name: Faker::Name.name,
+      }
     end
 
-    uri, q = parse_location!
-    expect(uri.path).to eq("/")
-    expect(q["status"]).to eq(status)
-    expect(q["message"]).to eq(message) if message
-  end
+    def build_mock_auth_hash(provider, auth_hash)
+      case provider.to_s
+      when "google_oauth2"
+        build_google_oauth2_hash(auth_hash)
+      when "line"
+        build_line_hash(auth_hash)
+      else
+        raise ArgumentError, "Unsupported provider: #{provider}"
+      end
+    end
+
+    def build_google_oauth2_hash(auth_hash)
+      {
+        "provider" => "google_oauth2",
+        "uid" => auth_hash[:uid],
+        "info" => build_google_info_hash(auth_hash),
+        "credentials" => build_google_credentials_hash,
+      }
+    end
+
+    def build_google_info_hash(auth_hash)
+      {
+        "name" => auth_hash[:name],
+        "email" => auth_hash[:email],
+        "unverified_email" => auth_hash[:email],
+        "email_verified" => true,
+        "first_name" => auth_hash[:name].split(" ").first || "First",
+        "last_name" => auth_hash[:name].split(" ").last || "Last",
+        "image" => "https://example.com/avatar.jpg",
+      }
+    end
+
+    def build_google_credentials_hash
+      {
+        "token" => "mock_google_token_#{SecureRandom.hex(8)}",
+        "expires_at" => 1.week.from_now.to_i,
+        "expires" => true,
+        "scope" => "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
+      }
+    end
+
+    def build_line_hash(auth_hash)
+      {
+        "provider" => "line",
+        "uid" => auth_hash[:uid],
+        "info" => build_line_info_hash(auth_hash),
+        "credentials" => build_line_credentials_hash,
+      }
+    end
+
+    def build_line_info_hash(auth_hash)
+      {
+        "name" => auth_hash[:name],
+        "image" => "https://profile.line-scdn.net/#{SecureRandom.hex(8)}",
+        "email" => auth_hash[:email],
+      }
+    end
+
+    def build_line_credentials_hash
+      {
+        "token" => "mock_line_token_#{SecureRandom.hex(8)}",
+        "refresh_token" => "mock_line_refresh_token_#{SecureRandom.hex(8)}",
+        "expires_at" => 1.week.from_now.to_i,
+        "expires" => true,
+      }
+    end
+
+    def setup_controller_mock(mock_auth_hash)
+      allow_any_instance_of(Api::V1::Auth::OmniauthCallbacksController).
+        to receive(:auth_hash).
+             and_return(mock_auth_hash)
+    end
+
+    def log_mock_setup(provider, mock_auth_hash)
+      puts "=== OmniAuth Mock Setup (CI Debug) ==="
+      puts "Provider: #{provider}"
+      puts "Mock UID: #{mock_auth_hash["uid"]}"
+      puts "Mock Email: #{mock_auth_hash.dig("info", "email")}"
+      puts "Mock Name: #{mock_auth_hash.dig("info", "name")}"
+      puts "Has Credentials: #{mock_auth_hash.has_key?("credentials")}"
+      puts "RSpec::Mocks available: #{defined?(RSpec::Mocks) ? "Yes" : "No"}"
+      puts "=================================="
+    end
 end
 
 RSpec.configure do |config|
   config.include OmniauthHelpers, type: :request
 
   config.before(:suite) do
-    next unless ENV["RSPEC_DEBUG"] == "1"
-
-    $stdout.puts "[DEBUG] OmniAuth.allowed_request_methods=#{OmniAuth.config.allowed_request_methods.inspect}"
+    OmniAuth.config.test_mode = true
+    puts "=== CI Debug: Test Suite Setup ===" if ENV["CI"]
+    puts "OmniAuth test_mode: #{OmniAuth.config.test_mode}" if ENV["CI"]
+    puts "Rails env: #{Rails.env}" if ENV["CI"]
+    puts "=================================" if ENV["CI"]
   end
 
-  config.around(:each, type: :request) do |ex|
-    prev = OmniAuth.config.test_mode
-    OmniAuth.config.test_mode = true
-    begin
-      ex.run
-    ensure
-      OmniAuth.config.mock_auth.clear
-      OmniAuth.config.test_mode = prev
-    end
+  config.before(:each, type: :request) do
+    Rails.application.env_config["devise.mapping"] = Devise.mappings[:user_auth]
+  end
+
+  config.after(:each, type: :request) do
+    RSpec::Mocks.space.reset_all
   end
 end
