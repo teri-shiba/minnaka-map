@@ -3,8 +3,6 @@ module OmniauthHelpers
     auth_hash = build_default_options.merge(options)
     mock_auth_hash = build_mock_auth_hash(provider, auth_hash)
     setup_controller_mock(mock_auth_hash)
-
-    log_mock_setup(provider, mock_auth_hash) if Rails.env.test?
   end
 
   private
@@ -89,17 +87,6 @@ module OmniauthHelpers
         to receive(:auth_hash).
              and_return(mock_auth_hash)
     end
-
-    def log_mock_setup(provider, mock_auth_hash)
-      puts "=== OmniAuth Mock Setup (CI Debug) ==="
-      puts "Provider: #{provider}"
-      puts "Mock UID: #{mock_auth_hash["uid"]}"
-      puts "Mock Email: #{mock_auth_hash.dig("info", "email")}"
-      puts "Mock Name: #{mock_auth_hash.dig("info", "name")}"
-      puts "Has Credentials: #{mock_auth_hash.has_key?("credentials")}"
-      puts "RSpec::Mocks available: #{defined?(RSpec::Mocks) ? "Yes" : "No"}"
-      puts "=================================="
-    end
 end
 
 RSpec.configure do |config|
@@ -107,10 +94,6 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     OmniAuth.config.test_mode = true
-    puts "=== CI Debug: Test Suite Setup ===" if ENV["CI"]
-    puts "OmniAuth test_mode: #{OmniAuth.config.test_mode}" if ENV["CI"]
-    puts "Rails env: #{Rails.env}" if ENV["CI"]
-    puts "=================================" if ENV["CI"]
   end
 
   config.before(:each, type: :request) do
