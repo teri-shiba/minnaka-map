@@ -15,7 +15,7 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
           name: "テスト太郎",
         )
         start_omniauth_flow(provider: :google_oauth2, auth_hash: auth)
-        expect(session['dta.omniauth.auth']).to be_present
+        expect(session["dta.omniauth.auth"]).to be_present
         expect {
           get omniauth_success_callback_path(:google_oauth2)
         }.to change { User.count }.by(1).
@@ -32,7 +32,7 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
       it "レコードは増加せず success パラメータで 302 リダイレクト" do
         auth = build_auth(uid: exist.uid, email: exist.email, name: "既存ユーザー")
         start_omniauth_flow(provider: :google_oauth2, auth_hash: auth)
-        expect(session['dta.omniauth.auth']).to be_present
+        expect(session["dta.omniauth.auth"]).to be_present
         expect {
           get omniauth_success_callback_path(:google_oauth2)
         }.to not_change { User.count }.
@@ -50,7 +50,7 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
       it "レコードは増加せず、error パラメータで 302 リダイレクト" do
         auth = build_auth(uid: "uid-new", email: "duplicate@example.com", name: "重複ユーザー")
         start_omniauth_flow(provider: :google_oauth2, auth_hash: auth)
-        expect(session['dta.omniauth.auth']).to be_present
+        expect(session["dta.omniauth.auth"]).to be_present
         expect {
           get omniauth_success_callback_path(:google_oauth2)
         }.to not_change { User.count }.
