@@ -100,13 +100,24 @@ RSpec.describe "Api::V1::MidpointsController", type: :request do
       it "200 { valid: true } を返す" do
         lat = "35.1"
         lng = "139.0"
+
+        get validate_api_v1_midpoint_path,
+            params: { latitude: lat, longitude: lng }
+
+        expect(response).to have_http_status(:ok)
+        expect(json).to eq(valid: true)
+      end
+
+      it "署名が含まれていたら 400 { valid: false } を返す" do
+        lat = "35.1"
+        lng = "139.0"
         sig = hmac_for(lat, lng)
 
         get validate_api_v1_midpoint_path,
             params: { latitude: lat, longitude: lng, signature: sig }
 
-        expect(response).to have_http_status(:ok)
-        expect(json).to eq(valid: true)
+        expect(response).to have_http_status(:bad_request)
+        expect(json).to eq(valid: false)
       end
     end
 
