@@ -7,19 +7,16 @@ class VerifyCoordinatesService
     @clock      = clock
   end
 
-  def call(lat_str, lng_str, signature, expires_at = nil)
-    if !@production && signature.blank?
-      return true
+  def call(lat_str, lng_str, signature = nil, expires_at = nil)
+    unless @production
+      return signature.blank?
     end
 
     return false if signature.blank?
+    return false if expires_at.blank?
+    return false if Time.zone.at(expires_at.to_i) < @clock.call
 
-    if @production
-      return false if expires_at.blank?
-      return false if Time.zone.at(expires_at.to_i) < @clock.call
-    end
-
-    data = signing_data(lat_str, lng_str, expires_at)
+    data     = signing_data(lat_str, lng_str, expires_at)
     expected = hmac_hexdigest(data)
 
     return false unless signature.bytesize == expected.bytesize
@@ -30,9 +27,7 @@ class VerifyCoordinatesService
   private
 
     def signing_data(lat_str, lng_str, expires_at)
-      parts = [lat_str, lng_str]
-      parts << expires_at if @production
-      parts.join(", ")
+      [lat_str, lng_str, expires_at].join(", ")
     end
 
     def hmac_hexdigest(data)
