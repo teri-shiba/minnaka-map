@@ -14,7 +14,7 @@ interface MidpointResult {
     readonly latitude: string
     readonly longitude: string
   }
-  readonly signature: string
+  readonly signature?: string
   readonly expires_at?: string
 }
 

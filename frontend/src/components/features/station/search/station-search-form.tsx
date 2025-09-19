@@ -74,8 +74,13 @@ export default function StationSearchForm() {
       const query: Record<string, string> = {
         lat: midpointResult.midpoint.latitude,
         lng: midpointResult.midpoint.longitude,
-        signature: midpointResult.signature,
       }
+
+      if (midpointResult.signature)
+        query.signature = midpointResult.signature
+
+      if (midpointResult.expires_at)
+        query.expires_at = midpointResult.expires_at
 
       const qs = new URLSearchParams(query).toString()
       router.push(`/result?${qs}`)

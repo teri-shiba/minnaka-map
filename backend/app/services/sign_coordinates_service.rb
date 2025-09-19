@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class SignCoordinatesService
   def initialize(secret: Rails.application.secret_key_base,
                  production: Rails.env.production?,

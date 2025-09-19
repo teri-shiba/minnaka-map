@@ -17,7 +17,7 @@ interface ResultPageProps {
 export default async function Result({ searchParams }: ResultPageProps) {
   const params = await searchParams
 
-  if (!params.lat || !params.lng || !params.signature)
+  if (!params.lat || !params.lng)
     redirect('/?error=missing_params')
 
   const { lat, lng } = await parseAndValidateCoordinates(params)
