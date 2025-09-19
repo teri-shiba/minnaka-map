@@ -1,4 +1,4 @@
-class FavoriteGroupSerializer < ActiveModel::Serializer
+class FavoriteGroupSerializer
   def self.call(search_history, favorites)
     {
       search_history: {
