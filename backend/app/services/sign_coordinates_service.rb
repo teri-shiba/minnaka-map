@@ -9,18 +9,14 @@ class SignCoordinatesService
 
   def call(lat, lng)
     lat_str, lng_str = format_coords(lat, lng)
-    expires_at = @production ? (@clock.call + 1.hour).to_i : nil
+
+    return { latitude: lat_str, longitude: lng_str } unless @production
+
+    expires_at = (@clock.call + 1.hour).to_i
     data       = signing_data(lat_str, lng_str, expires_at)
     signature  = hmac_hexdigest(data)
 
-    payload = {
-      latitude: lat_str,
-      longitude: lng_str,
-      signature: signature,
-    }
-
-    payload[:expires_at] = expires_at if expires_at
-    payload
+    { latitude: lat_str, longitude: lng_str, signature:, expires_at: }
   end
 
   private
@@ -30,9 +26,7 @@ class SignCoordinatesService
     end
 
     def signing_data(lat_str, lng_str, expires_at)
-      parts = [lat_str, lng_str]
-      parts << expires_at if @production
-      parts.join(", ")
+      [lat_str, lng_str, expires_at].join(", ")
     end
 
     def hmac_hexdigest(data)
