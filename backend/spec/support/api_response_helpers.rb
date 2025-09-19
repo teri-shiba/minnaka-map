@@ -46,6 +46,10 @@ module ApiResponseHelpers
     expect_error_json!(status: :unauthorized, message:)
   end
 
+  def expect_forbidden_json!(message: nil, details: nil)
+    expect_error_json!(status: :forbidden, message:, details:)
+  end
+
   private
 
     def assert_wrapper_error!(payload, message, details)
