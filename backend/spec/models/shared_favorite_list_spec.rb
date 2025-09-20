@@ -4,12 +4,62 @@ RSpec.describe SharedFavoriteList, type: :model do
   let(:user) { create(:user) }
   let(:search_history) { create(:search_history, user:) }
 
-  describe "関連付け" do
-    it { should belong_to(:user).required(true) }
-    it { should belong_to(:search_history).required(true) }
+  describe "associations" do
+    it { is_expected.to belong_to(:user).required }
+    it { is_expected.to belong_to(:search_history).required }
   end
 
-  describe "スコープメソッド" do
+  describe "validations" do
+    subject { create(:shared_favorite_list, user:, search_history:) }
+
+    it { is_expected.to validate_presence_of(:title) }
+    it { is_expected.to validate_length_of(:title).is_at_most(255) }
+    it { is_expected.to validate_uniqueness_of(:share_uuid).ignoring_case_sensitivity }
+
+    describe "重複制御（同一ユーザー×同一検索履歴）" do
+      it "公開リストが存在すると、同条件の公開リストは作成できない" do
+        create(:shared_favorite_list, :public, user:, search_history:)
+        dup = build(:shared_favorite_list, :public, user:, search_history:)
+
+        expect(dup).to be_invalid
+        expect(dup.errors[:search_history_id]).to be_present
+      end
+
+      it "公開リストが存在すると、同条件の非公開リストも作成できない" do
+        create(:shared_favorite_list, :public, user:, search_history:)
+        private_list = build(:shared_favorite_list, :private, user:, search_history:)
+
+        expect(private_list).to be_invalid
+        expect(private_list.errors[:search_history_id]).to be_present
+      end
+
+      it "ユーザーが異なれば同一検索履歴でも作成できる" do
+        other_user = create(:user)
+        create(:shared_favorite_list, :public, user:, search_history:)
+        other_public = build(:shared_favorite_list, :public, user: other_user, search_history:)
+
+        expect(other_public).to be_valid
+      end
+    end
+  end
+
+  describe "factory" do
+    subject(:shared_list) { create(:shared_favorite_list, user:, search_history:) }
+
+    it "有効なファクトリを持つこと" do
+      expect(build(:shared_favorite_list)).to be_valid
+    end
+
+    it "user, search_history, title が正しく設定されること" do
+      aggregate_failures do
+        expect(shared_list.user).to eq(user)
+        expect(shared_list.search_history).to eq(search_history)
+        expect(shared_list.title).to be_present
+      end
+    end
+  end
+
+  describe "scopes" do
     let!(:public_list)  { create(:shared_favorite_list, :public,  user:) }
     let!(:private_list) { create(:shared_favorite_list, :private, user:) }
     let!(:_sentinel_other) { create(:shared_favorite_list) }
@@ -35,14 +85,6 @@ RSpec.describe SharedFavoriteList, type: :model do
     end
   end
 
-  describe "バリデーション" do
-    subject { create(:shared_favorite_list, user:, search_history:) }
-
-    it { should validate_presence_of(:title) }
-    it { should validate_length_of(:title).is_at_most(255) }
-    it { should validate_uniqueness_of(:share_uuid).ignoring_case_sensitivity }
-  end
-
   describe "#to_param" do
     subject(:shared_list) { create(:shared_favorite_list, user:, search_history:) }
 
@@ -51,9 +93,9 @@ RSpec.describe SharedFavoriteList, type: :model do
     end
   end
 
-  describe "コールバック" do
+  describe "callbacks" do
     describe "share_uuid の自動生成" do
-      it "作成時に share_uuid が自動生成されること" do
+      it "作成時に share_uuid が自動生成されること（形式も正しい）" do
         shared_list = build(:shared_favorite_list, user:, search_history:, share_uuid: nil)
 
         expect { shared_list.save! }.to change { shared_list.share_uuid }.from(nil)
@@ -67,22 +109,6 @@ RSpec.describe SharedFavoriteList, type: :model do
 
         shared_list.save!
         expect(shared_list.share_uuid).to eq(custom_uuid)
-      end
-    end
-  end
-
-  describe "ファクトリ" do
-    subject(:shared_list) { create(:shared_favorite_list, user:, search_history:) }
-
-    it "有効なファクトリを持つこと" do
-      expect(build(:shared_favorite_list)).to be_valid
-    end
-
-    it "user, search_history, title が正しく設定されること" do
-      aggregate_failures do
-        expect(shared_list.user).to eq(user)
-        expect(shared_list.search_history).to eq(search_history)
-        expect(shared_list.title).to be_present
       end
     end
   end
