@@ -5,6 +5,10 @@ RSpec.describe UserAuth, type: :model do
     it { is_expected.to belong_to(:user).required }
   end
 
+  describe "validations" do
+    it { is_expected.to validate_presence_of(:user) }
+  end
+
   describe "factory" do
     let(:user_auth) { create(:user_auth) }
 
@@ -14,10 +18,6 @@ RSpec.describe UserAuth, type: :model do
         expect(user_auth).to be_confirmed
       end
     end
-  end
-
-  describe "validations" do
-    it { is_expected.to validate_presence_of(:user) }
   end
 
   describe "database constraints" do
@@ -36,7 +36,7 @@ RSpec.describe UserAuth, type: :model do
   end
 
   describe ".add_permitted_params" do
-    it "Devise parameter sanitizer に追加する許可リスト (:nameのみ)を返すこと" do
+    it "Devise parameter sanitizer に追加する許可リスト (:name のみ) を返すこと" do
       permitted = UserAuth.add_permitted_params
       expect(permitted).to contain_exactly(:name)
       expect(permitted).to all(be_a(Symbol))

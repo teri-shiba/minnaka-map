@@ -12,54 +12,59 @@ RSpec.describe Station, type: :model do
       station.name_romaji.start_with?(term)
   end
 
-  describe "ファクトリ" do
-    context "正常系" do
-      it "有効なファクトリを持つこと" do
-        expect(build(:station)).to be_valid
-      end
+  describe "associations" do
+    it { is_expected.to belong_to(:operator) }
+  end
 
-      it "駅名が作成できること" do
-        station = create(:station)
+  describe "validations" do
+    it { is_expected.to validate_presence_of(:name) }
+    it { is_expected.to validate_presence_of(:name_hiragana) }
+    it { is_expected.to validate_presence_of(:name_romaji) }
+    it { is_expected.to validate_presence_of(:latitude) }
+    it { is_expected.to validate_presence_of(:longitude) }
+    it { is_expected.to validate_presence_of(:group_code) }
+    it { is_expected.to validate_presence_of(:uuid) }
+
+    describe "ユニーク制約" do
+      subject { build(:station) }
+
+      before  { create(:station) }
+
+      it { is_expected.to validate_uniqueness_of(:name).scoped_to(:group_code).case_insensitive }
+      it { is_expected.to validate_uniqueness_of(:uuid).ignoring_case_sensitivity }
+    end
+  end
+
+  describe "factory" do
+    it "有効なファクトリを持つこと" do
+      expect(build(:station)).to be_valid
+    end
+
+    it "各属性を持つ駅を作成できること" do
+      station = create(:station)
+
+      aggregate_failures do
         expect(station.name).to be_present
         expect(station.name_hiragana).to be_present
         expect(station.name_romaji).to be_present
         expect(station.latitude).to be_present
         expect(station.longitude).to be_present
       end
-
-      it "指定した名前を持つ駅名が作成できること" do
-        test_data = {
-          name: "テスト駅",
-          name_hiragana: "てすとえき",
-          name_romaji: "tesutoeki",
-          latitude: 12.34567,
-          longitude: 89.12345,
-        }
-        station = create(:station, **test_data)
-
-        test_data.each do |attr, value|
-          expect(station.public_send(attr)).to eq(value)
-        end
-      end
     end
-  end
 
-  describe "アソシエーション" do
-    it { should belong_to(:operator) }
-  end
+    it "指定した属性で駅を作成できること" do
+      test_data = {
+        name: "テスト駅",
+        name_hiragana: "てすとえき",
+        name_romaji: "tesutoeki",
+        latitude: 12.34567,
+        longitude: 89.12345,
+      }
+      station = create(:station, **test_data)
 
-  describe "バリデーション" do
-    it { should validate_presence_of(:name) }
-    it { should validate_presence_of(:latitude) }
-    it { should validate_presence_of(:longitude) }
-    it { should validate_presence_of(:name_hiragana) }
-    it { should validate_presence_of(:name_romaji) }
-    it { should validate_presence_of(:group_code) }
-
-    describe "ユニーク制約" do
-      subject { create(:station) }
-
-      it { should validate_uniqueness_of(:name).scoped_to(:group_code).case_insensitive }
+      aggregate_failures do
+        test_data.each {|attr, value| expect(station.public_send(attr)).to eq(value) }
+      end
     end
   end
 
@@ -74,13 +79,12 @@ RSpec.describe Station, type: :model do
 
       it "条件に合致する駅を全て返すこと" do
         results = Station.search_by_name("上野")
-        expect(results).not_to be_empty
 
-        results.each do |station|
-          expect(starts_with_search_term?(station, "上野")).to be true
+        aggregate_failures do
+          expect(results).not_to be_empty
+          results.each {|st| expect(starts_with_search_term?(st, "上野")).to be true }
+          expect(results.map(&:name)).to include("上野", "上野毛")
         end
-
-        expect(results.map(&:name)).to include("上野", "上野毛")
       end
     end
 
@@ -89,10 +93,10 @@ RSpec.describe Station, type: :model do
 
       it "条件に合致する駅を全て返すこと" do
         results = Station.search_by_name("うえの")
-        expect(results).not_to be_empty
 
-        results.each do |station|
-          expect(starts_with_search_term?(station, "うえの")).to be true
+        aggregate_failures do
+          expect(results).not_to be_empty
+          results.each {|st| expect(starts_with_search_term?(st, "うえの")).to be true }
         end
       end
     end
@@ -102,16 +106,16 @@ RSpec.describe Station, type: :model do
 
       it "条件に合致する駅を全て返すこと" do
         results = Station.search_by_name("ueno")
-        expect(results).not_to be_empty
 
-        results.each do |station|
-          expect(starts_with_search_term?(station, "ueno")).to be true
+        aggregate_failures do
+          expect(results).not_to be_empty
+          results.each {|st| expect(starts_with_search_term?(st, "ueno")).to be true }
         end
       end
     end
 
     context "存在しない駅名で検索する場合" do
-      it "空の結果で返すこと" do
+      it "空の結果を返すこと" do
         results = Station.search_by_name("存在しない駅")
         expect(results).to be_empty
       end
@@ -122,20 +126,22 @@ RSpec.describe Station, type: :model do
 
       it "完全一致を優先し、次に名前の長さで並べること" do
         results = Station.search_by_name("上野")
-        expect(results.map(&:name)).to eq(["上野", "上野毛"])
+        expect(results.map(&:name)).to eq(%w[上野 上野毛])
       end
     end
   end
 
   describe "検索時の表示名" do
     it "駅名と運営会社名を返すこと" do
-      station = create(:station,
-                       name: "テスト駅",
-                       name_hiragana: "てすとえき",
-                       name_romaji: "tesutoseki",
-                       latitude: 123.45678,
-                       longitude: 98.76543,
-                       operator: operator)
+      station = create(
+        :station,
+        name: "テスト駅",
+        name_hiragana: "てすとえき",
+        name_romaji: "tesutoseki",
+        latitude: 123.45678,
+        longitude: 98.76543,
+        operator: operator,
+      )
 
       expect(station.display_name).to eq("テスト駅（テスト運営会社）")
     end
