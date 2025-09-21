@@ -1,29 +1,38 @@
 'use client'
 
-import type { AreaFormValues } from '~/schemas/station-search.schema'
+import type { ApiSuccess } from '~/types/api-response'
 import useSWRMutation from 'swr/mutation'
 import { API_ENDPOINTS } from '~/constants'
 import api from '~/lib/axios-interceptor'
+
+interface MidpointRequest {
+  area: { station_ids: number[] }
+}
 
 interface MidpointResult {
   readonly midpoint: {
     readonly latitude: string
     readonly longitude: string
   }
-  readonly signature: string
-  readonly expire_at?: string
+  readonly signature?: string
+  readonly expires_at?: string
 }
 
 async function postMidpoint(
   _key: string,
-  { arg }: { arg: AreaFormValues },
+  { arg }: { arg: MidpointRequest },
 ): Promise<MidpointResult> {
-  const response = await api.post(API_ENDPOINTS.MIDPOINT, arg)
-  return response.data as MidpointResult
+  const response = await api.post<ApiSuccess<MidpointResult>>(
+    API_ENDPOINTS.MIDPOINT,
+    arg,
+  )
+  return response.data.data
 }
 
 export function useMidpointMutation() {
-  return useSWRMutation(API_ENDPOINTS.MIDPOINT, postMidpoint, {
-    throwOnError: true,
-  })
+  return useSWRMutation<MidpointResult, Error, string, MidpointRequest>(
+    API_ENDPOINTS.MIDPOINT,
+    postMidpoint,
+    { throwOnError: true },
+  )
 }

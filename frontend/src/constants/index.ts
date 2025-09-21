@@ -14,7 +14,7 @@ export const API_PREFIX = '/api/v1' as const
 export const API_ENDPOINTS = {
   STATIONS: '/stations',
   MIDPOINT: '/midpoint',
-  VALIDATE_COORDINATES: '/validate_coordinates',
+  VALIDATE_COORDINATES: '/midpoint/validate',
   AUTH: '/auth',
   PROVIDER: '/provider',
   CURRENT_USER_STATUS: '/current/user/show_status',
@@ -97,6 +97,9 @@ export const PAGINATION = {
   ELLIPSIS_START_OFFSET: 3,
   ELLIPSIS_END_OFFSET: 2,
 } as const
+
+export const FAVORITES_FIRST_PAGE = 1 as const
+export const FAVORITE_GROUPS_PER_PAGE = 3 as const
 
 // ===============================================
 // Cache

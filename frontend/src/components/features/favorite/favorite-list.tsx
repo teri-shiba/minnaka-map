@@ -56,7 +56,7 @@ export default function FavoritesList({ initialData, initialMeta }: FavoriteList
           ? (
               <>
                 <p>
-                  {`全 ${favorites.length} 件中 ${meta.totalGroups} 件を表示中`}
+                  {`全 ${meta.totalGroups} 件中 ${favorites.length} 件を表示中`}
                 </p>
                 <Button
                   onClick={loadMore}

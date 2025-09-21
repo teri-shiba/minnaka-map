@@ -5,21 +5,20 @@ import type { ServiceResult } from '~/types/service-result'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
 import { apiFetchAuth, handleApiError } from './api-client'
 
+// TODO: 他で使用されているので外に出す
 export interface SharedListData {
-  share_uuid: string
+  shareUuid: string
   title: string
-  is_existing: boolean
+  isExisting: boolean
 }
 
 export async function createSharedList(searchHistoryId: number): Promise<ServiceResult<SharedListData>> {
   try {
     const response = await apiFetchAuth<ApiResponse<SharedListData>>(
-      'shared_lists',
+      'shared_favorite_lists',
       {
         method: 'POST',
-        body: {
-          search_history_id: searchHistoryId,
-        },
+        body: { searchHistoryId },
       },
     )
 

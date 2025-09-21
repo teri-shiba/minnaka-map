@@ -1,3 +1,13 @@
+require 'simplecov'
+SimpleCov.start do
+  add_filter "/spec/"
+  add_filter "/config/initializers/"
+  add_filter "/config/environments/test.rb"
+  add_filter "/config/environment.rb"
+  add_filter "/config/boot.rb"
+  add_filter "/config/application.rb"
+end
+
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true

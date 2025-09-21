@@ -4,7 +4,7 @@ import { Button } from '~/components/ui/button'
 import { getFavoritesWithDetailsPaginated } from '~/services/favorite-action'
 
 export default async function Favorites() {
-  const favoritesResult = await getFavoritesWithDetailsPaginated(1, 3)
+  const favoritesResult = await getFavoritesWithDetailsPaginated()
 
   return (
     <div className="mx-auto max-w-lg">

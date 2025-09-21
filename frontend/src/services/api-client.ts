@@ -3,6 +3,7 @@ import type { ServiceFailure } from '~/types/service-result'
 import type { QueryParams } from '~/utils/api-url'
 import { logger } from '~/lib/logger'
 import { apiUrl } from '~/utils/api-url'
+import { isPlainObject, toCamelDeep, toSnakeDeep } from '~/utils/case-convert'
 import { getAuthFromCookie } from './get-auth-from-cookie'
 import 'server-only'
 
@@ -23,6 +24,8 @@ interface ApiRequestOptions {
   readonly extraHeaders?: HeadersInit
   readonly next?: NextFetchRequestConfig
   readonly cache?: RequestCache
+  readonly requestCase?: 'snake' | 'none'
+  readonly responseCase?: 'camel' | 'none'
 }
 
 export class ApiError extends Error {
@@ -46,21 +49,31 @@ async function addAuthHeaders(headers: Headers): Promise<void> {
   headers.set('uid', auth.uid)
 }
 
-export async function apiFetch<T = any>(
+async function apiFetch<T = any>(
   path: string,
   options: ApiRequestOptions = {},
 ): Promise<T> {
   const {
     method = 'GET',
-    params,
-    body,
+    params: rawParams,
+    body: rawBody,
     withAuth = false,
     extraHeaders,
     next,
     cache,
+    requestCase = 'snake',
+    responseCase = 'camel',
   } = options
 
-  const url = apiUrl(path, params).toString()
+  const params = requestCase === 'snake' && isPlainObject(rawParams)
+    ? toSnakeDeep(rawParams as Record<string, unknown>)
+    : rawParams
+
+  const body = requestCase === 'snake' && isPlainObject(rawBody)
+    ? toSnakeDeep(rawBody as Record<string, unknown>)
+    : rawBody
+
+  const url = apiUrl(path, params as QueryParams).toString()
 
   const headers = new Headers({ Accept: 'application/json' })
   if (method !== 'GET')
@@ -107,7 +120,9 @@ export async function apiFetch<T = any>(
     if (isNoContent)
       return null as T
 
-    return (await response.json()) as T
+    const json = await response.json()
+    const payload = responseCase === 'camel' ? toCamelDeep(json) : json
+    return payload as T
   }
   catch (error) {
     if (!(error instanceof ApiError)) {

@@ -36,3 +36,6 @@
 /config/master.key
 /config/credentials/test.key
 cookies.txt
+
+# Ignore simplecov files
+/coverage/*

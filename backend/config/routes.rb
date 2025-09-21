@@ -2,7 +2,6 @@ Rails.application.routes.draw do
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
   namespace :api do
     namespace :v1 do
-      get "health_check", to: "health_check#index"
       resources :api_keys, only: [:show], param: :service
       mount_devise_token_auth_for "UserAuth", at: "auth", controllers: {
         omniauth_callbacks: "api/v1/auth/omniauth_callbacks",
@@ -11,19 +10,23 @@ Rails.application.routes.draw do
       }
 
       resources :stations, only: [:index]
-      resources :midpoint, only: [:create]
-      get "/validate_coordinates", to: "midpoint#validate"
+      resource :midpoint, only: [:create] do
+        get :validate
+      end
 
       resources :search_histories, only: [:create]
-      resources :favorites, only: [:index, :create, :destroy]
-      resources :shared_lists, only: [:create, :show], param: :share_uuid
+      resources :favorites, only: [:index, :create, :destroy] do
+        collection { get :status }
+      end
+      resources :shared_favorite_lists, only: [:create, :show], param: :share_uuid
 
       namespace :user do
         resource :confirmations, only: [:update]
       end
+
       namespace :current do
         resource :user, only: [:show] do
-          get :show_status, on: :member
+          get :show_status
         end
       end
     end

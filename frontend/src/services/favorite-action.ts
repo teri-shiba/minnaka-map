@@ -1,44 +1,37 @@
 'use server'
 
-import type { ApiResponse } from '~/types/api-response'
 import type {
-  Favorite,
   FavoriteActionResponse,
   FavoriteGroup,
-  FavoritesPaginationMeta,
   FavoriteStatus,
+  FavoritesWithDetails,
   PaginatedFavoritesResponse,
-  RawFavoriteGroup,
-  RawFavoritePaginationMeta,
 } from '~/types/favorite'
+import type { CreateFavoriteRes, DeleteFavoriteRes, GetFavoritesPageRes, GetFavoritesRes, GetFavoriteStatusRes } from '~/types/favorite.dto'
 import type { RestaurantListItem } from '~/types/restaurant'
 import type { ServiceResult } from '~/types/service-result'
+import { FAVORITE_GROUPS_PER_PAGE, FAVORITES_FIRST_PAGE } from '~/constants'
 import { logger } from '~/lib/logger'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
 import { apiFetchAuth, handleApiError } from './api-client'
 import { fetchRestaurantsByIds } from './fetch-restaurants'
 
+// TODO: ファイルを分割する getFavorites, getFavoritesWithDetailsPaginated / checkFavoriteStatus / addToFavorites, removeFromFavorites
 // すべてのお気に入りを取得
 export async function getFavorites(): Promise<ServiceResult<FavoriteGroup[]>> {
   try {
-    const response = await apiFetchAuth<ApiResponse<RawFavoriteGroup[]>>('favorites')
+    const response = await apiFetchAuth<GetFavoritesRes>
+    ('favorites')
 
-    if (!isApiSuccess(response))
-      return { success: false, message: getApiErrorMessage(response), cause: 'REQUEST_FAILED' }
+    if (!isApiSuccess(response)) {
+      return {
+        success: false,
+        message: getApiErrorMessage(response),
+        cause: 'REQUEST_FAILED',
+      }
+    }
 
-    const normalizedData: FavoriteGroup[] = response.data.map(group => ({
-      searchHistory: {
-        id: group.search_history.id,
-        stationNames: group.search_history.station_names,
-      },
-      favorites: group.favorites.map((fav): Favorite => ({
-        id: fav.id,
-        hotPepperId: fav.hotpepper_id,
-        searchHistoryId: fav.search_history_id,
-      })),
-    }))
-
-    return { success: true, data: normalizedData }
+    return { success: true, data: response.data }
   }
   catch (error) {
     return handleApiError(error, {
@@ -50,11 +43,11 @@ export async function getFavorites(): Promise<ServiceResult<FavoriteGroup[]>> {
 
 // 詳細情報付きのお気に入りを取得（ページネーション対応）
 export async function getFavoritesWithDetailsPaginated(
-  page: number = 1,
-  limit: number = 5,
+  page: number = FAVORITES_FIRST_PAGE,
+  limit: number = FAVORITE_GROUPS_PER_PAGE,
 ): Promise<PaginatedFavoritesResponse> {
   try {
-    const response = await apiFetchAuth<ApiResponse<RawFavoriteGroup[]> & { meta: RawFavoritePaginationMeta }>(
+    const response = await apiFetchAuth<GetFavoritesPageRes>(
       `favorites?page=${page}&limit=${limit}`,
     )
 
@@ -62,18 +55,24 @@ export async function getFavoritesWithDetailsPaginated(
       return {
         success: false,
         data: [],
-        meta: { currentPage: page, totalGroups: 0, hasMore: false },
+        meta: {
+          currentPage: page,
+          totalGroups: 0,
+          hasMore: false,
+        },
         message: getApiErrorMessage(response),
       }
     }
 
-    const hotPepperIds = Array.from(
-      new Set(response.data.flatMap(group => group.favorites.map(fav => fav.hotpepper_id))),
+    const hotpepperIds = Array.from(
+      new Set(
+        response.data.flatMap(g => g.favorites.map(f => f.hotpepperId)),
+      ),
     )
 
     let restaurantMap = new Map<string, RestaurantListItem>()
-    if (hotPepperIds.length > 0) {
-      const [first, ...rest] = hotPepperIds
+    if (hotpepperIds.length > 0) {
+      const [first, ...rest] = hotpepperIds
       const restaurantIds: [string, ...string[]] = [first, ...rest]
       const restaurantResult = await fetchRestaurantsByIds({ restaurantIds })
 
@@ -94,34 +93,21 @@ export async function getFavoritesWithDetailsPaginated(
       )
     }
 
-    const isNotNull = <T>(value: T | null): value is T => value !== null
-
     const groupsWithDetails = response.data.map(group => ({
-      searchHistory: {
-        id: group.search_history.id,
-        stationNames: group.search_history.station_names,
-      },
-      favorites: group.favorites
-        .map((favorite) => {
-          const restaurant = restaurantMap.get(favorite.hotpepper_id)
-          if (!restaurant)
-            return null
-          return {
-            id: favorite.id,
-            searchHistoryId: favorite.search_history_id,
-            restaurant,
-          }
-        })
-        .filter(isNotNull),
+      searchHistory: group.searchHistory,
+      favorites: group.favorites.flatMap<FavoritesWithDetails>((fav) => {
+        const restaurant = restaurantMap.get(fav.hotpepperId)
+        return restaurant
+          ? [{ id: fav.id, searchHistoryId: fav.searchHistoryId, restaurant }]
+          : []
+      }),
     }))
 
-    const normalizedMeta: FavoritesPaginationMeta = {
-      currentPage: response.meta.current_page,
-      totalGroups: response.meta.total_groups,
-      hasMore: response.meta.has_more,
+    return {
+      success: true,
+      data: groupsWithDetails,
+      meta: response.meta,
     }
-
-    return { success: true, data: groupsWithDetails, meta: normalizedMeta }
   }
   catch (error) {
     const failure = handleApiError(error, {
@@ -140,53 +126,46 @@ export async function getFavoritesWithDetailsPaginated(
 
 // 指定した店舗がお気に入りかを確認
 export async function checkFavoriteStatus(
-  hotPepperId: string,
+  hotpepperId: string,
   searchHistoryId: string,
 ): Promise<FavoriteStatus> {
   try {
-    const favoritesResponse = await getFavorites()
+    const response = await apiFetchAuth<GetFavoriteStatusRes>('favorites/status', {
+      params: { searchHistoryId, hotpepperId },
+    })
 
-    if (!favoritesResponse.success) {
-      return { isFavorite: false, favoriteId: null, message: favoritesResponse.message }
+    if (!isApiSuccess(response)) {
+      return {
+        isFavorite: false,
+        favoriteId: null,
+        message: getApiErrorMessage(response),
+      }
     }
 
-    const matchedGroup = favoritesResponse.data.find(
-      group => group.searchHistory.id.toString() === searchHistoryId,
-    )
-
-    if (!matchedGroup)
-      return { isFavorite: false, favoriteId: null }
-
-    const matchedFavorite = matchedGroup.favorites.find(
-      favoriteItem => favoriteItem.hotPepperId === hotPepperId,
-    )
-
-    if (!matchedFavorite)
-      return { isFavorite: false, favoriteId: null }
-
-    return { isFavorite: true, favoriteId: matchedFavorite.id }
+    return response.data
   }
   catch (error) {
     logger(error, { tags: { component: 'checkFavoriteStatus' } })
-    return { isFavorite: false, favoriteId: null, message: '予期しないエラーが発生しました' }
+    return {
+      isFavorite: false,
+      favoriteId: null,
+      message: '予期しないエラーが発生しました',
+    }
   }
 }
 
 // お気に入り追加
 export async function addToFavorites(
-  hotPepperId: string,
+  hotpepperId: string,
   searchHistoryId: number,
 ): Promise<FavoriteActionResponse> {
   try {
-    const response = await apiFetchAuth<ApiResponse<{ id: number }>>(
+    const response = await apiFetchAuth<CreateFavoriteRes>(
       'favorites',
       {
         method: 'POST',
         body: {
-          favorite: {
-            search_history_id: searchHistoryId,
-            hotpepper_id: hotPepperId,
-          },
+          favorite: { searchHistoryId, hotpepperId },
         },
       },
     )
@@ -210,13 +189,10 @@ export async function removeFromFavorites(
   favoriteId: number,
 ): Promise<FavoriteActionResponse> {
   try {
-    const response = await apiFetchAuth<ApiResponse<null> | null>(
+    const response = await apiFetchAuth<DeleteFavoriteRes>(
       `favorites/${favoriteId}`,
       { method: 'DELETE' },
     )
-
-    if (response === null)
-      return { success: true }
 
     if (!isApiSuccess(response))
       return { success: false, message: getApiErrorMessage(response) }
