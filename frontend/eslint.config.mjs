@@ -1,5 +1,6 @@
 import antfu from '@antfu/eslint-config'
 import nextPlugin from '@next/eslint-plugin-next'
+import pluginJest from 'eslint-plugin-jest'
 import tailwindcss from 'eslint-plugin-tailwindcss'
 
 export default antfu(
@@ -33,6 +34,28 @@ export default antfu(
           allow: ['tailwindcss-animate'],
         },
       ],
+    },
+  },
+  {
+    files: [
+      'src/test/**/*.{ts,tsx}',
+    ],
+    plugins: {
+      jest: pluginJest,
+    },
+    languageOptions: {
+      globals: {
+        ...pluginJest.environments.globals.globals,
+      },
+    },
+    rules: {
+      'jest/no-focused-tests': 'error',
+      'jest/no-identical-title': 'error',
+      'jest/valid-expect': 'error',
+      'jest/no-disabled-tests': 'warn',
+      'jest/prefer-to-have-length': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
+      'no-console': 'off',
     },
   },
 )
