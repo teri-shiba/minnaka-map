@@ -13,14 +13,17 @@ export async function saveSearchHistory(
       'search_histories',
       {
         method: 'POST',
-        body: {
-          search_history: { station_ids: stationIds },
-        },
+        body: { searchHistory: { stationIds } },
       },
     )
 
-    if (!isApiSuccess(response))
-      return { success: false, message: getApiErrorMessage(response), cause: 'REQUEST_FAILED' }
+    if (!isApiSuccess(response)) {
+      return {
+        success: false,
+        message: getApiErrorMessage(response),
+        cause: 'REQUEST_FAILED',
+      }
+    }
 
     return {
       success: true,

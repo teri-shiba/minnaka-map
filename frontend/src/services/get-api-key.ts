@@ -12,7 +12,7 @@ export async function getApiKey(service: SupportedService): Promise<string> {
     throw new Error(`未対応のサービスです: ${service}`)
 
   try {
-    const response = await apiFetchPublic<ApiResponse<{ api_key: string }>>(
+    const response = await apiFetchPublic<ApiResponse<{ apiKey: string }>>(
       config.endpoint,
       {
         extraHeaders: { 'X-Internal-Token': process.env.INTERNAL_API_TOKEN! },
@@ -22,7 +22,7 @@ export async function getApiKey(service: SupportedService): Promise<string> {
     if (!isApiSuccess(response))
       throw new Error(`${config.serviceName} APIキー取得失敗: ${getApiErrorMessage(response)}`)
 
-    return response.data.api_key
+    return response.data.apiKey
   }
   catch (error) {
     const failure = handleApiError(error, {

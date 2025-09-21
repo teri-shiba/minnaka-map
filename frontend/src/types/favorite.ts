@@ -1,29 +1,19 @@
 import type { RestaurantListItem } from './restaurant'
 
-export interface RawFavorite {
+interface SearchHistory {
   id: number
-  hotpepper_id: string
-  search_history_id: number
+  stationNames: string[]
 }
 
-export interface RawFavoriteGroup {
-  search_history: {
-    id: number
-    station_names: string[]
-  }
-  favorites: RawFavorite[]
-}
-
-export interface RawFavoritePaginationMeta {
-  current_page: number
-  total_groups: number
-  has_more: boolean
-}
-
-export interface Favorite {
+export interface FavoriteItem {
   id: number
-  hotPepperId: string
+  hotpepperId: string
   searchHistoryId: number
+}
+
+export interface FavoriteGroup {
+  searchHistory: SearchHistory
+  favorites: FavoriteItem[]
 }
 
 export interface FavoriteStatus {
@@ -36,16 +26,6 @@ export interface FavoriteActionResponse {
   success: boolean
   favoriteId?: number
   message?: string
-}
-
-export interface SearchHistory {
-  id: number
-  stationNames: string[]
-}
-
-export interface FavoriteGroup {
-  searchHistory: SearchHistory
-  favorites: Favorite[]
 }
 
 export interface FavoritesWithDetails {

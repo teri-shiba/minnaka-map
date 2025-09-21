@@ -1,5 +1,7 @@
 class UserAuth < ApplicationRecord
   include DeviseTokenAuth::Concerns::User
+  belongs_to :user
+
   # Include default devise modules. Others available are:
   # :lockable, :timeoutable, :trackable
   devise :database_authenticatable,
@@ -9,8 +11,6 @@ class UserAuth < ApplicationRecord
          :validatable,
          :confirmable,
          :omniauthable, omniauth_providers: [:google_oauth2, :line]
-
-  belongs_to :user, optional: true, dependent: :destroy
 
   def self.add_permitted_params
     [:name]

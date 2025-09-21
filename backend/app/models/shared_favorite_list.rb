@@ -10,8 +10,7 @@ class SharedFavoriteList < ApplicationRecord
   validates :search_history_id,
             uniqueness: {
               scope: :user_id,
-              conditions: -> { where(is_public: true) },
-              message: "の公開リストはすでに存在します",
+              message: "はすでに存在します",
             }
 
   before_validation :ensure_share_uuid, on: :create

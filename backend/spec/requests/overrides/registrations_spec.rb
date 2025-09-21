@@ -1,8 +1,7 @@
 require "rails_helper"
 
-RSpec.describe "Overrides::Registrations", type: :request do
+RSpec.describe "Overrides::RegistrationsController", type: :request do
   describe "POST /api/v1/auth" do
-    # Faker を使ってランダムなテストデータを生成
     let(:user_name) { Faker::Name.name }
     let(:user_email) { Faker::Internet.unique.email }
     let(:user_password) { Faker::Internet.password(min_length: 8) }
@@ -17,80 +16,73 @@ RSpec.describe "Overrides::Registrations", type: :request do
       }
     end
 
-    # 異常系のパラメーターを意図的に作成
-    let(:invalid_params_no_name) { valid_params.except(:name) }
-    let(:invalid_params_invalid_email) { valid_params.merge(email: "invalid-email") }
-
-    # -- 正常系のテスト --
     context "正常なパラメータを送信した場合" do
-      subject(:make_request) { post api_v1_user_auth_registration_path, params: valid_params }
-
-      it "リクエストが成功し、ステータスコード 200 が返ること" do
-        make_request
+      it "200 を返す" do
+        post api_v1_user_auth_registration_path,
+             params: valid_params, as: :json
         expect(response).to have_http_status(:ok)
       end
 
-      it "User レコードが1件作成されること" do
-        expect { make_request }.to change { User.count }.by(1)
+      it "User が 1 件作成される" do
+        expect {
+          post api_v1_user_auth_registration_path, params: valid_params, as: :json
+        }.to change { User.count }.by(1)
       end
 
-      it "UserAuth レコードが1件作成されること" do
-        expect { make_request }.to change { UserAuth.count }.by(1)
+      it "UserAuth が 1 件作成される" do
+        expect {
+          post api_v1_user_auth_registration_path, params: valid_params, as: :json
+        }.to change { UserAuth.count }.by(1)
       end
 
-      it "作成された User の name がパラメータと一致すること" do
-        make_request
+      it "作成された User の name が一致する" do
+        post api_v1_user_auth_registration_path,
+             params: valid_params, as: :json
         expect(User.last.name).to eq(user_name)
       end
 
-      it "作成された UserAuth の email が正しいこと" do
-        make_request
+      it "作成された UserAuth の email が小文字で保存される" do
+        post api_v1_user_auth_registration_path,
+             params: valid_params, as: :json
         expect(UserAuth.last.email).to eq(user_email.downcase)
       end
 
-      it "作成された UserAuth が、作成された User に正しく紐づいていること" do
-        make_request
-        created_user = User.last
-        created_user_auth = UserAuth.last
-        expect(created_user_auth.user_id).to eq(created_user.id)
-        expect(created_user_auth.user).to eq(created_user)
+      it "UserAuth は User に紐づく" do
+        post api_v1_user_auth_registration_path,
+             params: valid_params, as: :json
+        expect(UserAuth.last.user).to eq(User.last)
       end
 
-      it "レスポンスボディに登録されたユーザーの email が含まれること" do
-        make_request
-        json_response = JSON.parse(response.body)
-        expect(json_response["status"]).to eq("success")
-        expect(json_response["data"]["email"]).to eq(valid_params[:email].downcase)
+      it "レスポンスに登録済み email が含まれる" do
+        post api_v1_user_auth_registration_path,
+             params: valid_params, as: :json
+        expect(json[:status]).to eq("success")
+        expect(data[:email]).to eq(user_email.downcase)
       end
     end
 
-    # -- 異常系のテスト --
-    context "パラメータから name が欠落している場合" do
-      subject(:make_request_without_name) { post api_v1_user_auth_registration_path, params: invalid_params_no_name }
-
-      it "リクエストが失敗し、ステータスコード 500 が返ること（要確認/改善推奨）" do
-        make_request_without_name
+    context "name が欠落している場合" do
+      it "422 を返す" do
+        post api_v1_user_auth_registration_path,
+             params: valid_params.except(:name),
+             as: :json
         expect(response).to have_http_status(:unprocessable_entity)
       end
 
-      it "User レコードが作成されないこと" do
+      it "User / UserAuth は作成されない" do
         expect {
-          begin
-            make_request_without_name
-          rescue
-            nil
-          end
-        }.not_to change { User.count }
+          post api_v1_user_auth_registration_path, params: valid_params.except(:name), as: :json
+        }.to not_change { User.count }.
+               and not_change { UserAuth.count }
       end
+    end
 
-      it "UserAuth レコードが作成されないこと" do
-        expect {
-          begin
-            make_request_without_name
-          rescue
-            nil
-          end
-        }.not_to change { UserAuth.count }
+    context "email が不正な形式の場合" do
+      it "422 を返す" do
+        post api_v1_user_auth_registration_path,
+             params: valid_params.merge(email: "invalid-email"),
+             as: :json
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end

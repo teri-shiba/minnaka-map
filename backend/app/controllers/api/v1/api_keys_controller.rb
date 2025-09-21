@@ -1,28 +1,27 @@
 class Api::V1::ApiKeysController < Api::V1::BaseController
   before_action :verify_internal_token!
 
-  SUPPORTED_SERVICE = {
+  SUPPORTED_SERVICES = {
     "hotpepper" => :hotpepper,
     "maptiler" => :map_tiler,
     "googlemaps" => :google_maps,
   }.freeze
 
   def show
-    service_key = params[:service].to_s
+    service_key = params[:service].to_s.strip.downcase
 
-    unless SUPPORTED_SERVICE.has_key?(service_key)
-      return render_error("サポートされていないサービスです", :bad_request)
+    unless SUPPORTED_SERVICES.has_key?(service_key)
+      return render_error("サポートされていないサービスです", status: :bad_request)
     end
 
-    credentials_key = SUPPORTED_SERVICE[service_key]
-    raw = Rails.application.credentials.dig(credentials_key, :api_key)
-    api_key = raw.to_s.strip
+    credentials_key = SUPPORTED_SERVICES.fetch(service_key)
+    api_key = Rails.application.credentials.dig(credentials_key, :api_key).to_s.strip
 
     if api_key.present?
       render_success(data: { api_key: api_key })
     else
-      Rails.logger.error "API key not found for service: #{service_key}"
-      render_error("APIキーが設定されていません", :internal_server_error)
+      Rails.logger.error("サービス '#{service_key}' のAPIキー未設定 request_id=#{request.request_id}")
+      render_error("APIキーが設定されていません", status: :internal_server_error)
     end
   end
 
@@ -36,9 +35,9 @@ class Api::V1::ApiKeysController < Api::V1::BaseController
                  expected_token.present? &&
                  ActiveSupport::SecurityUtils.secure_compare(provided_token, expected_token)
 
-      unless is_valid
-        Rails.logger.warn "invalid internal token attempt from #{request.remote_ip}"
-        render_error("Forbidden", :forbidden)
-      end
+      return if is_valid
+
+      Rails.logger.warn("内部APIトークン検証失敗 request_id=#{request.request_id} ip=#{request.remote_ip} path=#{request.fullpath}")
+      render_error("アクセスが拒否されました", status: :forbidden)
     end
 end

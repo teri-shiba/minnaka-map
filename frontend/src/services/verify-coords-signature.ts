@@ -9,7 +9,7 @@ import { ApiError, apiFetchPublic } from './api-client'
 interface VerifyCoordsOptions {
   latitude: number
   longitude: number
-  signature: string
+  signature?: string
   expires_at?: number
 }
 
@@ -35,13 +35,19 @@ export async function verifyCoordsSignature(
     const revalidateConfig: NextFetchRequestConfig | undefined
       = secondsToLive > 0 ? { revalidate: secondsToLive } : undefined
 
+    const params: Record<string, string> = {
+      latitude: opts.latitude.toFixed(5),
+      longitude: opts.longitude.toFixed(5),
+    }
+
+    if (opts.signature)
+      params.signature = opts.signature
+
+    if (opts.expires_at)
+      params.expiresAt = opts.expires_at.toString()
+
     const result = await apiFetchPublic<ValidateResponse>(API_ENDPOINTS.VALIDATE_COORDINATES, {
-      params: {
-        latitude: opts.latitude.toFixed(5),
-        longitude: opts.longitude.toFixed(5),
-        signature: opts.signature,
-        ...(opts.expires_at ? { expires_at: opts.expires_at } : {}),
-      },
+      params,
       cache,
       next: revalidateConfig,
     })

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_08_14_004810) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_12_090417) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "uuid-ossp"
@@ -41,6 +41,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_004810) do
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "station_key", null: false
+    t.index ["user_id", "station_key"], name: "index_search_histories_on_user_id_and_station_key", unique: true
     t.index ["user_id"], name: "index_search_histories_on_user_id"
   end
 
@@ -49,6 +51,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_004810) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "station_id", null: false
+    t.index ["search_history_id", "station_id"], name: "index_shss_on_history_id_and_station_id_unique", unique: true
     t.index ["search_history_id"], name: "index_search_history_start_stations_on_search_history_id"
     t.index ["station_id"], name: "index_search_history_start_stations_on_station_id"
   end
@@ -57,7 +60,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_004810) do
     t.bigint "user_id", null: false
     t.bigint "search_history_id", null: false
     t.string "title", null: false
-    t.uuid "share_uuid", default: "uuid_generate_v4()", null: false
+    t.uuid "share_uuid", default: -> { "uuid_generate_v4()" }, null: false
     t.boolean "is_public", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -65,6 +68,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_004810) do
     t.index ["search_history_id"], name: "index_shared_favorite_lists_on_search_history_id"
     t.index ["share_uuid"], name: "index_shared_favorite_lists_on_share_uuid", unique: true
     t.index ["user_id", "created_at"], name: "index_shared_favorite_lists_on_user_id_and_created_at"
+    t.index ["user_id", "search_history_id"], name: "idx_unique_public_shared_list_per_user_history", unique: true, where: "(is_public = true)"
     t.index ["user_id"], name: "index_shared_favorite_lists_on_user_id"
   end
 
@@ -103,7 +107,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_004810) do
     t.json "tokens"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id"
+    t.bigint "user_id", null: false
     t.index ["confirmation_token"], name: "index_user_auths_on_confirmation_token", unique: true
     t.index ["email"], name: "index_user_auths_on_email", unique: true
     t.index ["reset_password_token"], name: "index_user_auths_on_reset_password_token", unique: true
@@ -112,7 +116,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_14_004810) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

@@ -2,18 +2,16 @@ class CurrentUserSerializer < ActiveModel::Serializer
   attributes :id, :email, :name, :provider
 
   def id
-    object.user.id
-  end
-
-  def email
-    object.email
+    object.respond_to?(:user_id) ? object.user_id : user&.id
   end
 
   def name
-    object.user&.name
+    user&.name
   end
 
-  def provider
-    object.provider
-  end
+  private
+
+    def user
+      @user ||= object.user
+    end
 end

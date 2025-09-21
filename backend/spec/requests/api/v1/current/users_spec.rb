@@ -1,29 +1,45 @@
 require "rails_helper"
 
-RSpec.describe "Api::V1::Current::Users", type: :request do
-  describe "GET api/v1/current/user" do
-    subject { get(api_v1_current_user_path, headers:) }
+RSpec.describe "Api::V1::Current::UsersController", type: :request do
+  describe "GET /api/v1/current/user" do
+    let!(:user_auth) { create(:user_auth) }
+    let!(:auth_headers) { user_auth.create_new_auth_token }
 
-    let(:current_user) { create(:user_auth) }
-    let(:headers) { current_user.create_new_auth_token }
-
-    context "ヘッダー情報が正常に送信された時" do
-      it "正常にレコードを取得できる" do
-        subject
-        res = JSON.parse(response.body)
-        expect(res.keys).to eq ["id", "email", "name", "provider"]
+    context "ヘッダー情報が正常に送信されたとき" do
+      it "200 で id, email, name, provider を返す" do
+        get api_v1_current_user_path, headers: auth_headers
         expect(response).to have_http_status(:ok)
+        expect(json.keys).to match_array(%i[id email name provider])
       end
     end
 
-    context "ヘッダー情報が空のままリクエストが送信された時" do
-      let(:headers) { nil }
+    context "ヘッダー情報が空のままリクエストが送信されたとき" do
+      it "401 を返す" do
+        get api_v1_current_user_path
+        expect_unauthorized_json!
+      end
+    end
+  end
 
-      it "unauthorized エラーが返る" do
-        subject
-        res = JSON.parse(response.body)
-        expect(res["errors"]).to eq ["ログインもしくはアカウント登録してください。"]
-        expect(response).to have_http_status(:unauthorized)
+  describe "GET /api/v1/current/user/show_status" do
+    context "未認証のとき" do
+      it "200 で { login: false } を返す" do
+        get show_status_api_v1_current_user_path
+        expect(response).to have_http_status(:ok)
+        expect(json).to eq(login: false)
+      end
+    end
+
+    context "認証済みのとき" do
+      let!(:user_auth) { create(:user_auth) }
+      let!(:auth_headers) { user_auth.create_new_auth_token }
+
+      it "200 で シリアライザー形式で返す" do
+        get show_status_api_v1_current_user_path,
+            headers: auth_headers
+
+        expect(response).to have_http_status(:ok)
+        expect(json.keys).to match_array(%i[id email name provider])
       end
     end
   end

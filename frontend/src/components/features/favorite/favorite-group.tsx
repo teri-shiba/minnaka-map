@@ -46,9 +46,9 @@ export default function FavoriteGroup({ group }: FavoriteGroupProps) {
         return
       }
 
-      const { share_uuid, title } = result.data
+      const { shareUuid, title } = result.data
       const generatedUrl = new URL(
-        `/shared/${share_uuid}`,
+        `/shared/${shareUuid}`,
         process.env.NEXT_PUBLIC_FRONT_BASE_URL,
       ).toString()
 
