@@ -1,36 +1,22 @@
 import { createLeafletOptions } from '~/utils/create-leaflet-options'
 
-jest.mock('leaflet', () => {
-  const latLng = (expression: any) => {
-    if (Array.isArray(expression))
-      return { lat: expression[0], lng: expression[1] }
-
-    if (expression
-      && typeof expression === 'object'
-      && 'lat' in expression
-      && 'lng' in expression) {
-      return expression
-    }
-
-    throw new Error('Invalid LatLngExpression in test')
-  }
-  return { __esModule: true, default: { latLng }, latLng }
-})
-
 describe('createLeafletOptions', () => {
-  const userLat = 35
-  const userLng = 139
-  const userLocation: [number, number] = [userLat, userLng]
+  const fakeLatLng = (expression: any) => Array.isArray(expression)
+    ? { lat: expression[0], lng: expression[1] }
+    : expression
 
   const RADIUS_METERS = 3000
   const METERS_PER_DEG_LAT = 111_000
   const DEG_TO_RAD = Math.PI / 180
 
-  const latOffset = RADIUS_METERS / METERS_PER_DEG_LAT
-  const lngOffset = RADIUS_METERS / (METERS_PER_DEG_LAT * Math.cos(userLat * DEG_TO_RAD))
-
   it('デスクトップのとき、必要なオプションを生成できる', () => {
-    const opts = createLeafletOptions(userLocation, false)
+    const userLat = 35
+    const userLng = 139
+    const userLocation: [number, number] = [userLat, userLng]
+    const latOffset = RADIUS_METERS / METERS_PER_DEG_LAT
+    const lngOffset = RADIUS_METERS / (METERS_PER_DEG_LAT * Math.cos(userLat * DEG_TO_RAD))
+
+    const opts = createLeafletOptions(userLocation, false, { latLng: fakeLatLng })
 
     // ZOOM
     expect(opts.zoom).toBe(17)
@@ -75,8 +61,9 @@ describe('createLeafletOptions', () => {
     expect(opts.maxBoundsViscosity).toBe(1)
   })
 
-  it('モバイルのとき、必要なオプションが生成できる(差分のみ検証)', () => {
-    const opts = createLeafletOptions(userLocation, true)
+  it('モバイルのとき、必要なオプションが生成できる (差分のみ検証)', () => {
+    const userLocation: [number, number] = [35, 139]
+    const opts = createLeafletOptions(userLocation, true, { latLng: fakeLatLng })
 
     // ZOOM
     expect(opts.zoom).toBe(15)
