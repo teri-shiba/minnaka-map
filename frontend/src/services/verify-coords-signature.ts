@@ -61,11 +61,11 @@ export async function verifyCoordsSignature(
     if (error instanceof ApiError) {
       const status = error.status
       const cause: ServiceCause
-      = status === 400
-        ? 'INVALID_SIGNATURE'
-        : status >= 500
-          ? 'SERVER_ERROR'
-          : 'REQUEST_FAILED'
+        = status === 400
+          ? 'INVALID_SIGNATURE'
+          : status >= 500
+            ? 'SERVER_ERROR'
+            : 'REQUEST_FAILED'
 
       logger(error, { tags: { component: 'verifyCoordsSignature', status } })
       return { success: false, message: '座標の検証に失敗しました', cause }
