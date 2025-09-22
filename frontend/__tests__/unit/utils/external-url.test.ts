@@ -11,6 +11,10 @@ describe('externalHref', () => {
     const url = externalHref(origin, '/v1/resource')
     expect(url).toBe('https://api.minnaka-map.com/v1/resource')
   })
+  it('path が // で始まるとき、同一オリジン配下のパスとして扱う', () => {
+    const url = externalHref(origin, '//v1/resource')
+    expect(url).toBe('https://api.minnaka-map.com/v1/resource')
+  })
 
   it('path が / で始まらないとき、先頭に / を補う', () => {
     const url = externalHref(origin, 'v1/resource')
