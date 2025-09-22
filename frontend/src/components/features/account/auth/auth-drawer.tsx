@@ -63,7 +63,7 @@ export function AuthDrawer() {
             {AUTH_PROVIDERS.map(provider => (
               <a
                 key={provider.name}
-                href={apiHref(dynamicPaths.oauthProvider(provider.authUrl))}
+                href={apiHref(dynamicPaths.oauthProvider(provider.provider))}
                 className="flex h-auto w-full items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent max-[383px]:[&:not(:last-child)]:mb-3"
               >
                 <Image
