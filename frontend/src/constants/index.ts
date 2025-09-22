@@ -66,12 +66,12 @@ export const AUTH_PROVIDERS = [
   {
     name: 'Google',
     iconImg: '/icon_Google.webp',
-    authUrl: 'google_oauth2',
+    provider: 'google_oauth2',
   },
   {
     name: 'LINE',
     iconImg: '/icon_LINE.webp',
-    authUrl: 'line',
+    provider: 'line',
   },
 ] as const satisfies ReadonlyArray<AuthProvider>
 
