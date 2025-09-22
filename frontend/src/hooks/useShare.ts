@@ -6,9 +6,9 @@ import { logger } from '~/lib/logger'
 
 export type SharePayload = Pick<ShareData, 'title' | 'text' | 'url'>
 
-type ShareResult =
-  | { readonly ok: true }
-  | { readonly ok: false, readonly reason: 'unsupported' | 'failed' }
+type ShareResult
+  = | { readonly ok: true }
+    | { readonly ok: false, readonly reason: 'unsupported' | 'failed' }
 
 interface UseShareReturn {
   readonly share: (data: SharePayload) => Promise<ShareResult>
