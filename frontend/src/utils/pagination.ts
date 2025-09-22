@@ -6,7 +6,7 @@ interface PaginationStructure {
   readonly ellipsisPositions: readonly('start' | 'end')[]
 }
 
-export function generatePaginationStructure(
+export function generatePagination(
   { currentPage, totalPages }: Pick<PageInfo, 'currentPage' | 'totalPages'>,
 ): PaginationStructure {
   const {
