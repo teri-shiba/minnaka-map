@@ -1,4 +1,4 @@
-import { generatePagination } from '~/utils/pagination'
+import { generatePagination } from '~/utils/generate-pagination'
 
 describe('generatePagination', () => {
   it('総ページ数が閾値以下のとき、1..totalPages を全て返し、三点リーダーは出さない', () => {
