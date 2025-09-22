@@ -9,27 +9,35 @@ interface PaginationStructure {
 export function generatePaginationStructure(
   { currentPage, totalPages }: Pick<PageInfo, 'currentPage' | 'totalPages'>,
 ): PaginationStructure {
-  if (totalPages <= PAGINATION.ELLIPSIS_THRESHOLD) {
+  const {
+    FIRST_PAGE,
+    SECOND_PAGE,
+    CURRENT_PAGE_RANGE,
+    LAST_PAGE_OFFSET,
+    ELLIPSIS_THRESHOLD,
+    ELLIPSIS_START_OFFSET,
+    ELLIPSIS_END_OFFSET,
+  } = PAGINATION
+
+  if (totalPages <= ELLIPSIS_THRESHOLD) {
     return {
       pages: Array.from({ length: totalPages }, (_, i) => i + 1),
       ellipsisPositions: [],
     }
   }
 
-  const start = Math.max(PAGINATION.SECOND_PAGE, currentPage - PAGINATION.CURRENT_PAGE_RANGE)
-  const end = Math.min(totalPages - PAGINATION.LAST_PAGE_OFFSET, currentPage + PAGINATION.CURRENT_PAGE_RANGE)
+  const start = Math.max(SECOND_PAGE, currentPage - CURRENT_PAGE_RANGE)
+  const end = Math.min(totalPages - LAST_PAGE_OFFSET, currentPage + CURRENT_PAGE_RANGE)
 
   const centerPages = Array.from({ length: end - start + 1 }, (_, i) => start + i)
 
-  const pages = [
-    PAGINATION.FIRST_PAGE,
-    ...centerPages,
-    ...(totalPages > PAGINATION.FIRST_PAGE ? [totalPages] : []),
-  ].filter((page, index, array) => array.indexOf(page) === index)
+  const pages = Array.from(
+    new Set([FIRST_PAGE, ...centerPages, ...(totalPages > FIRST_PAGE ? [totalPages] : [])]),
+  )
 
   const ellipsisPositions = [
-    ...(currentPage > PAGINATION.ELLIPSIS_START_OFFSET ? ['start'] as const : []),
-    ...(currentPage < totalPages - PAGINATION.ELLIPSIS_END_OFFSET ? ['end'] as const : []),
+    ...(currentPage > ELLIPSIS_START_OFFSET ? ['start'] as const : []),
+    ...(currentPage < totalPages - ELLIPSIS_END_OFFSET ? ['end'] as const : []),
   ]
 
   return { pages, ellipsisPositions }
