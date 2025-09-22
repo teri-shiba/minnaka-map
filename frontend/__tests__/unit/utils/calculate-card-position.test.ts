@@ -45,7 +45,7 @@ describe('calculateCardPosition', () => {
     })
   })
 
-  it('X と Y が中心と等しいとき、カードは左上に配置される (境界条件)', () => {
+  it('中心と X と Y が等しいとき、カードは左上に配置される (境界条件)', () => {
     const marker = { x: center.x, y: center.y }
     const position = calculateCardPosition({ markerPosition: marker, mapCenter: center })
 
