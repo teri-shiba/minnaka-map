@@ -1,9 +1,7 @@
-/**
- * For a detailed explanation regarding each configuration property, visit:
- * https://jestjs.io/docs/configuration
- */
-
 import type { Config } from 'jest'
+import nextJest from 'next/jest.js'
+
+const createJestConfig = nextJest({ dir: './' })
 
 const config: Config = {
   // All imported modules in your tests should be mocked automatically
@@ -94,12 +92,7 @@ const config: Config = {
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   moduleNameMapper: {
     '^~/public/(.*)$': '<rootDir>/public/$1',
-    '^~/components/(.*)$': '<rootDir>/src/app/components/$1',
-    '^~/hooks/(.*)$': '<rootDir>/src/app/hooks/$1',
-    '^~/lib/(.*)$': '<rootDir>/src/app/lib/$1',
     '^~/(.*)$': '<rootDir>/src/$1',
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    '\\.(jpg|jpeg|png|gif|webp|svg)$': '<rootDir>/__mocks__/fileMock.js',
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
@@ -112,7 +105,7 @@ const config: Config = {
   // notifyMode: "failure-change",
 
   // A preset that is used as a base for Jest's configuration
-  preset: 'ts-jest',
+  // preset: undefined,
 
   // Run tests from one or more projects
   // projects: undefined,
@@ -208,4 +201,4 @@ const config: Config = {
   // watchman: true,
 }
 
-export default config
+export default createJestConfig(config)
