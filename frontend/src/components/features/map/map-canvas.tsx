@@ -14,7 +14,7 @@ import '@maptiler/sdk/dist/maptiler-sdk.css'
 export default function MapCanvas({ apiKey, midpoint, restaurants }: MapItems) {
   const [selected, setSelected] = useState<RestaurantListItem | null>(null)
   const [mapData, setMapData] = useState<MapData>({
-    pinPosition: null,
+    markerPosition: null,
     mapCenter: null,
     mapSize: null,
   })
@@ -31,12 +31,12 @@ export default function MapCanvas({ apiKey, midpoint, restaurants }: MapItems) {
 
   const handleRestaurantClose = useCallback(() => setSelected(null), [])
 
-  const handlePinPositionChange = setMapData
+  const handleMarkerPositionChange = setMapData
 
   const cardPosition = useMemo<CardPosition | null>(() => {
-    const { pinPosition, mapCenter } = mapData
-    return selected && pinPosition && mapCenter
-      ? calculateCardPosition({ pinPosition, mapCenter })
+    const { markerPosition, mapCenter } = mapData
+    return selected && markerPosition && mapCenter
+      ? calculateCardPosition({ markerPosition, mapCenter })
       : null
   }, [selected, mapData])
 
@@ -62,7 +62,7 @@ export default function MapCanvas({ apiKey, midpoint, restaurants }: MapItems) {
           selectedRestaurant={selected}
           onRestaurantClick={handleRestaurantClick}
           onRestaurantClose={handleRestaurantClose}
-          onPinPositionChange={handlePinPositionChange}
+          onMarkerPositionChange={handleMarkerPositionChange}
         />
       </MapContainer>
 

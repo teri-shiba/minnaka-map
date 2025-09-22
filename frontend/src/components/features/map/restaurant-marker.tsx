@@ -7,13 +7,13 @@ import { Marker, Tooltip } from 'react-leaflet'
 import { ICON } from '~/constants'
 
 const defaultIcon = L.icon({
-  iconUrl: '/figure_pin_restaurant.webp',
+  iconUrl: '/figure_marker_restaurant.webp',
   iconSize: ICON.SIZE,
   iconAnchor: ICON.ANCHOR,
 })
 
 const selectedIcon = L.icon({
-  iconUrl: '/figure_pin_restaurant_selected.webp',
+  iconUrl: '/figure_marker_restaurant_selected.webp',
   iconSize: ICON.SIZE,
   iconAnchor: ICON.ANCHOR,
 })

@@ -13,7 +13,7 @@ export function useMapCoordinates(
 ): void {
   const map = useMap()
   const [data, setData] = useState<MapData>({
-    pinPosition: null,
+    markerPosition: null,
     mapCenter: null,
     mapSize: null,
   })
@@ -21,14 +21,14 @@ export function useMapCoordinates(
   const updatePosition = useCallback(() => {
     const size = map.getSize()
     const centerPoint = map.latLngToContainerPoint(map.getCenter())
-    const pinPoint = latLng
+    const markerPoint = latLng
       ? map.latLngToContainerPoint(latLng)
       : null
 
     setData({
       mapSize: { width: size.x, height: size.y },
       mapCenter: { x: centerPoint.x, y: centerPoint.y },
-      pinPosition: pinPoint ? { x: pinPoint.x, y: pinPoint.y } : null,
+      markerPosition: markerPoint ? { x: markerPoint.x, y: markerPoint.y } : null,
     })
   }, [map, latLng])
 
