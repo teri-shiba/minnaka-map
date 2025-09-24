@@ -5,11 +5,13 @@ function toCamel(key: string) {
 }
 
 function toSnake(key: string) {
-  return key.replace(/([A-Z])/g, '_$1') // camel/Pascal を区切る
-    .replace(/[-\s]/g, '_') // kebab も念のため
-    .replace(/_{2,}/g, '_') // 二重アンダースコア圧縮
-    .toLowerCase()
-    .replace(/^_+/, '') // 先頭のアンダースコアは除去
+  return key
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2') // 略語 + 単語の境界線: URLValue -> URL_Value
+    .replace(/([a-z\d])([A-Z])/g, '$1_$2') // 小文字/数字 + 大文字の境界線: userID -> user_ID
+    .replace(/[-\s]/g, '_') // ハイフン/空白はアンダースコア
+    .replace(/_{2,}/g, '_') // 連続アンダースコア圧縮
+    .toLowerCase() // 小文字に変換
+    .replace(/^_+|_+$/g, '') // 先頭/末尾ののアンダースコアを除去
 }
 
 export function isPlainObject(value: unknown): value is Record<string, unknown> {
