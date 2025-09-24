@@ -3,7 +3,9 @@ import { z } from 'zod'
 export const signupSchema = z
   .object({
     name: z
-      .string(),
+      .string()
+      .trim()
+      .min(1, { message: '名前を入力してください' }),
     email: z
       .string()
       .email(

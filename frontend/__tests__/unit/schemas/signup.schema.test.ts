@@ -27,10 +27,24 @@ function parse(overrides: Partial<typeof VALID> = {}) {
 
 describe('signup.schema', () => {
   describe('name', () => {
-    // TODO: 修正
-    it('文字列なら空でも通る', () => {
+    it('空文字は失敗し、メッセージが返る', () => {
       const result = parse({ name: '' })
+      expect(result.success).toBe(false)
+      expect(messagesOf(result)).toContain('名前を入力してください')
+    })
+
+    it('空白のみも失敗し、メッセージが返る', () => {
+      const result = parse({ name: '     ' })
+      expect(result.success).toBe(false)
+      expect(messagesOf(result)).toContain('名前を入力してください')
+    })
+
+    it('前後空白は trim され、成功する', () => {
+      const result = parse({ name: '  Taro  ' })
       expect(result.success).toBe(true)
+
+      if (result.success)
+        expect(result.data.name).toBe('Taro')
     })
   })
 
