@@ -11,9 +11,9 @@ export interface QueryParams {
 // -------------------
 // 内部ユーティリティ
 // -------------------
-const isServer = typeof window === 'undefined'
 
 function getApiOrigin(): string {
+  const isServer = typeof window === 'undefined'
   const baseOrigin = isServer
     ? process.env.API_BASE_URL
     : process.env.NEXT_PUBLIC_API_BASE_URL
@@ -41,21 +41,23 @@ function buildSearchString(params?: QueryParams): string {
 
   const searchParams = new URLSearchParams()
 
-  const appendSingleValue = (key: string, primitive: QueryPrimitive) => {
-    searchParams.append(key, String(primitive))
+  const append = (key: string, value: QueryPrimitive) => {
+    searchParams.append(key, String(value))
   }
 
-  for (const [key, rawValue] of Object.entries(params)) {
-    if (isNullish(rawValue))
+  for (const [key, value] of Object.entries(params)) {
+    if (isNullish(value))
       continue
 
-    if (isPrimitiveArray(rawValue)) {
-      for (const element of rawValue) {
-        appendSingleValue(key, element)
-      }
+    if (isPrimitiveArray(value)) {
+      if (value.length === 0)
+        continue
+
+      for (const element of value)
+        append(key, element)
     }
     else {
-      appendSingleValue(key, rawValue)
+      append(key, value)
     }
   }
 
