@@ -54,4 +54,13 @@ describe('logger', () => {
 
     expect(Sentry.captureException).toHaveBeenCalledWith(error, undefined)
   })
+
+  it('tags を渡すと Sentry のタグとして記録される', () => {
+    setNodeEnv('production')
+    const error = new Error('error')
+
+    logger(error, { tags: { component: 'componentName' } })
+
+    expect(Sentry.captureException).toHaveBeenCalledWith(error, { tags: { component: 'componentName' } })
+  })
 })
