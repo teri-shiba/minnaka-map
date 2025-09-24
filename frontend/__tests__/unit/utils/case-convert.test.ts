@@ -47,7 +47,7 @@ describe('toCamelDeep', () => {
     expect((output as any).createdAt).toBeInstanceOf(Date)
   })
 
-  it('snake -> camel -> snake の往復でキーが元に戻る', () => {
+  it('snake -> camel -> snake の往復でキーが元に戻る (正規化前提)', () => {
     const snake = { user_id: 1, profile: { first_name: 'Taro' }, items: [{ shop_id: 'x' }] }
     const round = toSnakeDeep(toCamelDeep(snake))
     expect(round).toEqual(snake)
@@ -57,11 +57,11 @@ describe('toCamelDeep', () => {
 describe('toSnakeDeep', () => {
   it('オブジェクトのキーをスネークに変換し、入れ子も処理する', () => {
     const input = {
-      userId: 1,
-      UserName: 'Yamada',
+      'userId': 1,
+      'UserName': 'Yamada',
       'kebab case': 'ok',
-      profile: { firstName: 'Taro', lastName: 'Yamada' },
-      items: [{ shopId: 'a' }, 123],
+      'profile': { firstName: 'Taro', lastName: 'Yamada' },
+      'items': [{ shopId: 'a' }, 123],
     }
 
     const output = toSnakeDeep(input)
@@ -74,15 +74,19 @@ describe('toSnakeDeep', () => {
     })
   })
 
-  it(' camel -> snake -> camel の往復でキーが元に戻る', () => {
+  it(' camel -> snake -> camel の往復でキーが元に戻る (正規化前提)', () => {
     const camel = { userId: 1, profile: { firstName: 'Taro' }, items: [{ shopId: 'x' }] }
     const round = toCamelDeep(toSnakeDeep(camel))
     expect(round).toEqual(camel)
   })
 
-  it('連続する区切りや先頭のアンダースコアは適切に処理される', () => {
-    const input = { __UserID__: 1, 'multi--dash key': 2 }
+  it('連続する区切りや先頭/末尾のアンダースコア、連続大文字を正しく正規化する', () => {
+    const input = { '__UserID__': 1, 'multi--dash key': 2, 'URLValue': 3 }
     const output = toSnakeDeep(input)
-    expect(output).toEqual({ user_i_d_: 1, multi_dash_key: 2 })
+    expect(output).toEqual({
+      user_id: 1,
+      multi_dash_key: 2,
+      url_value: 3,
+    })
   })
 })
