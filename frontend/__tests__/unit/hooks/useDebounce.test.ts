@@ -26,10 +26,10 @@ describe('useDebounce', () => {
     rerender({ value: 'b', delay: 300 })
     expect(result.current).toBe('a')
 
-    act(() => jest.advanceTimersByTime(299))
+    act(() => jest.advanceTimersByTime(299)) // 閾値未満
     expect(result.current).toBe('a')
 
-    act(() => jest.advanceTimersByTime(1))
+    act(() => jest.advanceTimersByTime(1)) // 閾値ちょうど
     expect(result.current).toBe('b')
   })
 
@@ -39,13 +39,13 @@ describe('useDebounce', () => {
     })
 
     rerender({ value: 'b', delay: 300 })
-    act(() => jest.advanceTimersByTime(100))
+    act(() => jest.advanceTimersByTime(100)) // 閾値未満のうちに再入力
     rerender({ value: 'c', delay: 300 })
 
-    act(() => jest.advanceTimersByTime(299))
+    act(() => jest.advanceTimersByTime(299)) // 閾値未満
     expect(result.current).toBe('a')
 
-    act(() => jest.advanceTimersByTime(1))
+    act(() => jest.advanceTimersByTime(1)) // 閾値到達で最終値のみ反映
     expect(result.current).toBe('c')
   })
 
@@ -57,9 +57,9 @@ describe('useDebounce', () => {
     rerender({ value: 'b', delay: 300 })
     unmount()
 
-    act(() => jest.advanceTimersByTime(299))
+    act(() => jest.advanceTimersByTime(299)) // 閾値未満（何も起きない）
     expect(() => {
-      act(() => jest.advanceTimersByTime(1000))
+      act(() => jest.advanceTimersByTime(1000)) // 進めても例外にならない
     }).not.toThrow()
   })
 })
