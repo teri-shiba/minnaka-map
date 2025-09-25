@@ -1,7 +1,7 @@
 import { logger } from '~/lib/logger'
 import { throttle } from '~/utils/throttle'
 
-jest.mock('~/lib/logger', () => ({ __esModule: true, logger: jest.fn() }))
+jest.mock('~/lib/logger', () => ({ logger: jest.fn() }))
 
 describe('throttle', () => {
   const mockLogger = logger as jest.MockedFunction<typeof logger>

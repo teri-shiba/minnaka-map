@@ -40,7 +40,6 @@ const createSpy = jest.fn((_config: AxiosRequestConfig) => {
 const isAxiosError = (error: any) => Boolean(error?.isAxiosError)
 
 jest.mock('axios', () => ({
-  __esModule: true,
   default: { create: createSpy, isAxiosError },
   create: createSpy,
   isAxiosError,
