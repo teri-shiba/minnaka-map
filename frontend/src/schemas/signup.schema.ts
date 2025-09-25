@@ -22,9 +22,12 @@ export const signupSchema = z
       .string()
       .min(1, { message: '確認用のパスワードを入力してください' }),
   })
-  .superRefine(({ password, password_confirmation }, ctx) => {
+  .superRefine(({ password, password_confirmation }, context) => {
+    if (password_confirmation.length === 0)
+      return
+
     if (password !== password_confirmation) {
-      ctx.addIssue({
+      context.addIssue({
         path: ['password_confirmation'],
         code: z.ZodIssueCode.custom,
         message: 'パスワードが一致しません',
