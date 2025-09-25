@@ -21,13 +21,17 @@ export default function DeleteAccountForm({ onClose }: DeleteAccountFormProps) {
   const user = useAtomValue(userStateAtom)
   const { deleteAccount } = useAuth()
 
+  // TODO: フォーム工程で ['email','google_oauth2'] をメール確認必須に統一
   const providerForValidation: ProviderId
     = user.provider === 'email' ? 'email' : 'google_oauth2'
 
+  // TODO: isEmailProvider → requiresEmailCheck(['email','google_oauth2']) に変更する。
   const isEmailProvider = providerForValidation === 'email'
 
   const form = useForm<DeleteAccountFormValues>({
     resolver: zodResolver(
+      // TODO: providerForValidation → 実際の provider を渡す
+      // google_oauth2 も一致検証対象にする
       deleteAccountSchema(providerForValidation, user.email ?? ''),
     ),
     defaultValues: { email: '' },

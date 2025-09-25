@@ -1,3 +1,9 @@
+/**
+ * TODO: google_oauth2 もメール確認を必須にする。
+ * 次の DeleteAccountForm のテスト工程で、UI表示と resolver の provider を
+ * ['email','google_oauth2'] 両対応に変更し、スキーマ・UI・テストを同一コミットで更新する。
+ */
+
 import type z from 'zod'
 import { deleteAccountSchema } from '~/schemas/delete-account.schema'
 
