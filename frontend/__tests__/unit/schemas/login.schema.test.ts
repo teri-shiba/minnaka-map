@@ -21,7 +21,7 @@ describe('loginSchema', () => {
     it('不正なメール形式なら専用メッセージで失敗する', () => {
       const result = parse({ email: 'not-an-email' })
       expect(result.success).toBe(false)
-      expect(messagesOf(result)).toContain('メールアドレスの形式が正しくありません')
+      expect(messagesOf(result)).toEqual(['メールアドレスの形式が正しくありません'])
     })
   })
 
