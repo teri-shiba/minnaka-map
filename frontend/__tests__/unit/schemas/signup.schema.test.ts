@@ -30,13 +30,13 @@ describe('signupSchema', () => {
     it('空文字は失敗し、メッセージが返る', () => {
       const result = parse({ name: '' })
       expect(result.success).toBe(false)
-      expect(messagesOf(result)).toContain('名前を入力してください')
+      expect(messagesOf(result)).toEqual(['名前を入力してください'])
     })
 
     it('空白のみも失敗し、メッセージが返る', () => {
       const result = parse({ name: '     ' })
       expect(result.success).toBe(false)
-      expect(messagesOf(result)).toContain('名前を入力してください')
+      expect(messagesOf(result)).toEqual(['名前を入力してください'])
     })
 
     it('前後空白は trim され、成功する', () => {
@@ -112,7 +112,7 @@ describe('signupSchema', () => {
     it('空なら「確認用のパスワードを入力してください」が含まれる', () => {
       const result = parse({ password_confirmation: '' })
       expect(result.success).toBe(false)
-      expect(messagesOf(result)).toContain('確認用のパスワードを入力してください')
+      expect(messagesOf(result)).toEqual(['確認用のパスワードを入力してください'])
     })
 
     it('password と不一致なら「パスワードが一致しません」が返る', () => {
