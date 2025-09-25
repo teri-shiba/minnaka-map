@@ -6,15 +6,15 @@ export interface DeleteAccountFormValues {
 }
 
 export function deleteAccountSchema(provider: ProviderId, registeredEmail: string) {
+  // TODO: gmail もメール一致判定を組み込む
   if (provider === 'email') {
-    const lower = (registeredEmail ?? '').toLowerCase()
+    const registered = (registeredEmail ?? '').trim()
     return z.object({
       email: z
         .string({ required_error: 'メールアドレスは必須です' })
         .min(1, 'メールアドレスは必須です')
         .pipe(z.string().email('メールアドレスの形式が正しくありません'))
-        .transform(value => value.toLowerCase())
-        .refine(value => value === lower, 'メールアドレスが一致しません'),
+        .refine(value => value === registered, 'メールアドレスが一致しません'),
     })
   }
 
