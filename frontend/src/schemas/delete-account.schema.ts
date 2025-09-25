@@ -12,7 +12,7 @@ export function deleteAccountSchema(provider: ProviderId, registeredEmail: strin
       email: z
         .string({ required_error: 'メールアドレスは必須です' })
         .min(1, 'メールアドレスは必須です')
-        .email('メールアドレスの形式が正しくありません')
+        .pipe(z.string().email('メールアドレスの形式が正しくありません'))
         .transform(value => value.toLowerCase())
         .refine(value => value === lower, 'メールアドレスが一致しません'),
     })
