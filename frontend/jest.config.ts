@@ -29,6 +29,9 @@ const config: Config = {
     '!src/constants/**',
     '!src/types/**',
     '!src/data/**',
+
+    // 対象外ファイルを個別指定
+    '!src/utils/cn.ts',
   ],
 
   // The directory where Jest should output its coverage files
