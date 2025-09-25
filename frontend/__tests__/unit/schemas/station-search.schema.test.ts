@@ -78,7 +78,7 @@ function parse(overrides: Partial<StationInput> = {}) {
   })
 }
 
-describe('station-search.schema', () => {
+describe('stationSearchSchema', () => {
   describe('areaValue(各行の必須・trim)', () => {
     it('空文字は「出発地点を入力してください」になる ', () => {
       const result = parse({ area: [{ ...tokyo, areaValue: '' }, kanda, ueno] })

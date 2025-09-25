@@ -16,7 +16,7 @@ function parse(overrides: Partial<{ email: string, password: string }> = {}) {
   })
 }
 
-describe('login.schema', () => {
+describe('loginSchema', () => {
   describe('email のバリデーション', () => {
     it('不正なメール形式なら専用メッセージで失敗する', () => {
       const result = parse({ email: 'not-an-email' })
