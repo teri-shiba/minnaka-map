@@ -6,15 +6,34 @@ export interface DeleteAccountFormValues {
 }
 
 export function deleteAccountSchema(provider: ProviderId, registeredEmail: string) {
-  // TODO: gmail もメール一致判定を組み込む
   if (provider === 'email') {
     const registered = (registeredEmail ?? '').trim()
-    return z.object({
-      email: z
-        .string({ required_error: 'メールアドレスは必須です' })
-        .min(1, 'メールアドレスは必須です')
-        .pipe(z.string().email('メールアドレスの形式が正しくありません'))
-        .refine(value => value === registered, 'メールアドレスが一致しません'),
+
+    const base = z
+      .string({ required_error: 'メールアドレスは必須です' })
+      .trim()
+      .min(1, 'メールアドレスは必須です')
+
+    const format = z
+      .string()
+      .email('メールアドレスの形式が正しくありません')
+
+    const schema = z.object({
+      email: base.pipe(format),
+    })
+
+    return schema.superRefine(({ email }, context) => {
+      const isValidFormat = format.safeParse(email).success
+      if (!isValidFormat)
+        return
+
+      if (email !== registered) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['email'],
+          message: 'メールアドレスが一致しません',
+        })
+      }
     })
   }
 
