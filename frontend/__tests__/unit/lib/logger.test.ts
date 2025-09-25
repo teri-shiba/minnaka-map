@@ -1,10 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 import { logger } from '~/lib/logger'
 
-jest.mock('@sentry/nextjs', () => ({
-  __esModule: true,
-  captureException: jest.fn(),
-}))
+jest.mock('@sentry/nextjs', () => ({ captureException: jest.fn() }))
 
 function setNodeEnv(value: 'production' | 'test' = 'test') {
   (process.env as Record<string, string | undefined>).NODE_ENV = value
