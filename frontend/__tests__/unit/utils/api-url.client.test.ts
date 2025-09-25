@@ -1,6 +1,6 @@
 import { apiUrl } from '~/utils/api-url'
 
-describe('api-url(client)', () => {
+describe('apiUrl(client)', () => {
   const SERVER_ORIGIN = 'https://server.minnaka-map.com'
   const CLIENT_ORIGIN = 'https://client.minnaka-map.com'
 

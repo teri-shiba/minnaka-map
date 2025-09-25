@@ -46,7 +46,7 @@ jest.mock('axios', () => ({
   isAxiosError,
 }))
 
-describe('axios interceptor', () => {
+describe('api', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })

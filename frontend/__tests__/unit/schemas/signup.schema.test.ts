@@ -25,7 +25,7 @@ function parse(overrides: Partial<typeof VALID> = {}) {
   })
 }
 
-describe('signup.schema', () => {
+describe('signupSchema', () => {
   describe('name', () => {
     it('空文字は失敗し、メッセージが返る', () => {
       const result = parse({ name: '' })

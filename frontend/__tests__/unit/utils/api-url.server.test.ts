@@ -3,7 +3,7 @@
 import type { QueryParams } from '~/utils/api-url'
 import { apiBaseHref, apiHref, apiUrl } from '~/utils/api-url'
 
-describe('api-url(server)', () => {
+describe('apiUrl(server)', () => {
   const SERVER_ORIGIN = 'https://server.minnaka-map.com'
 
   afterEach(() => {
