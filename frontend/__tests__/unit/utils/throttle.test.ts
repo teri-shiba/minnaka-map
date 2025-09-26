@@ -3,19 +3,17 @@ import { throttle } from '~/utils/throttle'
 
 jest.mock('~/lib/logger', () => ({ logger: jest.fn() }))
 
+beforeEach(() => {
+  jest.useFakeTimers()
+  jest.clearAllMocks()
+})
+
+afterEach(() => {
+  jest.runOnlyPendingTimers()
+  jest.useRealTimers()
+})
+
 describe('throttle', () => {
-  const mockLogger = logger as jest.MockedFunction<typeof logger>
-
-  beforeEach(() => {
-    jest.useFakeTimers()
-    jest.clearAllMocks()
-  })
-
-  afterEach(() => {
-    jest.runOnlyPendingTimers()
-    jest.useRealTimers()
-  })
-
   it('最初の呼び出しは即時に実行される', () => {
     const fn = jest.fn()
     const throttled = throttle(fn, 1000)
@@ -50,7 +48,12 @@ describe('throttle', () => {
     const throttled = throttle(fn, 1000)
 
     expect(() => throttled()).toThrow('boom')
-    expect(mockLogger).toHaveBeenCalledWith(error, { tags: { component: 'throttle' } })
+    expect(logger).toHaveBeenCalledWith(
+      expect.any(Error),
+      expect.objectContaining({
+        tags: { component: 'throttle' },
+      }),
+    )
     expect(fn).toHaveBeenCalledTimes(1)
 
     expect(() => throttled()).not.toThrow()
