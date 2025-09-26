@@ -1,7 +1,7 @@
 'use client'
 
 import type { StepIndex } from '~/data/guide-carousel'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { guideCarousel } from '~/data/guide-carousel'
 
 const INTERVAL = 3000
@@ -11,20 +11,31 @@ export function useGuideCarousel() {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    if (guideCarousel.length <= 1)
+    const length = guideCarousel.length
+    if (length <= 1) {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+        timerRef.current = null
+      }
       return
+    }
+
+    if (timerRef.current)
+      clearTimeout(timerRef.current)
 
     timerRef.current = setTimeout(() => {
-      setActiveIndex(currentIndex => ((currentIndex + 1) % guideCarousel.length) as StepIndex)
+      setActiveIndex(currentIndex => ((currentIndex + 1) % length) as StepIndex)
     }, INTERVAL)
 
     return () => {
-      if (timerRef.current)
+      if (timerRef.current) {
         clearTimeout(timerRef.current)
+        timerRef.current = null
+      }
     }
   }, [activeIndex])
 
-  const startSequenceFrom = (index: StepIndex) => setActiveIndex(index)
+  const startSequenceFrom = useCallback((index: StepIndex) => setActiveIndex(index), [])
 
   return { activeIndex, startSequenceFrom } as const
 }
