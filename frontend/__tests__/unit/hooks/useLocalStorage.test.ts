@@ -36,7 +36,10 @@ describe('useLocalStorage', () => {
       expect(result.current[0]).toBe(123)
       expect(logger).toHaveBeenCalledWith(
         expect.any(Error),
-        expect.objectContaining({ key: KEY }),
+        expect.objectContaining({
+          key: KEY,
+          tags: { component: 'useLocalStorage: storedValue' },
+        }),
       )
     })
 
@@ -83,7 +86,10 @@ describe('useLocalStorage', () => {
         expect(setSpy).toHaveBeenCalled()
         expect(logger).toHaveBeenCalledWith(
           expect.any(Error),
-          expect.objectContaining({ key: KEY }),
+          expect.objectContaining({
+            key: KEY,
+            tags: { component: 'useLocalStorage: setValue' },
+          }),
         )
       })
 
@@ -94,7 +100,10 @@ describe('useLocalStorage', () => {
         expect(result.current[0]).toEqual({ number: BigInt(1) })
         expect(logger).toHaveBeenCalledWith(
           expect.any(Error),
-          expect.objectContaining({ key: KEY }),
+          expect.objectContaining({
+            key: KEY,
+            tags: { component: 'useLocalStorage: setValue' },
+          }),
         )
       })
     })
@@ -117,7 +126,10 @@ describe('useLocalStorage', () => {
         expect(result.current[0]).toEqual({ version: 1 })
         expect(logger).toHaveBeenCalledWith(
           expect.any(Error),
-          expect.objectContaining({ key: KEY }),
+          expect.objectContaining({
+            key: KEY,
+            tags: { component: 'useLocalStorage: refreshValue' },
+          }),
         )
       })
     })
@@ -152,7 +164,10 @@ describe('useLocalStorage', () => {
         expect(result.current[0]).toEqual({ number: 1 })
         expect(logger).toHaveBeenCalledWith(
           expect.any(Error),
-          expect.objectContaining({ key: KEY }),
+          expect.objectContaining({
+            key: KEY,
+            tags: { component: 'useLocalStorage: handleStorageChange' },
+          }),
         )
       })
 
