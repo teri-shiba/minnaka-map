@@ -9,6 +9,7 @@ export default antfu(
     typescript: true,
     next: true,
     jsdoc: false,
+    test: false,
     ignores: [],
   },
   ...tailwindcss.configs['flat/recommended'],
@@ -38,7 +39,9 @@ export default antfu(
   },
   {
     files: [
-      'src/test/**/*.{ts,tsx}',
+      '__tests__/**/*.{ts,tsx}',
+      '**/*.test.{ts,tsx}',
+      '**/*.spec.{ts,tsx}',
     ],
     plugins: {
       jest: pluginJest,
@@ -53,8 +56,8 @@ export default antfu(
       'jest/no-identical-title': 'error',
       'jest/valid-expect': 'error',
       'jest/no-disabled-tests': 'warn',
-      'jest/prefer-to-have-length': 'warn',
-      '@typescript-eslint/no-explicit-any': 'off',
+      'jest/prefer-lowercase-title': 'off',
+      'jest/consistent-test-it': ['error', { fn: 'it' }],
       'no-console': 'off',
     },
   },
