@@ -3,66 +3,107 @@
 import { useCallback, useEffect, useState } from 'react'
 import { logger } from '~/lib/logger'
 
+interface Options {
+  refreshOnFocus?: boolean
+}
+
+const isBrowser = (): boolean => typeof window !== 'undefined'
+
+function safeParseJson(raw: string): unknown | undefined {
+  try {
+    return JSON.parse(raw)
+  }
+  catch {
+    return undefined
+  }
+}
+
+function isSameStoredValue(storedJson: string | null, nextValue: unknown): boolean {
+  if (storedJson === null)
+    return false
+
+  const nextJson = JSON.stringify(nextValue)
+
+  if (typeof nextJson !== 'string')
+    return false
+
+  if (storedJson === nextJson)
+    return true
+
+  const parsed = safeParseJson(storedJson)
+  if (parsed === undefined)
+    return false
+
+  return JSON.stringify(parsed) === nextJson
+}
+
 export function useLocalStorage<T>(
   key: string,
   initialValue: T,
-  options?: {
-    refreshOnFocus?: boolean
-  },
+  options?: Options,
 ) {
   const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === 'undefined') {
+    if (!isBrowser())
       return initialValue
-    }
 
-    try {
-      const item = window.localStorage.getItem(key)
-      return item ? JSON.parse(item) : initialValue
-    }
-    catch (error) {
-      logger(error, {
+    const item = window.localStorage.getItem(key)
+    if (item === null)
+      return initialValue
+
+    const parsed = safeParseJson(item)
+    if (parsed === undefined) {
+      logger(new Error('localStorageに無効なJSONが保存されています'), {
         key,
         tags: { component: 'useLocalStorage: storedValue' },
       })
+
       return initialValue
     }
+
+    return parsed as T
   })
 
   const refreshValue = useCallback(() => {
-    if (typeof window == 'undefined') {
+    if (!isBrowser())
       return
-    }
 
-    try {
-      const item = window.localStorage.getItem(key)
-      if (item) {
-        const parsedItem = JSON.parse(item)
-        setStoredValue(parsedItem)
-      }
-    }
-    catch (error) {
-      logger(error, {
+    const item = window.localStorage.getItem(key)
+    if (!item)
+      return
+
+    const parsed = safeParseJson(item)
+    if (parsed === undefined) {
+      logger(new Error('localStorageに無効なJSONが保存されています'), {
         key,
         tags: { component: 'useLocalStorage: refreshValue' },
       })
+
+      return
     }
+
+    setStoredValue(parsed as T)
   }, [key])
 
-  const setValue = useCallback((value: T | ((val: T) => T)) => {
+  const setValue = useCallback((value: T | ((value: T) => T)) => {
     try {
       const valueToStore = typeof value === 'function'
-        ? (value as (val: T) => T)(storedValue)
+        ? (value as (value: T) => T)(storedValue)
         : value
+
       setStoredValue(valueToStore)
 
-      if (typeof window !== 'undefined') {
-        const currentItem = window.localStorage.getItem(key)
-        const newValue = JSON.stringify(valueToStore)
+      if (!isBrowser())
+        return
 
-        if (currentItem !== newValue) {
-          window.localStorage.setItem(key, newValue)
-        }
-      }
+      const storedJson = window.localStorage.getItem(key)
+      if (isSameStoredValue(storedJson, valueToStore))
+        return
+
+      const serialized = JSON.stringify(valueToStore)
+      if (typeof serialized !== 'string')
+        return
+
+      window.localStorage.setItem(key, serialized)
     }
     catch (error) {
       logger(error, {
@@ -74,38 +115,38 @@ export function useLocalStorage<T>(
 
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === key && e.newValue !== null) {
-        try {
-          const newValue = JSON.parse(e.newValue)
-          setStoredValue(newValue)
-        }
-        catch (error) {
-          logger(error, {
-            key,
-            tags: { component: 'useLocalStorage: handleStorageChange' },
-          })
-        }
+      if (e.key !== key || e.newValue === null)
+        return
+
+      if (e.storageArea && e.storageArea !== window.localStorage)
+        return
+
+      const parsed = safeParseJson(e.newValue)
+      if (parsed === undefined) {
+        logger(new Error('ストレージイベントで無効なJSONが検出されました'), {
+          key,
+          tags: { component: 'useLocalStorage: handleStorageChange' },
+        })
+
+        return
       }
+
+      setStoredValue(parsed as T)
     }
 
     const handleWindowFocus = () => {
-      if (options?.refreshOnFocus) {
+      if (options?.refreshOnFocus)
         refreshValue()
-      }
     }
 
     window.addEventListener('storage', handleStorageChange)
-
-    if (options?.refreshOnFocus) {
+    if (options?.refreshOnFocus)
       window.addEventListener('focus', handleWindowFocus)
-    }
 
     return () => {
       window.removeEventListener('storage', handleStorageChange)
-
-      if (options?.refreshOnFocus) {
+      if (options?.refreshOnFocus)
         window.removeEventListener('focus', handleWindowFocus)
-      }
     }
   }, [key, options?.refreshOnFocus, refreshValue])
 

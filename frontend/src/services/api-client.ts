@@ -13,7 +13,7 @@ interface ErrorHandlingOptions {
   component: string
   defaultMessage: string
   notFoundMessage?: string
-  extraContext?: Record<string, any>
+  extraContext?: Record<string, unknown>
 }
 
 interface ApiRequestOptions {
@@ -49,6 +49,57 @@ async function addAuthHeaders(headers: Headers): Promise<void> {
   headers.set('uid', auth.uid)
 }
 
+function toSnakeIfNeeded<T>(
+  value: T,
+  requestCase: ApiRequestOptions['requestCase'],
+): T {
+  if (requestCase !== 'snake' || !isPlainObject(value))
+    return value
+
+  return toSnakeDeep(value as Record<string, unknown>) as unknown as T
+}
+
+async function buildHeaders(
+  method: HttpMethod,
+  extraHeaders?: HeadersInit,
+  withAuth?: boolean,
+): Promise<Headers> {
+  const headers = new Headers({ Accept: 'application/json' })
+
+  if (method !== 'GET')
+    headers.set('Content-Type', 'application/json')
+
+  if (extraHeaders) {
+    new Headers(extraHeaders).forEach((value, headerName) => {
+      headers.set(headerName, value)
+    })
+  }
+
+  if (withAuth)
+    await addAuthHeaders(headers)
+
+  return headers
+}
+
+async function parseResponse<T>(
+  response: Response,
+  responseCase: ApiRequestOptions['responseCase'],
+): Promise<T> {
+  const contentType = (response.headers.get('content-type') ?? '').toLowerCase()
+  const isText = contentType.includes('text/')
+  const isNoContent = response.status === 204
+
+  if (isText)
+    return await response.text() as unknown as T
+
+  if (isNoContent)
+    return null as T
+
+  const json = await response.json()
+  const payload = responseCase === 'camel' ? toCamelDeep(json) : json
+  return payload as T
+}
+
 async function apiFetch<T = any>(
   path: string,
   options: ApiRequestOptions = {},
@@ -65,23 +116,13 @@ async function apiFetch<T = any>(
     responseCase = 'camel',
   } = options
 
-  const params = requestCase === 'snake' && isPlainObject(rawParams)
-    ? toSnakeDeep(rawParams as Record<string, unknown>)
-    : rawParams
+  const params = toSnakeIfNeeded(rawParams, requestCase)
+  const body = toSnakeIfNeeded(rawBody, requestCase)
 
-  const body = requestCase === 'snake' && isPlainObject(rawBody)
-    ? toSnakeDeep(rawBody as Record<string, unknown>)
-    : rawBody
+  const urlObj = apiUrl(path, params as QueryParams)
+  const url = urlObj.toString()
 
-  const url = apiUrl(path, params as QueryParams).toString()
-
-  const headers = new Headers({ Accept: 'application/json' })
-  if (method !== 'GET')
-    headers.set('Content-Type', 'application/json')
-  if (extraHeaders)
-    new Headers(extraHeaders).forEach((value, headerName) => headers.set(headerName, value))
-  if (withAuth)
-    await addAuthHeaders(headers)
+  const headers = await buildHeaders(method, extraHeaders, withAuth)
 
   const init: RequestInit & { next?: NextFetchRequestConfig } = {
     method,
@@ -91,6 +132,7 @@ async function apiFetch<T = any>(
 
   if (cache !== undefined)
     init.cache = cache
+
   if (next)
     init.next = next
 
@@ -102,42 +144,33 @@ async function apiFetch<T = any>(
       const error = new ApiError(response.status, `${method} ${url} failed`, text)
 
       logger(`${method} ${path} failed`, {
-        tags: { component: 'apiFetch', path, method, status: response.status, withAuth },
+        tags: {
+          component: 'apiFetch',
+          path,
+          method,
+          status: response.status,
+          withAuth,
+        },
       })
 
       throw error
     }
 
-    const contentType = response.headers.get('content-type') ?? ''
-    const isText = contentType.includes('text/')
-    const isNoContent = response.status === 204
-
-    if (isText) {
-      const text = await response.text()
-      return text as unknown as T
-    }
-
-    if (isNoContent)
-      return null as T
-
-    const json = await response.json()
-    const payload = responseCase === 'camel' ? toCamelDeep(json) : json
-    return payload as T
+    return parseResponse<T>(response, responseCase)
   }
   catch (error) {
     if (!(error instanceof ApiError)) {
-      logger(error, { tags: { component: 'api-client', path, method, withAuth } })
+      logger(error, {
+        tags: {
+          component: 'api-client',
+          path,
+          method,
+          withAuth,
+        },
+      })
     }
     throw error
   }
-}
-
-// 認証付き
-export function apiFetchAuth<T = unknown>(
-  path: string,
-  options: Omit<ApiRequestOptions, 'withAuth'> = {},
-): Promise<T> {
-  return apiFetch<T>(path, { ...options, withAuth: true })
 }
 
 // 認証なし
@@ -146,6 +179,14 @@ export function apiFetchPublic<T = unknown>(
   options: Omit<ApiRequestOptions, 'withAuth'> = {},
 ): Promise<T> {
   return apiFetch<T>(path, { ...options, withAuth: false })
+}
+
+// 認証付き
+export function apiFetchAuth<T = unknown>(
+  path: string,
+  options: Omit<ApiRequestOptions, 'withAuth'> = {},
+): Promise<T> {
+  return apiFetch<T>(path, { ...options, withAuth: true })
 }
 
 export function handleApiError(

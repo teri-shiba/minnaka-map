@@ -5,12 +5,16 @@ export function externalHref(
 ) {
   if (!baseOrigin)
     throw new Error('External API base URL is not set')
+
   const origin = baseOrigin.replace(/\/+$/, '')
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  const normalizedPath = `/${path.replace(/^\/+/, '')}`
+
   const url = new URL(normalizedPath, origin)
+
   if (params) {
     const sp = params instanceof URLSearchParams ? params : new URLSearchParams(params)
     url.search = sp.toString()
   }
+
   return url.toString()
 }

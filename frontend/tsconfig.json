@@ -4,18 +4,12 @@
     "target": "ES2017",
     "jsx": "preserve",
     "lib": ["dom", "dom.iterable", "esnext"],
+    "baseUrl": ".",
     "module": "esnext",
     "moduleResolution": "bundler",
     "paths": {
       "~/*": ["./src/*"],
-      "~/public/*": ["./public/*"],
-      "~/actions/*": ["./src/actions/*"],
-      "~/components/*": ["./src/components/*"],
-      "~/ui/*": ["./src/components/ui/*"],
-      "~/hooks/*": ["./src/hooks/*"],
-      "~/lib/*": ["./src/lib/*"],
-      "~/types/*": ["./src/types/*"],
-      "~/styles/*": ["./src/styles/*"]
+      "~/public/*": ["./public/*"]
     },
     "resolveJsonModule": true,
     "allowJs": true,

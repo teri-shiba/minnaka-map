@@ -4,7 +4,7 @@ import type { PageInfo } from '~/types/pagination'
 import { useMemo } from 'react'
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '~/components/ui/pagination'
 import { usePagination } from '~/hooks/usePagination'
-import { generatePaginationStructure } from '~/utils/pagination'
+import { generatePagination } from '~/utils/generate-pagination'
 
 interface Props {
   pagination: PageInfo
@@ -15,7 +15,7 @@ export default function RestaurantPagination({ pagination }: Props) {
   const { createPageUrl, navigateToPage } = usePagination()
 
   const paginationStructure = useMemo(() =>
-    generatePaginationStructure({ currentPage, totalPages }), [currentPage, totalPages])
+    generatePagination({ currentPage, totalPages }), [currentPage, totalPages])
 
   const paginationSequence = useMemo(() => {
     const pages = paginationStructure.pages
