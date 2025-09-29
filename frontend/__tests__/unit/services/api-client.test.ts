@@ -20,9 +20,8 @@ jest.mock('~/utils/api-url', () => {
 })
 
 jest.mock('~/utils/case-convert', () => {
-  const isPlainObject = (value: unknown) => {
-    return value != null && typeof value === 'object' && !Array.isArray(value)
-  }
+  const isPlainObject = (value: unknown) =>
+    value != null && typeof value === 'object' && !Array.isArray(value)
 
   return {
     isPlainObject,
@@ -52,7 +51,7 @@ function mockFetchOnce(res: {
     status: res.status,
     headers,
     text: jest.fn().mockResolvedValue(res.textBody ?? ''),
-    json: jest.fn().mockResolvedValue(res.jsonBody ?? ''),
+    json: jest.fn().mockResolvedValue(res.jsonBody ?? {}),
   }
   fetchMock().mockResolvedValue(response)
   return response
@@ -65,7 +64,7 @@ describe('api-client', () => {
   })
 
   describe('apiFetchPublic', () => {
-    it('GET: params が与えられたとき、スネークに変換してURL生成関数に渡し、その結果をリクエスト先として使用する', async () => {
+    it('クエリパラメータが与えられたとき、スネークに変換してURL生成関数に渡し、その結果をリクエスト先として使用する', async () => {
       ;(toSnakeDeep as jest.Mock).mockImplementationOnce(() => ({ user_name: 'taro' }))
       mockFetchOnce({ ok: true, status: 200, jsonBody: { ok: true } })
 
@@ -82,7 +81,7 @@ describe('api-client', () => {
       expect(headers.get('Content-Type')).toBeNull()
     })
 
-    it('POST: body をスネーク化して、JSON 文字列として送信する', async () => {
+    it('POSTを指定したとき、body をスネーク化して、JSON 文字列として送信する', async () => {
       ;(toSnakeDeep as jest.Mock).mockImplementationOnce(() => ({ item_count: 1 }))
       mockFetchOnce({ ok: true, status: 200, jsonBody: { ok: true } })
 
@@ -310,9 +309,9 @@ describe('api-client', () => {
 
     cases.forEach(([statusCode, expected]) => {
       it(`HTTP ステータスが ${statusCode} のとき、期待するメッセージと原因を返す`, () => {
-        const error = new ApiError(statusCode as number, 'http-error')
+        const error = new ApiError(statusCode, 'http-error')
         const result = handleApiError(error, options)
-        expect(result).toEqual(expected as ServiceFailure)
+        expect(result).toEqual(expected)
       })
     })
 
