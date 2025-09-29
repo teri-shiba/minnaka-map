@@ -12,10 +12,10 @@ interface PositionProps {
 export default function MidpointMarker({ position }: PositionProps) {
   const icon = useMemo(() => {
     return L.icon({
-      iconUrl: '/figure_pin_center.webp',
+      iconUrl: '/figure_marker_center.webp',
       iconSize: [35, 45],
       iconAnchor: [17, 45],
-      shadowUrl: '/figure_pin_center_shadow.webp',
+      shadowUrl: '/figure_marker_center_shadow.webp',
       shadowSize: [23, 11],
       shadowAnchor: [11, 6],
     })

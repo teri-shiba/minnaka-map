@@ -22,7 +22,7 @@ export interface MapSize {
 
 // マップ上の状態をまとめた型
 export interface MapData {
-  pinPosition: Position | null
+  markerPosition: Position | null
   mapCenter: Position | null
   mapSize: MapSize | null
 }
@@ -35,6 +35,6 @@ export interface CardPosition {
 
 // calculateCardPosition の引数
 export interface CalculateCardPositionOptions {
-  pinPosition: Position
+  markerPosition: Position
   mapCenter: Position
 }

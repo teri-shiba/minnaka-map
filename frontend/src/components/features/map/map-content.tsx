@@ -11,7 +11,7 @@ interface MapContentProps extends MapItems {
   selectedRestaurant: RestaurantListItem | null
   onRestaurantClick: (restaurant: RestaurantListItem) => void
   onRestaurantClose: () => void
-  onPinPositionChange: (data: MapData) => void
+  onMarkerPositionChange: (data: MapData) => void
 }
 
 export default function MapContent({
@@ -21,13 +21,13 @@ export default function MapContent({
   selectedRestaurant,
   onRestaurantClick,
   onRestaurantClose,
-  onPinPositionChange,
+  onMarkerPositionChange,
 }: MapContentProps) {
   useMapCoordinates(
     selectedRestaurant
       ? [selectedRestaurant.lat, selectedRestaurant.lng]
       : null,
-    onPinPositionChange,
+    onMarkerPositionChange,
   )
 
   const handleMapClick = useCallback(() => {
