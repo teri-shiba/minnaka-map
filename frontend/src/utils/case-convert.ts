@@ -31,7 +31,7 @@ function convertDeep<T>(input: T, mapKey: (key: string) => string): T {
     return input.map(item => convertDeep(item as any, mapKey)) as unknown as T
 
   if (isPlainObject(input)) {
-    const output = Object.create(null) as Record<string, unknown>
+    const output: Record<string, unknown> = {}
     for (const [key, value] of Object.entries(input)) {
       const newKey = mapKey(key)
       output[newKey] = isTraversable(value) ? convertDeep(value as JsonLike, mapKey) : value
