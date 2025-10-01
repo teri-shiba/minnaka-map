@@ -2,14 +2,18 @@ import { act, renderHook } from '@testing-library/react'
 import { useLocalStorage } from '~/hooks/useLocalStorage'
 import { logger } from '~/lib/logger'
 
-jest.mock('~/lib/logger', () => ({ logger: jest.fn() }))
+vi.mock('~/lib/logger', () => ({ logger: vi.fn() }))
 
 const KEY = 'test-key'
-const spySetItem = () => jest.spyOn(Storage.prototype, 'setItem')
+
+function spySetItem() {
+  return vi.spyOn(Storage.prototype, 'setItem')
+}
 
 beforeEach(() => {
   localStorage.clear()
-  jest.restoreAllMocks()
+  vi.clearAllMocks()
+  vi.restoreAllMocks()
 })
 
 describe('useLocalStorage', () => {
@@ -93,7 +97,7 @@ describe('useLocalStorage', () => {
         )
       })
 
-      it('jSON.stringify が例外でも UI は落ちず logger に記録される', () => {
+      it('JSON.stringify が例外でも UI は落ちず logger に記録される', () => {
         const { result } = renderHook(() => useLocalStorage<any>(KEY, { number: 0 }))
         act(() => result.current[1]({ number: BigInt(1) }))
 
@@ -174,7 +178,7 @@ describe('useLocalStorage', () => {
       it('refreshOnFocus が有効なとき focus で最新値を反映する', () => {
         const { result } = renderHook(() => useLocalStorage(KEY, { flag: false }, { refreshOnFocus: true }))
         localStorage.setItem(KEY, JSON.stringify({ flag: true }))
-        act(() => window.dispatchEvent(new StorageEvent('focus')))
+        act(() => window.dispatchEvent(new Event('focus')))
 
         expect(result.current[0]).toEqual({ flag: true })
       })

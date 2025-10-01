@@ -1,28 +1,15 @@
 import type { AxiosRequestConfig } from 'axios'
 
-const mockToastError = jest.fn()
-
-jest.mock('sonner', () => ({ toast: { error: mockToastError } }))
-
-jest.mock('~/utils/api-url', () => ({
-  apiBaseHref: jest.fn(() => 'https://minnaka-map.com/api/v1'),
-}))
-
 interface InterceptorHandlers {
   onFulfilled?: (value: unknown) => unknown
   onRejected?: (error: any) => Promise<never>
 }
 
+const mockToastError = vi.fn()
 const interceptorHandlers: InterceptorHandlers = {}
+const isAxiosError = (error: any) => Boolean(error?.isAxiosError)
 
-function assertHandlers(
-  handlers: InterceptorHandlers,
-): asserts handlers is Required<InterceptorHandlers> {
-  expect(handlers.onFulfilled).toBeDefined()
-  expect(handlers.onRejected).toBeDefined()
-}
-
-const createSpy = jest.fn((_config: AxiosRequestConfig) => {
+const createSpy = vi.fn((_config: AxiosRequestConfig) => {
   return {
     interceptors: {
       response: {
@@ -37,9 +24,18 @@ const createSpy = jest.fn((_config: AxiosRequestConfig) => {
   }
 })
 
-const isAxiosError = (error: any) => Boolean(error?.isAxiosError)
+function assertHandlers(
+  handlers: InterceptorHandlers,
+): asserts handlers is Required<InterceptorHandlers> {
+  expect(handlers.onFulfilled).toBeDefined()
+  expect(handlers.onRejected).toBeDefined()
+}
 
-jest.mock('axios', () => ({
+vi.mock('sonner', () => ({ toast: { error: mockToastError } }))
+vi.mock('~/utils/api-url', () => ({
+  apiBaseHref: vi.fn(() => 'https://minnaka-map.com/api/v1'),
+}))
+vi.mock('axios', () => ({
   default: { create: createSpy, isAxiosError },
   create: createSpy,
   isAxiosError,
@@ -47,11 +43,11 @@ jest.mock('axios', () => ({
 
 describe('api', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('axios.create の設定が正しい (baseURL/headers/withCredentials/timeout)', async () => {
-    jest.resetModules()
+    vi.resetModules()
     await import('~/lib/axios-interceptor')
 
     expect(createSpy).toHaveBeenCalledTimes(1)
@@ -114,7 +110,7 @@ describe('api', () => {
       await expect(interceptorHandlers.onRejected(withMessages)).rejects.toBe(withMessages)
       expect(mockToastError).toHaveBeenCalledWith('入力が不正です')
 
-      jest.clearAllMocks()
+      vi.clearAllMocks()
 
       // カスタムメッセージなし -> 既定文言
       const noMessages = {

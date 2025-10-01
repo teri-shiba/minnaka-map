@@ -3,12 +3,13 @@ import { useDebounce } from '~/hooks/useDebounce'
 
 describe('useDebounce', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
-    jest.runOnlyPendingTimers()
-    jest.useRealTimers()
+    vi.clearAllTimers()
+    vi.useRealTimers()
+    vi.restoreAllMocks()
   })
 
   it('初期レンダーでは即座に初期値を返す', () => {
@@ -26,10 +27,10 @@ describe('useDebounce', () => {
     rerender({ value: 'b', delay: 300 })
     expect(result.current).toBe('a')
 
-    act(() => jest.advanceTimersByTime(299)) // 閾値未満
+    act(() => vi.advanceTimersByTime(299)) // 閾値未満
     expect(result.current).toBe('a')
 
-    act(() => jest.advanceTimersByTime(1)) // 閾値ちょうど
+    act(() => vi.advanceTimersByTime(1)) // 閾値ちょうど
     expect(result.current).toBe('b')
   })
 
@@ -39,13 +40,13 @@ describe('useDebounce', () => {
     })
 
     rerender({ value: 'b', delay: 300 })
-    act(() => jest.advanceTimersByTime(100)) // 閾値未満のうちに再入力
+    act(() => vi.advanceTimersByTime(100)) // 閾値未満のうちに再入力
     rerender({ value: 'c', delay: 300 })
 
-    act(() => jest.advanceTimersByTime(299)) // 閾値未満
+    act(() => vi.advanceTimersByTime(299)) // 閾値未満
     expect(result.current).toBe('a')
 
-    act(() => jest.advanceTimersByTime(1)) // 閾値到達で最終値のみ反映
+    act(() => vi.advanceTimersByTime(1)) // 閾値到達で最終値のみ反映
     expect(result.current).toBe('c')
   })
 
@@ -57,9 +58,9 @@ describe('useDebounce', () => {
     rerender({ value: 'b', delay: 300 })
     unmount()
 
-    act(() => jest.advanceTimersByTime(299)) // 閾値未満（何も起きない）
+    act(() => vi.advanceTimersByTime(299)) // 閾値未満（何も起きない）
     expect(() => {
-      act(() => jest.advanceTimersByTime(1000)) // 進めても例外にならない
+      act(() => vi.advanceTimersByTime(1000)) // 進めても例外にならない
     }).not.toThrow()
   })
 })
