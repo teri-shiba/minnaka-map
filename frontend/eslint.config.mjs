@@ -7,6 +7,7 @@ export default antfu(
     react: true,
     typescript: true,
     next: true,
+    test: true,
     jsdoc: false,
     ignores: [],
   },
@@ -33,6 +34,15 @@ export default antfu(
           allow: ['tailwindcss-animate'],
         },
       ],
+    },
+  },
+  {
+    files: [
+      '__tests__/**/*.{ts,tsx}',
+      '**/*.test.{ts,tsx}',
+    ],
+    rules: {
+      'test/prefer-lowercase-title': 'off',
     },
   },
 )
