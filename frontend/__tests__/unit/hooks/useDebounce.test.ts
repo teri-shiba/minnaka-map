@@ -4,12 +4,14 @@ import { useDebounce } from '~/hooks/useDebounce'
 describe('useDebounce', () => {
   beforeEach(() => {
     vi.useFakeTimers()
+    vi.clearAllTimers()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
     vi.clearAllTimers()
     vi.useRealTimers()
-    vi.restoreAllMocks()
+    vi.clearAllMocks()
   })
 
   it('初期レンダーでは即座に初期値を返す', () => {

@@ -13,19 +13,20 @@ function setData(items: GuideStep[]): void {
   guideData.splice(0, data.length, ...items)
 }
 
-beforeEach(() => {
-  vi.useFakeTimers()
-  vi.clearAllTimers()
-  setData([])
-})
-
-afterEach(() => {
-  vi.clearAllTimers()
-  vi.useRealTimers()
-  vi.restoreAllMocks()
-})
-
 describe('useGuideCarousel', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.clearAllTimers()
+    setData([])
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    vi.clearAllTimers()
+    vi.useRealTimers()
+    vi.clearAllMocks()
+  })
+
   describe('auto advance', () => {
     it('複数ステップあるとき、3 秒ごとに次のインデックスに進む', () => {
       setData([{ step: 1 }, { step: 2 }, { step: 3 }])

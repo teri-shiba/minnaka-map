@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import type { ServiceFailure } from '~/types/service-result'
 import type { QueryParams } from '~/utils/api-url'
 import { logger } from '~/lib/logger'
@@ -6,36 +7,32 @@ import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import { apiUrl } from '~/utils/api-url'
 import { toCamelDeep, toSnakeDeep } from '~/utils/case-convert'
 
-jest.mock('server-only', () => ({}))
-jest.mock('~/lib/logger', () => ({ logger: jest.fn() }))
-jest.mock('~/services/get-auth-from-cookie', () => ({
-  getAuthFromCookie: jest.fn(),
+vi.mock('server-only', () => ({}))
+vi.mock('~/lib/logger', () => ({ logger: vi.fn() }))
+vi.mock('~/services/get-auth-from-cookie', () => ({
+  getAuthFromCookie: vi.fn(),
 }))
 
-jest.mock('~/utils/api-url', () => {
-  const apiUrl = jest.fn((_path: string, _params?: Record<string, unknown>) => {
+vi.mock('~/utils/api-url', () => {
+  const apiUrl = vi.fn((_path: string, _params?: Record<string, unknown>) => {
     return new URL('https://api.minnaka-map.com/mock')
   })
   return { apiUrl }
 })
 
-jest.mock('~/utils/case-convert', () => {
+vi.mock('~/utils/case-convert', () => {
   const isPlainObject = (value: unknown) =>
     value != null && typeof value === 'object' && !Array.isArray(value)
 
   return {
     isPlainObject,
-    toCamelDeep: jest.fn((input: unknown) => ({ __toCamel__: input })),
-    toSnakeDeep: jest.fn((input: unknown) => ({ __toSnake__: input })),
+    toCamelDeep: vi.fn((input: unknown) => ({ __toCamel__: input })),
+    toSnakeDeep: vi.fn((input: unknown) => ({ __toSnake__: input })),
   }
 })
 
-function fetchMock(): jest.Mock {
-  return globalThis.fetch as unknown as jest.Mock
-}
-
-function installFetchMock(): void {
-  Object.defineProperty(globalThis, 'fetch', { value: jest.fn(), writable: true })
+function fetchMock(): Mock {
+  return vi.mocked(globalThis.fetch as unknown as Mock)
 }
 
 function mockFetchOnce(res: {
@@ -50,8 +47,8 @@ function mockFetchOnce(res: {
     ok: res.ok,
     status: res.status,
     headers,
-    text: jest.fn().mockResolvedValue(res.textBody ?? ''),
-    json: jest.fn().mockResolvedValue(res.jsonBody ?? {}),
+    text: vi.fn().mockResolvedValue(res.textBody ?? ''),
+    json: vi.fn().mockResolvedValue(res.jsonBody ?? {}),
   }
   fetchMock().mockResolvedValue(response)
   return response
@@ -59,13 +56,18 @@ function mockFetchOnce(res: {
 
 describe('api-client', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
-    installFetchMock()
+    vi.clearAllMocks()
+    vi.stubGlobal('fetch', vi.fn())
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.clearAllMocks()
   })
 
   describe('apiFetchPublic', () => {
     it('クエリパラメータが与えられたとき、スネークに変換してURL生成関数に渡し、その結果をリクエスト先として使用する', async () => {
-      ;(toSnakeDeep as jest.Mock).mockImplementationOnce(() => ({ user_name: 'taro' }))
+      ;(toSnakeDeep as Mock).mockImplementationOnce(() => ({ user_name: 'taro' }))
       mockFetchOnce({ ok: true, status: 200, jsonBody: { ok: true } })
 
       const params: QueryParams = { userName: 'taro' }
@@ -73,7 +75,7 @@ describe('api-client', () => {
       expect(apiUrl).toHaveBeenCalledWith('/users', { user_name: 'taro' })
 
       const [urlArg, initArg] = fetchMock().mock.calls[0]
-      const returnedUrl: URL = (apiUrl as jest.Mock).mock.results[0].value
+      const returnedUrl: URL = (apiUrl as Mock).mock.results[0].value
       expect(urlArg).toBe(String(returnedUrl))
 
       const headers = initArg.headers as Headers
@@ -81,8 +83,8 @@ describe('api-client', () => {
       expect(headers.get('Content-Type')).toBeNull()
     })
 
-    it('POSTを指定したとき、body をスネーク化して、JSON 文字列として送信する', async () => {
-      ;(toSnakeDeep as jest.Mock).mockImplementationOnce(() => ({ item_count: 1 }))
+    it('POST を指定したとき、body をスネーク化して、JSON 文字列として送信する', async () => {
+      ;(toSnakeDeep as Mock).mockImplementationOnce(() => ({ item_count: 1 }))
       mockFetchOnce({ ok: true, status: 200, jsonBody: { ok: true } })
 
       await apiFetchPublic('/items', { method: 'POST', body: { itemCount: 1 } })
@@ -128,7 +130,7 @@ describe('api-client', () => {
       expect(requestInit.cache).toBe('no-store')
     })
 
-    it('Content-Type が text/* のとき、text() の結果を返す', async () => {
+    it('content-Type が text/* のとき、text() の結果を返す', async () => {
       mockFetchOnce({
         ok: true,
         status: 200,
@@ -149,7 +151,7 @@ describe('api-client', () => {
     })
 
     it('responseCase が "camel" のとき、JSON をキャメル表記に変換して返す', async () => {
-      ;(toCamelDeep as jest.Mock).mockImplementationOnce(() => ({ userName: 'taro' }))
+      ;(toCamelDeep as Mock).mockImplementationOnce(() => ({ userName: 'taro' }))
       mockFetchOnce({ ok: true, status: 200, jsonBody: { user_name: 'taro' } })
 
       const result = await apiFetchPublic('/users', { responseCase: 'camel' })
@@ -179,7 +181,7 @@ describe('api-client', () => {
       expect(apiUrl).toHaveBeenCalledWith('/query', { searchKey: 'value' })
 
       const [urlArg, requestInit] = fetchMock().mock.calls[0]
-      const returnedUrl: URL = (apiUrl as jest.Mock).mock.results[0].value
+      const returnedUrl: URL = (apiUrl as Mock).mock.results[0].value
       expect(urlArg).toBe(String(returnedUrl))
       expect(JSON.parse(requestInit.body as string)).toEqual({ searchKey: 1 })
     })
@@ -233,7 +235,7 @@ describe('api-client', () => {
 
   describe('apiFetchAuth', () => {
     it('認証付きで呼び出したとき、認証ヘッダーを付与して送信する', async () => {
-      ;(getAuthFromCookie as jest.Mock).mockResolvedValue({
+      ;(getAuthFromCookie as Mock).mockResolvedValue({
         accessToken: 'token',
         client: 'client',
         uid: 'uid',
@@ -249,7 +251,7 @@ describe('api-client', () => {
     })
 
     it('HTTP 成功(2xx) ではない応答のとき、記録には withAuth: true を含める', async () => {
-      ;(getAuthFromCookie as jest.Mock).mockResolvedValue({
+      ;(getAuthFromCookie as Mock).mockResolvedValue({
         accessToken: 'token',
         client: 'client',
         uid: 'uid',
@@ -282,7 +284,7 @@ describe('api-client', () => {
       )
     })
 
-    it('Content-Type が text/* のとき、text() の結果を返す（認証付きでも同様に動作する）', async () => {
+    it('content-Type が text/* のとき、text() の結果を返す（認証付きでも同様に動作する）', async () => {
       mockFetchOnce({
         ok: true,
         status: 200,
@@ -307,13 +309,14 @@ describe('api-client', () => {
       [418, { success: false, message: '既定文言', cause: 'REQUEST_FAILED' }],
     ]
 
-    cases.forEach(([statusCode, expected]) => {
-      it(`HTTP ステータスが ${statusCode} のとき、期待するメッセージと原因を返す`, () => {
+    it.each(cases)(
+      'HTTP ステータスが %d のとき、対応する ServiceFailure を返す',
+      (statusCode, expected) => {
         const error = new ApiError(statusCode, 'http-error')
         const result = handleApiError(error, options)
         expect(result).toEqual(expected)
-      })
-    })
+      },
+    )
 
     it('HTTP ステータスが 404 のとき、nouFoundMessage を優先して返す', () => {
       const error = new ApiError(404, 'http-error')
@@ -321,12 +324,12 @@ describe('api-client', () => {
       expect(result).toEqual({ success: false, message: '見つかりませんでした', cause: 'NOT_FOUND' })
     })
 
-    it('TypeError が渡されたとき、ネットワークエラーとして返す', () => {
+    it('typeError が渡されたとき、ネットワークエラーとして返す', () => {
       const result = handleApiError(new TypeError('failed'), options)
       expect(result).toEqual({ success: false, message: 'ネットワークエラーが発生しました', cause: 'NETWORK' })
     })
 
-    it('ApiError 以外の例外が渡されたとき、記録したうえで既定メッセージを返す', () => {
+    it('apiError 以外の例外が渡されたとき、記録したうえで既定メッセージを返す', () => {
       const result = handleApiError(new Error('unexpected failure'), options)
       expect(result).toEqual({ success: false, message: '既定文言', cause: 'REQUEST_FAILED' })
       expect(logger).toHaveBeenCalledWith(

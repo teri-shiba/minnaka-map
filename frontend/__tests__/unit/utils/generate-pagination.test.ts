@@ -1,6 +1,12 @@
 import { generatePagination } from '~/utils/generate-pagination'
 
 describe('generatePagination', () => {
+  it('totalPages=1 のときは [1] のみを返す', () => {
+    const { pages, ellipsisPositions } = generatePagination({ currentPage: 1, totalPages: 1 })
+    expect(pages).toEqual([1])
+    expect(ellipsisPositions).toEqual([])
+  })
+
   it('総ページ数が閾値以下のとき、1..totalPages を全て返し、三点リーダーは出さない', () => {
     const { pages, ellipsisPositions } = generatePagination({ currentPage: 1, totalPages: 4 })
     expect(pages).toEqual([1, 2, 3, 4])

@@ -11,6 +11,12 @@ describe('isPlainObject', () => {
     expect(isPlainObject(null)).toBe(false)
     expect(isPlainObject(new Date())).toBe(false)
   })
+
+  it('null プロトタイプのとき、true を返す', () => {
+    const obj = Object.create(null) as Record<string, unknown>
+    obj.a = 1
+    expect(isPlainObject(obj)).toBe(true)
+  })
 })
 
 describe('toCamelDeep', () => {
@@ -52,6 +58,16 @@ describe('toCamelDeep', () => {
     const round = toSnakeDeep(toCamelDeep(snake))
     expect(round).toEqual(snake)
   })
+
+  it('null プロトタイプのとき、通常プロトタイプ(Object.prototype)で返す', () => {
+    const input = Object.create(null) as Record<string, unknown>
+    input.station_names = ['A', 'B']
+
+    const result = toCamelDeep(input) as any
+
+    expect(Object.getPrototypeOf(result)).toBe(Object.prototype)
+    expect(result.stationNames).toEqual(['A', 'B'])
+  })
 })
 
 describe('toSnakeDeep', () => {
@@ -74,7 +90,7 @@ describe('toSnakeDeep', () => {
     })
   })
 
-  it(' camel -> snake -> camel の往復でキーが元に戻る (正規化前提)', () => {
+  it('camel -> snake -> camel の往復でキーが元に戻る (正規化前提)', () => {
     const camel = { userId: 1, profile: { firstName: 'Taro' }, items: [{ shopId: 'x' }] }
     const round = toCamelDeep(toSnakeDeep(camel))
     expect(round).toEqual(camel)

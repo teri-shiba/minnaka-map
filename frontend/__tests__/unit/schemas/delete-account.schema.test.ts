@@ -4,12 +4,14 @@
  * ['email','google_oauth2'] 両対応に変更し、スキーマ・UI・テストを同一コミットで更新する。
  */
 
-import type z from 'zod'
+import type { ZodError } from 'zod'
 import { deleteAccountSchema } from '~/schemas/delete-account.schema'
 
-type ParseResult = z.SafeParseReturnType<unknown, unknown>
+type ParseResult<T = unknown>
+  = | { success: true, data: T }
+    | { success: false, error: ZodError<unknown> }
 
-function messageOf(result: ParseResult) {
+function messageOf<T>(result: ParseResult<T>): string[] {
   return result.success ? [] : result.error.issues.map(i => i.message)
 }
 
@@ -63,9 +65,7 @@ describe('deleteAccountSchema', () => {
     })
   })
 
-  describe('provider ≠ email (google_oauth2, line)', () => {
-    const provider = 'google_oauth2' as const
-
+  describe.each(['google_oauth2', 'line'] as const)('provider = %s', (provider) => {
     it('email が無くても成功する（オプショナル）', () => {
       const schema = deleteAccountSchema(provider, 'ignored@minnaka-map.com')
       const result = schema.safeParse({})
