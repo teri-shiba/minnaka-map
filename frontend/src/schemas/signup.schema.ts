@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import z from 'zod'
 
 export const signupSchema = z
   .object({
@@ -7,7 +7,9 @@ export const signupSchema = z
       .trim()
       .min(1, '名前を入力してください'),
     email: z
-      .email('メールアドレスの形式が正しくありません'),
+      .string()
+      .trim()
+      .pipe(z.email('メールアドレスの形式が正しくありません')),
     password: z
       .string()
       .min(8, 'パスワードは8文字以上で入力してください')
