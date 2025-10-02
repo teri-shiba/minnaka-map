@@ -1,13 +1,16 @@
+import type { ZodError } from 'zod'
 import { signupSchema } from '~/schemas/signup.schema'
 
 type SignupInput = import('zod').infer<typeof signupSchema>
-type ParseResult = ReturnType<typeof signupSchema.safeParse>
+type ParseResult<T = unknown>
+  = | { success: true, data: T }
+    | { success: false, error: ZodError<unknown> }
 
-function messagesOf(result: ParseResult): string[] {
+function messagesOf<T>(result: ParseResult<T>): string[] {
   return result.success ? [] : result.error.issues.map(i => i.message)
 }
 
-function findIssue(result: ParseResult, message: string) {
+function findIssue(result: ParseResult<SignupInput>, message: string) {
   return result.success ? undefined : result.error.issues.find(i => i.message === message)
 }
 
@@ -57,6 +60,14 @@ describe('signupSchema', () => {
     it('不正な形式なら専用メッセージで失敗する', () => {
       const result = parse({ email: 'non-an-email' })
       expect(result.success).toBe(false)
+      expect(messagesOf(result)).toEqual(['メールアドレスの形式が正しくありません'])
+    })
+
+    it('email の前後空白は trim され成功する', () => {
+      const result = parse({ email: '  test@minnaka-map.com  ' })
+      expect(result.success).toBe(true)
+      if (result.success)
+        expect(result.data.email).toBe('test@minnaka-map.com')
     })
   })
 
@@ -99,12 +110,15 @@ describe('signupSchema', () => {
         password_confirmation: 'short',
       })
       expect(result.success).toBe(false)
-      expect(messagesOf(result)).toEqual([
+
+      const messages = messagesOf(result)
+      expect(messages).toEqual([
         'パスワードは8文字以上で入力してください',
         '数字を1文字以上使用してください',
         '英大文字を1文字以上使用してください',
         '記号を1文字以上使用してください',
       ])
+      expect(messages).toHaveLength(4)
     })
   })
 
@@ -125,6 +139,14 @@ describe('signupSchema', () => {
 
     it('一致していれば成功する', () => {
       const result = parse({ password_confirmation: VALID.password_confirmation })
+      expect(result.success).toBe(true)
+    })
+
+    it('パスワードがちょうど8文字でも全要件を満たせば成功する', () => {
+      const result = parse({
+        password: 'Abc1@def',
+        password_confirmation: 'Abc1@def',
+      })
       expect(result.success).toBe(true)
     })
   })

@@ -10,13 +10,16 @@ function spySetItem() {
   return vi.spyOn(Storage.prototype, 'setItem')
 }
 
-beforeEach(() => {
-  localStorage.clear()
-  vi.clearAllMocks()
-  vi.restoreAllMocks()
-})
-
 describe('useLocalStorage', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   describe('初期読み込み', () => {
     it('既存の値がなければ initialValue を返す', () => {
       const setSpy = spySetItem()

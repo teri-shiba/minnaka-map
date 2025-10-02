@@ -3,24 +3,45 @@ import { apiFetchAuth, handleApiError } from '~/services/api-client'
 import { saveSearchHistory } from '~/services/save-search-history'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
 
-jest.mock('~/services/api-client', () => ({
-  apiFetchAuth: jest.fn(),
-  handleApiError: jest.fn(),
+vi.mock('~/services/api-client', () => ({
+  apiFetchAuth: vi.fn(),
+  handleApiError: vi.fn(),
 }))
 
-jest.mock('~/types/api-response', () => ({
-  isApiSuccess: jest.fn(),
-  getApiErrorMessage: jest.fn(),
+vi.mock('~/types/api-response', () => ({
+  isApiSuccess: vi.fn(),
+  getApiErrorMessage: vi.fn(),
 }))
 
-const mockedApiFetchAuth = jest.mocked(apiFetchAuth)
-const mockedHandleApiError = jest.mocked(handleApiError)
-const mockedIsApiSuccess = jest.mocked(isApiSuccess)
-const mockedGetApiErrorMessage = jest.mocked(getApiErrorMessage)
+const mockedApiFetchAuth = vi.mocked(apiFetchAuth)
+const mockedHandleApiError = vi.mocked(handleApiError)
+const mockedIsApiSuccess = vi.mocked(isApiSuccess)
+const mockedGetApiErrorMessage = vi.mocked(getApiErrorMessage)
 
 describe('save-search-history', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.resetAllMocks()
+  })
+
+  it('API が失敗を示したとき、取得したエラーメッセージを設定して返す', async () => {
+    const apiResponse = { error: [{ message: '保存に失敗しました' }] }
+    mockedApiFetchAuth.mockResolvedValue(apiResponse)
+    mockedIsApiSuccess.mockReturnValue(false)
+    mockedGetApiErrorMessage.mockReturnValue('保存に失敗しました')
+
+    const result = await saveSearchHistory([101])
+
+    expect(apiFetchAuth).toHaveBeenCalledWith('search_histories', {
+      method: 'POST',
+      body: { searchHistory: { stationIds: [101] } },
+    })
+    expect(getApiErrorMessage).toHaveBeenCalledWith(apiResponse)
+    expect(result).toEqual<ServiceResult<{ searchHistoryId: number | null }>>({
+      success: false,
+      message: '保存に失敗しました',
+      cause: 'REQUEST_FAILED',
+    })
+    expect(handleApiError).not.toHaveBeenCalled()
   })
 
   it('API が成功を示したとき、取得した id を searchHistoryId として渡す', async () => {
@@ -40,27 +61,6 @@ describe('save-search-history', () => {
     })
 
     expect(getApiErrorMessage).not.toHaveBeenCalled()
-    expect(handleApiError).not.toHaveBeenCalled()
-  })
-
-  it('API が失敗を示したとき、取得したエラーメッセージを設定して返す ', async () => {
-    const apiResponse = { error: [{ message: '保存に失敗しました' }] }
-    mockedApiFetchAuth.mockResolvedValue(apiResponse)
-    mockedIsApiSuccess.mockReturnValue(false)
-    mockedGetApiErrorMessage.mockReturnValue('保存に失敗しました')
-
-    const result = await saveSearchHistory([201])
-
-    expect(apiFetchAuth).toHaveBeenCalledWith('search_histories', {
-      method: 'POST',
-      body: { searchHistory: { stationIds: [201] } },
-    })
-    expect(getApiErrorMessage).toHaveBeenCalledWith(apiResponse)
-    expect(result).toEqual<ServiceResult<{ searchHistoryId: number | null }>>({
-      success: false,
-      message: '保存に失敗しました',
-      cause: 'REQUEST_FAILED',
-    })
     expect(handleApiError).not.toHaveBeenCalled()
   })
 

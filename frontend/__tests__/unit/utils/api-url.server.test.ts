@@ -1,4 +1,4 @@
-/* @jest-environment node */
+// @vitest-environment node
 
 import type { QueryParams } from '~/utils/api-url'
 import { apiBaseHref, apiHref, apiUrl } from '~/utils/api-url'
@@ -6,7 +6,7 @@ import { apiBaseHref, apiHref, apiUrl } from '~/utils/api-url'
 describe('apiUrl(server)', () => {
   const SERVER_ORIGIN = 'https://server.minnaka-map.com'
 
-  afterEach(() => {
+  beforeEach(() => {
     delete process.env.API_BASE_URL
     delete process.env.NEXT_PUBLIC_API_BASE_URL
   })
