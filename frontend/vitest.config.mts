@@ -41,7 +41,6 @@ export default defineConfig({
           environmentOptions: {
             jsdom: { url: 'http://localhost/' },
           },
-          setupFiles: ['__tests__/setup.ts'],
           include: ['__tests__/unit/**/*.{test,spec}.ts?(x)'],
         },
       },
