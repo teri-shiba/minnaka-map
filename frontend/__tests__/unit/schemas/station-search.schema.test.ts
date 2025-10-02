@@ -31,12 +31,15 @@
  */
 
 import type z from 'zod'
+import type { ZodError } from 'zod'
 import { stationSearchSchema } from '~/schemas/station-search.schema'
 
 type StationInput = z.infer<typeof stationSearchSchema>
-type ParseResult = ReturnType<typeof stationSearchSchema.safeParse>
+type ParseResult<T = unknown>
+  = | { success: true, data: T }
+    | { success: false, error: ZodError<unknown> }
 
-function messagesOf(result: ParseResult): string[] {
+function messagesOf<T>(result: ParseResult<T>): string[] {
   return result.success ? [] : result.error.issues.map(i => i.message)
 }
 
@@ -44,32 +47,26 @@ function issuesOf(result: ParseResult) {
   return result.success ? [] : result.error.issues
 }
 
-function findIssueByPath(result: ParseResult, path: (string | number)[]) {
-  return issuesOf(result).find(i => JSON.stringify(i.path) === JSON.stringify(path))
+function findIssueByPath(
+  result: ParseResult,
+  path: (string | number)[],
+) {
+  return issuesOf(result).find(i =>
+    i.path.length === path.length
+    && i.path.every((p, i) => p === path[i]),
+  )
 }
 
-const tokyo = {
-  areaValue: '東京',
-  stationId: null,
-  latitude: null,
-  longitude: null,
+function area(value: string) {
+  return {
+    areaValue: value,
+    stationId: null,
+    latitude: null,
+    longitude: null,
+  }
 }
 
-const kanda = {
-  areaValue: '神田',
-  stationId: null,
-  latitude: null,
-  longitude: null,
-}
-
-const ueno = {
-  areaValue: '上野',
-  stationId: null,
-  latitude: null,
-  longitude: null,
-}
-
-const VALID: StationInput = { area: [tokyo, kanda] }
+const VALID: StationInput = { area: [area('東京'), area('神田')] }
 
 function parse(overrides: Partial<StationInput> = {}) {
   return stationSearchSchema.safeParse({
@@ -80,20 +77,20 @@ function parse(overrides: Partial<StationInput> = {}) {
 
 describe('stationSearchSchema', () => {
   describe('areaValue(各行の必須・trim)', () => {
-    it('空文字は「出発地点を入力してください」になる ', () => {
-      const result = parse({ area: [{ ...tokyo, areaValue: '' }, kanda, ueno] })
+    it('空文字は「出発地点を入力してください」になる', () => {
+      const result = parse({ area: [{ ...area('東京'), areaValue: '' }, area('神田'), area('上野')] })
       expect(result.success).toBe(false)
       expect(messagesOf(result)).toEqual(['出発地点を入力してください'])
     })
 
     it('空白のみは trim 後に空になり失敗', () => {
-      const result = parse({ area: [{ ...tokyo, areaValue: '    ' }, kanda, ueno] })
+      const result = parse({ area: [{ ...area('東京'), areaValue: '    ' }, area('神田'), area('上野')] })
       expect(result.success).toBe(false)
       expect(messagesOf(result)).toEqual(['出発地点を入力してください'])
     })
 
     it('trim は実際に反映される', () => {
-      const result = parse({ area: [{ ...tokyo, areaValue: '  東京  ' }, kanda] })
+      const result = parse({ area: [{ ...area('東京'), areaValue: '  東京  ' }, area('神田')] })
       expect(result.success).toBe(true)
 
       if (result.success)
@@ -103,7 +100,7 @@ describe('stationSearchSchema', () => {
 
   describe('配列レベルのルール', () => {
     it('1件だけだと「出発地点を2つ以上入力してください」', () => {
-      const result = parse({ area: [tokyo] })
+      const result = parse({ area: [area('東京')] })
       expect(result.success).toBe(false)
       expect(messagesOf(result)).toEqual(['出発地点を2つ以上入力してください'])
     })
@@ -116,7 +113,7 @@ describe('stationSearchSchema', () => {
 
     it('同じ地点（trim 後を比較）を含むと「同じ出発地点が含まれています」', () => {
       const result = parse({
-        area: [tokyo, tokyo],
+        area: [area('東京'), area('東京')],
       })
       expect(result.success).toBe(false)
       expect(messagesOf(result)).toEqual(['同じ出発地点が含まれています'])
@@ -124,7 +121,7 @@ describe('stationSearchSchema', () => {
 
     it('空文字と有効な値の両方が存在する場合、個別エラーと配列エラーが同時に帰る', () => {
       const result = parse({
-        area: [{ ...tokyo, areaValue: '' }, kanda],
+        area: [{ ...area('東京'), areaValue: '' }, area('神田')],
       })
       expect(result.success).toBe(false)
       expect(messagesOf(result)).toEqual(
@@ -140,13 +137,13 @@ describe('stationSearchSchema', () => {
   describe('stationId / latitude / longitude (number | null)', () => {
     it('null は許可される', () => {
       const result = parse({
-        area: [{ ...tokyo, stationId: null, latitude: null, longitude: null }, kanda],
+        area: [{ ...area('東京'), stationId: null, latitude: null, longitude: null }, area('神田')],
       })
       expect(result.success).toBe(true)
     })
 
     it('型が不正（例: stationId が string）なら該当パスにエラーがつく', () => {
-      const payload: any = { area: [{ ...tokyo, stationId: '123' }, kanda] }
+      const payload: any = { area: [{ ...area('東京'), stationId: '123' }, area('神田')] }
       const result = stationSearchSchema.safeParse(payload)
       expect(result.success).toBe(false)
       const issue = findIssueByPath(result, ['area', 0, 'stationId'])

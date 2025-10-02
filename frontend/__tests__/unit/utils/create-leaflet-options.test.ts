@@ -1,10 +1,16 @@
+import type { LatLng, LatLngExpression } from 'leaflet'
 import { createLeafletOptions } from '~/utils/create-leaflet-options'
 
-describe('createLeafletOptions', () => {
-  const fakeLatLng = (expression: any) => Array.isArray(expression)
-    ? { lat: expression[0], lng: expression[1] }
-    : expression
+function fakeLatLng(expression: LatLngExpression): LatLng {
+  if (Array.isArray(expression)) {
+    const [lat, lng] = expression
+    return { lat, lng } as unknown as LatLng
+  }
 
+  return expression as unknown as LatLng
+}
+
+describe('createLeafletOptions', () => {
   const RADIUS_METERS = 3000
   const METERS_PER_DEG_LAT = 111_000
   const DEG_TO_RAD = Math.PI / 180

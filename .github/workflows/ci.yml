@@ -92,7 +92,7 @@ jobs:
       - name: Run lint
         run: npm run lint
 
-  Jest:
+  Vitest:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -109,13 +109,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Jest test
-        run: npm test -- --ci --coverage
+      - name: Run Vitest test
+        run: npm run test --reporter=github-actions --project unit --project integration
 
   Deploy-Sentry:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    needs: [ESLint, Jest]
+    needs: [ESLint, Vitest]
     defaults:
       run:
         working-directory: frontend
