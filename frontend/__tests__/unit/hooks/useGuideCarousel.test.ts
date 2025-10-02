@@ -1,31 +1,32 @@
 import { act, renderHook } from '@testing-library/react'
+import { guideCarousel as data } from '~/data/guide-carousel'
 import { useGuideCarousel } from '~/hooks/useGuideCarousel'
 
-jest.mock('~/data/guide-carousel', () => {
-  const guideCarousel: any[] = []
-  return { guideCarousel }
-})
-
-const { guideCarousel: data }
-  = jest.requireMock('~/data/guide-carousel') as { guideCarousel: any[] }
-
-function setData(items: any[]): void {
-  data.splice(0, data.length, ...items)
+interface GuideStep {
+  step: number
 }
 
-beforeEach(() => {
-  jest.useFakeTimers()
-  jest.clearAllTimers()
-  setData([])
-})
+const { guideData } = vi.hoisted(() => ({ guideData: [] as GuideStep[] }))
+vi.mock('~/data/guide-carousel', () => ({ guideCarousel: guideData }))
 
-afterEach(() => {
-  jest.runOnlyPendingTimers()
-  jest.useRealTimers()
-  jest.restoreAllMocks()
-})
+function setData(items: GuideStep[]): void {
+  guideData.splice(0, data.length, ...items)
+}
 
 describe('useGuideCarousel', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.clearAllTimers()
+    setData([])
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    vi.clearAllTimers()
+    vi.useRealTimers()
+    vi.clearAllMocks()
+  })
+
   describe('auto advance', () => {
     it('複数ステップあるとき、3 秒ごとに次のインデックスに進む', () => {
       setData([{ step: 1 }, { step: 2 }, { step: 3 }])
@@ -33,33 +34,33 @@ describe('useGuideCarousel', () => {
 
       expect(result.current.activeIndex).toBe(0)
 
-      act(() => jest.advanceTimersByTime(3000))
+      act(() => vi.advanceTimersByTime(3000))
       expect(result.current.activeIndex).toBe(1)
 
-      act(() => jest.advanceTimersByTime(3000))
+      act(() => vi.advanceTimersByTime(3000))
       expect(result.current.activeIndex).toBe(2)
 
-      act(() => jest.advanceTimersByTime(3000))
+      act(() => vi.advanceTimersByTime(3000))
       expect(result.current.activeIndex).toBe(0)
     })
 
     it('1件以下のときは自動進行のタイマーをセットしない', () => {
       setData([{ step: 1 }])
-      const spy = jest.spyOn(globalThis, 'setTimeout')
       renderHook(() => useGuideCarousel())
 
-      expect(spy).not.toHaveBeenCalled()
+      expect(vi.getTimerCount()).toBe(0)
     })
   })
 
   describe('cleanup', () => {
     it('アンマウント時にタイマーをクリアする', () => {
       setData([{ step: 1 }, { step: 2 }, { step: 3 }])
-      const clearSpy = jest.spyOn(globalThis, 'clearTimeout')
       const { unmount } = renderHook(() => useGuideCarousel())
-      unmount()
 
-      expect(clearSpy).toHaveBeenCalled()
+      expect(vi.getTimerCount()).toBeGreaterThan(0)
+
+      unmount()
+      expect(vi.getTimerCount()).toBe(0)
     })
   })
 

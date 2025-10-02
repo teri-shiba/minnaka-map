@@ -1,7 +1,11 @@
+import type { ZodError } from 'zod'
 import { loginSchema } from '~/schemas/login.schema'
 
-type ParseResult = ReturnType<typeof loginSchema.safeParse>
-function messagesOf(result: ParseResult): string[] {
+type ParseResult<T = unknown>
+  = | { success: true, data: T }
+    | { success: false, error: ZodError<unknown> }
+
+function messagesOf<T>(result: ParseResult<T>): string[] {
   return result.success ? [] : result.error.issues.map(i => i.message)
 }
 
@@ -22,6 +26,13 @@ describe('loginSchema', () => {
       const result = parse({ email: 'not-an-email' })
       expect(result.success).toBe(false)
       expect(messagesOf(result)).toEqual(['メールアドレスの形式が正しくありません'])
+    })
+
+    it('email の前後空白は trim され成功する', () => {
+      const result = parse({ email: ' test@minnaka-map.com ' })
+      expect(result.success).toBe(true)
+      if (result.success)
+        expect(result.data.email).toBe('test@minnaka-map.com')
     })
   })
 
@@ -61,12 +72,20 @@ describe('loginSchema', () => {
     it('複数条件を同時に満たさない場合、該当メッセージが複数返る', () => {
       const result = parse({ password: 'short' })
       expect(result.success).toBe(false)
-      expect(messagesOf(result)).toEqual([
+
+      const messages = messagesOf(result)
+      expect(messages).toEqual([
         'パスワードは8文字以上で入力してください',
         '数字を1文字以上使用してください',
         '英大文字を1文字以上使用してください',
         '記号を1文字以上使用してください',
       ])
+      expect(messages).toHaveLength(4)
+    })
+
+    it('パスワードがちょうど8文字でも全要件を満たせば成功する', () => {
+      const result = parse({ password: 'Abc1@def' })
+      expect(result.success).toBe(true)
     })
   })
 

@@ -1,15 +1,18 @@
+import type { Mock } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import useScrollToTopOnChange from '~/hooks/useScrollToTopOnChange'
 
 interface RefLike<T extends HTMLElement> { current: T | null }
-type ScrollableElement = HTMLElement & { scrollTo: jest.Mock }
+type ScrollToFn = (options?: ScrollToOptions | number, y?: number) => void
+type ScrollableElement = HTMLElement & { scrollTo: Mock }
 
 function makeRef<T extends HTMLElement>(element: T | null): RefLike<T> {
   return { current: element }
 }
 
 function makeElement(): ScrollableElement {
-  return { scrollTo: jest.fn() } as unknown as ScrollableElement
+  const scrollTo = vi.fn<ScrollToFn>()
+  return { scrollTo } as unknown as ScrollableElement
 }
 
 describe('useScrollToTopOnChange', () => {

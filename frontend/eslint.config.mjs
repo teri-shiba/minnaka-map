@@ -1,6 +1,5 @@
 import antfu from '@antfu/eslint-config'
 import nextPlugin from '@next/eslint-plugin-next'
-import pluginJest from 'eslint-plugin-jest'
 import tailwindcss from 'eslint-plugin-tailwindcss'
 
 export default antfu(
@@ -8,8 +7,8 @@ export default antfu(
     react: true,
     typescript: true,
     next: true,
+    test: true,
     jsdoc: false,
-    test: false,
     ignores: [],
   },
   ...tailwindcss.configs['flat/recommended'],
@@ -41,24 +40,9 @@ export default antfu(
     files: [
       '__tests__/**/*.{ts,tsx}',
       '**/*.test.{ts,tsx}',
-      '**/*.spec.{ts,tsx}',
     ],
-    plugins: {
-      jest: pluginJest,
-    },
-    languageOptions: {
-      globals: {
-        ...pluginJest.environments.globals.globals,
-      },
-    },
     rules: {
-      'jest/no-focused-tests': 'error',
-      'jest/no-identical-title': 'error',
-      'jest/valid-expect': 'error',
-      'jest/no-disabled-tests': 'warn',
-      'jest/prefer-lowercase-title': 'off',
-      'jest/consistent-test-it': ['error', { fn: 'it' }],
-      'no-console': 'off',
+      'test/prefer-lowercase-title': 'off',
     },
   },
 )

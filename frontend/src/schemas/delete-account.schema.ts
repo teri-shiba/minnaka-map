@@ -12,39 +12,32 @@ export interface DeleteAccountFormValues {
   email?: string
 }
 
-export function deleteAccountSchema(provider: ProviderId, registeredEmail: string) {
+export function deleteAccountSchema(
+  provider: ProviderId,
+  registeredEmail: string,
+) {
   if (provider === 'email') {
     const registered = (registeredEmail ?? '').trim()
 
-    const base = z
-      .string({ required_error: 'メールアドレスは必須です' })
-      .trim()
-      .min(1, 'メールアドレスは必須です')
+    const basic = z.string().trim().min(1, 'メールアドレスは必須です')
+    const format = z.email('メールアドレスの形式が正しくありません')
+    const normalize = z.any().transform((value: unknown) => (value == null ? '' : String(value)))
+    const emailSchema = normalize.pipe(basic.pipe(format))
 
-    const format = z
-      .string()
-      .email('メールアドレスの形式が正しくありません')
-
-    const schema = z.object({
-      email: base.pipe(format),
-    })
-
-    return schema.superRefine(({ email }, context) => {
-      const isValidFormat = format.safeParse(email).success
-      if (!isValidFormat)
+    return z.object({ email: emailSchema }).superRefine(({ email }, context) => {
+      if (!format.safeParse(email).success)
         return
 
       if (email !== registered) {
-        context.addIssue({
-          code: z.ZodIssueCode.custom,
+        context.issues.push({
+          code: 'custom',
           path: ['email'],
           message: 'メールアドレスが一致しません',
+          input: email,
         })
       }
     })
   }
 
-  return z.object({
-    email: z.string().optional(),
-  })
+  return z.object({ email: z.string().optional() })
 }

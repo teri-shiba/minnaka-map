@@ -1,21 +1,36 @@
 import { getApiKey } from '~/services/get-api-key'
 import { getGoogleMapsEmbedUrl } from '~/services/get-google-maps-embed-url'
 
-jest.mock('~/services/get-api-key', () => ({
-  getApiKey: jest.fn(),
+vi.mock('~/services/get-api-key', () => ({
+  getApiKey: vi.fn(),
 }))
 
-const mockedGetApiKey = jest.mocked(getApiKey)
-
-beforeEach(() => {
-  jest.resetAllMocks()
-})
+const mockedGetApiKey = vi.mocked(getApiKey)
 
 describe('getGoogleMapsEmbedUrl', () => {
-  it('api key が取得できたら正しい url を返す', async () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+  })
+
+  it('API キー取得で例外が発生したら null を返す', async () => {
+    mockedGetApiKey.mockRejectedValue(new Error('failure'))
+    const result = await getGoogleMapsEmbedUrl('tokyo cafe')
+
+    expect(result).toBeNull()
+  })
+
+  it('API キーが空文字なら null を返す', async () => {
+    mockedGetApiKey.mockRejectedValue('')
+    const result = await getGoogleMapsEmbedUrl('tokyo cafe')
+
+    expect(result).toBeNull()
+  })
+
+  it('API キーが取得できたら正しい url を返す', async () => {
     mockedGetApiKey.mockResolvedValue('FAKE_API_KEY')
     const result = await getGoogleMapsEmbedUrl('tokyo station')
 
+    expect(mockedGetApiKey).toHaveBeenCalledTimes(1)
     expect(mockedGetApiKey).toHaveBeenCalledWith('googlemaps')
     expect(result).not.toBeNull()
 
@@ -33,12 +48,5 @@ describe('getGoogleMapsEmbedUrl', () => {
     const url = new URL(result as string)
 
     expect(url.searchParams.get('q')).toBe(query)
-  })
-
-  it('api key 取得で例外が発生したら null を返す', async () => {
-    mockedGetApiKey.mockRejectedValue(new Error('failure'))
-    const result = await getGoogleMapsEmbedUrl('tokyo cafe')
-
-    expect(result).toBeNull()
   })
 })
