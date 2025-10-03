@@ -1,20 +1,11 @@
-import type { ServiceFailure } from '~/types/service-result'
-
 import type { QueryParams } from '~/utils/api-url'
-import { logger } from '~/lib/logger'
+import { logger, reportHttpError } from '~/lib/logger'
 import { apiUrl } from '~/utils/api-url'
+import { addAuthHeaders } from '~/utils/auth-headers'
 import { isPlainObject, toCamelDeep, toSnakeDeep } from '~/utils/case-convert'
-import { getAuthFromCookie } from './get-auth-from-cookie'
 import 'server-only'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
-
-interface ErrorHandlingOptions {
-  component: string
-  defaultMessage: string
-  notFoundMessage?: string
-  extraContext?: Record<string, unknown>
-}
 
 interface ApiRequestOptions {
   readonly method?: HttpMethod
@@ -26,6 +17,8 @@ interface ApiRequestOptions {
   readonly cache?: RequestCache
   readonly requestCase?: 'snake' | 'none'
   readonly responseCase?: 'camel' | 'none'
+  readonly signal?: AbortSignal
+  readonly timeoutMs?: number
 }
 
 export class ApiError extends Error {
@@ -37,16 +30,6 @@ export class ApiError extends Error {
     this.status = status
     this.body = body
   }
-}
-
-async function addAuthHeaders(headers: Headers): Promise<void> {
-  const auth = await getAuthFromCookie()
-  if (!auth)
-    return
-
-  headers.set('access-token', auth.accessToken)
-  headers.set('client', auth.client)
-  headers.set('uid', auth.uid)
 }
 
 function toSnakeIfNeeded<T>(
@@ -61,12 +44,13 @@ function toSnakeIfNeeded<T>(
 
 async function buildHeaders(
   method: HttpMethod,
-  extraHeaders?: HeadersInit,
-  withAuth?: boolean,
+  extraHeaders: HeadersInit | undefined,
+  withAuth: boolean | undefined,
+  isJsonBody: boolean,
 ): Promise<Headers> {
   const headers = new Headers({ Accept: 'application/json' })
 
-  if (method !== 'GET')
+  if (method !== 'GET' && isJsonBody)
     headers.set('Content-Type', 'application/json')
 
   if (extraHeaders) {
@@ -100,7 +84,7 @@ async function parseResponse<T>(
   return payload as T
 }
 
-async function apiFetch<T = any>(
+export async function apiFetch<T = any>(
   path: string,
   options: ApiRequestOptions = {},
 ): Promise<T> {
@@ -114,6 +98,8 @@ async function apiFetch<T = any>(
     cache,
     requestCase = 'snake',
     responseCase = 'camel',
+    signal,
+    timeoutMs,
   } = options
 
   const params = toSnakeIfNeeded(rawParams, requestCase)
@@ -121,13 +107,17 @@ async function apiFetch<T = any>(
 
   const urlObj = apiUrl(path, params as QueryParams)
   const url = urlObj.toString()
+  const willSendJsonBody = method !== 'GET' && body != null && isPlainObject(body)
+  const headers = await buildHeaders(method, extraHeaders, withAuth, willSendJsonBody)
 
-  const headers = await buildHeaders(method, extraHeaders, withAuth)
+  const bodyInit = body != null
+    ? (isPlainObject(body) ? JSON.stringify(body) : (body as BodyInit))
+    : undefined
 
   const init: RequestInit & { next?: NextFetchRequestConfig } = {
     method,
     headers,
-    body: body != null ? JSON.stringify(body) : undefined,
+    body: bodyInit,
   }
 
   if (cache !== undefined)
@@ -136,21 +126,48 @@ async function apiFetch<T = any>(
   if (next)
     init.next = next
 
+  let controller: AbortController | undefined
+  let timeoutId: ReturnType<typeof setTimeout> | undefined
+
+  if (timeoutMs != null && timeoutMs >= 0) {
+    controller = new AbortController()
+    timeoutId = setTimeout(() => controller?.abort(), timeoutMs)
+  }
+
+  if (signal) {
+    if (!controller)
+      controller = new AbortController()
+
+    const onAbort = () => controller?.abort()
+
+    if ('addEventListener' in signal)
+      signal.addEventListener('abort', onAbort, { once: true })
+  }
+
+  if (controller) {
+    init.signal = controller.signal
+  }
+  else if (signal) {
+    init.signal = signal
+  }
+
   try {
     const response = await fetch(url, init)
+    if (timeoutId)
+      clearTimeout(timeoutId)
 
     if (!response.ok) {
       const text = await response.text().catch(() => undefined)
       const error = new ApiError(response.status, `${method} ${url} failed`, text)
 
-      logger(`${method} ${path} failed`, {
-        tags: {
-          component: 'apiFetch',
-          path,
-          method,
-          status: response.status,
-          withAuth,
-        },
+      reportHttpError({
+        error,
+        status: response.status,
+        method,
+        path,
+        component: 'apiFetch',
+        withAuth,
+        responseBody: text,
       })
 
       throw error
@@ -159,6 +176,9 @@ async function apiFetch<T = any>(
     return parseResponse<T>(response, responseCase)
   }
   catch (error) {
+    if (timeoutId)
+      clearTimeout(timeoutId)
+
     if (!(error instanceof ApiError)) {
       logger(error, {
         tags: {
@@ -173,49 +193,15 @@ async function apiFetch<T = any>(
   }
 }
 
-// 認証なし
-export function apiFetchPublic<T = unknown>(
-  path: string,
-  options: Omit<ApiRequestOptions, 'withAuth'> = {},
-): Promise<T> {
-  return apiFetch<T>(path, { ...options, withAuth: false })
-}
-
 // 認証付き
 export function apiFetchAuth<T = unknown>(
   path: string,
   options: Omit<ApiRequestOptions, 'withAuth'> = {},
 ): Promise<T> {
-  return apiFetch<T>(path, { ...options, withAuth: true })
-}
+  const merged: ApiRequestOptions
+    = (options.cache === undefined && !options.next)
+      ? { ...options, withAuth: true, cache: 'no-store' }
+      : { ...options, withAuth: true }
 
-export function handleApiError(
-  error: unknown,
-  options: ErrorHandlingOptions,
-): ServiceFailure {
-  const { component, defaultMessage, notFoundMessage, extraContext } = options
-
-  if (!(error instanceof ApiError)) {
-    logger('handleApiError: non-ApiError', { tags: { component, ...extraContext } })
-  }
-
-  if (error instanceof ApiError) {
-    if (error.status === 401)
-      return { success: false, message: '認証が必要です', cause: 'UNAUTHORIZED' }
-    if (error.status === 403)
-      return { success: false, message: '権限がありません', cause: 'FORBIDDEN' }
-    if (error.status === 404)
-      return { success: false, message: notFoundMessage ?? 'リソースが見つかりません', cause: 'NOT_FOUND' }
-    if (error.status === 429)
-      return { success: false, message: 'アクセスが集中しています。時間をあけてお試しください。', cause: 'RATE_LIMIT' }
-    if (error.status >= 500)
-      return { success: false, message: 'サーバーエラーが発生しました', cause: 'SERVER_ERROR' }
-
-    return { success: false, message: defaultMessage, cause: 'REQUEST_FAILED' }
-  }
-
-  if (error instanceof TypeError)
-    return { success: false, message: 'ネットワークエラーが発生しました', cause: 'NETWORK' }
-
-  return { success: false, message: defaultMessage, cause: 'REQUEST_FAILED' }
+  return apiFetch<T>(path, merged)
 }
