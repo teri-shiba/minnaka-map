@@ -2,7 +2,8 @@ import type { QueryParams } from '~/utils/api-url'
 import { logger, reportHttpError } from '~/lib/logger'
 import { apiUrl } from '~/utils/api-url'
 import { addAuthHeaders } from '~/utils/auth-headers'
-import { isPlainObject, toCamelDeep, toSnakeDeep } from '~/utils/case-convert'
+import { isPlainObject } from '~/utils/case-convert'
+import { parseApiResponse, toSnakeRequest } from '~/utils/serde'
 import 'server-only'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -32,16 +33,6 @@ export class ApiError extends Error {
   }
 }
 
-function toSnakeIfNeeded<T>(
-  value: T,
-  requestCase: ApiRequestOptions['requestCase'],
-): T {
-  if (requestCase !== 'snake' || !isPlainObject(value))
-    return value
-
-  return toSnakeDeep(value as Record<string, unknown>) as unknown as T
-}
-
 async function buildHeaders(
   method: HttpMethod,
   extraHeaders: HeadersInit | undefined,
@@ -65,25 +56,6 @@ async function buildHeaders(
   return headers
 }
 
-async function parseResponse<T>(
-  response: Response,
-  responseCase: ApiRequestOptions['responseCase'],
-): Promise<T> {
-  const contentType = (response.headers.get('content-type') ?? '').toLowerCase()
-  const isText = contentType.includes('text/')
-  const isNoContent = response.status === 204
-
-  if (isText)
-    return await response.text() as unknown as T
-
-  if (isNoContent)
-    return null as T
-
-  const json = await response.json()
-  const payload = responseCase === 'camel' ? toCamelDeep(json) : json
-  return payload as T
-}
-
 export async function apiFetch<T = any>(
   path: string,
   options: ApiRequestOptions = {},
@@ -102,8 +74,8 @@ export async function apiFetch<T = any>(
     timeoutMs,
   } = options
 
-  const params = toSnakeIfNeeded(rawParams, requestCase)
-  const body = toSnakeIfNeeded(rawBody, requestCase)
+  const params = toSnakeRequest(rawParams, requestCase === 'snake')
+  const body = toSnakeRequest(rawBody, requestCase === 'snake')
 
   const urlObj = apiUrl(path, params as QueryParams)
   const url = urlObj.toString()
@@ -173,7 +145,7 @@ export async function apiFetch<T = any>(
       throw error
     }
 
-    return parseResponse<T>(response, responseCase)
+    return parseApiResponse<T>(response, responseCase === 'camel')
   }
   catch (error) {
     if (timeoutId)
