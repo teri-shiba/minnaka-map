@@ -3,17 +3,18 @@
 import type { ApiResponse } from '~/types/api-response'
 import type { ServiceResult } from '~/types/service-result'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
-import { apiFetchAuth, handleApiError } from './api-client'
+import { apiFetch, handleApiError } from './api-client'
 
 export async function saveSearchHistory(
   stationIds: number[],
 ): Promise<ServiceResult<{ searchHistoryId: number | null }>> {
   try {
-    const response = await apiFetchAuth<ApiResponse<{ id: number }>>(
+    const response = await apiFetch<ApiResponse<{ id: number }>>(
       'search_histories',
       {
         method: 'POST',
         body: { searchHistory: { stationIds } },
+        withAuth: true,
       },
     )
 

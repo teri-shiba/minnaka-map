@@ -3,7 +3,7 @@
 import type { ApiResponse } from '~/types/api-response'
 import type { ServiceResult } from '~/types/service-result'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
-import { apiFetchAuth, handleApiError } from './api-client'
+import { apiFetch, handleApiError } from './api-client'
 
 // TODO: 他で使用されているので外に出す
 export interface SharedListData {
@@ -14,11 +14,12 @@ export interface SharedListData {
 
 export async function createSharedList(searchHistoryId: number): Promise<ServiceResult<SharedListData>> {
   try {
-    const response = await apiFetchAuth<ApiResponse<SharedListData>>(
+    const response = await apiFetch<ApiResponse<SharedListData>>(
       'shared_favorite_lists',
       {
         method: 'POST',
         body: { searchHistoryId },
+        withAuth: true,
       },
     )
 
