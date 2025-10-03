@@ -4,7 +4,7 @@ import type { LatLngExpression } from 'leaflet'
 import type { ServiceCause, ServiceResult } from '~/types/service-result'
 import { API_ENDPOINTS } from '~/constants'
 import { logger } from '~/lib/logger'
-import { ApiError, apiFetchPublic } from './api-client'
+import { ApiError, apiFetch } from './api-client'
 
 interface VerifyCoordsOptions {
   latitude: number
@@ -46,7 +46,7 @@ export async function verifyCoordsSignature(
     if (opts.expires_at)
       params.expiresAt = opts.expires_at.toString()
 
-    const result = await apiFetchPublic<ValidateResponse>(API_ENDPOINTS.VALIDATE_COORDINATES, {
+    const result = await apiFetch<ValidateResponse>(API_ENDPOINTS.VALIDATE_COORDINATES, {
       params,
       cache,
       next: revalidateConfig,
