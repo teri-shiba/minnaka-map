@@ -3,7 +3,7 @@
 import type { ApiResponse } from '~/types/api-response'
 import type { ServiceResult } from '~/types/service-result'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
-import { apiFetchPublic, handleApiError } from './api-client'
+import { apiFetch, handleApiError } from './api-client'
 
 interface SharedListData {
   title: string
@@ -20,7 +20,7 @@ interface SharedListData {
 
 export async function fetchSharedList(uuid: string): Promise<ServiceResult<SharedListData>> {
   try {
-    const response = await apiFetchPublic<ApiResponse<SharedListData>>(
+    const response = await apiFetch<ApiResponse<SharedListData>>(
       `shared_lists/${uuid}`,
     )
 

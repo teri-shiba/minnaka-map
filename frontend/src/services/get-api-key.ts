@@ -4,7 +4,7 @@ import type { SupportedService } from '~/constants'
 import type { ApiResponse } from '~/types/api-response'
 import { API_SERVICES } from '~/constants'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
-import { apiFetchPublic, handleApiError } from './api-client'
+import { apiFetch, handleApiError } from './api-client'
 
 export async function getApiKey(service: SupportedService): Promise<string> {
   const config = API_SERVICES[service]
@@ -12,7 +12,7 @@ export async function getApiKey(service: SupportedService): Promise<string> {
     throw new Error(`未対応のサービスです: ${service}`)
 
   try {
-    const response = await apiFetchPublic<ApiResponse<{ apiKey: string }>>(
+    const response = await apiFetch<ApiResponse<{ apiKey: string }>>(
       config.endpoint,
       {
         extraHeaders: { 'X-Internal-Token': process.env.INTERNAL_API_TOKEN! },
