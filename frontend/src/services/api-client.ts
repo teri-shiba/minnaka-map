@@ -3,10 +3,19 @@ import { logger, reportHttpError } from '~/lib/logger'
 import { apiUrl } from '~/utils/api-url'
 import { addAuthHeaders } from '~/utils/auth-headers'
 import { isPlainObject } from '~/utils/case-convert'
+import { mapToServiceFailure } from '~/utils/map-to-service-failure'
 import { parseApiResponse, toSnakeRequest } from '~/utils/serde'
+import { fetchWithTimeout } from '~/utils/transport'
 import 'server-only'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+
+export interface ErrorHandlingOptions {
+  component: string
+  defaultMessage: string
+  notFoundMessage?: string
+  extraContext?: Record<string, unknown>
+}
 
 interface ApiRequestOptions {
   readonly method?: HttpMethod
@@ -98,35 +107,8 @@ export async function apiFetch<T = any>(
   if (next)
     init.next = next
 
-  let controller: AbortController | undefined
-  let timeoutId: ReturnType<typeof setTimeout> | undefined
-
-  if (timeoutMs != null && timeoutMs >= 0) {
-    controller = new AbortController()
-    timeoutId = setTimeout(() => controller?.abort(), timeoutMs)
-  }
-
-  if (signal) {
-    if (!controller)
-      controller = new AbortController()
-
-    const onAbort = () => controller?.abort()
-
-    if ('addEventListener' in signal)
-      signal.addEventListener('abort', onAbort, { once: true })
-  }
-
-  if (controller) {
-    init.signal = controller.signal
-  }
-  else if (signal) {
-    init.signal = signal
-  }
-
   try {
-    const response = await fetch(url, init)
-    if (timeoutId)
-      clearTimeout(timeoutId)
+    const response = await fetchWithTimeout(url, init, { signal, timeoutMs })
 
     if (!response.ok) {
       const text = await response.text().catch(() => undefined)
@@ -148,9 +130,6 @@ export async function apiFetch<T = any>(
     return parseApiResponse<T>(response, responseCase === 'camel')
   }
   catch (error) {
-    if (timeoutId)
-      clearTimeout(timeoutId)
-
     if (!(error instanceof ApiError)) {
       logger(error, {
         tags: {
@@ -176,4 +155,20 @@ export function apiFetchAuth<T = unknown>(
       : { ...options, withAuth: true }
 
   return apiFetch<T>(path, merged)
+}
+
+export function handleApiError(
+  error: unknown,
+  options: ErrorHandlingOptions,
+) {
+  if ((error as any)?.status == null) {
+    logger('handleApiError: non-ApiError', {
+      tags: {
+        component: options.component,
+        ...options.extraContext,
+      },
+    })
+  }
+
+  return mapToServiceFailure(error, options)
 }

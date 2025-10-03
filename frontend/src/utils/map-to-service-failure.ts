@@ -1,17 +1,11 @@
+import type { ErrorHandlingOptions } from '~/services/api-client'
 import type { ServiceFailure } from '~/types/service-result'
-
-interface ErrorHandlingOptions {
-  component: string
-  defaultMessage: string
-  notFoundMessage?: string
-  extraContext?: Record<string, unknown>
-}
 
 function isHttpErrorLike(error: unknown): error is { status: number } {
   return !!error && typeof (error as any).status === 'number'
 }
 
-export function handleApiError(
+export function mapToServiceFailure(
   error: unknown,
   options: ErrorHandlingOptions,
 ): ServiceFailure {
