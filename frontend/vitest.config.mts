@@ -30,7 +30,8 @@ export default defineConfig({
       ],
     },
     env: {
-      API_BASE_URL: 'https://minnaka-map.com',
+      NEXT_PUBLIC_API_BASE_URL: 'http://localhost',
+      API_BASE_URL: 'http://localhost',
     },
     projects: [
       {
