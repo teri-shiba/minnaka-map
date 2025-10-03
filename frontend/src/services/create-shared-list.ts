@@ -3,7 +3,8 @@
 import type { ApiResponse } from '~/types/api-response'
 import type { ServiceResult } from '~/types/service-result'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
-import { apiFetchAuth, handleApiError } from './api-client'
+import { handleApiError } from '~/utils/error-map'
+import { apiFetchAuth } from './api-client'
 
 // TODO: 他で使用されているので外に出す
 export interface SharedListData {

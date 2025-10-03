@@ -13,7 +13,8 @@ import type { ServiceResult } from '~/types/service-result'
 import { FAVORITE_GROUPS_PER_PAGE, FAVORITES_FIRST_PAGE } from '~/constants'
 import { logger } from '~/lib/logger'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
-import { apiFetchAuth, handleApiError } from './api-client'
+import { handleApiError } from '~/utils/error-map'
+import { apiFetchAuth } from './api-client'
 import { fetchRestaurantsByIds } from './fetch-restaurants'
 
 // TODO: ファイルを分割する getFavorites, getFavoritesWithDetailsPaginated / checkFavoriteStatus / addToFavorites, removeFromFavorites

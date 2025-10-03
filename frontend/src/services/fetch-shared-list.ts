@@ -3,7 +3,8 @@
 import type { ApiResponse } from '~/types/api-response'
 import type { ServiceResult } from '~/types/service-result'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
-import { apiFetch, handleApiError } from './api-client'
+import { handleApiError } from '~/utils/error-map'
+import { apiFetch } from './api-client'
 
 interface SharedListData {
   title: string
