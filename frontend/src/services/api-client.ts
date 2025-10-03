@@ -5,7 +5,6 @@ import { addAuthHeaders } from '~/utils/auth-headers'
 import { isPlainObject } from '~/utils/case-convert'
 import { mapToServiceFailure } from '~/utils/map-to-service-failure'
 import { parseApiResponse, toSnakeRequest } from '~/utils/serde'
-import { fetchWithTimeout } from '~/utils/transport'
 import 'server-only'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -25,10 +24,6 @@ interface ApiRequestOptions {
   readonly extraHeaders?: HeadersInit
   readonly next?: NextFetchRequestConfig
   readonly cache?: RequestCache
-  readonly requestCase?: 'snake' | 'none'
-  readonly responseCase?: 'camel' | 'none'
-  readonly signal?: AbortSignal
-  readonly timeoutMs?: number
 }
 
 export class ApiError extends Error {
@@ -77,14 +72,10 @@ export async function apiFetch<T = any>(
     extraHeaders,
     next,
     cache,
-    requestCase = 'snake',
-    responseCase = 'camel',
-    signal,
-    timeoutMs,
   } = options
 
-  const params = toSnakeRequest(rawParams, requestCase === 'snake')
-  const body = toSnakeRequest(rawBody, requestCase === 'snake')
+  const params = toSnakeRequest(rawParams, true)
+  const body = toSnakeRequest(rawBody, true)
 
   const urlObj = apiUrl(path, params as QueryParams)
   const url = urlObj.toString()
@@ -101,14 +92,18 @@ export async function apiFetch<T = any>(
     body: bodyInit,
   }
 
-  if (cache !== undefined)
+  if (cache !== undefined) {
     init.cache = cache
+  }
+  else if (!next && withAuth) {
+    init.cache = 'no-cache'
+  }
 
   if (next)
     init.next = next
 
   try {
-    const response = await fetchWithTimeout(url, init, { signal, timeoutMs })
+    const response = await fetch(url, init)
 
     if (!response.ok) {
       const text = await response.text().catch(() => undefined)
@@ -127,7 +122,7 @@ export async function apiFetch<T = any>(
       throw error
     }
 
-    return parseApiResponse<T>(response, responseCase === 'camel')
+    return parseApiResponse<T>(response, true)
   }
   catch (error) {
     if (!(error instanceof ApiError)) {
@@ -142,19 +137,6 @@ export async function apiFetch<T = any>(
     }
     throw error
   }
-}
-
-// 認証付き
-export function apiFetchAuth<T = unknown>(
-  path: string,
-  options: Omit<ApiRequestOptions, 'withAuth'> = {},
-): Promise<T> {
-  const merged: ApiRequestOptions
-    = (options.cache === undefined && !options.next)
-      ? { ...options, withAuth: true, cache: 'no-store' }
-      : { ...options, withAuth: true }
-
-  return apiFetch<T>(path, merged)
 }
 
 export function handleApiError(
