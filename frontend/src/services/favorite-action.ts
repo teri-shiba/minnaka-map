@@ -13,15 +13,15 @@ import type { ServiceResult } from '~/types/service-result'
 import { FAVORITE_GROUPS_PER_PAGE, FAVORITES_FIRST_PAGE } from '~/constants'
 import { logger } from '~/lib/logger'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
-import { apiFetchAuth, handleApiError } from './api-client'
+import { apiFetch, handleApiError } from './api-client'
 import { fetchRestaurantsByIds } from './fetch-restaurants'
 
 // TODO: ファイルを分割する getFavorites, getFavoritesWithDetailsPaginated / checkFavoriteStatus / addToFavorites, removeFromFavorites
 // すべてのお気に入りを取得
 export async function getFavorites(): Promise<ServiceResult<FavoriteGroup[]>> {
   try {
-    const response = await apiFetchAuth<GetFavoritesRes>
-    ('favorites')
+    const response = await apiFetch<GetFavoritesRes>
+    ('favorites', { withAuth: true })
 
     if (!isApiSuccess(response)) {
       return {
@@ -47,8 +47,9 @@ export async function getFavoritesWithDetailsPaginated(
   limit: number = FAVORITE_GROUPS_PER_PAGE,
 ): Promise<PaginatedFavoritesResponse> {
   try {
-    const response = await apiFetchAuth<GetFavoritesPageRes>(
+    const response = await apiFetch<GetFavoritesPageRes>(
       `favorites?page=${page}&limit=${limit}`,
+      { withAuth: true },
     )
 
     if (!isApiSuccess(response)) {
@@ -130,8 +131,9 @@ export async function checkFavoriteStatus(
   searchHistoryId: string,
 ): Promise<FavoriteStatus> {
   try {
-    const response = await apiFetchAuth<GetFavoriteStatusRes>('favorites/status', {
+    const response = await apiFetch<GetFavoriteStatusRes>('favorites/status', {
       params: { searchHistoryId, hotpepperId },
+      withAuth: true,
     })
 
     if (!isApiSuccess(response)) {
@@ -160,13 +162,14 @@ export async function addToFavorites(
   searchHistoryId: number,
 ): Promise<FavoriteActionResponse> {
   try {
-    const response = await apiFetchAuth<CreateFavoriteRes>(
+    const response = await apiFetch<CreateFavoriteRes>(
       'favorites',
       {
         method: 'POST',
         body: {
           favorite: { searchHistoryId, hotpepperId },
         },
+        withAuth: true,
       },
     )
 
@@ -189,9 +192,9 @@ export async function removeFromFavorites(
   favoriteId: number,
 ): Promise<FavoriteActionResponse> {
   try {
-    const response = await apiFetchAuth<DeleteFavoriteRes>(
+    const response = await apiFetch<DeleteFavoriteRes>(
       `favorites/${favoriteId}`,
-      { method: 'DELETE' },
+      { method: 'DELETE', withAuth: true },
     )
 
     if (!isApiSuccess(response))
