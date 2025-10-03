@@ -1,10 +1,13 @@
 import { http, HttpResponse } from 'msw'
-import { logger } from '~/lib/logger'
-import { apiFetchAuth, apiFetchPublic } from '~/services/api-client'
+import { logger, reportHttpError } from '~/lib/logger'
+import { apiFetch } from '~/services/api-client'
 import { server } from '../setup/msw.server'
 
 vi.mock('server-only', () => ({}))
-vi.mock('~/lib/logger', () => ({ logger: vi.fn() }))
+vi.mock('~/lib/logger', () => ({
+  logger: vi.fn(),
+  reportHttpError: vi.fn(),
+}))
 
 vi.mock('~/services/get-auth-from-cookie', () => ({
   getAuthFromCookie: vi.fn().mockResolvedValue({
@@ -14,9 +17,13 @@ vi.mock('~/services/get-auth-from-cookie', () => ({
   }),
 }))
 
-describe('api-client（MSW 結合)', () => {
-  describe('apiFetchPublic', () => {
-    it('クエリパラメータが与えられたとき、スネークに変換して送信する', async () => {
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+describe('api-client（integration / MSW)', () => {
+  describe('apiFetch', () => {
+    it('GET: クエリは snake で送信され、レスポンスは camel で返る', async () => {
       server.use(
         http.get('*/users', ({ request }) => {
           const url = new URL(request.url)
@@ -24,53 +31,39 @@ describe('api-client（MSW 結合)', () => {
           return HttpResponse.json({ query: { user_name: userName } })
         }),
       )
-      const result = await apiFetchPublic('/users', {
-        params: { userName: 'taro' },
-        responseCase: 'none',
-      })
-      expect(result).toEqual({ query: { user_name: 'taro' } })
+      const result = await apiFetch('/users', { params: { userName: 'taro' } })
+      expect(result).toEqual({ query: { userName: 'taro' } })
     })
 
-    it('POST のとき、body をスネーク化し JSON 文字列として送信する', async () => {
+    it('POST: body は snake で送信され、レスポンスは camel で返る', async () => {
       server.use(
         http.post('*/items', async ({ request }) => {
-          const body = await request.json()
-          return HttpResponse.json({ body })
+          const body = await request.json().catch(() => undefined) as unknown
+          const isSnake = isRecord(body) && 'item_count' in body && !('itemCount' in body)
+          return HttpResponse.json({ isSnake, body })
         }),
       )
 
-      const result = await apiFetchPublic('/items', {
-        method: 'POST',
-        body: { itemCount: 1 },
-        responseCase: 'none',
-      })
-      expect(result).toEqual({ body: { item_count: 1 } })
+      const result = await apiFetch('/items', { method: 'POST', body: { itemCount: 1 } })
+      expect(result).toEqual({ isSnake: true, body: { itemCount: 1 } })
     })
 
-    it('追加ヘッダーを上書き送信し、text/* は text() の結果を返す', async () => {
+    it('追加ヘッダーを上書きして送信できる（サーバー側で値を検証）', async () => {
       server.use(
-        http.post('*/headers', async ({ request }) => {
-          return HttpResponse.json({
-            headers: {
-              'accept': request.headers.get('accept'),
-              'x-request-id': request.headers.get('x-request-id'),
-            },
-          })
+        http.post('*/override', async ({ request }) => {
+          const accept = request.headers.get('accept')
+          const xRequestId = request.headers.get('x-request-id')
+          const ok = accept === 'text/plain' && xRequestId === 'req-1'
+          return HttpResponse.json({ ok })
         }),
       )
 
-      const result = await apiFetchPublic('/headers', {
+      const result = await apiFetch('/override', {
         method: 'POST',
         body: { count: 1 },
         extraHeaders: { 'Accept': 'text/plain', 'X-Request-Id': 'req-1' },
-        responseCase: 'none',
       })
-      expect(result).toEqual({
-        headers: {
-          'accept': 'text/plain',
-          'x-request-id': 'req-1',
-        },
-      })
+      expect(result).toEqual({ ok: true })
     })
 
     it('content-type が text/* のとき、text() の結果を返す', async () => {
@@ -78,7 +71,7 @@ describe('api-client（MSW 結合)', () => {
         http.get('*/plaintext', () => HttpResponse.text('hello')),
       )
 
-      const result = await apiFetchPublic('/plaintext')
+      const result = await apiFetch('/plaintext')
       expect(result).toBe('hello')
     })
 
@@ -87,49 +80,8 @@ describe('api-client（MSW 結合)', () => {
         http.get('*/no-content', () => new HttpResponse(null, { status: 204 })),
       )
 
-      const result = await apiFetchPublic('/no-content')
+      const result = await apiFetch('/no-content')
       expect(result).toBeNull()
-    })
-
-    it('responseCase を "camel" にしたとき、 snake JSON を camel にして返す', async () => {
-      server.use (
-        http.get('*/users', () => HttpResponse.json({ user_name: 'taro' })),
-      )
-
-      const result = await apiFetchPublic('/users', { responseCase: 'camel' })
-      expect(result).toEqual({ userName: 'taro' })
-    })
-
-    it('responseCase を "none" にしたとき、 snake JSON を変換せずに返す', async () => {
-      server.use (
-        http.get('*/users', () => HttpResponse.json({ user_name: 'taro' })),
-      )
-
-      const result = await apiFetchPublic('/users', { responseCase: 'none' })
-      expect(result).toEqual({ user_name: 'taro' })
-    })
-
-    it('requestCase を "none" にしたとき、params/body を変換せずに返す ', async () => {
-      server.use(
-        http.post('*/query', async ({ request }) => {
-          const url = new URL(request.url)
-          const body = await request.json()
-          const searchKey = url.searchParams.get('searchKey')
-          return HttpResponse.json({ query: { searchKey }, body })
-        }),
-      )
-
-      const result = await apiFetchPublic('*/query', {
-        method: 'POST',
-        params: { searchKey: 'value' },
-        body: { searchKey: 1 },
-        requestCase: 'none',
-        responseCase: 'none',
-      })
-      expect(result).toEqual({
-        query: { searchKey: 'value' },
-        body: { searchKey: 1 },
-      })
     })
 
     it('HTTP ステータスが 2xx 以外のとき、ApiError を投げ、ログを記録する', async () => {
@@ -142,25 +94,25 @@ describe('api-client（MSW 結合)', () => {
         }),
       )
 
-      const result = apiFetchPublic('/not-found')
+      const result = apiFetch('/not-found')
       await expect(result).rejects.toMatchObject({
         name: 'ApiError',
         status: 404,
         body: 'Not Found',
       })
 
-      expect(logger).toHaveBeenCalledWith(
-        expect.stringContaining('/not-found failed'),
+      expect(reportHttpError).toHaveBeenCalledWith(
         expect.objectContaining({
-          tags: expect.objectContaining({
-            component: 'apiFetch',
-            path: '/not-found',
-            method: 'GET',
-            status: 404,
-            withAuth: false,
-          }),
+          status: 404,
+          method: 'GET',
+          path: '/not-found',
+          component: 'apiFetch',
+          withAuth: false,
+          responseBody: 'Not Found',
         }),
       )
+
+      expect(logger).not.toHaveBeenCalled()
     })
 
     it('ネットワーク層で ApiError 以外の例外が起きたとき、ログを記録してそのまま投げ直す', async () => {
@@ -168,7 +120,7 @@ describe('api-client（MSW 結合)', () => {
         http.get('*/simulator-error', () => HttpResponse.error()),
       )
 
-      const result = apiFetchPublic('/simulator-error')
+      const result = apiFetch('/simulator-error')
       await expect(result).rejects.toBeInstanceOf(Error)
 
       expect(logger).toHaveBeenCalledWith(
@@ -185,31 +137,20 @@ describe('api-client（MSW 結合)', () => {
     })
   })
 
-  describe('apiFetchAuth', () => {
-    it('認証付きで呼び出したとき、認証ヘッダーの値を返す', async () => {
+  describe('withAuth: true', () => {
+    it('認証ヘッダーを送信でき、サーバで受信した値を検証する', async () => {
       server.use(
         http.get('*/auth', ({ request }) => {
-          return HttpResponse.json({
-            headers: {
-              'access-token': request.headers.get('access-token'),
-              'client': request.headers.get('client'),
-              'uid': request.headers.get('uid'),
-            },
-          })
+          const ok
+            = request.headers.get('access-token') === 'token-123'
+              && request.headers.get('client') === 'client-123'
+              && request.headers.get('uid') === 'uid-123'
+          return HttpResponse.json({ ok })
         }),
       )
 
-      const result = await apiFetchAuth('/auth', {
-        method: 'GET',
-        responseCase: 'none',
-      })
-      expect(result).toEqual({
-        headers: {
-          'access-token': 'token-123',
-          'client': 'client-123',
-          'uid': 'uid-123',
-        },
-      })
+      const result = await apiFetch('/auth', { withAuth: true })
+      expect(result).toEqual({ ok: true })
     })
 
     it('content-type が text/* のとき、text() の結果を返す', async () => {
@@ -217,7 +158,7 @@ describe('api-client（MSW 結合)', () => {
         http.get('*/plaintext', () => HttpResponse.text('hello')),
       )
 
-      const result = await apiFetchAuth('/plaintext')
+      const result = await apiFetch('/plaintext', { withAuth: true })
       expect(result).toBe('hello')
     })
 
@@ -231,21 +172,32 @@ describe('api-client（MSW 結合)', () => {
         }),
       )
 
-      const result = apiFetchAuth('/auth-required')
+      const result = apiFetch('/auth-required', { withAuth: true })
       await expect(result).rejects.toBeInstanceOf(Error)
 
-      expect(logger).toHaveBeenCalledWith(
-        expect.stringContaining('/auth-required failed'),
+      expect(reportHttpError).toHaveBeenCalledWith(
         expect.objectContaining({
-          tags: expect.objectContaining({
-            component: 'apiFetch',
-            path: '/auth-required',
-            method: 'GET',
-            status: 401,
-            withAuth: true,
-          }),
+          status: 401,
+          method: 'GET',
+          path: '/auth-required',
+          component: 'apiFetch',
+          withAuth: true,
+          responseBody: 'Unauthorized',
         }),
       )
+    })
+
+    it('DELETE で body なしのとき、Content-Type を付与しない（サーバーで null を観測）', async () => {
+      server.use(
+        http.delete('*/items/:id', ({ request }) => {
+          return HttpResponse.json({
+            contentType: request.headers.get('content-type'),
+          })
+        }),
+      )
+
+      const result = await apiFetch('/items/1', { method: 'DELETE', withAuth: true })
+      expect(result).toEqual({ contentType: null })
     })
   })
 })
