@@ -1,10 +1,10 @@
 import type { QueryParams } from '~/utils/api-url'
 import { logger, reportHttpError } from '~/lib/logger'
 import { apiUrl } from '~/utils/api-url'
-import { addAuthHeaders } from '~/utils/auth-headers'
 import { isPlainObject } from '~/utils/case-convert'
 import { mapToServiceFailure } from '~/utils/map-to-service-failure'
 import { parseApiResponse, toSnakeRequest } from '~/utils/serde'
+import { getAuthFromCookie } from './get-auth-from-cookie'
 import 'server-only'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -35,6 +35,16 @@ export class ApiError extends Error {
     this.status = status
     this.body = body
   }
+}
+
+export async function addAuthHeaders(headers: Headers): Promise<void> {
+  const auth = await getAuthFromCookie()
+  if (!auth)
+    return
+
+  headers.set('access-token', auth.accessToken)
+  headers.set('client', auth.client)
+  headers.set('uid', auth.uid)
 }
 
 async function buildHeaders(
