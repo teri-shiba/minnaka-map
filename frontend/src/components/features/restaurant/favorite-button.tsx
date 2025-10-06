@@ -1,16 +1,19 @@
 'use client'
 
 import { useAtom, useSetAtom } from 'jotai'
+import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { LuHeart } from 'react-icons/lu'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
 import { Skeleton } from '~/components/ui/skeleton'
+import { getErrorMessage } from '~/lib/get-error-message'
 import { logger } from '~/lib/logger'
 import { addToFavorites, checkFavoriteStatus, removeFromFavorites } from '~/services/favorite-action'
 import { saveSearchHistory } from '~/services/save-search-history'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
 import { userStateAtom } from '~/state/user-state.atom'
+import { isServiceSuccess } from '~/types/service-result'
 import { cn } from '~/utils/cn'
 
 interface FavoriteButtonProps {
@@ -33,6 +36,7 @@ export default function FavoriteButton({
   initialFavoriteId,
   initialIsFavorite = false,
 }: FavoriteButtonProps) {
+  const router = useRouter()
   const setModalOpen = useSetAtom(authModalOpenAtom)
   const [userState] = useAtom(userStateAtom)
   const isSignedIn = userState.isSignedIn
@@ -75,25 +79,27 @@ export default function FavoriteButton({
     if (isLoading)
       return
 
-    if (!isSignedIn) {
-      toast.error('お気に入りに登録するには、ログインが必要です')
-      setModalOpen(true)
-      return
-    }
-
     let currentHistoryId = historyId
     if (!currentHistoryId) {
       const raw = sessionStorage.getItem('pendingStationIds')
       const stationIds = raw ? JSON.parse(raw) as number[] : []
-      if (stationIds.length === 0) {
-        toast.error('お気に入り登録には、検索画面からもう一度検索してください')
+
+      if (stationIds.length <= 1) {
+        router.push('/?error=search_context_missing')
         return
       }
-      const response = await saveSearchHistory(stationIds)
-      if (!response.success || response.data.searchHistoryId == null) {
-        throw new Error('検索履歴の作成に失敗しました')
+
+      const result = await saveSearchHistory(stationIds)
+
+      if (!isServiceSuccess(result)) {
+        if (result.cause === 'UNAUTHORIZED')
+          setModalOpen(true)
+
+        toast.error(getErrorMessage(result, 'お気に入りの保存'))
+        return
       }
-      currentHistoryId = String(response.data.searchHistoryId)
+
+      currentHistoryId = String(result.data.searchHistoryId)
       sessionStorage.setItem('pendingSearchHistoryId', currentHistoryId)
       setHistoryId(currentHistoryId)
     }
