@@ -140,7 +140,7 @@ export default function FavoriteButton({
     finally {
       setIsLoading(false)
     }
-  }, [isSignedIn, isFavorite, favoriteId, hotpepperId, historyId, isLoading, setHistoryId, setModalOpen])
+  }, [isFavorite, favoriteId, hotpepperId, historyId, isLoading, setHistoryId, setModalOpen, router])
 
   const buttonProps = { onClick: handleClick, disabled: isChecking || isLoading }
 
