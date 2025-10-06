@@ -27,8 +27,8 @@ export async function getApiKey(service: SupportedService): Promise<string> {
   catch (error) {
     const failure = handleApiError(error, {
       component: 'getApiKey',
-      defaultMessage: `${config.serviceName} APIキー取得に失敗しました`,
-      notFoundMessage: `${config.serviceName} APIキーが見つかりません`,
+      defaultMessage: `APIキー取得に失敗しました`,
+      notFoundMessage: `APIキーが見つかりません`,
       extraContext: { service },
     })
 
