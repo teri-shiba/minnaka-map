@@ -1,44 +1,27 @@
-import type { Extras } from '@sentry/core'
 import * as Sentry from '@sentry/nextjs'
+import { ApiError } from './api-error'
 
-type LogContext = { extra?: Extras, tags?: Record<string, unknown> } | Extras
-
-interface HttpErrorLogOptions {
-  error: unknown
-  status?: number
-  method?: string
-  path?: string
-  component?: string
-  withAuth?: boolean
-  responseBody?: string
-  force?: boolean
+interface LogContext {
+  component: string
+  action?: string
+  extra?: Record<string, unknown>
 }
 
-function stringifyTags(tags?: Record<string, unknown>): Record<string, string> {
-  if (!tags)
-    return {}
-
-  const output: Record<string, string> = {}
-  for (const [key, value] of Object.entries(tags)) {
-    if (value !== undefined)
-      output[key] = String(value)
-  }
-  return output
-}
-
-function normalizeContext(context?: LogContext) {
-  if (!context)
-    return undefined
-
-  const isObject = typeof context === 'object'
-  const withExtraAndTags = ('extra' in context || 'tags' in context)
-
-  if (isObject && withExtraAndTags) {
-    const ctx = context as { extra?: Extras, tags?: Record<string, unknown> }
-    return { extra: ctx.extra, tags: stringifyTags(ctx.tags) }
+function normalizeContext(status: number | unknown, context: LogContext) {
+  const tags: Record<string, string> = {
+    component: context.component,
   }
 
-  return { extra: context as Extras }
+  if (context.action)
+    tags.action = context.action
+
+  if (status !== undefined)
+    tags.status = String(status)
+
+  return {
+    tags,
+    extra: context.extra,
+  }
 }
 
 const IGNORE_STATUS_CODES = new Set([401, 403, 404, 422, 304])
@@ -50,32 +33,17 @@ export function shouldLogStatus(status?: number): boolean {
   return !IGNORE_STATUS_CODES.has(status)
 }
 
-export function reportHttpError(opts: HttpErrorLogOptions): void {
-  if (!opts.force && !shouldLogStatus(opts.status))
+export function logger(error: unknown, context: LogContext) {
+  const production = process.env.NODE_ENV === 'production'
+
+  const status = error instanceof ApiError ? error.status : undefined
+
+  if (production && !shouldLogStatus(status))
     return
 
-  const {
-    error,
-    status,
-    method,
-    path,
-    component,
-    withAuth,
-    responseBody,
-  } = opts
+  const captureContext = normalizeContext(status, context)
 
-  const context = {
-    tags: { component, method, path, status, withAuth },
-    extra: responseBody ? { responseBody } : undefined,
-  }
-
-  logger(error instanceof Error ? error : new Error(String(error)), context)
-}
-
-export function logger(error: unknown, context?: LogContext) {
-  const captureContext = normalizeContext(context)
-
-  if (process.env.NODE_ENV === 'production') {
+  if (production) {
     Sentry.captureException(error, captureContext)
   }
   else {
