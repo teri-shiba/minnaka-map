@@ -10,7 +10,16 @@ import { getApiKey } from './get-api-key'
 
 export async function fetchRestaurantDetail(id: string): Promise<ServiceResult<RestaurantDetailItem>> {
   try {
-    const apiKey = await getApiKey('hotpepper')
+    const result = await getApiKey('hotpepper')
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.message,
+        cause: result.cause,
+      }
+    }
+
+    const apiKey = result.data
     const params = new URLSearchParams({
       key: apiKey,
       id,
@@ -40,7 +49,8 @@ export async function fetchRestaurantDetail(id: string): Promise<ServiceResult<R
             : 'REQUEST_FAILED'
 
       logger(new Error(`HotPepper detail request failed: ${status}`), {
-        tags: { component: 'fetchRestaurantDetail', statusCode: status, id },
+        component: 'fetchRestaurantDetail',
+        extra: { id },
       })
 
       return {
@@ -60,7 +70,8 @@ export async function fetchRestaurantDetail(id: string): Promise<ServiceResult<R
 
     if (shops.length === 0) {
       logger(new Error('HotPepper: shop not found'), {
-        tags: { component: 'fetchRestaurantDetail', id },
+        component: 'fetchRestaurantDetail',
+        extra: { id },
       })
       return { success: false, message: '店舗が見つかりませんでした', cause: 'NOT_FOUND' }
     }
@@ -68,7 +79,10 @@ export async function fetchRestaurantDetail(id: string): Promise<ServiceResult<R
     return { success: true, data: transformToDetail(shops[0]) }
   }
   catch (error) {
-    logger(error, { tags: { component: 'fetchRestaurantDetail', id } })
+    logger(error, {
+      component: 'fetchRestaurantDetail',
+      extra: { id },
+    })
 
     if (error instanceof TypeError) {
       return {

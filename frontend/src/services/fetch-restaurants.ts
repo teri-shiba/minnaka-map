@@ -33,8 +33,16 @@ export async function fetchRestaurants(
     const itemsPerPage = Math.min(opts.itemsPerPage ?? 10, 100)
     const start = (page - 1) * itemsPerPage + 1
 
-    const apiKey = await getApiKey('hotpepper')
+    const result = await getApiKey('hotpepper')
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.message,
+        cause: result.cause,
+      }
+    }
 
+    const apiKey = result.data
     const params: Record<string, string> = {
       key: apiKey,
       lat: String(opts.latitude),
@@ -73,7 +81,7 @@ export async function fetchRestaurants(
         = status === 429 ? 'RATE_LIMIT' : status >= 500 ? 'SERVER_ERROR' : 'REQUEST_FAILED'
 
       logger(new Error(`HotPepper API request failed: ${status}`), {
-        tags: { component: 'fetchRestaurants', statusCode: status },
+        component: 'fetchRestaurants',
       })
 
       return {
@@ -108,7 +116,7 @@ export async function fetchRestaurants(
     }
   }
   catch (error) {
-    logger(error, { tags: { component: 'fetchRestaurants' } })
+    logger(error, { component: 'fetchRestaurants' })
     return {
       success: false,
       message: 'ネットワークエラーが発生しました',
@@ -131,7 +139,16 @@ export async function fetchRestaurantsByIds(
     if (slicedIds.length === 0)
       return { success: true, data: [] }
 
-    const apiKey = await getApiKey('hotpepper')
+    const result = await getApiKey('hotpepper')
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.message,
+        cause: result.cause,
+      }
+    }
+
+    const apiKey = result.data
 
     const CHUNK_SIZE = 20
 
@@ -205,7 +222,11 @@ export async function fetchRestaurantsByIds(
               : 'NETWORK'
 
       logger(new Error(`HotPepper API (by ids) all failed`), {
-        tags: { component: 'fetchRestaurantsByIds', statusList, slicedIds },
+        component: 'fetchRestaurantsByIds',
+        extra: {
+          statusList,
+          slicedIds,
+        },
       })
 
       return {
@@ -233,7 +254,11 @@ export async function fetchRestaurantsByIds(
 
     if (items.length !== slicedIds.length) {
       logger(new Error('Some HotPepper ids were not returned'), {
-        tags: { component: 'fetchRestaurantsByIds', requested: slicedIds.length, returned: items.length },
+        component: 'fetchRestaurantsByIds',
+        extra: {
+          requested: slicedIds.length,
+          returned: items.length,
+        },
       })
     }
 
@@ -241,7 +266,8 @@ export async function fetchRestaurantsByIds(
   }
   catch (error) {
     logger(error, {
-      tags: { component: 'fetchRestaurantsByIds', ids: opts.restaurantIds },
+      component: 'fetchRestaurantsByIds',
+      extra: { ids: opts.restaurantIds },
     })
     return {
       success: false,
