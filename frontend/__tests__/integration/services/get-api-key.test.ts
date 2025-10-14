@@ -14,16 +14,19 @@ describe('getApiKey', () => {
   })
 
   it('Map Tiler のとき、HTTP 200 なら API キーを返す', async () => {
-    server.use(http.get('*/api_keys/maptiler', async ({ request }) => {
-      request.headers.get('X-Internal-Token')
-      const apiKey = 'test_api_key'
+    server.use(http.get('*/api_keys/maptiler', async () => {
       return HttpResponse.json({
         success: true,
-        data: { apiKey },
+        data: { apiKey: 'test_api_key' },
       })
     }))
 
-    await expect(getApiKey('maptiler')).resolves.toBe('test_api_key')
+    const result = await getApiKey('maptiler')
+
+    expect(result.success).toBe(true)
+
+    if (result.success)
+      expect(result.data).toBe('test_api_key')
   })
 
   it.each([
@@ -36,14 +39,19 @@ describe('getApiKey', () => {
       let seenToken: string | null = null
       server.use(http.get(endpoint, async ({ request }) => {
         seenToken = request.headers.get('X-Internal-Token')
-        const apiKey = 'dummy-key'
         return HttpResponse.json({
           success: true,
-          data: { apiKey },
+          data: { apiKey: 'dummy-key' },
         })
       }))
-      await getApiKey(service)
+
+      const result = await getApiKey(service)
+
       expect(seenToken).toBe('test-internal-token')
+      expect(result.success).toBe(true)
+
+      if (result.success)
+        expect(result.data).toBe('dummy-key')
     },
   )
 
@@ -52,9 +60,12 @@ describe('getApiKey', () => {
       return HttpResponse.json({}, { status: 404 })
     }))
 
-    await expect(getApiKey('googlemaps'))
-      .rejects
-      .toThrow('GoogleMaps APIキー取得失敗: APIキーが見つかりません')
+    const result = await getApiKey('googlemaps')
+
+    expect(result.success).toBe(false)
+
+    if (!result.success)
+      expect(result.message).toContain('APIキーが見つかりません')
   })
 
   it('サーバーエラーで API キーが取得できないとき、「サーバーエラーが発生しました」のメッセージを投げる', async () => {
@@ -62,9 +73,12 @@ describe('getApiKey', () => {
       return HttpResponse.json({}, { status: 500 })
     }))
 
-    await expect(getApiKey('hotpepper'))
-      .rejects
-      .toThrow('HotPepper APIキー取得失敗: サーバーエラーが発生しました')
+    const result = await getApiKey('hotpepper')
+
+    expect(result.success).toBe(false)
+
+    if (!result.success)
+      expect(result.message).toContain('サーバーエラーが発生しました')
   })
 
   it('ネットワークエラーが発生したとき、「ネットワークエラーが発生しました」のメッセージを投げる', async () => {
@@ -72,14 +86,20 @@ describe('getApiKey', () => {
       return HttpResponse.error()
     }))
 
-    await expect(getApiKey('maptiler'))
-      .rejects
-      .toThrow('MapTiler APIキー取得失敗: ネットワークエラーが発生しました')
+    const result = await getApiKey('maptiler')
+
+    expect(result.success).toBe(false)
+
+    if (!result.success)
+      expect(result.message).toContain('ネットワークエラーが発生しました')
   })
 
   it('設定していないサービスを渡したとき、「未対応のサービスです」のメッセージを投げる', async () => {
-    await expect(getApiKey('invalid_service' as any))
-      .rejects
-      .toThrow('未対応のサービスです: invalid_service')
+    const result = await getApiKey('invalid_service' as any)
+
+    expect(result.success).toBe(false)
+
+    if (!result.success)
+      expect(result.message).toContain('未対応のサービスです')
   })
 })
