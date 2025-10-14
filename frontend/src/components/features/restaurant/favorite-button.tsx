@@ -1,22 +1,20 @@
 'use client'
 
-import { useAtom, useSetAtom } from 'jotai'
+import { useSetAtom } from 'jotai'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { LuHeart } from 'react-icons/lu'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
 import { Skeleton } from '~/components/ui/skeleton'
-import { getErrorMessage } from '~/lib/get-error-message'
 import { logger } from '~/lib/logger'
 import { addToFavorites, checkFavoriteStatus, removeFromFavorites } from '~/services/favorite-action'
 import { saveSearchHistory } from '~/services/save-search-history'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
-import { userStateAtom } from '~/state/user-state.atom'
-import { isServiceSuccess } from '~/types/service-result'
 import { cn } from '~/utils/cn'
 
 interface FavoriteButtonProps {
+  isAuthenticated: boolean
   hotpepperId: string
   compact?: boolean
   initialHistoryId?: string
@@ -30,6 +28,7 @@ interface FavoriteActionResult {
 }
 
 export default function FavoriteButton({
+  isAuthenticated,
   hotpepperId,
   compact = false,
   initialHistoryId,
@@ -38,8 +37,6 @@ export default function FavoriteButton({
 }: FavoriteButtonProps) {
   const router = useRouter()
   const setModalOpen = useSetAtom(authModalOpenAtom)
-  const [userState] = useAtom(userStateAtom)
-  const isSignedIn = userState.isSignedIn
 
   const [historyId, setHistoryId] = useState<string | null>(() =>
     initialHistoryId ?? (typeof window !== 'undefined' ? sessionStorage.getItem('pendingSearchHistoryId') : null),
@@ -54,7 +51,7 @@ export default function FavoriteButton({
 
   useEffect(() => {
     const initCheck = async () => {
-      if (isFromFavoritesPage || !isSignedIn || !historyId) {
+      if (isFromFavoritesPage || !isAuthenticated || !historyId) {
         setIsChecking(false)
         return
       }
@@ -64,8 +61,8 @@ export default function FavoriteButton({
         setIsFavorite(status.isFavorite)
         setFavoriteId(status.favoriteId ?? null)
       }
-      catch (err) {
-        logger(err, { tags: { component: 'FavoriteButton - initCheck' } })
+      catch (error) {
+        logger(error, { component: 'FavoriteButton - initCheck' })
       }
       finally {
         setIsChecking(false)
@@ -73,11 +70,18 @@ export default function FavoriteButton({
     }
 
     initCheck()
-  }, [initialHistoryId, historyId, isSignedIn, hotpepperId, isFromFavoritesPage])
+  }, [initialHistoryId, historyId, isAuthenticated, hotpepperId, isFromFavoritesPage])
 
+  // TODO: 依存関係が多すぎるので、サイズダウンする
   const handleClick = useCallback(async () => {
     if (isLoading)
       return
+
+    if (!isAuthenticated) {
+      setModalOpen(true)
+      toast.error('お気に入りの保存にはログインが必要です')
+      return
+    }
 
     let currentHistoryId = historyId
     if (!currentHistoryId) {
@@ -91,11 +95,15 @@ export default function FavoriteButton({
 
       const result = await saveSearchHistory(stationIds)
 
-      if (!isServiceSuccess(result)) {
-        if (result.cause === 'UNAUTHORIZED')
+      if (!result.success) {
+        if (result.cause === 'UNAUTHORIZED') {
           setModalOpen(true)
+          toast.error('お気に入りの保存にはログインが必要です')
+        }
+        else {
+          toast.error(result.message)
+        }
 
-        toast.error(getErrorMessage(result, 'お気に入りの保存'))
         return
       }
 
@@ -129,7 +137,7 @@ export default function FavoriteButton({
       }
     }
     catch (error) {
-      logger(error, { tags: { component: 'FavoriteButton' } })
+      logger(error, { component: 'FavoriteButton' })
 
       toast.error(
         !isFavorite
@@ -140,7 +148,7 @@ export default function FavoriteButton({
     finally {
       setIsLoading(false)
     }
-  }, [isFavorite, favoriteId, hotpepperId, historyId, isLoading, setHistoryId, setModalOpen, router])
+  }, [isFavorite, favoriteId, hotpepperId, historyId, isLoading, setHistoryId, setModalOpen, router, isAuthenticated])
 
   const buttonProps = { onClick: handleClick, disabled: isChecking || isLoading }
 
