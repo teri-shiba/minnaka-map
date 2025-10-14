@@ -54,7 +54,6 @@ export default function RestaurantList({ restaurants, pagination }: Props) {
           isMobile={false}
         />
       </RestaurantSidebarContainer>
-      )
 
       {/* SP */}
       <RestaurantDrawerContainer
