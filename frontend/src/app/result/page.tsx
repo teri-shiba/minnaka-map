@@ -68,15 +68,19 @@ export default async function Result({ searchParams }: ResultPageProps) {
 
   const { items, pagination } = restaurantsResult.data
 
-  const mapTilerApiKey = await getApiKey('maptiler')
+  const result = await getApiKey('maptiler')
+  if (!result.success)
+    return null
+
+  const maptilerApiKey = result.data
 
   return (
     <div className="relative mx-auto h-[calc(100dvh-4rem)] max-w-screen-2xl overflow-hidden md:flex">
       <div className="h-mobile-map w-full md:h-desktop-map md:w-3/5 md:flex-1">
-        {(mapTilerApiKey && midpoint)
+        {(maptilerApiKey && midpoint)
           ? (
               <Map
-                apiKey={mapTilerApiKey}
+                apiKey={maptilerApiKey}
                 midpoint={midpoint}
                 restaurants={items}
               />
