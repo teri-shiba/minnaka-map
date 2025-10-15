@@ -1,7 +1,16 @@
 import * as Sentry from '@sentry/nextjs'
-import { logger, reportHttpError, shouldLogStatus } from '~/lib/logger'
+import { ApiError } from '~/lib/api-error'
+import { logger, shouldLogStatus } from '~/lib/logger'
 
 vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))
+
+function buildApiError(status: number, message: string): unknown {
+  return Object.assign(Object.create(ApiError.prototype), {
+    name: 'ApiError',
+    status,
+    message,
+  })
+}
 
 describe('logger', () => {
   const originalEnv = process.env.NODE_ENV
@@ -20,43 +29,52 @@ describe('logger', () => {
   })
 
   describe('logger（基本動作）', () => {
-    it('本番では、Sentry.captureException を呼ぶ', () => {
+    it('本番では、Sentry.captureException をタグ・追加情報付きで呼ぶ', () => {
       vi.stubEnv('NODE_ENV', 'production')
       const error = new Error('error')
-      const context = { key: 'value' }
+      const context = {
+        component: 'userForm',
+        action: 'submit',
+        extra: { userId: 'USERID' },
+      }
+
       logger(error, context)
-
-      expect(Sentry.captureException).toHaveBeenCalledWith(error, { extra: context })
-      expect(spyError).not.toHaveBeenCalled()
-    })
-
-    it('非本番では、console.error に出力する', () => {
-      vi.stubEnv('NODE_ENV', 'test')
-      const error = new Error('error')
-      const context = { key: 'value' }
-      logger(error, context)
-
-      expect(spyError).toHaveBeenCalledWith(error, { extra: context })
-      expect(Sentry.captureException).not.toHaveBeenCalled()
-    })
-
-    it('context が未指定でもエラーなく動作する', () => {
-      vi.stubEnv('NODE_ENV', 'production')
-      const error = new Error('no-context')
-      logger(error)
-
-      expect(Sentry.captureException).toHaveBeenCalledWith(error, undefined)
-    })
-
-    it('tags を渡すと Sentry のタグとして記録される', () => {
-      vi.stubEnv('NODE_ENV', 'production')
-      const error = new Error('error')
-      logger(error, { tags: { component: 'componentName' } })
 
       expect(Sentry.captureException).toHaveBeenCalledWith(
         error,
-        { tags: { component: 'componentName' } },
+        expect.objectContaining({
+          tags: {
+            component: 'userForm',
+            action: 'submit',
+          },
+          extra: { userId: 'USERID' },
+        }),
       )
+      expect(spyError).not.toHaveBeenCalled()
+    })
+
+    it('非本番のとき、console.error に [error, captureContext] を出力する', () => {
+      vi.stubEnv('NODE_ENV', 'test')
+      const error = new Error('error')
+      const context = {
+        component: 'userForm',
+        action: 'submit',
+        extra: { userId: 'USERID' },
+      }
+
+      logger(error, context)
+
+      expect(spyError).toHaveBeenCalledWith(
+        error,
+        expect.objectContaining({
+          tags: {
+            component: 'userForm',
+            action: 'submit',
+          },
+          extra: { userId: 'USERID' },
+        }),
+      )
+      expect(Sentry.captureException).not.toHaveBeenCalled()
     })
   })
 
@@ -76,49 +94,32 @@ describe('logger', () => {
     })
   })
 
-  describe('reportHttpError（API用ラッパ）', () => {
-    it('404 のとき、本番環境でもログを抑制する', () => {
+  describe('ApiError 連携（ステータスでタグ化/抑制）', () => {
+    it('HTTP ステータスが 404 のとき、本番環境では送信しない', () => {
       vi.stubEnv('NODE_ENV', 'production')
+      const error = buildApiError(404, 'ページが見つかりません')
+      const context = { component: 'shareList' }
 
-      reportHttpError({
-        error: new Error('not-found'),
-        status: 404,
-        method: 'GET',
-        path: '/path',
-        component: 'apiFetch',
-        withAuth: false,
-      })
+      logger(error, context)
 
       expect(Sentry.captureException).not.toHaveBeenCalled()
       expect(spyError).not.toHaveBeenCalled()
     })
 
-    it('500 のとき、本番環境では Error とタグを送る', () => {
+    it('HTTP ステータスが 500 のとき、本番環境では status をタグに含めて Sentry に送信する', () => {
       vi.stubEnv('NODE_ENV', 'production')
+      const error = buildApiError(500, 'サーバーエラーが発生しました')
+      const context = { component: 'shareList' }
 
-      reportHttpError({
-        error: new Error('server-error'),
-        status: 500,
-        method: 'POST',
-        path: '/items',
-        component: 'apiFetch',
-        withAuth: true,
-        responseBody: '{ "message": "fail" }',
-      })
+      logger(error, context)
 
       expect(Sentry.captureException).toHaveBeenCalledWith(
-        expect.any(Error),
+        error,
         expect.objectContaining({
           tags: {
-            component: 'apiFetch',
-            method: 'POST',
-            path: '/items',
+            component: 'shareList',
             status: '500',
-            withAuth: 'true',
           },
-          extra: expect.objectContaining({
-            responseBody: expect.stringContaining('"message": "fail"'),
-          }),
         }),
       )
     })
