@@ -14,7 +14,7 @@ import { FAVORITE_GROUPS_PER_PAGE, FAVORITES_FIRST_PAGE } from '~/constants'
 import { logger } from '~/lib/logger'
 import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
 import { apiFetch, handleApiError } from './api-client'
-import { fetchRestaurantsByIds } from './fetch-restaurants'
+import { fetchRestaurantsByIds } from './fetch-restaurants-by-ids'
 
 // TODO: ファイルを分割する getFavorites, getFavoritesWithDetailsPaginated / checkFavoriteStatus / addToFavorites, removeFromFavorites
 // すべてのお気に入りを取得
