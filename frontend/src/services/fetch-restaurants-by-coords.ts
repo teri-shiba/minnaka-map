@@ -3,7 +3,7 @@
 import type { PaginatedResult } from '~/types/pagination'
 import type { HotPepperRestaurant, RestaurantListItem } from '~/types/restaurant'
 import type { ServiceResult } from '~/types/service-result'
-import { ApiError } from '~/lib/api-error'
+import { HttpError } from '~/lib/http-error'
 import { logger } from '~/lib/logger'
 import { transformToList } from '~/types/restaurant'
 import { getErrorInfo } from '~/utils/get-error-info'
@@ -75,7 +75,7 @@ export async function fetchRestaurantsByCoords(
     })
 
     if (!response.ok)
-      throw new ApiError(response.status, 'レストラン情報の取得に失敗しました')
+      throw new HttpError(response.status, 'レストラン情報の取得に失敗しました')
 
     const data = await response.json()
     const restaurants: HotPepperRestaurant[] = data?.results?.shop ?? []

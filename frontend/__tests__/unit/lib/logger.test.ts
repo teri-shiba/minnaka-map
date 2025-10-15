@@ -1,12 +1,12 @@
 import * as Sentry from '@sentry/nextjs'
-import { ApiError } from '~/lib/api-error'
+import { HttpError } from '~/lib/http-error'
 import { logger, shouldLogStatus } from '~/lib/logger'
 
 vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))
 
-function buildApiError(status: number, message: string): unknown {
-  return Object.assign(Object.create(ApiError.prototype), {
-    name: 'ApiError',
+function buildHttpError(status: number, message: string): unknown {
+  return Object.assign(Object.create(HttpError.prototype), {
+    name: 'HttpError',
     status,
     message,
   })
@@ -94,10 +94,10 @@ describe('logger', () => {
     })
   })
 
-  describe('ApiError 連携（ステータスでタグ化/抑制）', () => {
+  describe('HttpError 連携（ステータスでタグ化/抑制）', () => {
     it('HTTP ステータスが 404 のとき、本番環境では送信しない', () => {
       vi.stubEnv('NODE_ENV', 'production')
-      const error = buildApiError(404, 'ページが見つかりません')
+      const error = buildHttpError(404, 'ページが見つかりません')
       const context = { component: 'shareList' }
 
       logger(error, context)
@@ -108,7 +108,7 @@ describe('logger', () => {
 
     it('HTTP ステータスが 500 のとき、本番環境では status をタグに含めて Sentry に送信する', () => {
       vi.stubEnv('NODE_ENV', 'production')
-      const error = buildApiError(500, 'サーバーエラーが発生しました')
+      const error = buildHttpError(500, 'サーバーエラーが発生しました')
       const context = { component: 'shareList' }
 
       logger(error, context)

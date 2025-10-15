@@ -1,7 +1,7 @@
 'use server'
 
 import type { ServiceResult } from '~/types/service-result'
-import { ApiError } from '~/lib/api-error'
+import { HttpError } from '~/lib/http-error'
 import { logger } from '~/lib/logger'
 import { getErrorInfo } from '~/utils/get-error-info'
 import { getAuthFromCookie } from './get-auth-from-cookie'
@@ -44,7 +44,7 @@ export async function saveSearchHistory(
     })
 
     if (!response.ok) {
-      throw new ApiError(response.status, '検索履歴の保存に失敗しました')
+      throw new HttpError(response.status, '検索履歴の保存に失敗しました')
     }
 
     const json = await response.json()

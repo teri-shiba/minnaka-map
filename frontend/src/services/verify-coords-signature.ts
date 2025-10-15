@@ -2,7 +2,7 @@
 
 import type { LatLngExpression } from 'leaflet'
 import type { ServiceResult } from '~/types/service-result'
-import { ApiError } from '~/lib/api-error'
+import { HttpError } from '~/lib/http-error'
 import { logger } from '~/lib/logger'
 import { getErrorInfo } from '~/utils/get-error-info'
 
@@ -68,7 +68,7 @@ export async function verifyCoordsSignature(
     })
 
     if (!response.ok) {
-      throw new ApiError(response.status, '座標の検証に失敗しました')
+      throw new HttpError(response.status, '座標の検証に失敗しました')
     }
 
     const result = await response.json() as ValidateResponse
@@ -99,7 +99,7 @@ export async function verifyCoordsSignature(
     const errorInfo = await getErrorInfo({ error })
 
     // 400エラーのみ署名検証失敗として扱う
-    if (error instanceof ApiError && error.status === 400) {
+    if (error instanceof HttpError && error.status === 400) {
       return {
         success: false,
         message: '座標の検証に失敗しました',

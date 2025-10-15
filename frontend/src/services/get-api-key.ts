@@ -3,7 +3,7 @@
 import type { SupportedService } from '~/constants'
 import type { ServiceResult } from '~/types/service-result'
 import { API_SERVICES } from '~/constants'
-import { ApiError } from '~/lib/api-error'
+import { HttpError } from '~/lib/http-error'
 import { logger } from '~/lib/logger'
 import { getErrorInfo } from '~/utils/get-error-info'
 
@@ -34,7 +34,7 @@ export async function getApiKey(
     })
 
     if (!response.ok)
-      throw new ApiError(response.status, `${config.serviceName} APIキー取得失敗`)
+      throw new HttpError(response.status, `${config.serviceName} APIキー取得失敗`)
 
     const json = await response.json()
 
