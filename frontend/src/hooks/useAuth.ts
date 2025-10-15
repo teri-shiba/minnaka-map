@@ -113,10 +113,11 @@ export function useAuth() {
     catch (error) {
       logger(error, {
         component: 'useAuth.deleteAccount',
-        endpoint: '/auth',
-        action: 'DELETE',
-        userId: user?.id,
-        provider: user?.provider ?? 'unknown',
+        action: 'deleteAccount',
+        extra: {
+          userId: user?.id,
+          provider: user?.provider ?? 'unknown',
+        },
       })
       toast.error('アカウントの削除に失敗しました')
       return { success: false, error }
