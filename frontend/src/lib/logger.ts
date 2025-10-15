@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
-import { ApiError } from './api-error'
+import { HttpError } from './http-error'
 
 interface LogContext {
   component: string
@@ -36,7 +36,7 @@ export function shouldLogStatus(status?: number): boolean {
 export function logger(error: unknown, context: LogContext) {
   const production = process.env.NODE_ENV === 'production'
 
-  const status = error instanceof ApiError ? error.status : undefined
+  const status = error instanceof HttpError ? error.status : undefined
 
   if (production && !shouldLogStatus(status))
     return

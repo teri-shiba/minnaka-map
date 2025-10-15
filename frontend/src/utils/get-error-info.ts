@@ -1,5 +1,5 @@
 import type { ServiceCause } from '~/types/service-result'
-import { ApiError } from '~/lib/api-error'
+import { HttpError } from '~/lib/http-error'
 
 interface GetErrorInfoOptions {
   error: unknown
@@ -10,7 +10,7 @@ export function getErrorInfo({
   error,
   notFoundErrorMessage,
 }: GetErrorInfoOptions): { message: string, cause: ServiceCause } {
-  if (error instanceof ApiError) {
+  if (error instanceof HttpError) {
     switch (error.status) {
       case 401:
         return { message: 'ログインが必要です', cause: 'UNAUTHORIZED' }
