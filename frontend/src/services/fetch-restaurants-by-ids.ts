@@ -2,7 +2,6 @@
 
 import type { HotPepperRestaurant, RestaurantListItem } from '~/types/restaurant'
 import type { ServiceCause, ServiceResult } from '~/types/service-result'
-import { CACHE_DURATION, EXTERNAL_ENDPOINTS } from '~/constants'
 import { logger } from '~/lib/logger'
 import { transformToList } from '~/types/restaurant'
 import { externalHref } from '~/utils/external-url'
@@ -65,13 +64,13 @@ export async function fetchRestaurantsByIds(
         try {
           const url = externalHref(
             process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL,
-            EXTERNAL_ENDPOINTS.HOTPEPPER_GOURMET_V1,
+            '/hotpepper/gourmet/v1/',
             params,
           )
 
           const response = await fetch(url, {
             next: {
-              revalidate: CACHE_DURATION.RESTAURANT_INFO,
+              revalidate: 86400, // 24時間 (60 * 60 * 24)
               tags: ['hotpepper:restaurants:by-ids'],
             },
           })
