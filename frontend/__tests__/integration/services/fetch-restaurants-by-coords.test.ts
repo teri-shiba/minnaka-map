@@ -15,7 +15,7 @@ describe('fetchRestaurantsByCoords', () => {
   beforeEach(() => {
     vi.unstubAllEnvs()
     vi.stubEnv('INTERNAL_API_TOKEN', 'test-internal-token')
-    vi.stubEnv('NEXT_PUBLIC_HOTPEPPER_API_BASE_URL', baseURL)
+    vi.stubEnv('HOTPEPPER_API_BASE_URL', baseURL)
     lastHotPepperUrl = null
 
     server.use(
@@ -98,7 +98,7 @@ describe('fetchRestaurantsByCoords', () => {
 
     if (!result.success) {
       expect(result.cause).toBe('RATE_LIMIT')
-      expect(result.message).toBe('HotPepper API のレート制限に達しました')
+      expect(result.message).toBe('アクセスが集中しています。時間をあけてお試しください。')
     }
   })
 
@@ -118,7 +118,7 @@ describe('fetchRestaurantsByCoords', () => {
 
     if (!result.success) {
       expect(result.cause).toBe('SERVER_ERROR')
-      expect(result.message).toBe('HotPepper API サーバーエラーが発生しました')
+      expect(result.message).toBe('サーバーエラーが発生しました')
     }
   })
 
@@ -137,8 +137,8 @@ describe('fetchRestaurantsByCoords', () => {
     expect(result.success).toBe(false)
 
     if (!result.success) {
-      expect(result.cause).toBe('REQUEST_FAILED')
-      expect(result.message).toBe('店舗情報の取得に失敗しました')
+      expect(result.cause).toBe('NOT_FOUND')
+      expect(result.message).toBe('リソースが見つかりません')
     }
   })
 
