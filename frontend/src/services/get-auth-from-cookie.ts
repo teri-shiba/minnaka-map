@@ -32,11 +32,9 @@ export async function getAuthFromCookie(): Promise<AuthData | null> {
       || !isValidAuthField(uid)
     ) {
       logger(new Error('認証Cookieが破損しています'), {
-        tags: {
-          component: 'getAuthFromCookie',
-          error_type: 'corrupted_cookie',
-        },
+        component: 'getAuthFromCookie',
         extra: {
+          errorType: 'corrupted_cookie',
           hasAccessToken: isValidAuthField(accessToken),
           hasClient: isValidAuthField(client),
           hasUid: isValidAuthField(uid),
@@ -48,7 +46,7 @@ export async function getAuthFromCookie(): Promise<AuthData | null> {
     return { accessToken, client, uid }
   }
   catch (error) {
-    logger(error, { tags: { component: 'getAuthFromCookie' } })
+    logger(error, { component: 'getAuthFromCookie' })
     return null
   }
 }

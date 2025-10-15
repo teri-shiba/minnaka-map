@@ -86,7 +86,7 @@ export default function StationSearchForm() {
       router.push(`/result?${qs}`)
     }
     catch (error) {
-      logger(error, { tags: { component: 'StationSearchForm - processValidData' } })
+      logger(error, { component: 'StationSearchForm - processValidData' })
       toast.error('フォームの送信に失敗しました。時間を置いてから、再度お試しください。')
     }
   }
