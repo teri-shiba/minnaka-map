@@ -61,11 +61,9 @@ describe('getAuthFromCookie', () => {
     expect(logger).toHaveBeenCalledWith(
       expect.any(Error),
       expect.objectContaining({
-        tags: expect.objectContaining({
-          component: 'getAuthFromCookie',
-          error_type: 'corrupted_cookie',
-        }),
+        component: 'getAuthFromCookie',
         extra: expect.objectContaining({
+          errorType: 'corrupted_cookie',
           hasAccessToken: false,
           hasClient: true,
           hasUid: true,
