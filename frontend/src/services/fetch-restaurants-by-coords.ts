@@ -2,11 +2,11 @@
 
 import type { PaginatedResult } from '~/types/pagination'
 import type { HotPepperRestaurant, RestaurantListItem } from '~/types/restaurant'
-import type { ServiceCause, ServiceResult } from '~/types/service-result'
-import { CACHE_DURATION, EXTERNAL_ENDPOINTS } from '~/constants'
+import type { ServiceResult } from '~/types/service-result'
+import { ApiError } from '~/lib/api-error'
 import { logger } from '~/lib/logger'
 import { transformToList } from '~/types/restaurant'
-import { externalHref } from '~/utils/external-url'
+import { getErrorInfo } from '~/utils/get-error-info'
 import { getApiKey } from './get-api-key'
 
 interface FetchRestaurantsOpts {
@@ -21,12 +21,22 @@ export async function fetchRestaurantsByCoords(
   opts: FetchRestaurantsOpts,
 ): Promise<ServiceResult<PaginatedResult<RestaurantListItem>>> {
   try {
+    // ページネーション計算
     const page = Math.max(1, Math.floor(opts.page ?? 1))
     const itemsPerPage = Math.min(opts.itemsPerPage ?? 10, 100)
     const start = (page - 1) * itemsPerPage + 1
 
+    // APIキー取得
     const result = await getApiKey('hotpepper')
     if (!result.success) {
+      logger(new Error('APIキーの取得に失敗しました'), {
+        component: 'fetchRestaurantsByCoords',
+        extra: {
+          service: 'hotpepper',
+          apiKeyError: result,
+        },
+      })
+
       return {
         success: false,
         message: result.message,
@@ -48,15 +58,12 @@ export async function fetchRestaurantsByCoords(
     if (opts.genre)
       params.genre = opts.genre
 
-    const url = externalHref(
-      process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL,
-      EXTERNAL_ENDPOINTS.HOTPEPPER_GOURMET_V1,
-      params,
-    )
+    const url = new URL('/hotpepper/gourmet/v1/', process.env.HOTPEPPER_API_BASE_URL)
+    url.search = new URLSearchParams(params).toString()
 
     const response = await fetch(url, {
       next: {
-        revalidate: CACHE_DURATION.RESTAURANT_INFO,
+        revalidate: 86400, // 24時間 (60 * 60 * 24)
         tags: [
           'hotpepper:restaurants',
           `lat:${opts.latitude}`,
@@ -67,26 +74,8 @@ export async function fetchRestaurantsByCoords(
       },
     })
 
-    if (!response.ok) {
-      const status = response.status
-      const cause: ServiceCause
-        = status === 429 ? 'RATE_LIMIT' : status >= 500 ? 'SERVER_ERROR' : 'REQUEST_FAILED'
-
-      logger(new Error(`HotPepper API request failed: ${status}`), {
-        component: 'fetchRestaurants',
-      })
-
-      return {
-        success: false,
-        message:
-        cause === 'RATE_LIMIT'
-          ? 'HotPepper API のレート制限に達しました'
-          : cause === 'SERVER_ERROR'
-            ? 'HotPepper API サーバーエラーが発生しました'
-            : '店舗情報の取得に失敗しました',
-        cause,
-      }
-    }
+    if (!response.ok)
+      throw new ApiError(response.status, 'レストラン情報の取得に失敗しました')
 
     const data = await response.json()
     const restaurants: HotPepperRestaurant[] = data?.results?.shop ?? []
@@ -108,11 +97,22 @@ export async function fetchRestaurantsByCoords(
     }
   }
   catch (error) {
-    logger(error, { component: 'fetchRestaurants' })
+    logger(error, {
+      component: 'fetchRestaurants',
+      extra: {
+        latitude: opts.latitude,
+        longitude: opts.longitude,
+        genre: opts.genre,
+        page: opts.page,
+      },
+    })
+
+    const errorInfo = await getErrorInfo({ error })
+
     return {
       success: false,
-      message: 'ネットワークエラーが発生しました',
-      cause: 'NETWORK',
+      message: errorInfo.message,
+      cause: errorInfo.cause,
     }
   }
 }
