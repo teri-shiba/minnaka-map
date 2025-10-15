@@ -44,8 +44,9 @@ describe('useLocalStorage', () => {
       expect(logger).toHaveBeenCalledWith(
         expect.any(Error),
         expect.objectContaining({
-          key: KEY,
-          component: 'useLocalStorage: storedValue',
+          component: 'useLocalStorage',
+          action: 'storedValue',
+          extra: { key: KEY },
         }),
       )
     })
@@ -94,8 +95,9 @@ describe('useLocalStorage', () => {
         expect(logger).toHaveBeenCalledWith(
           expect.any(Error),
           expect.objectContaining({
-            key: KEY,
-            component: 'useLocalStorage: setValue',
+            component: 'useLocalStorage',
+            action: 'setValue',
+            extra: { key: KEY },
           }),
         )
       })
@@ -108,8 +110,9 @@ describe('useLocalStorage', () => {
         expect(logger).toHaveBeenCalledWith(
           expect.any(Error),
           expect.objectContaining({
-            key: KEY,
-            component: 'useLocalStorage: setValue',
+            component: 'useLocalStorage',
+            action: 'setValue',
+            extra: { key: KEY },
           }),
         )
       })
@@ -134,8 +137,9 @@ describe('useLocalStorage', () => {
         expect(logger).toHaveBeenCalledWith(
           expect.any(Error),
           expect.objectContaining({
-            key: KEY,
-            component: 'useLocalStorage: refreshValue',
+            component: 'useLocalStorage',
+            action: 'refreshValue',
+            extra: { key: KEY },
           }),
         )
       })
@@ -172,8 +176,9 @@ describe('useLocalStorage', () => {
         expect(logger).toHaveBeenCalledWith(
           expect.any(Error),
           expect.objectContaining({
-            key: KEY,
-            component: 'useLocalStorage: handleStorageChange',
+            component: 'useLocalStorage',
+            action: 'handleStorageChange',
+            extra: { key: KEY },
           }),
         )
       })
