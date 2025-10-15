@@ -2,8 +2,8 @@ import type { RestaurantListItem } from '~/types/restaurant'
 import { notFound, redirect } from 'next/navigation'
 import RestaurantCard from '~/components/features/restaurant/restaurant-card'
 import Section from '~/components/layout/section'
-import { fetchRestaurantsByIds } from '~/services/fetch-restaurants'
 import { fetchSharedList } from '~/services/fetch-shared-list'
+import { fetchRestaurantsByIds } from '~/services/fetch-restaurants-by-ids'
 
 interface SharedListPageProps {
   params: Promise<{ shareUuid: string }>
