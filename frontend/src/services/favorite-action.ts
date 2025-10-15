@@ -79,7 +79,7 @@ export async function getFavoritesWithDetailsPaginated(
 
       if (!restaurantResult.success) {
         logger(new Error(restaurantResult.message), {
-          tags: { component: 'getFavoritesWithDetailsPaginated' },
+          component: 'getFavoritesWithDetailsPaginated',
         })
         return {
           success: false,
@@ -147,7 +147,7 @@ export async function checkFavoriteStatus(
     return response.data
   }
   catch (error) {
-    logger(error, { tags: { component: 'checkFavoriteStatus' } })
+    logger(error, { component: 'checkFavoriteStatus' })
     return {
       isFavorite: false,
       favoriteId: null,

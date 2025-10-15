@@ -44,7 +44,7 @@ export default function useOAuthCallback() {
           await mutate(API_ENDPOINTS.CURRENT_USER_STATUS)
         }
         catch (error) {
-          logger(error, { tags: { component: 'handleOAuthCallback' } })
+          logger(error, { component: 'handleOAuthCallback' })
           resetUser()
           toast.error('ログインの検証に失敗しました')
         }

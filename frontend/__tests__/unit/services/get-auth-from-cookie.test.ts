@@ -83,7 +83,7 @@ describe('getAuthFromCookie', () => {
     expect(logger).toHaveBeenCalledWith(
       expect.any(Error),
       expect.objectContaining({
-        tags: { component: 'getAuthFromCookie' },
+        component: 'getAuthFromCookie',
       }),
     )
   })
@@ -96,7 +96,7 @@ describe('getAuthFromCookie', () => {
     expect(logger).toHaveBeenCalledWith(
       expect.any(Error),
       expect.objectContaining({
-        tags: { component: 'getAuthFromCookie' },
+        component: 'getAuthFromCookie',
       }),
     )
   })

@@ -44,8 +44,10 @@ export default function useShare(): UseShareReturn {
           return { ok: true }
 
         logger(error, {
-          message: 'share failed',
-          tags: { component: 'useShare' },
+          component: 'useShare',
+          extra: {
+            message: 'share failed',
+          },
         })
 
         return { ok: false, reason: 'failed' }

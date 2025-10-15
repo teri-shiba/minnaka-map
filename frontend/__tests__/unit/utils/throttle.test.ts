@@ -53,7 +53,7 @@ describe('throttle', () => {
     expect(logger).toHaveBeenCalledWith(
       expect.any(Error),
       expect.objectContaining({
-        tags: { component: 'throttle' },
+        component: 'throttle',
       }),
     )
     expect(fn).toHaveBeenCalledTimes(1)

@@ -49,7 +49,7 @@ export default function ShareRestaurantDialog({
     }
     catch (error) {
       toast.error('リンクのコピーに失敗しました')
-      logger(error, { tags: { component: 'handleCopyLink' } })
+      logger(error, { component: 'handleCopyLink' })
     }
   }, [currentUrl])
 

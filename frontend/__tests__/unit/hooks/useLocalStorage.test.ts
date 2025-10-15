@@ -45,7 +45,7 @@ describe('useLocalStorage', () => {
         expect.any(Error),
         expect.objectContaining({
           key: KEY,
-          tags: { component: 'useLocalStorage: storedValue' },
+          component: 'useLocalStorage: storedValue',
         }),
       )
     })
@@ -95,7 +95,7 @@ describe('useLocalStorage', () => {
           expect.any(Error),
           expect.objectContaining({
             key: KEY,
-            tags: { component: 'useLocalStorage: setValue' },
+            component: 'useLocalStorage: setValue',
           }),
         )
       })
@@ -109,7 +109,7 @@ describe('useLocalStorage', () => {
           expect.any(Error),
           expect.objectContaining({
             key: KEY,
-            tags: { component: 'useLocalStorage: setValue' },
+            component: 'useLocalStorage: setValue',
           }),
         )
       })
@@ -135,7 +135,7 @@ describe('useLocalStorage', () => {
           expect.any(Error),
           expect.objectContaining({
             key: KEY,
-            tags: { component: 'useLocalStorage: refreshValue' },
+            component: 'useLocalStorage: refreshValue',
           }),
         )
       })
@@ -173,7 +173,7 @@ describe('useLocalStorage', () => {
           expect.any(Error),
           expect.objectContaining({
             key: KEY,
-            tags: { component: 'useLocalStorage: handleStorageChange' },
+            component: 'useLocalStorage: handleStorageChange',
           }),
         )
       })

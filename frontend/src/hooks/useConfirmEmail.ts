@@ -33,7 +33,7 @@ export default function useConfirmEmail() {
         setModalOpen(true)
       }
       catch (error) {
-        logger(error, { tags: { component: 'handleConfirmEmail' } })
+        logger(error, { component: 'handleConfirmEmail' })
       }
       finally {
         router.replace('/', { scroll: false })
