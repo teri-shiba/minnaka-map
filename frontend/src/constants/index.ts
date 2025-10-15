@@ -30,13 +30,6 @@ export const dynamicPaths = {
 export type StaticEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS]
 
 // ===============================================
-// EXTERNAL API Paths
-// ===============================================
-export const EXTERNAL_ENDPOINTS = {
-  HOTPEPPER_GOURMET_V1: '/hotpepper/gourmet/v1/',
-} as const
-
-// ===============================================
 // Error Messages
 // ===============================================
 export const ERROR_MESSAGE = {
@@ -120,14 +113,6 @@ export const PAGINATION = {
 
 export const FAVORITES_FIRST_PAGE = 1 as const
 export const FAVORITE_GROUPS_PER_PAGE = 3 as const
-
-// ===============================================
-// Cache
-// ===============================================
-export const CACHE_DURATION = {
-  /* 24H (60 * 60 * 24) */
-  RESTAURANT_INFO: 60 * 60 * 24,
-} as const
 
 // ===============================================
 // Restaurant Marker Options
