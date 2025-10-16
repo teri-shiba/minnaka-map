@@ -12,6 +12,8 @@ export function getErrorInfo({
 }: GetErrorInfoOptions): { message: string, cause: ServiceCause } {
   if (error instanceof HttpError) {
     switch (error.status) {
+      case 0:
+        return { message: 'ネットワークエラーが発生しました', cause: 'NETWORK' }
       case 401:
         return { message: 'ログインが必要です', cause: 'UNAUTHORIZED' }
       case 403:
