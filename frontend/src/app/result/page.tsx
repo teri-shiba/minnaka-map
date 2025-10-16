@@ -4,11 +4,11 @@ import { redirect } from 'next/navigation'
 import Map from '~/components/features/map/map'
 import RestaurantList from '~/components/features/restaurant/restaurant-list'
 import { Button } from '~/components/ui/button'
+import { fetchRestaurantsByCoords } from '~/services/fetch-restaurants-by-coords'
 import { getApiKey } from '~/services/get-api-key'
 import { parseAndValidateCoordinates } from '~/services/parse-and-validate-coords'
 import { verifyCoordsSignature } from '~/services/verify-coords-signature'
 import { isServiceSuccess } from '~/types/service-result'
-import { fetchRestaurantsByCoords } from '~/services/fetch-restaurants-by-coords'
 
 interface ResultPageProps {
   searchParams: Promise<SearchParams & { page?: string }>
@@ -79,23 +79,23 @@ export default async function Result({ searchParams }: ResultPageProps) {
       <div className="h-mobile-map w-full md:h-desktop-map md:w-3/5 md:flex-1">
         {(maptilerApiKey && midpoint)
           ? (
-            <Map
-              apiKey={maptilerApiKey}
-              midpoint={midpoint}
-              restaurants={items}
-            />
-          )
+              <Map
+                apiKey={maptilerApiKey}
+                midpoint={midpoint}
+                restaurants={items}
+              />
+            )
           : (
-            <div className="size-full place-content-center bg-gray-100">
-              <div className="flex flex-col items-center gap-1">
-                <p>地図の取得に失敗しました。</p>
-                <p className="pb-4">お手数ですが、トップページから再度お試しください。</p>
-                <Button>
-                  <Link href="/">トップに戻る</Link>
-                </Button>
+              <div className="size-full place-content-center bg-gray-100">
+                <div className="flex flex-col items-center gap-1">
+                  <p>地図の取得に失敗しました。</p>
+                  <p className="pb-4">お手数ですが、トップページから再度お試しください。</p>
+                  <Button>
+                    <Link href="/">トップに戻る</Link>
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
       </div>
 
       <RestaurantList
