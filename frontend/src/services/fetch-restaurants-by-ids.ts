@@ -1,34 +1,53 @@
 'use server'
 
 import type { HotPepperRestaurant, RestaurantListItem } from '~/types/restaurant'
-import type { ServiceCause, ServiceResult } from '~/types/service-result'
+import type { ServiceResult } from '~/types/service-result'
+import { HttpError } from '~/lib/http-error'
 import { logger } from '~/lib/logger'
 import { transformToList } from '~/types/restaurant'
-import { externalHref } from '~/utils/external-url'
+import { getErrorInfo } from '~/utils/get-error-info'
+import { mapHotPepperErrorCode } from '~/utils/map-hotpepper-error-code'
 import { getApiKey } from './get-api-key'
 
 type NonEmptyArray<T> = [T, ...T[]]
 
-interface FetchRestaurantsByIds {
-  restaurantIds: NonEmptyArray<string>
-  offset?: number
-  limit?: number
+interface ChunkSuccess { success: true, items: HotPepperRestaurant[] }
+interface ChunkFailure { success: false, status: number }
+type ChunkResult = ChunkSuccess | ChunkFailure
+
+// HotPeeper の最大同時リクエスト数 (20件) に合わせて分割
+function splitIntoChunks(array: string[]): string[][] {
+  const CHUNK_SIZE = 20
+  const chunkCount = Math.ceil(array.length / CHUNK_SIZE)
+
+  return Array.from({ length: chunkCount }, (_, i) => {
+    const startIndex = i * CHUNK_SIZE
+    const endIndex = startIndex + CHUNK_SIZE
+    return array.slice(startIndex, endIndex)
+  })
 }
 
-// HotPepper: id 指定は 1 リクエスト最大 20 件
+// 結果を集計・ソート
+function collectAndSortResults(
+  successfulChunks: ChunkSuccess[],
+  originalIds: string[],
+): RestaurantListItem[] {
+  const allRestaurants = successfulChunks.flatMap(result => result.items)
+  const orderById = new Map<string, number>()
+  originalIds.forEach((id, index) => orderById.set(id, index))
+
+  return allRestaurants
+    .map(transformToList)
+    .sort((leftItem, rightItem) => (
+      orderById.get(leftItem.id)! - orderById.get(rightItem.id)!
+    ))
+}
+
 export async function fetchRestaurantsByIds(
-  opts: FetchRestaurantsByIds,
+  restaurantIds: NonEmptyArray<string>,
 ): Promise<ServiceResult<RestaurantListItem[]>> {
   try {
-    const { restaurantIds, offset = 0, limit } = opts
-
-    const slicedIds = limit === undefined
-      ? restaurantIds.slice(offset)
-      : restaurantIds.slice(offset, offset + limit)
-
-    if (slicedIds.length === 0)
-      return { success: true, data: [] }
-
+    // APIキー取得
     const result = await getApiKey('hotpepper')
     if (!result.success) {
       return {
@@ -39,34 +58,17 @@ export async function fetchRestaurantsByIds(
     }
 
     const apiKey = result.data
+    const chunks = splitIntoChunks(restaurantIds)
 
-    const CHUNK_SIZE = 20
-
-    const chunkCount = Math.ceil(slicedIds.length / CHUNK_SIZE)
-    const chunks = Array.from({ length: chunkCount }, (_, i) => {
-      const startIndex = i * CHUNK_SIZE
-      const endIndex = startIndex + CHUNK_SIZE
-      return slicedIds.slice(startIndex, endIndex)
-    })
-
-    const perChunkResults = await Promise.all(
-      chunks.map(async (chunkIds) => {
-        if (chunkIds.length === 0)
-          return { ok: true as const, items: [] as HotPepperRestaurant[], chunkIds }
-
-        const params = new URLSearchParams({
-          key: apiKey,
-          id: chunkIds.join(','),
-          count: String(chunkIds.length),
-          format: 'json',
-        })
-
+    // 並列リクエスト
+    const perChunkResults: ChunkResult[] = await Promise.all(
+      chunks.map(async (chunkIds): Promise<ChunkResult> => {
         try {
-          const url = externalHref(
-            process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL,
-            '/hotpepper/gourmet/v1/',
-            params,
-          )
+          const url = new URL('/hotpepper/gourmet/v1/', process.env.HOTPEPPER_API_BASE_URL)
+          url.searchParams.set('key', apiKey)
+          url.searchParams.set('id', chunkIds.join(','))
+          url.searchParams.set('count', String(chunkIds.length))
+          url.searchParams.set('format', 'json')
 
           const response = await fetch(url, {
             next: {
@@ -75,94 +77,56 @@ export async function fetchRestaurantsByIds(
             },
           })
 
-          if (!response.ok)
-            return { ok: false as const, status: response.status, chunkIds }
-
           const data = await response.json()
+
+          if (data?.results?.error) {
+            const errorCode = data.results.error[0]?.code ?? 3000
+            const httpStatus = mapHotPepperErrorCode(errorCode)
+            return {
+              success: false,
+              status: httpStatus,
+            }
+          }
+
           const restaurants: HotPepperRestaurant[] = data?.results?.shop ?? []
-          return { ok: true as const, items: restaurants, chunkIds }
+          return {
+            success: true,
+            items: restaurants,
+          }
         }
         catch {
-          return { ok: false as const, status: 0, chunkIds } // 0 = ネットワーク層
+          // 並列処理を最後まで完了させるため、ネットワークエラーのみ
+          return {
+            success: false,
+            status: 0,
+          }
         }
       }),
     )
 
-    const succeeded = perChunkResults.filter(result => result.ok) as Array<{
-      ok: true
-      items: HotPepperRestaurant[]
-      chunkIds: string[]
-    }>
-
-    const failed = perChunkResults.filter(result => !result.ok) as Array<{
-      ok: false
-      status: number
-      chunkIds: string[]
-    }>
+    const succeeded = perChunkResults.filter(result => result.success)
+    const failed = perChunkResults.filter(result => !result.success)
 
     if (succeeded.length === 0) {
-      const statusList = failed.map(f => f.status)
-      const cause: ServiceCause
-        = statusList.includes(429)
-          ? 'RATE_LIMIT'
-          : statusList.some(status => status >= 500)
-            ? 'SERVER_ERROR'
-            : statusList.some(status => status > 0)
-              ? 'REQUEST_FAILED'
-              : 'NETWORK'
-
-      logger(new Error(`HotPepper API (by ids) all failed`), {
-        component: 'fetchRestaurantsByIds',
-        extra: {
-          statusList,
-          slicedIds,
-        },
-      })
-
-      return {
-        success: false,
-        message: cause === 'RATE_LIMIT'
-          ? 'HotPepper API のレート制限に達しました'
-          : cause === 'SERVER_ERROR'
-            ? 'HotPepper API サーバーエラーが発生しました'
-            : '店舗情報の取得に失敗しました',
-        cause,
-      }
+      const firstStatus = failed[0]?.status ?? 0
+      throw new HttpError(firstStatus, '店舗情報の取得に失敗しました')
     }
 
-    const allRestaurants = succeeded.flatMap(result => result.items)
-
-    const orderById = new Map<string, number>()
-    slicedIds.forEach((id, index) => orderById.set(id, index))
-
-    const items = allRestaurants
-      .map(transformToList)
-      .sort(
-        (leftItem, rightItem) =>
-          (orderById.get(leftItem.id)! - orderById.get(rightItem.id)!),
-      )
-
-    if (items.length !== slicedIds.length) {
-      logger(new Error('Some HotPepper ids were not returned'), {
-        component: 'fetchRestaurantsByIds',
-        extra: {
-          requested: slicedIds.length,
-          returned: items.length,
-        },
-      })
-    }
+    const items = collectAndSortResults(succeeded, restaurantIds)
 
     return { success: true, data: items }
   }
   catch (error) {
     logger(error, {
       component: 'fetchRestaurantsByIds',
-      extra: { ids: opts.restaurantIds },
+      extra: { ids: restaurantIds },
     })
+
+    const errorInfo = getErrorInfo({ error })
     return {
       success: false,
-      message: 'ネットワークエラーが発生しました',
-      cause: 'NETWORK',
+      message: errorInfo.message,
+      cause: errorInfo.cause,
     }
   }
 }
