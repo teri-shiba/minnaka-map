@@ -23,7 +23,7 @@ export default async function SharedListPage({ params }: SharedListPageProps) {
   if (favoriteIds.length > 0) {
     const [first, ...rest] = favoriteIds
     const restaurantIds: [string, ...string[]] = [first, ...rest]
-    const response = await fetchRestaurantsByIds({ restaurantIds })
+    const response = await fetchRestaurantsByIds(restaurantIds)
 
     if (!response.success)
       redirect('/?error=restaurant_fetch_failed')

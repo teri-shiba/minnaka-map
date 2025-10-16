@@ -75,7 +75,7 @@ export async function getFavoritesWithDetailsPaginated(
     if (hotpepperIds.length > 0) {
       const [first, ...rest] = hotpepperIds
       const restaurantIds: [string, ...string[]] = [first, ...rest]
-      const restaurantResult = await fetchRestaurantsByIds({ restaurantIds })
+      const restaurantResult = await fetchRestaurantsByIds(restaurantIds)
 
       if (!restaurantResult.success) {
         return {
