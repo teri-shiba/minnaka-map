@@ -78,9 +78,6 @@ export async function getFavoritesWithDetailsPaginated(
       const restaurantResult = await fetchRestaurantsByIds({ restaurantIds })
 
       if (!restaurantResult.success) {
-        logger(new Error(restaurantResult.message), {
-          component: 'getFavoritesWithDetailsPaginated',
-        })
         return {
           success: false,
           data: [],
