@@ -14,7 +14,7 @@ describe('fetchRestaurantsByIds', () => {
   beforeEach(() => {
     vi.unstubAllEnvs()
     vi.stubEnv('INTERNAL_API_TOKEN', 'test-internal-token')
-    vi.stubEnv('NEXT_PUBLIC_HOTPEPPER_API_BASE_URL', baseURL)
+    vi.stubEnv('HOTPEPPER_API_BASE_URL', baseURL)
 
     server.use(
       http.get('*/api_keys/hotpepper', async () => {
@@ -44,9 +44,9 @@ describe('fetchRestaurantsByIds', () => {
       }),
     )
 
-    const result = await fetchRestaurantsByIds({
-      restaurantIds: requestedIds as [string, ...string[]],
-    })
+    const restaurantIds = requestedIds as [string, ...string[]]
+
+    const result = await fetchRestaurantsByIds(restaurantIds)
 
     expect(result.success).toBe(true)
 
@@ -57,23 +57,87 @@ describe('fetchRestaurantsByIds', () => {
     }
   })
 
-  it('全チャンクが HTTP ステータス 429 のとき、RATE_LIMIT で失敗を返す', async () => {
+  it('サーバーエラー (code: 1000) のとき、SERVER_ERROR で失敗を返す', async () => {
     server.use(
       http.get('*/gourmet/v1*', async () => {
-        return HttpResponse.json({}, { status: 429 })
+        return HttpResponse.json({
+          results: {
+            api_version: '1.30',
+            error: [{ code: 1000, message: 'サーバー障害エラー' }],
+          },
+        }, { status: 200 })
       }),
     )
 
-    const result = await fetchRestaurantsByIds({
-      restaurantIds: ['A1', 'A2', 'A3'] as [string, ...string[]],
-    })
+    const restaurantIds = ['X1'] as [string, ...string[]]
+
+    const result = await fetchRestaurantsByIds(restaurantIds)
 
     expect(result.success).toBe(false)
 
-    if (!result.success) {
-      expect(result.cause).toBe('RATE_LIMIT')
-      expect(result.message).toBe('HotPepper API のレート制限に達しました')
-    }
+    if (!result.success)
+      expect(result.cause).toBe('SERVER_ERROR')
+  })
+
+  it('APIキー認証エラー (code: 2000)のとき、UNAUTHORIZED で失敗を返す', async () => {
+    server.use(
+      http.get('*/gourmet/v1*', async () => {
+        return HttpResponse.json({
+          results: {
+            api_version: '1.30',
+            error: [{ code: 2000, message: '認証エラー' }],
+          },
+        }, { status: 200 })
+      }),
+    )
+
+    const restaurantIds = ['Y1'] as [string, ...string[]]
+
+    const result = await fetchRestaurantsByIds(restaurantIds)
+
+    expect(result.success).toBe(false)
+
+    if (!result.success)
+      expect(result.cause).toBe('UNAUTHORIZED')
+  })
+
+  it('パラメータ不正エラー (code: 3000)のとき、REQUEST_FAILED で失敗を返す', async () => {
+    server.use(
+      http.get('*/gourmet/v1*', async () => {
+        return HttpResponse.json({
+          results: {
+            api_version: '1.30',
+            error: [{ code: 3000, message: 'パラメータ不正エラー' }],
+          },
+        }, { status: 200 })
+      }),
+    )
+
+    const restaurantIds = ['Z1'] as [string, ...string[]]
+
+    const result = await fetchRestaurantsByIds(restaurantIds)
+
+    expect(result.success).toBe(false)
+
+    if (!result.success)
+      expect(result.cause).toBe('REQUEST_FAILED')
+  })
+
+  it('ネットワークエラーのとき、NETWORK で失敗を返す', async () => {
+    server.use(
+      http.get('*/gourmet/v1*', async () => {
+        return HttpResponse.error()
+      }),
+    )
+
+    const restaurantIds = ['A1', 'A2', 'A3'] as [string, ...string[]]
+
+    const result = await fetchRestaurantsByIds(restaurantIds)
+
+    expect(result.success).toBe(false)
+
+    if (!result.success)
+      expect(result.cause).toBe('NETWORK')
   })
 
   it('一部成功・一部失敗のとき、成功分のみ返し、要求順を維持する', async () => {
@@ -87,12 +151,14 @@ describe('fetchRestaurantsByIds', () => {
         if (chunkIds.includes('B21')) {
           return HttpResponse.json({}, { status: 500 })
         }
+
         const shops = chunkIds.map(id => buildHotPepperShop(id))
         return HttpResponse.json(buildHotPepperResults(shops, chunkIds.length))
       }),
     )
 
-    const result = await fetchRestaurantsByIds({ restaurantIds: ids })
+    const restaurantIds = ids
+    const result = await fetchRestaurantsByIds(restaurantIds)
 
     expect(result.success).toBe(true)
 
@@ -105,28 +171,33 @@ describe('fetchRestaurantsByIds', () => {
     }
   })
 
-  it('offset/limit が適用される（slice 済みだけ問い合わせる）', async () => {
-    const ids = Array.from({ length: 10 }, (_, i) => `C${i + 1}`) as [string, ...string[]]
-    const expectSlice = ids.slice(3, 3 + 4)
+  // it('2チェンク目の5件のうち1件が常に500のとき、フォールバック分割で残り4件を回収し、要求順を維持する', async () => {
+  //   const ids = Array.from({ length: 25 }, (_, i) => `E${i + 1}`) as [string, ...string[]]
+  //   const badId = 'E22'
 
-    server.use(
-      http.get('*/gourmet/v1*', async ({ request }) => {
-        const url = new URL(request.url)
-        const idsInQuery = (url.searchParams.get('id') ?? '').split(',').filter(Boolean)
-        const shops = idsInQuery.map(id => buildHotPepperShop(id))
-        return HttpResponse.json(buildHotPepperResults(shops, idsInQuery.length))
-      }),
-    )
+  //   server.use(
+  //     http.get('*/gourmet/v1*', async ({ request }) => {
+  //       const url = new URL(request.url)
+  //       const chunkIds = (url.searchParams.get('id') ?? '').split(',').filter(Boolean)
 
-    const result = await fetchRestaurantsByIds({
-      restaurantIds: ids,
-      offset: 3,
-      limit: 4,
-    })
+  //       if (chunkIds.includes(badId)) {
+  //         return HttpResponse.json({}, { status: 500 })
+  //       }
 
-    expect(result.success).toBe(true)
+  //       const shops = chunkIds.map(id => buildHotPepperShop(id))
+  //       return HttpResponse.json(buildHotPepperResults(shops, chunkIds.length))
+  //     }),
+  //   )
 
-    if (result.success)
-      expect(result.data.map(i => i.id)).toEqual(expectSlice)
-  })
+  //   const restaurantIds = ids
+  //   const result = await fetchRestaurantsByIds(restaurantIds)
+
+  //   expect(result.success).toBe(true)
+
+  //   if (result.success) {
+  //     const returned = result.data.map(i => i.id)
+  //     const expected = ids.filter(id => id !== badId)
+  //     expect(returned).toEqual(expected)
+  //   }
+  // })
 })
