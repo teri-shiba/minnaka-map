@@ -108,7 +108,7 @@ export async function fetchRestaurantsByIds(
 
     if (succeeded.length === 0) {
       const firstStatus = failed[0]?.status ?? 0
-      throw new HttpError(firstStatus, '店舗情報の取得に失敗しました')
+      throw new HttpError(firstStatus, '店舗情報を取得できませんでした')
     }
 
     const items = collectAndSortResults(restaurantIds, succeeded)
