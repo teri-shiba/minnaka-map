@@ -29,12 +29,12 @@ function splitIntoChunks(array: string[]): string[][] {
 
 // 結果を集計・ソート
 function collectAndSortResults(
-  successfulChunks: ChunkSuccess[],
   originalIds: string[],
+  successfulChunks: ChunkSuccess[],
 ): RestaurantListItem[] {
-  const allRestaurants = successfulChunks.flatMap(result => result.items)
   const orderById = new Map<string, number>()
   originalIds.forEach((id, index) => orderById.set(id, index))
+  const allRestaurants = successfulChunks.flatMap(result => result.items)
 
   return allRestaurants
     .map(transformToList)
@@ -47,7 +47,6 @@ export async function fetchRestaurantsByIds(
   restaurantIds: NonEmptyArray<string>,
 ): Promise<ServiceResult<RestaurantListItem[]>> {
   try {
-    // APIキー取得
     const result = await getApiKey('hotpepper')
     if (!result.success) {
       return {
@@ -95,7 +94,7 @@ export async function fetchRestaurantsByIds(
           }
         }
         catch {
-          // 並列処理を最後まで完了させるため、ネットワークエラーのみ
+          // 並列処理を最後まで完了させるため、ネットワークエラーのみ検知
           return {
             success: false,
             status: 0,
@@ -112,7 +111,7 @@ export async function fetchRestaurantsByIds(
       throw new HttpError(firstStatus, '店舗情報の取得に失敗しました')
     }
 
-    const items = collectAndSortResults(succeeded, restaurantIds)
+    const items = collectAndSortResults(restaurantIds, succeeded)
 
     return { success: true, data: items }
   }
