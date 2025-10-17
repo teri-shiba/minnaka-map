@@ -170,34 +170,4 @@ describe('fetchRestaurantsByIds', () => {
       ])
     }
   })
-
-  // it('2チェンク目の5件のうち1件が常に500のとき、フォールバック分割で残り4件を回収し、要求順を維持する', async () => {
-  //   const ids = Array.from({ length: 25 }, (_, i) => `E${i + 1}`) as [string, ...string[]]
-  //   const badId = 'E22'
-
-  //   server.use(
-  //     http.get('*/gourmet/v1*', async ({ request }) => {
-  //       const url = new URL(request.url)
-  //       const chunkIds = (url.searchParams.get('id') ?? '').split(',').filter(Boolean)
-
-  //       if (chunkIds.includes(badId)) {
-  //         return HttpResponse.json({}, { status: 500 })
-  //       }
-
-  //       const shops = chunkIds.map(id => buildHotPepperShop(id))
-  //       return HttpResponse.json(buildHotPepperResults(shops, chunkIds.length))
-  //     }),
-  //   )
-
-  //   const restaurantIds = ids
-  //   const result = await fetchRestaurantsByIds(restaurantIds)
-
-  //   expect(result.success).toBe(true)
-
-  //   if (result.success) {
-  //     const returned = result.data.map(i => i.id)
-  //     const expected = ids.filter(id => id !== badId)
-  //     expect(returned).toEqual(expected)
-  //   }
-  // })
 })
