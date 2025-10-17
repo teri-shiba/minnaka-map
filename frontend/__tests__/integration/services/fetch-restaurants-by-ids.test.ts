@@ -20,7 +20,7 @@ describe('fetchRestaurantsByIds', () => {
       http.get('*/api_keys/hotpepper', async () => {
         return HttpResponse.json({
           success: true,
-          data: { apiKey: 'API_KEY' },
+          data: { api_key: 'API_KEY' },
         })
       }),
     )
