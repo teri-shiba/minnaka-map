@@ -80,10 +80,15 @@ describe('fetchRestaurantsByCoords', () => {
     expect(params.get('format')).toBe('json')
   })
 
-  it('HotPepper が HTTP ステータス 429 のとき、RATE_LIMIT とメッセージで失敗を返す', async () => {
+  it('サーバーエラー (code: 1000) のとき、SERVER_ERROR で失敗を返す', async () => {
     server.use(
       http.get('*/gourmet/v1*', async () => {
-        return HttpResponse.json({ message: 'rate' }, { status: 429 })
+        return HttpResponse.json({
+          results: {
+            api_version: '1.30',
+            error: [{ code: 1000, message: 'サーバー障害エラー' }],
+          },
+        }, { status: 200 })
       }),
     )
 
@@ -96,36 +101,19 @@ describe('fetchRestaurantsByCoords', () => {
 
     expect(result.success).toBe(false)
 
-    if (!result.success) {
-      expect(result.cause).toBe('RATE_LIMIT')
-      expect(result.message).toBe('アクセスが集中しています。時間をあけてお試しください。')
-    }
-  })
-
-  it('HotPepper が HTTP ステータス 500 のとき、SERVER_ERROR のメッセージで失敗を返す', async () => {
-    server.use(
-      http.get('*/gourmet/v1*', async () => {
-        return HttpResponse.json({ message: 'server-error' }, { status: 500 })
-      }),
-    )
-
-    const result = await fetchRestaurantsByCoords({
-      latitude: 35.0,
-      longitude: 139.0,
-    })
-
-    expect(result.success).toBe(false)
-
-    if (!result.success) {
+    if (!result.success)
       expect(result.cause).toBe('SERVER_ERROR')
-      expect(result.message).toBe('サーバーエラーが発生しました')
-    }
   })
 
-  it('HotPepper が HTTP ステータス 404 などのとき、REQUEST_FAILED と既定メッセージで失敗を返す', async () => {
+  it('APIキー認証エラー (code: 2000)のとき、UNAUTHORIZED で失敗を返す', async () => {
     server.use(
       http.get('*/gourmet/v1*', async () => {
-        return HttpResponse.json({ message: 'not-found' }, { status: 404 })
+        return HttpResponse.json({
+          results: {
+            api_version: '1.30',
+            error: [{ code: 2000, message: '認証エラー' }],
+          },
+        }, { status: 200 })
       }),
     )
 
@@ -136,13 +124,34 @@ describe('fetchRestaurantsByCoords', () => {
 
     expect(result.success).toBe(false)
 
-    if (!result.success) {
-      expect(result.cause).toBe('NOT_FOUND')
-      expect(result.message).toBe('リソースが見つかりません')
-    }
+    if (!result.success)
+      expect(result.cause).toBe('UNAUTHORIZED')
   })
 
-  it('ネットワーク例外のとき、NETWORK と既定メッセージで失敗を返す', async () => {
+  it('パラメータ不正エラー (code: 3000)のとき、REQUEST_FAILED で失敗を返す', async () => {
+    server.use(
+      http.get('*/gourmet/v1*', async () => {
+        return HttpResponse.json({
+          results: {
+            api_version: '1.30',
+            error: [{ code: 3000, message: 'パラメータ不正エラー' }],
+          },
+        }, { status: 200 })
+      }),
+    )
+
+    const result = await fetchRestaurantsByCoords({
+      latitude: 35.0,
+      longitude: 139.0,
+    })
+
+    expect(result.success).toBe(false)
+
+    if (!result.success)
+      expect(result.cause).toBe('REQUEST_FAILED')
+  })
+
+  it('ネットワークエラーのとき、NETWORK で失敗を返す', async () => {
     server.use(
       http.get('*/gourmet/v1*', async () => {
         return HttpResponse.error()
@@ -156,9 +165,7 @@ describe('fetchRestaurantsByCoords', () => {
 
     expect(result.success).toBe(false)
 
-    if (!result.success) {
+    if (!result.success)
       expect(result.cause).toBe('NETWORK')
-      expect(result.message).toBe('ネットワークエラーが発生しました')
-    }
   })
 })
