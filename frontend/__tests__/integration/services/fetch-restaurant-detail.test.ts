@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import { fetchRestaurantsByCoords } from '~/services/fetch-restaurants-by-coords'
+import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
 import { buildHotPepperResults, buildHotPepperShop } from '../helpers/hotpepper-fixtures'
 import { server } from '../setup/msw.server'
 
@@ -8,15 +8,13 @@ vi.mock('~/lib/logger', () => ({
   logger: vi.fn(),
 }))
 
-describe('fetchRestaurantsByCoords', () => {
+describe('fetchRestaurantDetail', () => {
   const baseURL = 'https://hotpepper.test.local'
-  let lastHotPepperUrl: URL | null = null
 
   beforeEach(() => {
     vi.unstubAllEnvs()
     vi.stubEnv('INTERNAL_API_TOKEN', 'test-internal-token')
     vi.stubEnv('HOTPEPPER_API_BASE_URL', baseURL)
-    lastHotPepperUrl = null
 
     server.use(
       http.get('*/api_keys/hotpepper', async () => {
@@ -33,51 +31,39 @@ describe('fetchRestaurantsByCoords', () => {
     vi.unstubAllEnvs()
   })
 
-  it('HTTP ステータスが 200 のとき、ページング情報と items を返す', async () => {
-    const page = 3
-    const itemsPerPage = 10
-    const start = (page - 1) * itemsPerPage + 1
-    const total = 123
-    const shops = Array.from({ length: itemsPerPage }, (_, i) => buildHotPepperShop(String(1000 + i)))
+  it('店舗IDが存在するとき、店舗の詳細情報を返す', async () => {
+    const shopId = 'J004421997'
+    const shop = buildHotPepperShop(shopId)
 
     server.use(
-      http.get('*/gourmet/v1*', async ({ request }) => {
-        lastHotPepperUrl = new URL(request.url)
-        return HttpResponse.json(buildHotPepperResults(shops, total))
+      http.get('*/gourmet/v1*', async () => {
+        return HttpResponse.json(buildHotPepperResults([shop], 1))
       }),
     )
 
-    const result = await fetchRestaurantsByCoords({
-      latitude: 35.0,
-      longitude: 139.0,
-      genre: 'G001',
-      page,
-      itemsPerPage,
-    })
+    const result = await fetchRestaurantDetail(shopId)
 
     expect(result.success).toBe(true)
 
-    if (result.success) {
-      expect(result.data.items).toHaveLength(itemsPerPage)
-      expect(result.data.pagination).toEqual({
-        currentPage: page,
-        totalPages: Math.ceil(total / itemsPerPage),
-        totalCount: total,
-        itemsPerPage,
-      })
-      expect(result.data.hasMore).toBe(page < Math.ceil(total / itemsPerPage))
-    }
+    if (result.success)
+      expect(result.data.id).toBe(shopId)
+  })
 
-    expect(lastHotPepperUrl).not.toBeNull()
-    const params = lastHotPepperUrl!.searchParams
-    expect(params.get('key')).toBe('API_KEY')
-    expect(params.get('lat')).toBe('35')
-    expect(params.get('lng')).toBe('139')
-    expect(params.get('genre')).toBe('G001')
-    expect(params.get('range')).toBe('5')
-    expect(params.get('start')).toBe(String(start))
-    expect(params.get('count')).toBe(String(itemsPerPage))
-    expect(params.get('format')).toBe('json')
+  it('店舗が見つからないとき、NOT_FOUND で失敗を返す', async () => {
+    server.use(
+      http.get('*/gourmet/v1*', async () => {
+        return HttpResponse.json(buildHotPepperResults([], 0))
+      }),
+    )
+
+    const result = await fetchRestaurantDetail('INVALID_ID')
+
+    expect(result.success).toBe(false)
+
+    if (!result.success) {
+      expect(result.cause).toBe('NOT_FOUND')
+      expect(result.message).toBe('店舗が見つかりませんでした')
+    }
   })
 
   it('サーバーエラー (code: 1000) のとき、SERVER_ERROR で失敗を返す', async () => {
@@ -92,12 +78,7 @@ describe('fetchRestaurantsByCoords', () => {
       }),
     )
 
-    const result = await fetchRestaurantsByCoords({
-      latitude: 35.0,
-      longitude: 139.0,
-      page: 1,
-      itemsPerPage: 5,
-    })
+    const result = await fetchRestaurantDetail('J004421997')
 
     expect(result.success).toBe(false)
 
@@ -119,10 +100,7 @@ describe('fetchRestaurantsByCoords', () => {
       }),
     )
 
-    const result = await fetchRestaurantsByCoords({
-      latitude: 35.0,
-      longitude: 139.0,
-    })
+    const result = await fetchRestaurantDetail('J004421997')
 
     expect(result.success).toBe(false)
 
@@ -144,10 +122,7 @@ describe('fetchRestaurantsByCoords', () => {
       }),
     )
 
-    const result = await fetchRestaurantsByCoords({
-      latitude: 35.0,
-      longitude: 139.0,
-    })
+    const result = await fetchRestaurantDetail('J004421997')
 
     expect(result.success).toBe(false)
 
@@ -164,10 +139,7 @@ describe('fetchRestaurantsByCoords', () => {
       }),
     )
 
-    const result = await fetchRestaurantsByCoords({
-      latitude: 35.0,
-      longitude: 139.0,
-    })
+    const result = await fetchRestaurantDetail('J004421997')
 
     expect(result.success).toBe(false)
 
