@@ -7,6 +7,7 @@ import { HttpError } from '~/lib/http-error'
 import { logger } from '~/lib/logger'
 import { transformToList } from '~/types/restaurant'
 import { getErrorInfo } from '~/utils/get-error-info'
+import { mapHotPepperErrorCode } from '~/utils/map-hotpepper-error-code'
 import { getApiKey } from './get-api-key'
 
 interface FetchRestaurantsOpts {
@@ -26,17 +27,8 @@ export async function fetchRestaurantsByCoords(
     const itemsPerPage = Math.min(opts.itemsPerPage ?? 10, 100)
     const start = (page - 1) * itemsPerPage + 1
 
-    // APIキー取得
     const result = await getApiKey('hotpepper')
     if (!result.success) {
-      logger(new Error('APIキーの取得に失敗しました'), {
-        component: 'fetchRestaurantsByCoords',
-        extra: {
-          service: 'hotpepper',
-          apiKeyError: result,
-        },
-      })
-
       return {
         success: false,
         message: result.message,
@@ -74,10 +66,14 @@ export async function fetchRestaurantsByCoords(
       },
     })
 
-    if (!response.ok)
-      throw new HttpError(response.status, '店舗情報の取得に失敗しました')
-
     const data = await response.json()
+
+    if (data?.results?.error) {
+      const errorCode = data.results.error[0]?.code ?? 3000
+      const httpStatus = mapHotPepperErrorCode(errorCode)
+      throw new HttpError(httpStatus, '店舗情報の取得に失敗しました')
+    }
+
     const restaurants: HotPepperRestaurant[] = data?.results?.shop ?? []
     const totalCount = Number(data?.results?.results_available ?? 0) || 0
     const totalPages = Math.ceil(totalCount / itemsPerPage)
@@ -98,7 +94,7 @@ export async function fetchRestaurantsByCoords(
   }
   catch (error) {
     logger(error, {
-      component: 'fetchRestaurants',
+      component: 'fetchRestaurantsByCoords',
       extra: {
         latitude: opts.latitude,
         longitude: opts.longitude,
