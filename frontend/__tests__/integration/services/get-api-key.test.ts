@@ -17,7 +17,7 @@ describe('getApiKey', () => {
     server.use(http.get('*/api_keys/maptiler', async () => {
       return HttpResponse.json({
         success: true,
-        data: { apiKey: 'test_api_key' },
+        data: { api_key: 'test_api_key' },
       })
     }))
 
@@ -41,7 +41,7 @@ describe('getApiKey', () => {
         seenToken = request.headers.get('X-Internal-Token')
         return HttpResponse.json({
           success: true,
-          data: { apiKey: 'dummy-key' },
+          data: { api_key: 'dummy-key' },
         })
       }))
 
