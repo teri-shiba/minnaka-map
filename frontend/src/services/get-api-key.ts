@@ -5,6 +5,7 @@ import type { ServiceResult } from '~/types/service-result'
 import { API_SERVICES } from '~/constants'
 import { HttpError } from '~/lib/http-error'
 import { logger } from '~/lib/logger'
+import { toCamelDeep } from '~/utils/case-convert'
 import { getErrorInfo } from '~/utils/get-error-info'
 
 export async function getApiKey(
@@ -37,10 +38,11 @@ export async function getApiKey(
       throw new HttpError(response.status, `${config.serviceName} APIキー取得失敗`)
 
     const json = await response.json()
+    const apiKey = toCamelDeep(json.data.api_key)
 
     return {
       success: true,
-      data: String(json.data.apiKey),
+      data: apiKey,
     }
   }
   catch (error) {
