@@ -75,8 +75,10 @@ describe('fetchRestaurantsByIds', () => {
 
     expect(result.success).toBe(false)
 
-    if (!result.success)
+    if (!result.success) {
       expect(result.cause).toBe('SERVER_ERROR')
+      expect(result.message).toBe('サーバーエラーが発生しました')
+    }
   })
 
   it('APIキー認証エラー (code: 2000)のとき、UNAUTHORIZED で失敗を返す', async () => {
@@ -97,8 +99,10 @@ describe('fetchRestaurantsByIds', () => {
 
     expect(result.success).toBe(false)
 
-    if (!result.success)
+    if (!result.success) {
       expect(result.cause).toBe('UNAUTHORIZED')
+      expect(result.message).toBe('認証が必要です')
+    }
   })
 
   it('パラメータ不正エラー (code: 3000)のとき、REQUEST_FAILED で失敗を返す', async () => {
@@ -119,8 +123,10 @@ describe('fetchRestaurantsByIds', () => {
 
     expect(result.success).toBe(false)
 
-    if (!result.success)
+    if (!result.success) {
       expect(result.cause).toBe('REQUEST_FAILED')
+      expect(result.message).toBe('店舗情報を取得できませんでした')
+    }
   })
 
   it('ネットワークエラーのとき、NETWORK で失敗を返す', async () => {
@@ -136,11 +142,13 @@ describe('fetchRestaurantsByIds', () => {
 
     expect(result.success).toBe(false)
 
-    if (!result.success)
+    if (!result.success) {
       expect(result.cause).toBe('NETWORK')
+      expect(result.message).toBe('ネットワークエラーが発生しました')
+    }
   })
 
-  it('一部成功・一部失敗のとき、成功分のみ返し、要求順を維持する', async () => {
+  it('一部店舗の情報が取得できなかったとき、成功分のみリクエストIDの並びのまま返す', async () => {
     const ids = Array.from({ length: 45 }, (_, i) => `B${i + 1}`) as [string, ...string[]]
 
     server.use(
