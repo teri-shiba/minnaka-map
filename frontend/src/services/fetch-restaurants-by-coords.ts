@@ -71,7 +71,7 @@ export async function fetchRestaurantsByCoords(
     if (data?.results?.error) {
       const errorCode = data.results.error[0]?.code ?? 3000
       const httpStatus = mapHotPepperErrorCode(errorCode)
-      throw new HttpError(httpStatus, '店舗情報の取得に失敗しました')
+      throw new HttpError(httpStatus, '店舗情報を取得できませんでした')
     }
 
     const restaurants: HotPepperRestaurant[] = data?.results?.shop ?? []
