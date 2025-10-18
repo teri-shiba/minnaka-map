@@ -79,7 +79,7 @@ describe('checkFavoriteStatus', () => {
     }
   })
 
-  it('ネットワークエラーのとき、既定メッセージで失敗を返す', async () => {
+  it('ネットワークエラーのとき、success: false と NETWORK を返す', async () => {
     server.use(
       http.get('*/favorites/status', async () => {
         return HttpResponse.error()
