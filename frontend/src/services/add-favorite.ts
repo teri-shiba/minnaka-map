@@ -1,36 +1,75 @@
 'use server'
 
-import type { FavoriteActionResponse } from '~/types/favorite'
-import type { CreateFavoriteRes } from '~/types/favorite.dto'
-import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
-import { apiFetch, handleApiError } from './api-client'
+import type { ServiceResult } from '~/types/service-result'
+import { HttpError } from '~/lib/http-error'
+import { logger } from '~/lib/logger'
+import { toCamelDeep, toSnakeDeep } from '~/utils/case-convert'
+import { getErrorInfo } from '~/utils/get-error-info'
+import { getAuthFromCookie } from './get-auth-from-cookie'
 
-export async function addToFavorites(
+interface AddFavoriteData {
+  favoriteId: number
+}
+
+export async function addFavorite(
   hotpepperId: string,
   searchHistoryId: number,
-): Promise<FavoriteActionResponse> {
+): Promise<ServiceResult<AddFavoriteData>> {
   try {
-    const response = await apiFetch<CreateFavoriteRes>(
-      'favorites',
-      {
-        method: 'POST',
-        body: {
-          favorite: { searchHistoryId, hotpepperId },
-        },
-        withAuth: true,
-      },
-    )
+    const auth = await getAuthFromCookie()
 
-    if (!isApiSuccess(response))
-      return { success: false, message: getApiErrorMessage(response) }
+    if (!auth) {
+      return {
+        success: false,
+        message: 'ログインが必要です',
+        cause: 'UNAUTHORIZED',
+      }
+    }
 
-    return { success: true, favoriteId: response.data.id }
+    const url = new URL('/api/v1/favorites', process.env.API_BASE_URL)
+
+    const headers = new Headers({
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'access-token': auth.accessToken,
+      'client': auth.client,
+      'uid': auth.uid,
+    })
+
+    const requestBody = toSnakeDeep({
+      favorite: { searchHistoryId, hotpepperId },
+    })
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(requestBody),
+      cache: 'no-cache',
+    })
+
+    if (!response.ok)
+      throw new HttpError(response.status, 'お気に入りの追加に失敗しました')
+
+    const json = await response.json()
+    const { id } = toCamelDeep(json.data)
+
+    return {
+      success: true,
+      data: { favoriteId: id },
+    }
   }
   catch (error) {
-    const failure = handleApiError(error, {
-      component: 'addToFavorites',
-      defaultMessage: 'お気に入りの追加に失敗しました',
+    logger(error, {
+      component: 'addFavorites',
+      extra: { hotpepperId, searchHistoryId },
     })
-    return { success: false, message: failure.message }
+
+    const errorInfo = getErrorInfo({ error })
+
+    return {
+      success: false,
+      message: errorInfo.message,
+      cause: errorInfo.cause,
+    }
   }
 }
