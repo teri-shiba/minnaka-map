@@ -11,6 +11,7 @@ import { logger } from '~/lib/logger'
 import { addFavorite } from '~/services/add-favorite'
 import { checkFavoriteStatus } from '~/services/check-favorite-status'
 import { removeFromFavorites } from '~/services/favorite-action'
+import { removeFavorite } from '~/services/remove-favorite'
 import { saveSearchHistory } from '~/services/save-search-history'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
 import { cn } from '~/utils/cn'
@@ -142,25 +143,32 @@ export default function FavoriteButton({
       }
       else {
         // お気に入り削除処理
-        if (!favoriteId)
-          throw new Error('ID不正')
-        const result: FavoriteActionResult = await removeFromFavorites(favoriteId)
-        if (!result.success)
-          throw new Error('削除失敗')
+        if (!favoriteId) {
+          toast.error('お気に入りIDが不正です')
+          return
+        }
+
+        const result = await removeFavorite(favoriteId)
+
+        if (!result.success) {
+          toast.error(result.message)
+          return
+        }
+
         setIsFavorite(false)
         setFavoriteId(null)
         toast.success('お気に入りから削除しました')
       }
     }
-    catch (error) {
-      logger(error, { component: 'FavoriteButton' })
+    // catch (error) {
+    //   logger(error, { component: 'FavoriteButton' })
 
-      toast.error(
-        !isFavorite
-          ? 'お気に入りの追加に失敗しました。時間をおいて再度お試しください。'
-          : 'お気に入りの削除に失敗しました。時間をおいて再度お試しください。',
-      )
-    }
+    //   toast.error(
+    //     !isFavorite
+    //       ? 'お気に入りの追加に失敗しました。時間をおいて再度お試しください。'
+    //       : 'お気に入りの削除に失敗しました。時間をおいて再度お試しください。',
+    //   )
+    // }
     finally {
       setIsLoading(false)
     }
