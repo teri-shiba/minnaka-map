@@ -8,7 +8,8 @@ import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
 import { Skeleton } from '~/components/ui/skeleton'
 import { logger } from '~/lib/logger'
-import { addToFavorites, checkFavoriteStatus, removeFromFavorites } from '~/services/favorite-action'
+import { checkFavoriteStatus } from '~/services/check-favorite-status'
+import { addToFavorites, removeFromFavorites } from '~/services/favorite-action'
 import { saveSearchHistory } from '~/services/save-search-history'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
 import { cn } from '~/utils/cn'
@@ -51,18 +52,25 @@ export default function FavoriteButton({
 
   useEffect(() => {
     const initCheck = async () => {
-      if (isFromFavoritesPage || !isAuthenticated || !historyId) {
+      if (isFromFavoritesPage
+        || !isAuthenticated
+        || !historyId) {
         setIsChecking(false)
         return
       }
 
+      // TODO: 保存する -> 保存済みがちらつくのを解消する
       try {
-        const status = await checkFavoriteStatus(hotpepperId, historyId)
-        setIsFavorite(status.isFavorite)
-        setFavoriteId(status.favoriteId ?? null)
-      }
-      catch (error) {
-        logger(error, { component: 'FavoriteButton - initCheck' })
+        const result = await checkFavoriteStatus(hotpepperId, historyId)
+
+        if (!result.success) {
+          setIsFavorite(false)
+          setFavoriteId(null)
+          return
+        }
+
+        setIsFavorite(result.data.isFavorite)
+        setFavoriteId(result.data.favoriteId)
       }
       finally {
         setIsChecking(false)
@@ -70,7 +78,7 @@ export default function FavoriteButton({
     }
 
     initCheck()
-  }, [initialHistoryId, historyId, isAuthenticated, hotpepperId, isFromFavoritesPage])
+  }, [initialHistoryId, historyId, isAuthenticated, hotpepperId, isFromFavoritesPage, isFavorite, favoriteId])
 
   // TODO: 依存関係が多すぎるので、サイズダウンする
   const handleClick = useCallback(async () => {
