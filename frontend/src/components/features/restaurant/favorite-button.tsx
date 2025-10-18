@@ -8,8 +8,9 @@ import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
 import { Skeleton } from '~/components/ui/skeleton'
 import { logger } from '~/lib/logger'
+import { addFavorite } from '~/services/add-favorite'
 import { checkFavoriteStatus } from '~/services/check-favorite-status'
-import { addToFavorites, removeFromFavorites } from '~/services/favorite-action'
+import { removeFromFavorites } from '~/services/favorite-action'
 import { saveSearchHistory } from '~/services/save-search-history'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
 import { cn } from '~/utils/cn'
@@ -124,16 +125,23 @@ export default function FavoriteButton({
 
     try {
       if (!isFavorite) {
-        // 追加処理
-        const result: FavoriteActionResult = await addToFavorites(hotpepperId, Number(currentHistoryId))
-        if (!result.success || !result.favoriteId)
-          throw new Error('追加失敗')
+        // お気に入り追加処理
+        const result = await addFavorite(
+          hotpepperId,
+          Number(currentHistoryId),
+        )
+
+        if (!result.success) {
+          toast.error(result.message)
+          return
+        }
+
         setIsFavorite(true)
-        setFavoriteId(result.favoriteId)
+        setFavoriteId(result.data.favoriteId)
         toast.success('お気に入りに追加しました')
       }
       else {
-        // 削除処理
+        // お気に入り削除処理
         if (!favoriteId)
           throw new Error('ID不正')
         const result: FavoriteActionResult = await removeFromFavorites(favoriteId)
