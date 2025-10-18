@@ -1,29 +1,67 @@
 'use server'
 
-import type { FavoriteActionResponse } from '~/types/favorite'
-import type { DeleteFavoriteRes } from '~/types/favorite.dto'
-import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
-import { apiFetch, handleApiError } from './api-client'
+import type { ServiceResult } from '~/types/service-result'
+import { HttpError } from '~/lib/http-error'
+import { logger } from '~/lib/logger'
+import { getErrorInfo } from '~/utils/get-error-info'
+import { getAuthFromCookie } from './get-auth-from-cookie'
 
-export async function removeFromFavorites(
+export async function removeFavorite(
   favoriteId: number,
-): Promise<FavoriteActionResponse> {
+): Promise<ServiceResult<void>> {
   try {
-    const response = await apiFetch<DeleteFavoriteRes>(
-      `favorites/${favoriteId}`,
-      { method: 'DELETE', withAuth: true },
+    const auth = await getAuthFromCookie()
+
+    if (!auth) {
+      return {
+        success: false,
+        message: 'ログインが必要です',
+        cause: 'UNAUTHORIZED',
+      }
+    }
+
+    const url = new URL(
+      `/api/v1/favorites/${favoriteId}`,
+      process.env.API_BASE_URL,
     )
 
-    if (!isApiSuccess(response))
-      return { success: false, message: getApiErrorMessage(response) }
+    const headers = new Headers({
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'access-token': auth.accessToken,
+      'client': auth.client,
+      'uid': auth.uid,
+    })
 
-    return { success: true }
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers,
+      cache: 'no-cache',
+    })
+
+    if (!response.ok)
+      throw new HttpError(response.status, 'お気に入りの削除に失敗しました')
+
+    return {
+      success: true,
+      data: undefined,
+    }
   }
   catch (error) {
-    const failure = handleApiError(error, {
+    logger(error, {
       component: 'removeFromFavorites',
-      defaultMessage: 'お気に入りの削除に失敗しました',
+      extra: { favoriteId },
     })
-    return { success: false, message: failure.message }
+
+    const errorInfo = getErrorInfo({
+      error,
+      notFoundErrorMessage: 'お気に入りが見つかりませんでした',
+    })
+
+    return {
+      success: false,
+      message: errorInfo.message,
+      cause: errorInfo.cause,
+    }
   }
 }
