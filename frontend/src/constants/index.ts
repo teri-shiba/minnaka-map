@@ -112,6 +112,12 @@ export const PAGINATION = {
 } as const
 
 // ===============================================
+// Favorite Groups
+// ===============================================
+export const FAVORITES_FIRST_PAGE = 1
+export const FAVORITE_GROUPS_PER_PAGE = 3
+
+// ===============================================
 // Restaurant Marker Options
 // ===============================================
 export const ICON = {

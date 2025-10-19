@@ -3,6 +3,7 @@
 import type { FavoriteGroup, FavoriteGroupWithDetails, FavoritesPaginationMeta, FavoritesWithDetails } from '~/types/favorite'
 import type { RestaurantListItem } from '~/types/restaurant'
 import type { ServiceResult } from '~/types/service-result'
+import { FAVORITE_GROUPS_PER_PAGE, FAVORITES_FIRST_PAGE } from '~/constants'
 import { HttpError } from '~/lib/http-error'
 import { logger } from '~/lib/logger'
 import { toCamelDeep } from '~/utils/case-convert'
@@ -14,9 +15,6 @@ interface FavoriteGroupsData {
   groups: FavoriteGroupWithDetails[]
   pagination: FavoritesPaginationMeta
 }
-
-export const FAVORITES_FIRST_PAGE = 1
-export const FAVORITE_GROUPS_PER_PAGE = 3
 
 export async function getFavoriteGroups(
   page: number = FAVORITES_FIRST_PAGE,
