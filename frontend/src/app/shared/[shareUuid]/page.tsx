@@ -23,7 +23,7 @@ export default async function SharedListPage({ params }: SharedListPageProps) {
   let restaurants: RestaurantListItem[] = []
 
   if (favoriteIds.length > 0) {
-    const restaurantIds= favoriteIds as [string, ...string[]]
+    const restaurantIds = favoriteIds as [string, ...string[]]
     const result = await fetchRestaurantsByIds(restaurantIds)
 
     if (!result.success)
