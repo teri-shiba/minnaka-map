@@ -1,18 +1,19 @@
 import Link from 'next/link'
 import FavoritesList from '~/components/features/favorite/favorite-list'
 import { Button } from '~/components/ui/button'
-import { getFavoritesWithDetailsPaginated } from '~/services/favorite-action'
+import { getFavoriteGroups } from '~/services/get-favorite-groups'
 
 export default async function Favorites() {
-  const favoritesResult = await getFavoritesWithDetailsPaginated()
+  // 初期表示（1ページ目）
+  const favoritesResult = await getFavoriteGroups()
 
   return (
     <div className="mx-auto max-w-lg">
       {favoritesResult.success
         ? (
             <FavoritesList
-              initialData={favoritesResult.data}
-              initialMeta={favoritesResult.meta}
+              initialData={favoritesResult.data.groups}
+              initialMeta={favoritesResult.data.pagination}
             />
           )
         : (
