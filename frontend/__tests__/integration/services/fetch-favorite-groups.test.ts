@@ -1,9 +1,9 @@
 import type { RestaurantListItem } from '~/types/restaurant'
 import { http, HttpResponse } from 'msw'
 import { FAVORITE_GROUPS_PER_PAGE, FAVORITES_FIRST_PAGE } from '~/constants'
+import { fetchFavoriteGroups } from '~/services/fetch-favorite-groups'
 import { fetchRestaurantsByIds } from '~/services/fetch-restaurants-by-ids'
 import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
-import { getFavoriteGroups } from '~/services/get-favorite-groups'
 import { server } from '../setup/msw.server'
 
 vi.mock('server-only', () => ({}))
@@ -32,7 +32,7 @@ function makeRestaurant(id: string): RestaurantListItem {
   }
 }
 
-describe('getFavoriteGroups', () => {
+describe('fetchFavoriteGroups', () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.mocked(getAuthFromCookie).mockResolvedValue({
@@ -72,7 +72,7 @@ describe('getFavoriteGroups', () => {
       ],
     })
 
-    const result = await getFavoriteGroups(2)
+    const result = await fetchFavoriteGroups(2)
 
     expect(result.success).toBe(true)
 
@@ -93,7 +93,7 @@ describe('getFavoriteGroups', () => {
       }),
     )
 
-    const result = await getFavoriteGroups(1)
+    const result = await fetchFavoriteGroups(1)
 
     expect(result.success).toBe(false)
 
@@ -130,7 +130,7 @@ describe('getFavoriteGroups', () => {
       data: [],
     })
 
-    await getFavoriteGroups()
+    await fetchFavoriteGroups()
 
     expect(seenPage).toBe(String(FAVORITES_FIRST_PAGE))
     expect(seenLimit).toBe(String(FAVORITE_GROUPS_PER_PAGE))
@@ -143,7 +143,7 @@ describe('getFavoriteGroups', () => {
       }),
     )
 
-    const result = await getFavoriteGroups(1)
+    const result = await fetchFavoriteGroups(1)
 
     expect(result.success).toBe(false)
     if (!result.success) {
@@ -155,7 +155,7 @@ describe('getFavoriteGroups', () => {
   it('認証情報がないとき、UNAUTHORIZED を返す', async () => {
     vi.mocked(getAuthFromCookie).mockResolvedValueOnce(null)
 
-    const result = await getFavoriteGroups(1)
+    const result = await fetchFavoriteGroups(1)
 
     expect(result.success).toBe(false)
 
