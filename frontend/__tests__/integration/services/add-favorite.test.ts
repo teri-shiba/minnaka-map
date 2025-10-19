@@ -71,18 +71,14 @@ describe('addFavorite', () => {
   })
 
   it('認証情報がないとき、UNAUTHORIZED を返す', async () => {
-    server.use(
-      http.post('*/favorites', async () => {
-        return HttpResponse.json({}, { status: 401 })
-      }),
-    )
+    vi.mocked(getAuthFromCookie).mockResolvedValueOnce(null)
 
     const result = await addFavorite('J001246910', 5)
 
     expect(result.success).toBe(false)
 
     if (!result.success) {
-      expect(result.message).toBe('認証が必要です')
+      expect(result.message).toBe('ログインが必要です')
       expect(result.cause).toBe('UNAUTHORIZED')
     }
   })
