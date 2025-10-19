@@ -9,7 +9,7 @@ export function mapHotPepperErrorCode(code: number): number {
     case 1000: // サーバ障害エラー
       return 500
     case 2000: // APIキーまたはIPアドレスの認証エラー
-      return 401
+      return 500
     case 3000: // パラメータ不正エラー
       return 400
     default: // 不明なエラーはリクエストエラー扱い

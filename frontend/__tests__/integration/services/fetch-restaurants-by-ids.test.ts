@@ -81,7 +81,7 @@ describe('fetchRestaurantsByIds', () => {
     }
   })
 
-  it('APIキー認証エラー (code: 2000)のとき、UNAUTHORIZED で失敗を返す', async () => {
+  it('APIキー認証エラー (code: 2000)のとき、SERVER_ERROR で失敗を返す', async () => {
     server.use(
       http.get('*/gourmet/v1*', async () => {
         return HttpResponse.json({
@@ -100,8 +100,8 @@ describe('fetchRestaurantsByIds', () => {
     expect(result.success).toBe(false)
 
     if (!result.success) {
-      expect(result.cause).toBe('UNAUTHORIZED')
-      expect(result.message).toBe('認証が必要です')
+      expect(result.cause).toBe('SERVER_ERROR')
+      expect(result.message).toBe('サーバーエラーが発生しました')
     }
   })
 
