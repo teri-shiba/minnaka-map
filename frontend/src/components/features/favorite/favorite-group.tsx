@@ -1,13 +1,12 @@
 'use client'
 
-import type { SharedListData } from '~/services/create-shared-list'
 import type { FavoriteGroupWithDetails } from '~/types/favorite'
+import type { SharedListData } from '~/types/shared-list'
 import { useCallback, useState } from 'react'
 import { LuChevronDown, LuChevronUp } from 'react-icons/lu'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
 import useShare from '~/hooks/useShare'
-import { logger } from '~/lib/logger'
 import { createSharedList } from '~/services/create-shared-list'
 import RestaurantCard from '../restaurant/restaurant-card'
 import ShareFavoriteListDialog from './share/share-favorite-list-dialog'
@@ -42,7 +41,7 @@ export default function FavoriteGroup({ group }: FavoriteGroupProps) {
       const result = await createSharedList(group.searchHistory.id)
 
       if (!result.success) {
-        toast.error(result.message || 'シェア作成に失敗しました')
+        toast.error(result.message)
         return
       }
 
@@ -67,10 +66,6 @@ export default function FavoriteGroup({ group }: FavoriteGroupProps) {
       setShareData(result.data)
       setShareUrl(generatedUrl)
       setShareDialogOpen(true)
-    }
-    catch (error) {
-      logger(error, { component: 'FavoriteGroup', action: 'handleShare' })
-      toast.error('予期しないエラーが発生しました')
     }
     finally {
       setIsSharing(false)
