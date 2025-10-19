@@ -5,11 +5,7 @@ import { server } from '../setup/msw.server'
 
 vi.mock('server-only', () => ({}))
 vi.mock('~/services/get-auth-from-cookie', () => ({
-  getAuthFromCookie: vi.fn().mockResolvedValue({
-    accessToken: 'token-123',
-    client: 'client-123',
-    uid: 'uid-123',
-  }),
+  getAuthFromCookie: vi.fn(),
 }))
 
 function buildHandlers() {
@@ -49,15 +45,12 @@ describe('saveSearchHistory', () => {
   const handlers = buildHandlers()
 
   beforeEach(() => {
+    vi.resetAllMocks()
     vi.mocked(getAuthFromCookie).mockResolvedValue({
       accessToken: 'token-123',
       client: 'client-123',
       uid: 'uid-123',
     })
-  })
-
-  afterEach(() => {
-    vi.clearAllMocks()
   })
 
   it('API が成功のとき、id を searchHistoryId にして success: true を返す', async () => {

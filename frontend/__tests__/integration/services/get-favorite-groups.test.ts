@@ -41,11 +41,6 @@ describe('getFavoriteGroups', () => {
     })
   })
 
-  afterEach(() => {
-    server.resetHandlers()
-    vi.clearAllMocks()
-  })
-
   it('成功したとき、レストラン詳細を結合してグループと pagination を返す', async () => {
     const pageMeta = { currentPage: 2, totalGroup: 3, hasMore: true }
     const groupData = [
