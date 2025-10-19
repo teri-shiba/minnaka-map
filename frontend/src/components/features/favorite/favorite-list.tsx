@@ -4,8 +4,9 @@ import type { FavoriteGroupWithDetails, FavoritesPaginationMeta } from '~/types/
 import Link from 'next/link'
 import { useState } from 'react'
 import { LuHeart } from 'react-icons/lu'
+import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
-import { getFavoritesWithDetailsPaginated } from '~/services/favorite-action'
+import { getFavoriteGroups } from '~/services/get-favorite-groups'
 import FavoriteGroup from './favorite-group'
 
 interface FavoriteListProps {
@@ -21,14 +22,21 @@ export default function FavoritesList({ initialData, initialMeta }: FavoriteList
   const loadMore = async () => {
     setIsLoading(true)
 
-    const result = await getFavoritesWithDetailsPaginated(meta.currentPage + 1, 3)
+    try {
+      // 追加読み込み（「さらに読み込む」ボタン）
+      const result = await getFavoriteGroups(meta.currentPage + 1)
 
-    if (result.success) {
-      setFavorites(prev => [...prev, ...result.data])
-      setMeta(result.meta)
+      if (!result.success) {
+        toast.error(result.message)
+        return
+      }
+
+      setFavorites(prev => [...prev, ...result.data.groups])
+      setMeta(result.data.pagination)
     }
-
-    setIsLoading(false)
+    finally {
+      setIsLoading(false)
+    }
   }
 
   if (favorites.length === 0) {
