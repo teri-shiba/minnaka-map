@@ -111,9 +111,6 @@ export const PAGINATION = {
   ELLIPSIS_END_OFFSET: 2,
 } as const
 
-export const FAVORITES_FIRST_PAGE = 1 as const
-export const FAVORITE_GROUPS_PER_PAGE = 3 as const
-
 // ===============================================
 // Restaurant Marker Options
 // ===============================================
