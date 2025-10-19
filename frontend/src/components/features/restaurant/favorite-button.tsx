@@ -7,10 +7,8 @@ import { LuHeart } from 'react-icons/lu'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
 import { Skeleton } from '~/components/ui/skeleton'
-import { logger } from '~/lib/logger'
 import { addFavorite } from '~/services/add-favorite'
 import { checkFavoriteStatus } from '~/services/check-favorite-status'
-import { removeFromFavorites } from '~/services/favorite-action'
 import { removeFavorite } from '~/services/remove-favorite'
 import { saveSearchHistory } from '~/services/save-search-history'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
@@ -23,11 +21,6 @@ interface FavoriteButtonProps {
   initialHistoryId?: string
   initialFavoriteId?: number
   initialIsFavorite?: boolean
-}
-
-interface FavoriteActionResult {
-  success: boolean
-  favoriteId?: number
 }
 
 export default function FavoriteButton({
