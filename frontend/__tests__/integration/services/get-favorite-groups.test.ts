@@ -1,8 +1,9 @@
 import type { RestaurantListItem } from '~/types/restaurant'
 import { http, HttpResponse } from 'msw'
+import { FAVORITE_GROUPS_PER_PAGE, FAVORITES_FIRST_PAGE } from '~/constants'
 import { fetchRestaurantsByIds } from '~/services/fetch-restaurants-by-ids'
 import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
-import { FAVORITE_GROUPS_PER_PAGE, FAVORITES_FIRST_PAGE, getFavoriteGroups } from '~/services/get-favorite-groups'
+import { getFavoriteGroups } from '~/services/get-favorite-groups'
 import { server } from '../setup/msw.server'
 
 vi.mock('server-only', () => ({}))
