@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { toast } from 'sonner'
-import { apiBaseHref } from '~/utils/api-url'
 
 interface ApiErrorPayload {
   error?: { messages?: string }
@@ -16,8 +15,10 @@ const STATUS_MESSAGE: Record<number, string | ((data: unknown) => string)> = {
   },
 }
 
+const baseURL = new URL('/api/v1', process.env.NEXT_PUBLIC_API_BASE_URL).href
+
 const api = axios.create({
-  baseURL: apiBaseHref(),
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',

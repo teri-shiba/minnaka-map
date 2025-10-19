@@ -1,9 +1,5 @@
 import type { AxiosRequestConfig } from 'axios'
 
-vi.mock('~/utils/api-url', () => ({
-  apiBaseHref: () => 'https://minnaka-map.com/api/v1',
-}))
-
 const createSpy = vi.fn((_config: AxiosRequestConfig) => ({
   interceptors: { response: { use: vi.fn() } },
 }))
@@ -27,7 +23,7 @@ describe('api（単体: 設定のみ）', () => {
 
     expect(passed).toEqual(
       expect.objectContaining({
-        baseURL: 'https://minnaka-map.com/api/v1',
+        baseURL: 'http://localhost/api/v1',
         headers: expect.objectContaining({
           'Content-Type': 'application/json',
           'Accept': 'application/json',
