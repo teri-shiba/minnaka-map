@@ -75,7 +75,7 @@ describe('createSharedList', () => {
     }
   })
 
-  it('API が 400 エラーのとき、success: false を返す', async () => {
+  it('API が 400 エラーのとき、REQUEST_FAILED で失敗を返す', async () => {
     server.use(
       http.post('*/shared_favorite_lists', async () => {
         return HttpResponse.json({}, { status: 400 })
@@ -92,7 +92,7 @@ describe('createSharedList', () => {
     }
   })
 
-  it('ネットワークエラーのとき、success: false と NETWORK を返す', async () => {
+  it('ネットワークエラーのとき、NETWORK で失敗を返す', async () => {
     server.use(
       http.post('*/shared_favorite_lists', async () => {
         return HttpResponse.error()
