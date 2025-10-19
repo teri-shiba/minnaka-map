@@ -16,7 +16,7 @@ interface FavoriteGroupsData {
   pagination: FavoritesPaginationMeta
 }
 
-export async function getFavoriteGroups(
+export async function fetchFavoriteGroups(
   page: number = FAVORITES_FIRST_PAGE,
 ): Promise<ServiceResult<FavoriteGroupsData>> {
   try {
@@ -113,7 +113,7 @@ export async function getFavoriteGroups(
   }
   catch (error) {
     logger(error, {
-      component: 'getFavoriteGroups',
+      component: 'fetchFavoriteGroups',
       extra: { page },
     })
 

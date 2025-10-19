@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import FavoritesList from '~/components/features/favorite/favorite-list'
 import { Button } from '~/components/ui/button'
-import { getFavoriteGroups } from '~/services/get-favorite-groups'
+import { fetchFavoriteGroups } from '~/services/fetch-favorite-groups'
 
 export default async function Favorites() {
   // 初期表示（1ページ目）
-  const favoritesResult = await getFavoriteGroups()
+  const favoritesResult = await fetchFavoriteGroups()
 
   return (
     <div className="mx-auto max-w-lg">

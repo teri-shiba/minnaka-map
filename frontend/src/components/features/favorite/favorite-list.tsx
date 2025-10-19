@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { LuHeart } from 'react-icons/lu'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
-import { getFavoriteGroups } from '~/services/get-favorite-groups'
+import { fetchFavoriteGroups } from '~/services/fetch-favorite-groups'
 import FavoriteGroup from './favorite-group'
 
 interface FavoriteListProps {
@@ -24,7 +24,7 @@ export default function FavoritesList({ initialData, initialMeta }: FavoriteList
 
     try {
       // 追加読み込み（「さらに読み込む」ボタン）
-      const result = await getFavoriteGroups(meta.currentPage + 1)
+      const result = await fetchFavoriteGroups(meta.currentPage + 1)
 
       if (!result.success) {
         toast.error(result.message)
