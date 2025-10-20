@@ -19,7 +19,7 @@ const INITIAL_DISPLAY_COUNT = 3
 
 export default function FavoriteGroup({ group }: FavoriteGroupProps) {
   const [showAll, setShowAll] = useState(false)
-  const { share, canNativeShare, isMobile } = useShare()
+  const { openNativeShare } = useShare()
   const [isSharing, setIsSharing] = useState(false)
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const [shareData, setShareData] = useState<SharedListData | null>(null)
@@ -38,14 +38,14 @@ export default function FavoriteGroup({ group }: FavoriteGroupProps) {
     setIsSharing(true)
 
     try {
-      const result = await createSharedList(group.searchHistory.id)
+      const createResult = await createSharedList(group.searchHistory.id)
 
-      if (!result.success) {
-        toast.error(result.message)
+      if (!createResult.success) {
+        toast.error(createResult.message)
         return
       }
 
-      const { shareUuid, title } = result.data
+      const { shareUuid, title } = createResult.data
       const generatedUrl = new URL(
         `/shared/${shareUuid}`,
         process.env.NEXT_PUBLIC_FRONT_BASE_URL,
@@ -57,20 +57,18 @@ export default function FavoriteGroup({ group }: FavoriteGroupProps) {
         url: generatedUrl,
       }
 
-      if (canNativeShare && isMobile) {
-        const response = await share(payload)
-        if (response.ok)
-          return
-      }
+      const shareResult = await openNativeShare(payload)
+      if (shareResult.success)
+        return
 
-      setShareData(result.data)
+      setShareData(createResult.data)
       setShareUrl(generatedUrl)
       setShareDialogOpen(true)
     }
     finally {
       setIsSharing(false)
     }
-  }, [canNativeShare, group.searchHistory.id, isMobile, share])
+  }, [group.searchHistory.id, openNativeShare])
 
   return (
     <section>
