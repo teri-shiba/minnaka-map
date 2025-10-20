@@ -24,7 +24,7 @@ export default function ShareRestaurantDialog({
   station,
 }: ShareDialogProps) {
   const [open, setOpen] = useState<boolean>(false)
-  const { share, canNativeShare, isMobile } = useShare()
+  const { openNativeShare } = useShare()
 
   const pathname = usePathname()
   const currentUrl = useMemo(() => {
@@ -73,14 +73,15 @@ export default function ShareRestaurantDialog({
       if (!currentUrl)
         return
 
-      if (canNativeShare && isMobile) {
-        e.preventDefault()
-        const response = await share(sharePayload)
-        if (!response.ok)
-          setOpen(true)
-      }
+      e.preventDefault()
+
+      const result = await openNativeShare(sharePayload)
+      if (result.success)
+        return
+
+      setOpen(true)
     },
-    [currentUrl, canNativeShare, isMobile, sharePayload, share],
+    [currentUrl, sharePayload, openNativeShare],
   )
 
   const options = useMemo(() => [
