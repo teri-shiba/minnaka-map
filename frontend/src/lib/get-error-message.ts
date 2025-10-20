@@ -1,6 +1,7 @@
 import type { ErrorCode } from '~/constants'
 import type { ServiceFailure } from '~/types/service-result'
 
+// cause → params に変換するロジック
 export function mapFailureToErrorCode(failure: ServiceFailure): ErrorCode {
   switch (failure.cause) {
     case 'UNAUTHORIZED': return 'auth_required'
@@ -12,6 +13,7 @@ export function mapFailureToErrorCode(failure: ServiceFailure): ErrorCode {
   }
 }
 
+// cause → params に変換するロジック(restaurant/page.tsx 限定)
 export function mapFailureToRestaurantCode(failure: ServiceFailure): ErrorCode {
   if (failure.cause === 'RATE_LIMIT')
     return 'rate_limit_exceeded'
@@ -21,6 +23,7 @@ export function mapFailureToRestaurantCode(failure: ServiceFailure): ErrorCode {
   return 'restaurant_fetch_failed'
 }
 
+// cause → toast 用のテキストに変換するロジック
 export function getErrorMessage(
   failure: ServiceFailure,
   operationLabel: string,
