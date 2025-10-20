@@ -5,21 +5,21 @@ import useDrawerController from '~/hooks/useDrawerController'
 
 const startAnimationMock = vi.fn()
 vi.mock('framer-motion', () => ({
-  useAnimationControls: () => ({ start: startAnimationMock }),
+  useAnimationControls: vi.fn(() => ({ start: startAnimationMock })),
 }))
 
 function DrawerHarness(props: { enabled: boolean }) {
   const { enabled } = props
-  const { contentRef, dragConstraints, resetPosition } = useDrawerController(enabled)
+  const { contentRef, scrollLimits, resetPosition } = useDrawerController(enabled)
 
   useEffect(() => {
     const element = document.querySelector('[data-testid="drawer"]') as HTMLDivElement | null
 
     if (element) {
-      element.dataset.top = String(dragConstraints.top)
-      element.dataset.bottom = String(dragConstraints.bottom)
+      element.dataset.top = String(scrollLimits.top)
+      element.dataset.bottom = String(scrollLimits.bottom)
     }
-  }, [dragConstraints])
+  }, [scrollLimits])
 
   return (
     <div>
