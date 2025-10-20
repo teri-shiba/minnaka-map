@@ -23,7 +23,7 @@ export default function RestaurantList({ restaurants, pagination }: Props) {
 
   // SP: スクロール対象の参照とドロワー制御
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const { contentRef, dragConstraints, controls, resetPosition } = useDrawerController(!isDesktop)
+  const { contentRef, scrollLimits, controls, resetPosition } = useDrawerController(!isDesktop)
 
   const headingId = 'restaurant-list-heading'
 
@@ -59,7 +59,7 @@ export default function RestaurantList({ restaurants, pagination }: Props) {
       <RestaurantDrawerContainer
         contentRef={contentRef}
         controls={controls}
-        dragConstraints={dragConstraints}
+        scrollLimits={scrollLimits}
         className="block md:hidden"
       >
         <RestaurantListHeader id={headingId} totalCount={totalCount} />
