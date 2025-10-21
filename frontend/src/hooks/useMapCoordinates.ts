@@ -1,6 +1,5 @@
 'use client'
 
-import type { LatLngExpression } from 'leaflet'
 import type { MapData } from '~/types/map'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useMap, useMapEvents } from 'react-leaflet'
@@ -8,28 +7,9 @@ import { throttle } from '~/utils/throttle'
 
 const THROTTLE_MS = 16
 
-interface ExtractLatLngReturn {
-  lat: number | null
-  lng: number | null
-}
-
-function extractLatLng(
-  latLng: LatLngExpression | null,
-): ExtractLatLngReturn {
-  if (!latLng)
-    return { lat: null, lng: null }
-
-  if (Array.isArray(latLng))
-    return { lat: latLng[0], lng: latLng[1] }
-
-  if ('lat' in latLng && 'lng' in latLng)
-    return { lat: latLng.lat as number, lng: latLng.lng as number }
-
-  return { lat: null, lng: null }
-}
-
 export function useMapCoordinates(
-  latLng: LatLngExpression | null,
+  lat: number | null,
+  lng: number | null,
   onChange: (data: MapData) => void,
 ): void {
   const map = useMap()
@@ -42,25 +22,17 @@ export function useMapCoordinates(
   // onChange を ref で安定化して無限ループを防ぐ
   const onChangeRef = useRef(onChange)
 
-  // latLng も ref で保持して、常に最新の値を参照できるようにする
-  const latLngRef = useRef(latLng)
-
   useEffect(() => {
     onChangeRef.current = onChange
-    latLngRef.current = latLng
-  })
+  }, [onChange])
 
-  // latLng から lat, lng を抽出（プリミティブ値なので参照の問題がない）
-  const { lat, lng } = extractLatLng(latLng)
-
-  // updatePosition: lat, lng が変わった時だけ再実行
+  // lat, lng が変わった時だけ再実行
   useEffect(() => {
     const updatePosition = () => {
       const size = map.getSize()
       const centerPoint = map.latLngToContainerPoint(map.getCenter())
-      const currentLatLng = latLngRef.current
-      const markerPoint = currentLatLng
-        ? map.latLngToContainerPoint(currentLatLng)
+      const markerPoint = lat !== null && lng !== null
+        ? map.latLngToContainerPoint([lat, lng])
         : null
 
       setData({
@@ -79,9 +51,8 @@ export function useMapCoordinates(
   updatePositionRef.current = () => {
     const size = map.getSize()
     const centerPoint = map.latLngToContainerPoint(map.getCenter())
-    const currentLatLng = latLngRef.current
-    const markerPoint = currentLatLng
-      ? map.latLngToContainerPoint(currentLatLng)
+    const markerPoint = lat !== null && lng !== null
+      ? map.latLngToContainerPoint([lat, lng])
       : null
 
     setData({

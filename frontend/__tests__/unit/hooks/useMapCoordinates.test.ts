@@ -63,7 +63,7 @@ describe('useMapCoordinates', () => {
   it('初期化時、地図の座標情報を計算して onChange に通知する', () => {
     const onChange = vi.fn()
 
-    renderHook(() => useMapCoordinates([35.0, 139.0], onChange))
+    renderHook(() => useMapCoordinates(35.0, 139.0, onChange))
 
     expect(onChange).toHaveBeenCalledTimes(1)
 
@@ -79,7 +79,7 @@ describe('useMapCoordinates', () => {
   it('マーカー位置が指定されたとき、そのマーカーの画面座標を含めて通知する', () => {
     const onChange = vi.fn()
 
-    renderHook(() => useMapCoordinates([35.0, 139.0], onChange))
+    renderHook(() => useMapCoordinates(35.0, 139.0, onChange))
 
     expect(mapStub.latLngToContainerPoint).toHaveBeenCalledWith([35.0, 139.0])
 
@@ -90,7 +90,7 @@ describe('useMapCoordinates', () => {
   it('マーカー位置が null のとき、マーカーの画面座標を null として通知する', () => {
     const onChange = vi.fn()
 
-    renderHook(() => useMapCoordinates(null, onChange))
+    renderHook(() => useMapCoordinates(null, null, onChange))
 
     expect(onChange).toHaveBeenCalled()
 
@@ -100,7 +100,7 @@ describe('useMapCoordinates', () => {
 
   it('地図の移動イベント時、更新された座標情報を onChange に通知する', () => {
     const onChange = vi.fn()
-    renderHook(() => useMapCoordinates(null, onChange))
+    renderHook(() => useMapCoordinates(null, null, onChange))
 
     expect(registeredEvents.moveend?.length).toBeGreaterThan(0)
 
@@ -120,7 +120,7 @@ describe('useMapCoordinates', () => {
 
   it('地図のズームイベント時、更新された座標情報を onChange に通知する', () => {
     const onChange = vi.fn()
-    renderHook(() => useMapCoordinates(null, onChange))
+    renderHook(() => useMapCoordinates(null, null, onChange))
 
     expect(registeredEvents.zoomend?.length).toBeGreaterThan(0)
 
@@ -141,8 +141,8 @@ describe('useMapCoordinates', () => {
   it('マーカー位置が変更されたとき、新しい座標情報を再計算する', () => {
     const onChange = vi.fn()
     const { rerender } = renderHook(
-      ({ latLng }: { latLng: [number, number] | null }) => useMapCoordinates(latLng, onChange),
-      { initialProps: { latLng: [35.0, 139.0] as [number, number] | null } },
+      ({ lat, lng }: { lat: number | null, lng: number | null }) => useMapCoordinates(lat, lng, onChange),
+      { initialProps: { lat: 35.0, lng: 139.0 } },
     )
 
     expect(onChange).toHaveBeenCalledTimes(1)
@@ -152,7 +152,7 @@ describe('useMapCoordinates', () => {
 
     onChange.mockClear()
 
-    rerender({ latLng: [35.1, 139.1] })
+    rerender({ lat: 35.1, lng: 139.1 })
 
     expect(onChange).toHaveBeenCalled()
 
@@ -164,7 +164,7 @@ describe('useMapCoordinates', () => {
     const onChange = vi.fn()
     const cancelSpy = vi.mocked(cancelAnimationFrame)
 
-    const { unmount } = renderHook(() => useMapCoordinates(null, onChange))
+    const { unmount } = renderHook(() => useMapCoordinates(null, null, onChange))
 
     unmount()
 
