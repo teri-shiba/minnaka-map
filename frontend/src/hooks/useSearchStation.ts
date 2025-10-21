@@ -7,10 +7,10 @@ import { useDebounce } from './useDebounce'
 const fetcher = (url: string) => fetch(url).then(response => response.json())
 
 export default function useSearchStation(query: string) {
-  const deboucedQuery = useDebounce(query.trim(), 300)
+  const debouncedQuery = useDebounce(query.trim(), 300)
   const { data, error, isLoading } = useSWR(
-    deboucedQuery
-      ? apiHref(API_ENDPOINTS.STATIONS, { q: deboucedQuery })
+    debouncedQuery
+      ? apiHref(API_ENDPOINTS.STATIONS, { q: debouncedQuery })
       : null,
     fetcher,
     {
