@@ -2,16 +2,16 @@ import type { ReadonlyURLSearchParams } from 'next/navigation'
 import { renderHook } from '@testing-library/react'
 import { usePagination } from '~/hooks/usePagination'
 
-let currentQueryString = ''
+let currentQuery = ''
 const routerPushSpy = vi.fn()
 
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(() => ({ push: routerPushSpy })),
-  useSearchParams: vi.fn(() => new URLSearchParams(currentQueryString) as unknown as ReadonlyURLSearchParams),
+  useSearchParams: vi.fn(() => new URLSearchParams(currentQuery) as unknown as ReadonlyURLSearchParams),
 }))
 
 function setSearchParams(query: string) {
-  currentQueryString = query
+  currentQuery = query
 }
 
 describe('usePagination', () => {
