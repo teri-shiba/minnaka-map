@@ -4,7 +4,6 @@ import { useSetAtom } from 'jotai'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import { API_ENDPOINTS } from '~/constants'
 import api from '~/lib/axios-interceptor'
 import { logger } from '~/lib/logger'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
@@ -19,27 +18,29 @@ export default function useConfirmEmail() {
     if (!token)
       return
 
-    const handleConfirmEmail = async () => {
+    const confirmEmail = async () => {
       try {
         await toast.promise(
-          api.patch(API_ENDPOINTS.USER_CONFIRMATIONS, { confirmation_token: token }),
+          api.patch('/user/confirmations', { confirmation_token: token }),
           {
             loading: '確認中…',
             success: 'メールアドレスの確認が完了しました',
-            error: '確認に失敗しました',
           },
         )
 
         setModalOpen(true)
       }
       catch (error) {
-        logger(error, { component: 'handleConfirmEmail' })
+        logger(error, {
+          component: 'useConfirmEmail',
+          action: 'confirmEmail',
+        })
       }
       finally {
         router.replace('/', { scroll: false })
       }
     }
 
-    handleConfirmEmail()
+    confirmEmail()
   }, [token, setModalOpen, router])
 }
