@@ -14,19 +14,6 @@ function setSearchParams(query: string) {
   currentQueryString = query
 }
 
-function toObjectFromQueryString(qsWithOrWithoutQuestion: string) {
-  const qs = qsWithOrWithoutQuestion.startsWith('?')
-    ? qsWithOrWithoutQuestion.slice(1)
-    : qsWithOrWithoutQuestion
-
-  const params = new URLSearchParams(qs)
-  const result: Record<string, string> = {}
-  params.forEach((value, key) => {
-    result[key] = value
-  })
-  return result
-}
-
 describe('usePagination', () => {
   beforeEach(() => {
     routerPushSpy.mockClear()
@@ -39,10 +26,7 @@ describe('usePagination', () => {
       const { result } = renderHook(() => usePagination())
 
       const url = result.current.createPageUrl(3)
-      const queryParams = toObjectFromQueryString(url)
-
-      expect(url.startsWith('?')).toBe(true)
-      expect(queryParams).toEqual({ page: '3' })
+      expect(url).toBe('?page=3')
     })
 
     it('既存のクエリパラメータがあるとき、それらを保持したまま新しいページ番号のURLを返す', () => {
@@ -50,10 +34,10 @@ describe('usePagination', () => {
       const { result } = renderHook(() => usePagination())
 
       const url = result.current.createPageUrl(2)
-      const queryParams = toObjectFromQueryString(url)
+      const params = new URLSearchParams(url.slice(1))
 
-      expect(queryParams.genre).toBe('G001')
-      expect(queryParams.page).toBe('2')
+      expect(params.get('genre')).toBe('G001')
+      expect(params.get('page')).toBe('2')
     })
 
     it('ページ番号パラメータがないとき、新しいページ番号を追加したURLを返す', () => {
@@ -61,10 +45,10 @@ describe('usePagination', () => {
       const { result } = renderHook(() => usePagination())
 
       const url = result.current.createPageUrl(1)
-      const queryParams = toObjectFromQueryString(url)
+      const params = new URLSearchParams(url.slice(1))
 
-      expect(queryParams.genre).toBe('G002')
-      expect(queryParams.page).toBe('1')
+      expect(params.get('genre')).toBe('G002')
+      expect(params.get('page')).toBe('1')
     })
   })
 
@@ -76,8 +60,7 @@ describe('usePagination', () => {
       result.current.navigateToPage(4)
 
       expect(routerPushSpy).toHaveBeenCalledTimes(1)
-      const calledUrl = routerPushSpy.mock.calls[0][0] as string
-      expect(toObjectFromQueryString(calledUrl)).toEqual({ page: '4' })
+      expect(routerPushSpy).toHaveBeenCalledWith('?page=4')
     })
 
     it('既存のクエリパラメータがあるとき、それらを保持したURLに遷移する', () => {
@@ -88,9 +71,10 @@ describe('usePagination', () => {
 
       expect(routerPushSpy).toHaveBeenCalledTimes(1)
       const calledUrl = routerPushSpy.mock.calls[0][0] as string
-      const queryParams = toObjectFromQueryString(calledUrl)
-      expect(queryParams.genre).toBe('G001')
-      expect(queryParams.page).toBe('2')
+      const params = new URLSearchParams(calledUrl.slice(1))
+
+      expect(params.get('genre')).toBe('G001')
+      expect(params.get('page')).toBe('2')
     })
   })
 })
