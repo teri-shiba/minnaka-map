@@ -11,26 +11,29 @@ interface Props {
 }
 
 export default function RestaurantPagination({ pagination }: Props) {
-  const { currentPage, totalPages } = pagination
+  // ページネーションのフック（URL生成・遷移）
   const { createPageUrl, navigateToPage } = usePagination()
 
-  const paginationStructure = useMemo(() =>
+  // 現在のページ情報
+  const { currentPage, totalPages } = pagination
+
+  // ページ構造の生成
+  const pageStructure = useMemo(() =>
     generatePagination({ currentPage, totalPages }), [currentPage, totalPages])
 
-  const paginationSequence = useMemo(() => {
-    const pages = paginationStructure.pages
+  // 表示アイテムの生成（省略記号を含む）
+  const displayItems = useMemo(() => {
+    const pages = pageStructure.pages
     let result: (number | string)[] = [...pages]
 
-    if (paginationStructure.ellipsisPositions.includes('start')) {
+    if (pageStructure.ellipsisPositions.includes('start'))
       result = [pages[0], 'ellipsis-start', ...pages.slice(1)]
-    }
 
-    if (paginationStructure.ellipsisPositions.includes('end')) {
+    if (pageStructure.ellipsisPositions.includes('end'))
       result = [...result.slice(0, -1), 'ellipsis-end', result[result.length - 1]]
-    }
 
     return result
-  }, [paginationStructure])
+  }, [pageStructure])
 
   return (
     <Pagination>
@@ -48,7 +51,7 @@ export default function RestaurantPagination({ pagination }: Props) {
           />
         </PaginationItem>
 
-        {paginationSequence.map((item) => {
+        {displayItems.map((item) => {
           // 省略記号の場合
           if (typeof item === 'string') {
             return (
