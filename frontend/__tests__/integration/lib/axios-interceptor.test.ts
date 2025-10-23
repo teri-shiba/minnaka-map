@@ -4,10 +4,6 @@ import { server } from '../setup/msw.server'
 const mockedToastError = vi.fn()
 const mockedToastInfo = vi.fn()
 
-vi.mock('~/utils/api-url', () => ({
-  apiBaseHref: () => 'https://api.minnaka-map.com',
-}))
-
 vi.mock('sonner', () => ({
   toast: {
     info: (message: string) => mockedToastInfo(message),
