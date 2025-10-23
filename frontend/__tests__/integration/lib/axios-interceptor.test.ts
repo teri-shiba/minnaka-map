@@ -2,12 +2,17 @@ import { http, HttpResponse } from 'msw'
 import { server } from '../setup/msw.server'
 
 const mockedToastError = vi.fn()
+const mockedToastInfo = vi.fn()
+
 vi.mock('~/utils/api-url', () => ({
   apiBaseHref: () => 'https://api.minnaka-map.com',
 }))
 
 vi.mock('sonner', () => ({
-  toast: { error: (message: string) => mockedToastError(message) },
+  toast: {
+    info: (message: string) => mockedToastInfo(message),
+    error: (message: string) => mockedToastError(message),
+  },
 }))
 
 async function importApi() {
@@ -16,7 +21,7 @@ async function importApi() {
   return mod.default
 }
 
-describe('axios-interceptor（結合）', () => {
+describe('axios-interceptor', () => {
   afterEach(() => {
     vi.clearAllMocks()
   })
@@ -31,55 +36,41 @@ describe('axios-interceptor（結合）', () => {
     expect(mockedToastError).not.toHaveBeenCalled()
   })
 
-  it('HTTP 400 のとき、「メールアドレスはすでに確認済みです」を表示する', async () => {
-    server.use(http.get('*/confirmed', () => {
+  it('HTTP 400（認証メール確認済み）のとき、「メールアドレスはすでに確認済みです」を info として表示する', async () => {
+    server.use(http.patch('*/user/confirmations', () => {
       return HttpResponse.json({}, { status: 400 })
     }))
     const api = await importApi()
-    await expect(api.get('/confirmed')).rejects.toThrow()
-    expect(mockedToastError).toHaveBeenCalledWith('メールアドレスはすでに確認済みです')
+    await expect(api.patch('/user/confirmations')).rejects.toThrow()
+    expect(mockedToastInfo).toHaveBeenCalledWith('メールアドレスはすでに確認済みです')
+    expect(mockedToastError).not.toHaveBeenCalled()
   })
 
-  it('HTTP 401 のとき、「認証エラーが発生しました。再ログインしてください。」を表示する', async () => {
+  it('HTTP 400 （その他）のとき、「リクエストが正しくありません」を表示する', async () => {
+    server.use(http.get('*/bad-request', () => {
+      return HttpResponse.json({}, { status: 400 })
+    }))
+    const api = await importApi()
+    await expect(api.get('/bad-request')).rejects.toThrow()
+    expect(mockedToastError).toHaveBeenCalledWith('リクエストが正しくありません')
+  })
+
+  it('HTTP 401 のとき、「認証エラーが発生しました」を表示する', async () => {
     server.use(http.get('*/unauthorized', () => {
       return HttpResponse.json({}, { status: 401 })
     }))
     const api = await importApi()
     await expect(api.get('/unauthorized')).rejects.toThrow()
-    expect(mockedToastError).toHaveBeenCalledWith('認証エラーが発生しました。再ログインしてください。')
+    expect(mockedToastError).toHaveBeenCalledWith('認証エラーが発生しました')
   })
 
-  it('HTTP 404 のとき、「ユーザーは見つかりません」を表示する', async () => {
-    server.use(http.get('*/not-found', () => {
+  it('HTTP 404 （メール認証確認リンク）のとき、「このリンクは無効です」を表示する', async () => {
+    server.use(http.get('*/user/confirmations', () => {
       return HttpResponse.json({}, { status: 404 })
     }))
     const api = await importApi()
-    await expect(api.get('/not-found')).rejects.toThrow()
-    expect(mockedToastError).toHaveBeenCalledWith('ユーザーは見つかりません')
-  })
-
-  it('HTTP 422 で指定のメッセージがあるとき、指定メッセージを表示する', async () => {
-    server.use(http.get('*/unprocessable-entity', () => {
-      return HttpResponse.json(
-        { error: { messages: '入力が不正です' } },
-        { status: 422 },
-      )
-    }))
-    const api = await importApi()
-    await expect(api.get('/unprocessable-entity')).rejects.toThrow()
-    expect(mockedToastError).toHaveBeenCalledWith('入力が不正です')
-  })
-
-  it('HTTP 422 で指定のメッセージがないとき、「バリデーションエラーです」を表示する', async () => {
-    server.use(http.get('*/unprocessable-entity', () => {
-      return HttpResponse.json(
-        { error: {} },
-        { status: 422 },
-      )
-    }))
-    const api = await importApi()
-    await expect(api.get('/unprocessable-entity')).rejects.toThrow()
-    expect(mockedToastError).toHaveBeenCalledWith('バリデーションエラーです')
+    await expect(api.get('/user/confirmations')).rejects.toThrow()
+    expect(mockedToastError).toHaveBeenCalledWith('このリンクは無効です')
   })
 
   it('HTTP 500 のとき、「サーバーエラーが発生しました」を表示する', async () => {
