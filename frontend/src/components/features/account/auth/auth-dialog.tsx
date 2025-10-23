@@ -2,18 +2,20 @@
 
 import { useAtom } from 'jotai'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '~/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog'
-import { AUTH_PROVIDERS, dynamicPaths } from '~/constants'
+import { AUTH_PROVIDERS } from '~/constants'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
-import { apiHref } from '~/utils/api-url'
+import { getOAuthUrl } from '~/utils/get-oauth-url'
 import LoginForm from './forms/login-form'
 import SignUpForm from './forms/signup-form'
 
 export function AuthDialog() {
   const [open, setOpen] = useAtom(authModalOpenAtom)
   const [isLogin, setIsLogin] = useState(true)
+  const pathname = usePathname()
 
   const handleClick = () => {
     setIsLogin(!isLogin)
@@ -59,19 +61,19 @@ export function AuthDialog() {
           <span className="inline-block bg-white px-4">OR</span>
         </p>
         <div className="grid grid-cols-2 gap-3">
-          {AUTH_PROVIDERS.map(provider => (
+          {AUTH_PROVIDERS.map(item => (
             <a
-              key={provider.name}
-              href={apiHref(dynamicPaths.oauthProvider(provider.provider))}
+              key={item.name}
+              href={getOAuthUrl(item.provider, pathname)}
               className="flex h-auto items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent"
             >
               <Image
-                src={provider.iconImg}
+                src={item.iconImg}
                 width={24}
                 height={24}
                 alt=""
               />
-              {isLogin ? `${provider.name}でログイン` : `${provider.name}で登録`}
+              {isLogin ? `${item.name}でログイン` : `${item.name}で登録`}
             </a>
           ))}
         </div>
