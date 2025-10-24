@@ -1,16 +1,16 @@
 Rails.application.config.middleware.use OmniAuth::Builder do
   OmniAuth.config.logger = Rails.logger
 
-  setup_proc = lambda do |env|
+  setup_proc = ->(env) do
     request = Rack::Request.new(env)
-    redirect_to = request.params['redirect_to']
+    redirect_to = request.params["redirect_to"]
 
     if redirect_to
-      env['omniauth.strategy'].options[:authorize_params] ||= {}
+      env["omniauth.strategy"].options[:authorize_params] ||= {}
 
-      existing_state = env['rack.session']['omniauth.state'] || SecureRandom.hex(24)
+      env["rack.session"]["omniauth.state"] || SecureRandom.hex(24)
 
-      env['rack.session']["omniauth.redirect_to"] = redirect_to
+      env["rack.session"]["omniauth.redirect_to"] = redirect_to
     end
   end
 
