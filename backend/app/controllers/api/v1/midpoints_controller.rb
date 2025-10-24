@@ -1,7 +1,7 @@
 class Api::V1::MidpointsController < ApplicationController
   MAX_STATIONS = 6
 
-  def create
+  def show
     ids = normalize_station_ids(params)
 
     return render_error("station_ids is empty") if ids.blank?
