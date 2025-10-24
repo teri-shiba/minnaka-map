@@ -71,6 +71,30 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
         expect(params["message"].first).to eq(expected_message)
       end
     end
+
+    context "redirect_to パラメータがあるとき" do
+      before do
+        set_omniauth_mock(provider, uid:, email:, name:, redirect_to: "/result")
+      end
+
+      it "指定されたパスにリダイレクトすること" do
+        get "/api/v1/auth/#{provider}/callback"
+
+        expect(response).to redirect_to("#{front_domain}/result?status=success")
+      end
+
+      context "クエリパラメータが含まれるとき" do
+        before do
+          set_omniauth_mock(provider, uid:, email:, name:, redirect_to: "/result?lat=35.00000&lng=139.00000")
+        end
+
+        it "クエリパラメータを保持してリダイレクトすること" do
+          get "/api/v1/auth/#{provider}/callback"
+
+          expect(response).to redirect_to("#{front_domain}/result?lat=35.00000&lng=139.00000&status=success")
+        end
+      end
+    end
   end
 
   describe "GET /api/v1/auth/line/callback" do
@@ -138,6 +162,20 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
       get "/api/v1/auth/failure"
 
       expect(response).to redirect_to("#{front_domain}/?status=error")
+    end
+
+    context "redirect_to パラメータがあるとき" do
+      before do
+        allow_any_instance_of(Api::V1::Auth::OmniauthCallbacksController).
+          to receive(:session).
+               and_return({ "omniauth.redirect_to" => "/result" })
+      end
+
+      it "指定されたパスにリダイレクトすること" do
+        get "/api/v1/auth/failure"
+
+        expect(response).to redirect_to("#{front_domain}/result?status=error")
+      end
     end
   end
 end
