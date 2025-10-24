@@ -7,20 +7,19 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
 import { Form, FormControl, FormField, FormItem } from '~/components/ui/form'
-import { useMidpointMutation } from '~/hooks/useMidpointMutation'
 import { logger } from '~/lib/logger'
 import { stationSearchSchema } from '~/schemas/station-search.schema'
 import { AddFormButton } from './buttons/add-form-button'
 import { RemoveFormButton } from './buttons/remove-form-button'
 import { ResetFormButton } from './buttons/reset-form-button'
 import StationAutocomplete from './station-autocomplete'
+import { getMidpoint } from '~/services/get-midpoint'
 
 const MAX_AREA_FIELDS = 6
 const MAX_REQUIRED_FIELDS = 2
 
 export default function StationSearchForm() {
   const router = useRouter()
-  const { trigger: postMidpoint, isMutating } = useMidpointMutation()
 
   const form = useForm<AreaFormValues>({
     resolver: zodResolver(stationSearchSchema),
@@ -42,48 +41,48 @@ export default function StationSearchForm() {
   const watchedArea = form.watch('area')
 
   const processValidData = async (data: AreaFormValues) => {
-    try {
-      const stationIds = data.area
-        .filter(s => s.stationId !== null)
-        .map(s => s.stationId as number)
+    const stationIds = data.area
+      .filter(s => s.stationId !== null)
+      .map(s => s.stationId as number)
 
-      if (typeof window !== 'undefined') {
-        const rawPrev = sessionStorage.getItem('pendingStationIds')
-        if (rawPrev) {
-          const prevIds = JSON.parse(rawPrev) as number[]
-          const sortedPrevIds = [...prevIds].sort((a, b) => a - b)
-          const sortedStationIds = [...stationIds].sort((a, b) => a - b)
+    // sessionStorage 処理
+    if (typeof window !== 'undefined') {
+      const rawPrev = sessionStorage.getItem('pendingStationIds')
+      if (rawPrev) {
+        const prevIds = JSON.parse(rawPrev) as number[]
+        const sortedPrevIds = [...prevIds].sort((a, b) => a - b)
+        const sortedStationIds = [...stationIds].sort((a, b) => a - b)
 
-          const isSameStationIds
-            = sortedPrevIds.length === sortedStationIds.length
-              && sortedPrevIds.every((prevStationId, i) =>
-                prevStationId === sortedStationIds[i])
+        const isSameStationIds
+          = sortedPrevIds.length === sortedStationIds.length
+          && sortedPrevIds.every((prevStationId, i) =>
+            prevStationId === sortedStationIds[i])
 
-          if (!isSameStationIds) {
-            sessionStorage.removeItem('pendingSearchHistoryId')
-          }
+        if (!isSameStationIds) {
+          sessionStorage.removeItem('pendingSearchHistoryId')
         }
-
-        sessionStorage.setItem('pendingStationIds', JSON.stringify(stationIds))
       }
 
-      const midpointResult = await postMidpoint({
-        area: { station_ids: stationIds },
+      sessionStorage.setItem('pendingStationIds', JSON.stringify(stationIds))
+    }
+
+    try {
+      const result = await getMidpoint(stationIds)
+
+      if (!result.success) {
+        toast.error(result.message)
+        return
+      }
+
+      const { midpoint, signature, expiresAt } = result.data
+      const params = new URLSearchParams({
+        lat: midpoint.latitude,
+        lng: midpoint.longitude,
+        ...(signature && { signature }),
+        ...(expiresAt && { expires_at: expiresAt })
       })
 
-      const query: Record<string, string> = {
-        lat: midpointResult.midpoint.latitude,
-        lng: midpointResult.midpoint.longitude,
-      }
-
-      if (midpointResult.signature)
-        query.signature = midpointResult.signature
-
-      if (midpointResult.expires_at)
-        query.expires_at = midpointResult.expires_at
-
-      const qs = new URLSearchParams(query).toString()
-      router.push(`/result?${qs}`)
+      router.push(`/result?${params}`)
     }
     catch (error) {
       logger(error, { component: 'StationSearchForm - processValidData' })
@@ -169,12 +168,12 @@ export default function StationSearchForm() {
 
         <Button
           type="submit"
-          disabled={isMutating}
+          disabled={form.formState.isSubmitting}
           variant="default"
           size="lg"
           className="block w-full md:inline-block md:w-auto"
         >
-          検索する
+          {form.formState.isSubmitting ? '検索中...' : '検索する'}
         </Button>
       </form>
     </Form>
