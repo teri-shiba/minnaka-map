@@ -7,29 +7,6 @@ export const DRAWER_DVH = 30 as const // 30dvh
 export const DRAWER_RATIO = DRAWER_DVH / 100 // 0.3
 
 // ===============================================
-// API Paths
-// ===============================================
-export const API_PREFIX = '/api/v1' as const
-
-export const API_ENDPOINTS = {
-  STATIONS: '/stations',
-  MIDPOINT: '/midpoint',
-  VALIDATE_COORDINATES: '/midpoint/validate',
-  AUTH: '/auth',
-  PROVIDER: '/provider',
-  CURRENT_USER_STATUS: '/current/user/show_status',
-  AUTH_SIGN_IN: '/auth/sign_in',
-  AUTH_SIGN_OUT: '/auth/sign_out',
-  USER_CONFIRMATIONS: '/user/confirmations',
-} as const
-
-export const dynamicPaths = {
-  oauthProvider: (provider: string) => `${API_ENDPOINTS.AUTH}/${provider}`,
-}
-
-export type StaticEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS]
-
-// ===============================================
 // Error Messages
 // ===============================================
 export const ERROR_MESSAGE = {
