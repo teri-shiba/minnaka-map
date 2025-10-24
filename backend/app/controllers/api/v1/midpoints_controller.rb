@@ -42,7 +42,7 @@ class Api::V1::MidpointsController < ApplicationController
   private
 
     def normalize_station_ids(params)
-      Array(params.dig(:area, :station_ids)).
+      Array(params[:station_ids]).
         filter_map {|v| (i = Integer(v, exception: false)) and i.positive? ? i : nil }.
         uniq
     end

@@ -15,7 +15,7 @@ RSpec.describe "Api::V1::MidpointsController", type: :request do
 
   shared_examples "非本番環境では署名と期限を返さない" do
     it "midpoint のみ返す" do
-      get api_v1_midpoint_path, params: { area: { station_ids: } }
+      get api_v1_midpoint_path, params: { station_ids: }
 
       expect_status_ok!
       expect(data[:midpoint]).to eq(latitude: "35.10000", longitude: "139.10000")
@@ -52,7 +52,7 @@ RSpec.describe "Api::V1::MidpointsController", type: :request do
 
       it "expires_at 付きで返す" do
         travel_to(now) do
-          get api_v1_midpoint_path, params: { area: { station_ids: } }
+          get api_v1_midpoint_path, params: { station_ids: }
 
           expected_expires = (now + 1.hour).to_i
           expected_sig = hmac_for("35.10000", "139.10000", expected_expires.to_s)
@@ -70,7 +70,7 @@ RSpec.describe "Api::V1::MidpointsController", type: :request do
     context "station_ids が空のとき" do
       it "422 を返す" do
         allow(Station).to receive(:where)
-        get api_v1_midpoint_path, params: { area: { station_ids: [] } }
+        get api_v1_midpoint_path, params: { station_ids: [] }
         expect(Station).not_to have_received(:where)
         expect_unprocessable_json!(message: "station_ids is empty")
       end
@@ -79,7 +79,7 @@ RSpec.describe "Api::V1::MidpointsController", type: :request do
     context "上限（MAX_STATIONS=6）を超過したとき" do
       it "422 を返す" do
         allow(Station).to receive(:where)
-        get api_v1_midpoint_path, params: { area: { station_ids: (1..7).to_a } }
+        get api_v1_midpoint_path, params: { station_ids: (1..7).to_a }
         expect(Station).not_to have_received(:where)
         expect_unprocessable_json!(message: "too many stations")
       end
@@ -87,7 +87,7 @@ RSpec.describe "Api::V1::MidpointsController", type: :request do
 
     context "DB に存在しない id が含まれているとき" do
       it "422 を返し、details に欠番が入る" do
-        get api_v1_midpoint_path, params: { area: { station_ids: [9999] } }
+        get api_v1_midpoint_path, params: { station_ids: [9999] }
         expect_unprocessable_json!(message: "not found ids", details: [9999])
       end
     end
