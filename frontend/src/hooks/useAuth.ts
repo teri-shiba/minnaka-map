@@ -1,9 +1,10 @@
+'use client'
+
 import { useAtom } from 'jotai'
 import { useResetAtom } from 'jotai/utils'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 import useSWR, { useSWRConfig } from 'swr'
-import { API_ENDPOINTS } from '~/constants'
 import api from '~/lib/axios-interceptor'
 import { logger } from '~/lib/logger'
 import { userStateAtom } from '~/state/user-state.atom'
@@ -21,7 +22,7 @@ export function useAuth() {
     api.get(url).then(response => response.data)
 
   const { error, isLoading, isValidating } = useSWR(
-    API_ENDPOINTS.CURRENT_USER_STATUS,
+    '/current/user/show_status',
     fetcher,
     {
       onSuccess: (data) => {
@@ -69,8 +70,8 @@ export function useAuth() {
   const login = useCallback(
     async (email: string, password: string) => {
       try {
-        await api.post(API_ENDPOINTS.AUTH_SIGN_IN, { email, password })
-        await mutate(API_ENDPOINTS.CURRENT_USER_STATUS)
+        await api.post('/auth/sign_in', { email, password })
+        await mutate('/current/user/show_status')
         toast.success('ログインに成功しました')
       }
       catch {
@@ -83,12 +84,11 @@ export function useAuth() {
   const logout = useCallback(
     async () => {
       try {
-        await api.delete(API_ENDPOINTS.AUTH_SIGN_OUT)
-        mutate(API_ENDPOINTS.CURRENT_USER_STATUS)
+        await api.delete('/auth/sign_out')
+        mutate('/current/user/show_status')
         resetUser()
         sessionStorage.removeItem('pendingStationIds')
         sessionStorage.removeItem('pendingSearchHistoryId')
-        // TODO: ErrorToastHandler にまとめることで、トースト発火→リダイレクトという変な挙動をなくす
         toast.success('ログアウトしました')
       }
       catch {
@@ -101,8 +101,7 @@ export function useAuth() {
   const deleteAccount = useCallback(async (): Promise<DeleteAccountResult> => {
     try {
       await api.delete('/auth')
-
-      await mutate(API_ENDPOINTS.CURRENT_USER_STATUS)
+      await mutate('/current/user/show_status')
       resetUser()
       sessionStorage.removeItem('pendingStationIds')
       sessionStorage.removeItem('pendingSearchHistoryId')
@@ -112,11 +111,12 @@ export function useAuth() {
     }
     catch (error) {
       logger(error, {
-        component: 'useAuth.deleteAccount',
-        endpoint: '/auth',
-        action: 'DELETE',
-        userId: user?.id,
-        provider: user?.provider ?? 'unknown',
+        component: 'useAuth',
+        action: 'deleteAccount',
+        extra: {
+          userId: user?.id,
+          provider: user?.provider ?? 'unknown',
+        },
       })
       toast.error('アカウントの削除に失敗しました')
       return { success: false, error }

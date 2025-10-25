@@ -6,6 +6,7 @@ import ShareRestaurantDialog from '~/components/features/restaurant/share/share-
 import Section from '~/components/layout/section'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '~/components/ui/table'
 import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
+import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import { getGoogleMapsEmbedUrl } from '~/services/get-google-maps-embed-url'
 
 interface RestaurantDetailPageProps {
@@ -16,6 +17,7 @@ interface RestaurantDetailPageProps {
 export default async function RestaurantDetailPage({ params, searchParams }: RestaurantDetailPageProps) {
   const { id } = await params
   const { historyId } = await searchParams
+  const auth = await getAuthFromCookie()
 
   const result = await fetchRestaurantDetail(id)
   if (!result.success) {
@@ -89,6 +91,7 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
             station={station}
           />
           <FavoriteButton
+            isAuthenticated={!!auth}
             hotpepperId={id}
             initialHistoryId={historyId}
           />

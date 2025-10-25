@@ -16,11 +16,17 @@ class Api::V1::Auth::OmniauthCallbacksController < DeviseTokenAuth::OmniauthCall
 
     set_token_in_cookie(@resource, @token) if DeviseTokenAuth.cookie_enabled
 
-    redirect_to "#{Settings.front_domain}/?status=success", allow_other_host: true
+    redirect_path = session.delete("omniauth.redirect_to") || "/"
+
+    separator = redirect_path.include?("?") ? "&" : "?"
+    redirect_to "#{Settings.front_domain}#{redirect_path}#{separator}status=success", allow_other_host: true
   end
 
   def omniauth_failure
-    redirect_to "#{Settings.front_domain}/?status=error", allow_other_host: true
+    redirect_path = session.delete("omniauth.redirect_to") || "/"
+
+    separator = redirect_path.include?("?") ? "&" : "?"
+    redirect_to "#{Settings.front_domain}#{redirect_path}#{separator}status=error", allow_other_host: true
   end
 
   private

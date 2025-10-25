@@ -53,8 +53,9 @@ export function useLocalStorage<T>(
     const parsed = safeParseJson(item)
     if (parsed === undefined) {
       logger(new Error('localStorageに無効なJSONが保存されています'), {
-        key,
-        tags: { component: 'useLocalStorage: storedValue' },
+        component: 'useLocalStorage',
+        action: 'storedValue',
+        extra: { key },
       })
 
       return initialValue
@@ -74,8 +75,9 @@ export function useLocalStorage<T>(
     const parsed = safeParseJson(item)
     if (parsed === undefined) {
       logger(new Error('localStorageに無効なJSONが保存されています'), {
-        key,
-        tags: { component: 'useLocalStorage: refreshValue' },
+        component: 'useLocalStorage',
+        action: 'refreshValue',
+        extra: { key },
       })
 
       return
@@ -107,8 +109,9 @@ export function useLocalStorage<T>(
     }
     catch (error) {
       logger(error, {
-        key,
-        tags: { component: 'useLocalStorage: setValue' },
+        component: 'useLocalStorage',
+        action: 'setValue',
+        extra: { key },
       })
     }
   }, [key, storedValue])
@@ -124,8 +127,9 @@ export function useLocalStorage<T>(
       const parsed = safeParseJson(e.newValue)
       if (parsed === undefined) {
         logger(new Error('ストレージイベントで無効なJSONが検出されました'), {
-          key,
-          tags: { component: 'useLocalStorage: handleStorageChange' },
+          component: 'useLocalStorage',
+          action: 'handleStorageChange',
+          extra: { key },
         })
 
         return

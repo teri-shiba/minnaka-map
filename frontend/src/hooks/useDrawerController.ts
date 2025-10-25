@@ -1,47 +1,74 @@
 'use client'
 
+import type { RefObject } from 'react'
 import { useAnimationControls } from 'framer-motion'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { DRAWER_RATIO } from '~/constants'
 
-const drawerPxFromViewport = (viewportHeight: number) => viewportHeight * DRAWER_RATIO
+interface DrawerScrollLimits {
+  top: number
+  bottom: number
+}
 
-export default function useDrawerController(enabled: boolean) {
+interface UseDrawerControllerReturn {
+  contentRef: RefObject<HTMLDivElement | null>
+  scrollLimits: DrawerScrollLimits
+  controls: ReturnType<typeof useAnimationControls>
+  resetPosition: () => void
+}
+
+function calcDrawerHeight(viewportHeight: number): number {
+  return viewportHeight * DRAWER_RATIO
+}
+
+function getViewportHeight(): number {
+  return window.visualViewport?.height ?? window.innerHeight
+}
+
+export default function useDrawerController(
+  enabled: boolean,
+): UseDrawerControllerReturn {
   const contentRef = useRef<HTMLDivElement>(null)
-  const [dragConstraints, setDragConstraints] = useState({ top: 0, bottom: 0 })
+  const [scrollLimits, setScrollLimits] = useState<DrawerScrollLimits>({ top: 0, bottom: 0 })
   const controls = useAnimationControls()
 
-  const measureDrawerPx = useCallback(() => {
-    const vh = window.visualViewport?.height ?? window.innerHeight
-    return drawerPxFromViewport(vh)
-  }, [])
-
-  const recalc = useCallback(() => {
+  const calcScrollLimits = useCallback(() => {
     if (!enabled || !contentRef.current)
       return
 
     const contentHeight = contentRef.current.offsetHeight
-    const modalViewHeight = measureDrawerPx()
-    const dragDistance = Math.max(0, contentHeight - modalViewHeight)
+    const viewportHeight = getViewportHeight()
+    const drawerHeight = calcDrawerHeight(viewportHeight)
 
-    setDragConstraints({ top: -dragDistance, bottom: 0 })
-  }, [enabled, measureDrawerPx])
+    const scrollableDistance = Math.max(0, contentHeight - drawerHeight)
+
+    setScrollLimits({
+      top: -scrollableDistance,
+      bottom: 0,
+    })
+  }, [enabled])
 
   useEffect(() => {
     if (!enabled || !contentRef.current)
       return
 
-    const resizeObserver = new ResizeObserver(recalc)
-    resizeObserver.observe(contentRef.current)
-    window.addEventListener('resize', recalc)
-    const raf = requestAnimationFrame(recalc)
+    // 初回計算
+    const rafId = requestAnimationFrame(calcScrollLimits)
 
+    // コンテンツサイズの変更を監視
+    const resizeObserver = new ResizeObserver(calcScrollLimits)
+    resizeObserver.observe(contentRef.current)
+
+    // ウィンドウリサイズを監視
+    window.addEventListener('resize', calcScrollLimits)
+
+    // クリーンアップ
     return () => {
+      cancelAnimationFrame(rafId)
       resizeObserver.disconnect()
-      window.removeEventListener('resize', recalc)
-      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', calcScrollLimits)
     }
-  }, [enabled, recalc])
+  }, [enabled, calcScrollLimits])
 
   const resetPosition = useCallback(() => {
     if (!enabled)
@@ -50,5 +77,10 @@ export default function useDrawerController(enabled: boolean) {
     controls.start({ y: 0 })
   }, [enabled, controls])
 
-  return { contentRef, dragConstraints, controls, resetPosition }
+  return {
+    contentRef,
+    scrollLimits,
+    controls,
+    resetPosition,
+  }
 }

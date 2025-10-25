@@ -1,87 +1,72 @@
 'use server'
 
 import type { HotPepperRestaurant, RestaurantDetailItem } from '~/types/restaurant'
-import type { ServiceCause, ServiceResult } from '~/types/service-result'
-import { CACHE_DURATION, EXTERNAL_ENDPOINTS } from '~/constants'
+import type { ServiceResult } from '~/types/service-result'
+import { HttpError } from '~/lib/http-error'
 import { logger } from '~/lib/logger'
 import { transformToDetail } from '~/types/restaurant'
-import { externalHref } from '~/utils/external-url'
+import { getErrorInfo } from '~/utils/get-error-info'
+import { mapHotPepperErrorCode } from '~/utils/map-hotpepper-error-code'
 import { getApiKey } from './get-api-key'
 
-export async function fetchRestaurantDetail(id: string): Promise<ServiceResult<RestaurantDetailItem>> {
+export async function fetchRestaurantDetail(
+  id: string,
+): Promise<ServiceResult<RestaurantDetailItem>> {
   try {
-    const apiKey = await getApiKey('hotpepper')
-    const params = new URLSearchParams({
-      key: apiKey,
-      id,
-      format: 'json',
-    })
+    const result = await getApiKey('hotpepper')
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.message,
+        cause: result.cause,
+      }
+    }
 
-    const url = externalHref(
-      process.env.NEXT_PUBLIC_HOTPEPPER_API_BASE_URL,
-      EXTERNAL_ENDPOINTS.HOTPEPPER_GOURMET_V1,
-      params,
-    )
+    const apiKey = result.data
+    const url = new URL('/hotpepper/gourmet/v1/', process.env.HOTPEPPER_API_BASE_URL)
+    url.searchParams.set('key', apiKey)
+    url.searchParams.set('id', id)
+    url.searchParams.set('format', 'json')
 
     const response = await fetch(url, {
       next: {
-        revalidate: CACHE_DURATION.RESTAURANT_INFO,
+        revalidate: 86400, // 24時間 (60 * 60 * 24)
         tags: ['hotpepper:restaurant-detail', `id:${id}`],
       },
     })
 
-    if (!response.ok) {
-      const status = response.status
-      const cause: ServiceCause
-        = status === 429
-          ? 'RATE_LIMIT'
-          : status >= 500
-            ? 'SERVER_ERROR'
-            : 'REQUEST_FAILED'
+    const data = await response.json()
 
-      logger(new Error(`HotPepper detail request failed: ${status}`), {
-        tags: { component: 'fetchRestaurantDetail', statusCode: status, id },
-      })
-
-      return {
-        success: false,
-        message:
-        cause === 'RATE_LIMIT'
-          ? 'HotPepper API のレート制限に達しました'
-          : cause === 'SERVER_ERROR'
-            ? 'HotPepper API サーバーエラーが発生しました'
-            : '店舗の取得に失敗しました',
-        cause,
-      }
+    if (data?.results?.error) {
+      const errorCode = data.results.error[0]?.code ?? 3000
+      const httpStatus = mapHotPepperErrorCode(errorCode)
+      throw new HttpError(httpStatus, '店舗情報を取得できませんでした')
     }
 
-    const data = await response.json()
     const shops: HotPepperRestaurant[] = data?.results?.shop ?? []
 
     if (shops.length === 0) {
-      logger(new Error('HotPepper: shop not found'), {
-        tags: { component: 'fetchRestaurantDetail', id },
-      })
-      return { success: false, message: '店舗が見つかりませんでした', cause: 'NOT_FOUND' }
+      return {
+        success: false,
+        message: '店舗が見つかりませんでした',
+        cause: 'NOT_FOUND',
+      }
     }
 
     return { success: true, data: transformToDetail(shops[0]) }
   }
   catch (error) {
-    logger(error, { tags: { component: 'fetchRestaurantDetail', id } })
+    logger(error, {
+      component: 'fetchRestaurantDetail',
+      extra: { id },
+    })
 
-    if (error instanceof TypeError) {
-      return {
-        success: false,
-        message: 'ネットワークエラーが発生しました',
-        cause: 'NETWORK',
-      }
-    }
+    const errorInfo = getErrorInfo({ error })
 
     return {
       success: false,
-      message: '店舗の取得に失敗しました',
-      cause: 'REQUEST_FAILED',
+      message: errorInfo.message,
+      cause: errorInfo.cause,
     }
   }
 }

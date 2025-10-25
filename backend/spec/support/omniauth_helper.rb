@@ -3,6 +3,8 @@ module OmniauthHelpers
     auth_hash = build_default_options.merge(options)
     mock_auth_hash = build_mock_auth_hash(provider, auth_hash)
     setup_controller_mock(mock_auth_hash)
+
+    setup_session_mock(options[:redirect_to]) if options[:redirect_to]
   end
 
   private
@@ -86,6 +88,12 @@ module OmniauthHelpers
       allow_any_instance_of(Api::V1::Auth::OmniauthCallbacksController).
         to receive(:auth_hash).
              and_return(mock_auth_hash)
+    end
+
+    def setup_session_mock(redirect_to)
+      allow_any_instance_of(Api::V1::Auth::OmniauthCallbacksController).
+        to receive(:session).
+             and_return({ "omniauth.redirect_to" => redirect_to })
     end
 end
 

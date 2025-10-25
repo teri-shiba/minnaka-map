@@ -1,10 +1,10 @@
 'use server'
 
 import type { LatLngExpression } from 'leaflet'
-import type { ServiceCause, ServiceResult } from '~/types/service-result'
-import { API_ENDPOINTS } from '~/constants'
+import type { ServiceResult } from '~/types/service-result'
+import { HttpError } from '~/lib/http-error'
 import { logger } from '~/lib/logger'
-import { ApiError, apiFetchPublic } from './api-client'
+import { getErrorInfo } from '~/utils/get-error-info'
 
 interface VerifyCoordsOptions {
   latitude: number
@@ -21,11 +21,21 @@ export async function verifyCoordsSignature(
   opts: VerifyCoordsOptions,
 ): Promise<ServiceResult<LatLngExpression>> {
   try {
+    // 有効期限チェック
     const nowSec = Math.floor(Date.now() / 1000)
 
-    if (typeof opts.expires_at === 'number' && opts.expires_at <= nowSec)
-      return { success: false, message: 'リンクの有効期限が切れました。もう一度検索してください。', cause: 'EXPIRED' }
+    if (
+      typeof opts.expires_at === 'number'
+      && opts.expires_at <= nowSec
+    ) {
+      return {
+        success: false,
+        message: 'リンクの有効期限が切れました。もう一度検索してください。',
+        cause: 'EXPIRED',
+      }
+    }
 
+    // キャッシュ利用
     const remainingSec = typeof opts.expires_at === 'number'
       ? Math.max(0, opts.expires_at - nowSec)
       : 60
@@ -35,43 +45,72 @@ export async function verifyCoordsSignature(
     const revalidateConfig: NextFetchRequestConfig | undefined
       = secondsToLive > 0 ? { revalidate: secondsToLive } : undefined
 
-    const params: Record<string, string> = {
-      latitude: opts.latitude.toFixed(5),
-      longitude: opts.longitude.toFixed(5),
-    }
+    // リクエスト
+    const url = new URL('/api/v1/midpoint/validate', process.env.API_BASE_URL)
+    url.searchParams.set('latitude', opts.latitude.toFixed(5))
+    url.searchParams.set('longitude', opts.longitude.toFixed(5))
 
     if (opts.signature)
-      params.signature = opts.signature
+      url.searchParams.set('signature', opts.signature)
 
     if (opts.expires_at)
-      params.expiresAt = opts.expires_at.toString()
+      url.searchParams.set('expiresAt', opts.expires_at.toString())
 
-    const result = await apiFetchPublic<ValidateResponse>(API_ENDPOINTS.VALIDATE_COORDINATES, {
-      params,
+    const headers = new Headers({
+      Accept: 'application/json',
+    })
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
       cache,
       next: revalidateConfig,
     })
 
-    if (!result.valid)
-      return { success: false, message: '座標の検証に失敗しました', cause: 'REQUEST_FAILED' }
-
-    return { success: true, data: [opts.latitude, opts.longitude] }
-  }
-  catch (error) {
-    if (error instanceof ApiError) {
-      const status = error.status
-      const cause: ServiceCause
-        = status === 400
-          ? 'INVALID_SIGNATURE'
-          : status >= 500
-            ? 'SERVER_ERROR'
-            : 'REQUEST_FAILED'
-
-      logger(error, { tags: { component: 'verifyCoordsSignature', status } })
-      return { success: false, message: '座標の検証に失敗しました', cause }
+    if (!response.ok) {
+      throw new HttpError(response.status, '座標の検証に失敗しました')
     }
 
-    logger(error, { tags: { component: 'verifyCoordsSignature' } })
-    return { success: false, message: 'ネットワークエラーが発生しました', cause: 'NETWORK' }
+    const result = await response.json() as ValidateResponse
+
+    if (!result.valid) {
+      return {
+        success: false,
+        message: '座標の検証に失敗しました',
+        cause: 'REQUEST_FAILED',
+      }
+    }
+
+    return {
+      success: true,
+      data: [opts.latitude, opts.longitude],
+    }
+  }
+  catch (error) {
+    logger(error, {
+      component: 'verifyCoordsSignature',
+      extra: {
+        latitude: opts.latitude,
+        longitude: opts.longitude,
+        hasSignature: !!opts.signature,
+      },
+    })
+
+    const errorInfo = await getErrorInfo({ error })
+
+    // 400エラーのみ署名検証失敗として扱う
+    if (error instanceof HttpError && error.status === 400) {
+      return {
+        success: false,
+        message: '座標の検証に失敗しました',
+        cause: 'INVALID_SIGNATURE',
+      }
+    }
+
+    return {
+      success: false,
+      message: errorInfo.message,
+      cause: errorInfo.cause,
+    }
   }
 }

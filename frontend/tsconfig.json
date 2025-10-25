@@ -27,7 +27,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "next.config.ts"
+    "next.config.ts",
+    "__tests__/unit/hooks/helpers/swr-test-helpers.tsx"
   ],
   "exclude": ["node_modules"]
 }

@@ -36,7 +36,7 @@ export default function ShareFavoriteListDialog({
       }
       catch (error) {
         toast.error('リンクのコピーに失敗しました')
-        logger(error, { tags: { component: 'ShareFavoriteListDialog', action: 'copy' } })
+        logger(error, { component: 'ShareFavoriteListDialog', action: 'copy' })
       }
     },
     [shareUrl],

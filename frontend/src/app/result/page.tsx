@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import Map from '~/components/features/map/map'
 import RestaurantList from '~/components/features/restaurant/restaurant-list'
 import { Button } from '~/components/ui/button'
-import { fetchRestaurants } from '~/services/fetch-restaurants'
+import { fetchRestaurantsByCoords } from '~/services/fetch-restaurants-by-coords'
 import { getApiKey } from '~/services/get-api-key'
 import { parseAndValidateCoordinates } from '~/services/parse-and-validate-coords'
 import { verifyCoordsSignature } from '~/services/verify-coords-signature'
@@ -47,7 +47,7 @@ export default async function Result({ searchParams }: ResultPageProps) {
   const currentPage = Number(params.page) || 1
   const genreCode = params.genre
 
-  const restaurantsResult = await fetchRestaurants({
+  const restaurantsResult = await fetchRestaurantsByCoords({
     latitude: lat,
     longitude: lng,
     page: currentPage,
@@ -68,15 +68,19 @@ export default async function Result({ searchParams }: ResultPageProps) {
 
   const { items, pagination } = restaurantsResult.data
 
-  const mapTilerApiKey = await getApiKey('maptiler')
+  const result = await getApiKey('maptiler')
+  if (!result.success)
+    return null
+
+  const maptilerApiKey = result.data
 
   return (
     <div className="relative mx-auto h-[calc(100dvh-4rem)] max-w-screen-2xl overflow-hidden md:flex">
       <div className="h-mobile-map w-full md:h-desktop-map md:w-3/5 md:flex-1">
-        {(mapTilerApiKey && midpoint)
+        {(maptilerApiKey && midpoint)
           ? (
               <Map
-                apiKey={mapTilerApiKey}
+                apiKey={maptilerApiKey}
                 midpoint={midpoint}
                 restaurants={items}
               />

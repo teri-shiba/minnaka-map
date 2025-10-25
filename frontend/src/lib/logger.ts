@@ -1,23 +1,49 @@
-import type { Extras } from '@sentry/core'
 import * as Sentry from '@sentry/nextjs'
+import { HttpError } from './http-error'
 
-type LogContext = { extra?: Extras, tags?: Record<string, string> } | Extras
-
-function normalizeContext(context?: LogContext) {
-  if (!context)
-    return undefined
-
-  if (typeof context === 'object' && ('extra' in context || 'tags' in context)) {
-    return context as { extra?: Extras, tags?: Record<string, string> }
-  }
-
-  return { extra: context as Extras }
+interface LogContext {
+  component: string
+  action?: string
+  extra?: Record<string, unknown>
 }
 
-export function logger(error: unknown, context?: LogContext) {
-  const captureContext = normalizeContext(context)
+function normalizeContext(status: number | unknown, context: LogContext) {
+  const tags: Record<string, string> = {
+    component: context.component,
+  }
 
-  if (process.env.NODE_ENV === 'production') {
+  if (context.action)
+    tags.action = context.action
+
+  if (status !== undefined)
+    tags.status = String(status)
+
+  return {
+    tags,
+    extra: context.extra,
+  }
+}
+
+const IGNORE_STATUS_CODES = new Set([401, 403, 404, 422, 304])
+
+export function shouldLogStatus(status?: number): boolean {
+  if (typeof status !== 'number')
+    return true
+
+  return !IGNORE_STATUS_CODES.has(status)
+}
+
+export function logger(error: unknown, context: LogContext) {
+  const production = process.env.NODE_ENV === 'production'
+
+  const status = error instanceof HttpError ? error.status : undefined
+
+  if (production && !shouldLogStatus(status))
+    return
+
+  const captureContext = normalizeContext(status, context)
+
+  if (production) {
     Sentry.captureException(error, captureContext)
   }
   else {
