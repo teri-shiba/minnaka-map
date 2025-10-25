@@ -15,6 +15,7 @@ export default function ErrorToastListener() {
     if (!error)
       return
 
+    // TODO: エラー解消
     const displayMessage = message
       || ERROR_MESSAGE[error as ErrorType]
       || '不明なエラーが発生しました'

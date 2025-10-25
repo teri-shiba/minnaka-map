@@ -79,6 +79,7 @@ export default function RestaurantCard({
           className="absolute right-0 top-0 [@media(max-width:335px)]:right-1 [@media(max-width:335px)]:top-1"
           onClick={e => e.preventDefault()}
         >
+          {/* // TODO: エラー解消 */}
           <FavoriteButton
             hotpepperId={id}
             compact={true}
