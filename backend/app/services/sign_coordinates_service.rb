@@ -1,22 +1,17 @@
 class SignCoordinatesService
   def initialize(secret: Rails.application.secret_key_base,
-                 production: Rails.env.production?,
                  clock: -> { Time.current })
     @secret     = secret
-    @production = production
     @clock      = clock
   end
 
   def call(lat, lng)
     lat_str, lng_str = format_coords(lat, lng)
+    exp = (@clock.call + 1.hour).to_i
+    data = signing_data(lat_str, lng_str, exp)
+    sig  = hmac_hexdigest(data)
 
-    return { latitude: lat_str, longitude: lng_str } unless @production
-
-    expires_at = (@clock.call + 1.hour).to_i
-    data       = signing_data(lat_str, lng_str, expires_at)
-    signature  = hmac_hexdigest(data)
-
-    { latitude: lat_str, longitude: lng_str, signature:, expires_at: }
+    { lat: lat_str, lng: lng_str, sig:, exp: }
   end
 
   private

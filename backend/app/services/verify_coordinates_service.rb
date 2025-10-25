@@ -1,36 +1,22 @@
 class VerifyCoordinatesService
   def initialize(secret: Rails.application.secret_key_base,
-                 production: Rails.env.production?,
                  clock: -> { Time.current })
     @secret     = secret
-    @production = production
     @clock      = clock
   end
 
-  def call(lat_str, lng_str, signature = nil, expires_at = nil)
-    unless @production
-      return signature.blank?
-    end
+  def call(lat_in, lng_in, sig = nil, exp = nil)
+    return false if sig.blank? || exp.blank?
+    return false if Time.zone.at(exp.to_i) < @clock.call
 
-    return false if signature.blank?
-    return false if expires_at.blank?
-    return false if Time.zone.at(expires_at.to_i) < @clock.call
+    lat_str = "%.5f" % lat_in.to_f
+    lng_str = "%.5f" % lng_in.to_f
 
-    data     = signing_data(lat_str, lng_str, expires_at)
-    expected = hmac_hexdigest(data)
+    data = [lat_str, lng_str, exp].join(", ")
+    expected = OpenSSL::HMAC.hexdigest("SHA256", @secret, data)
 
-    return false unless signature.bytesize == expected.bytesize
+    return false unless sig.bytesize == expected.bytesize
 
-    ActiveSupport::SecurityUtils.secure_compare(expected, signature)
+    ActiveSupport::SecurityUtils.secure_compare(expected, sig)
   end
-
-  private
-
-    def signing_data(lat_str, lng_str, expires_at)
-      [lat_str, lng_str, expires_at].join(", ")
-    end
-
-    def hmac_hexdigest(data)
-      OpenSSL::HMAC.hexdigest("SHA256", @secret, data)
-    end
 end
