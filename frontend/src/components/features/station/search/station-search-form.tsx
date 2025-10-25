@@ -9,11 +9,11 @@ import { Button } from '~/components/ui/button'
 import { Form, FormControl, FormField, FormItem } from '~/components/ui/form'
 import { logger } from '~/lib/logger'
 import { stationSearchSchema } from '~/schemas/station-search.schema'
+import { getMidpoint } from '~/services/get-midpoint'
 import { AddFormButton } from './buttons/add-form-button'
 import { RemoveFormButton } from './buttons/remove-form-button'
 import { ResetFormButton } from './buttons/reset-form-button'
 import StationAutocomplete from './station-autocomplete'
-import { getMidpoint } from '~/services/get-midpoint'
 
 const MAX_AREA_FIELDS = 6
 const MAX_REQUIRED_FIELDS = 2
@@ -55,8 +55,8 @@ export default function StationSearchForm() {
 
         const isSameStationIds
           = sortedPrevIds.length === sortedStationIds.length
-          && sortedPrevIds.every((prevStationId, i) =>
-            prevStationId === sortedStationIds[i])
+            && sortedPrevIds.every((prevStationId, i) =>
+              prevStationId === sortedStationIds[i])
 
         if (!isSameStationIds) {
           sessionStorage.removeItem('pendingSearchHistoryId')
@@ -74,12 +74,12 @@ export default function StationSearchForm() {
         return
       }
 
-      const { midpoint, signature, expiresAt } = result.data
+      const { midpoint, sig, exp } = result.data
       const params = new URLSearchParams({
-        lat: midpoint.latitude,
-        lng: midpoint.longitude,
-        ...(signature && { signature }),
-        ...(expiresAt && { expires_at: expiresAt })
+        lat: midpoint.lat,
+        lng: midpoint.lng,
+        ...(sig && { sig }),
+        ...(exp && { exp }),
       })
 
       router.push(`/result?${params}`)

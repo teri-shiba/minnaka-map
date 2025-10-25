@@ -23,10 +23,10 @@ export default async function Result({ searchParams }: ResultPageProps) {
   const { lat, lng } = await parseAndValidateCoordinates(params)
 
   const verifyResult = await verifyCoordsSignature({
-    latitude: lat,
-    longitude: lng,
-    signature: params.signature,
-    expires_at: params.expires_at,
+    lat,
+    lng,
+    sig: params.sig,
+    exp: params.exp,
   })
 
   if (!isServiceSuccess(verifyResult)) {
@@ -48,8 +48,8 @@ export default async function Result({ searchParams }: ResultPageProps) {
   const genreCode = params.genre
 
   const restaurantsResult = await fetchRestaurantsByCoords({
-    latitude: lat,
-    longitude: lng,
+    lat,
+    lng,
     page: currentPage,
     itemsPerPage: 10,
     genre: genreCode,

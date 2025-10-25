@@ -11,8 +11,8 @@ import { mapHotPepperErrorCode } from '~/utils/map-hotpepper-error-code'
 import { getApiKey } from './get-api-key'
 
 interface FetchRestaurantsOpts {
-  latitude: number
-  longitude: number
+  lat: number
+  lng: number
   genre?: string
   page?: number
   itemsPerPage?: number
@@ -39,8 +39,8 @@ export async function fetchRestaurantsByCoords(
     const apiKey = result.data
     const params: Record<string, string> = {
       key: apiKey,
-      lat: String(opts.latitude),
-      lng: String(opts.longitude),
+      lat: String(opts.lat),
+      lng: String(opts.lng),
       range: '5', // 3000m
       start: String(start),
       count: String(itemsPerPage),
@@ -58,8 +58,8 @@ export async function fetchRestaurantsByCoords(
         revalidate: 86400, // 24時間 (60 * 60 * 24)
         tags: [
           'hotpepper:restaurants',
-          `lat:${opts.latitude}`,
-          `lng:${opts.longitude}`,
+          `lat:${opts.lat}`,
+          `lng:${opts.lng}`,
           `genre:${opts.genre ?? 'all'}`,
           `page:${page}`,
         ],
@@ -96,8 +96,8 @@ export async function fetchRestaurantsByCoords(
     logger(error, {
       component: 'fetchRestaurantsByCoords',
       extra: {
-        latitude: opts.latitude,
-        longitude: opts.longitude,
+        lat: opts.lat,
+        lng: opts.lng,
         genre: opts.genre,
         page: opts.page,
       },
