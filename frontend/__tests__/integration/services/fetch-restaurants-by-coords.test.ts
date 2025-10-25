@@ -48,8 +48,8 @@ describe('fetchRestaurantsByCoords', () => {
     )
 
     const result = await fetchRestaurantsByCoords({
-      latitude: 35.0,
-      longitude: 139.0,
+      lat: 35.0,
+      lng: 139.0,
       genre: 'G001',
       page,
       itemsPerPage,
@@ -93,8 +93,8 @@ describe('fetchRestaurantsByCoords', () => {
     )
 
     const result = await fetchRestaurantsByCoords({
-      latitude: 35.0,
-      longitude: 139.0,
+      lat: 35.0,
+      lng: 139.0,
       page: 1,
       itemsPerPage: 5,
     })
@@ -120,8 +120,8 @@ describe('fetchRestaurantsByCoords', () => {
     )
 
     const result = await fetchRestaurantsByCoords({
-      latitude: 35.0,
-      longitude: 139.0,
+      lat: 35.0,
+      lng: 139.0,
     })
 
     expect(result.success).toBe(false)
@@ -145,8 +145,8 @@ describe('fetchRestaurantsByCoords', () => {
     )
 
     const result = await fetchRestaurantsByCoords({
-      latitude: 35.0,
-      longitude: 139.0,
+      lat: 35.0,
+      lng: 139.0,
     })
 
     expect(result.success).toBe(false)
@@ -165,8 +165,8 @@ describe('fetchRestaurantsByCoords', () => {
     )
 
     const result = await fetchRestaurantsByCoords({
-      latitude: 35.0,
-      longitude: 139.0,
+      lat: 35.0,
+      lng: 139.0,
     })
 
     expect(result.success).toBe(false)
