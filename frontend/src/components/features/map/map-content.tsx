@@ -24,9 +24,8 @@ export default function MapContent({
   onMarkerPositionChange,
 }: MapContentProps) {
   useMapCoordinates(
-    selectedRestaurant
-      ? [selectedRestaurant.lat, selectedRestaurant.lng]
-      : null,
+    selectedRestaurant?.lat ?? null,
+    selectedRestaurant?.lng ?? null,
     onMarkerPositionChange,
   )
 

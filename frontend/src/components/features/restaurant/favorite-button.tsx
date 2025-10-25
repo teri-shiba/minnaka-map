@@ -1,19 +1,21 @@
 'use client'
 
-import { useAtom, useSetAtom } from 'jotai'
+import { useSetAtom } from 'jotai'
+import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { LuHeart } from 'react-icons/lu'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
 import { Skeleton } from '~/components/ui/skeleton'
-import { logger } from '~/lib/logger'
-import { addToFavorites, checkFavoriteStatus, removeFromFavorites } from '~/services/favorite-action'
+import { addFavorite } from '~/services/add-favorite'
+import { checkFavoriteStatus } from '~/services/check-favorite-status'
+import { removeFavorite } from '~/services/remove-favorite'
 import { saveSearchHistory } from '~/services/save-search-history'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
-import { userStateAtom } from '~/state/user-state.atom'
 import { cn } from '~/utils/cn'
 
 interface FavoriteButtonProps {
+  isAuthenticated: boolean
   hotpepperId: string
   compact?: boolean
   initialHistoryId?: string
@@ -21,21 +23,16 @@ interface FavoriteButtonProps {
   initialIsFavorite?: boolean
 }
 
-interface FavoriteActionResult {
-  success: boolean
-  favoriteId?: number
-}
-
 export default function FavoriteButton({
+  isAuthenticated,
   hotpepperId,
   compact = false,
   initialHistoryId,
   initialFavoriteId,
   initialIsFavorite = false,
 }: FavoriteButtonProps) {
+  const router = useRouter()
   const setModalOpen = useSetAtom(authModalOpenAtom)
-  const [userState] = useAtom(userStateAtom)
-  const isSignedIn = userState.isSignedIn
 
   const [historyId, setHistoryId] = useState<string | null>(() =>
     initialHistoryId ?? (typeof window !== 'undefined' ? sessionStorage.getItem('pendingSearchHistoryId') : null),
@@ -50,18 +47,25 @@ export default function FavoriteButton({
 
   useEffect(() => {
     const initCheck = async () => {
-      if (isFromFavoritesPage || !isSignedIn || !historyId) {
+      if (isFromFavoritesPage
+        || !isAuthenticated
+        || !historyId) {
         setIsChecking(false)
         return
       }
 
+      // TODO: 保存する -> 保存済みがちらつくのを解消する
       try {
-        const status = await checkFavoriteStatus(hotpepperId, historyId)
-        setIsFavorite(status.isFavorite)
-        setFavoriteId(status.favoriteId ?? null)
-      }
-      catch (err) {
-        logger(err, { tags: { component: 'FavoriteButton - initCheck' } })
+        const result = await checkFavoriteStatus(hotpepperId, historyId)
+
+        if (!result.success) {
+          setIsFavorite(false)
+          setFavoriteId(null)
+          return
+        }
+
+        setIsFavorite(result.data.isFavorite)
+        setFavoriteId(result.data.favoriteId)
       }
       finally {
         setIsChecking(false)
@@ -69,15 +73,16 @@ export default function FavoriteButton({
     }
 
     initCheck()
-  }, [initialHistoryId, historyId, isSignedIn, hotpepperId, isFromFavoritesPage])
+  }, [initialHistoryId, historyId, isAuthenticated, hotpepperId, isFromFavoritesPage, isFavorite, favoriteId])
 
+  // TODO: 依存関係が多すぎるので、サイズダウンする
   const handleClick = useCallback(async () => {
     if (isLoading)
       return
 
-    if (!isSignedIn) {
-      toast.error('お気に入りに登録するには、ログインが必要です')
+    if (!isAuthenticated) {
       setModalOpen(true)
+      toast.error('お気に入りの保存にはログインが必要です')
       return
     }
 
@@ -85,15 +90,27 @@ export default function FavoriteButton({
     if (!currentHistoryId) {
       const raw = sessionStorage.getItem('pendingStationIds')
       const stationIds = raw ? JSON.parse(raw) as number[] : []
-      if (stationIds.length === 0) {
-        toast.error('お気に入り登録には、検索画面からもう一度検索してください')
+
+      if (stationIds.length <= 1) {
+        router.push('/?error=search_context_missing')
         return
       }
-      const response = await saveSearchHistory(stationIds)
-      if (!response.success || response.data.searchHistoryId == null) {
-        throw new Error('検索履歴の作成に失敗しました')
+
+      const result = await saveSearchHistory(stationIds)
+
+      if (!result.success) {
+        if (result.cause === 'UNAUTHORIZED') {
+          setModalOpen(true)
+          toast.error('お気に入りの保存にはログインが必要です')
+        }
+        else {
+          toast.error(result.message)
+        }
+
+        return
       }
-      currentHistoryId = String(response.data.searchHistoryId)
+
+      currentHistoryId = String(result.data.searchHistoryId)
       sessionStorage.setItem('pendingSearchHistoryId', currentHistoryId)
       setHistoryId(currentHistoryId)
     }
@@ -102,39 +119,53 @@ export default function FavoriteButton({
 
     try {
       if (!isFavorite) {
-        // 追加処理
-        const result: FavoriteActionResult = await addToFavorites(hotpepperId, Number(currentHistoryId))
-        if (!result.success || !result.favoriteId)
-          throw new Error('追加失敗')
+        // お気に入り追加処理
+        const result = await addFavorite(
+          hotpepperId,
+          Number(currentHistoryId),
+        )
+
+        if (!result.success) {
+          toast.error(result.message)
+          return
+        }
+
         setIsFavorite(true)
-        setFavoriteId(result.favoriteId)
+        setFavoriteId(result.data.favoriteId)
         toast.success('お気に入りに追加しました')
       }
       else {
-        // 削除処理
-        if (!favoriteId)
-          throw new Error('ID不正')
-        const result: FavoriteActionResult = await removeFromFavorites(favoriteId)
-        if (!result.success)
-          throw new Error('削除失敗')
+        // お気に入り削除処理
+        if (!favoriteId) {
+          toast.error('お気に入りIDが不正です')
+          return
+        }
+
+        const result = await removeFavorite(favoriteId)
+
+        if (!result.success) {
+          toast.error(result.message)
+          return
+        }
+
         setIsFavorite(false)
         setFavoriteId(null)
         toast.success('お気に入りから削除しました')
       }
     }
-    catch (error) {
-      logger(error, { tags: { component: 'FavoriteButton' } })
+    // catch (error) {
+    //   logger(error, { component: 'FavoriteButton' })
 
-      toast.error(
-        !isFavorite
-          ? 'お気に入りの追加に失敗しました。時間をおいて再度お試しください。'
-          : 'お気に入りの削除に失敗しました。時間をおいて再度お試しください。',
-      )
-    }
+    //   toast.error(
+    //     !isFavorite
+    //       ? 'お気に入りの追加に失敗しました。時間をおいて再度お試しください。'
+    //       : 'お気に入りの削除に失敗しました。時間をおいて再度お試しください。',
+    //   )
+    // }
     finally {
       setIsLoading(false)
     }
-  }, [isSignedIn, isFavorite, favoriteId, hotpepperId, historyId, isLoading, setHistoryId, setModalOpen])
+  }, [isFavorite, favoriteId, hotpepperId, historyId, isLoading, setHistoryId, setModalOpen, router, isAuthenticated])
 
   const buttonProps = { onClick: handleClick, disabled: isChecking || isLoading }
 

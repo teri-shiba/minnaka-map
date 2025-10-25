@@ -1,11 +1,12 @@
 'use server'
 
-import type { ApiResponse } from '~/types/api-response'
 import type { ServiceResult } from '~/types/service-result'
-import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
-import { apiFetchPublic, handleApiError } from './api-client'
+import { HttpError } from '~/lib/http-error'
+import { logger } from '~/lib/logger'
+import { toCamelDeep } from '~/utils/case-convert'
+import { getErrorInfo } from '~/utils/get-error-info'
 
-interface SharedListData {
+interface SharedListDetail {
   title: string
   createdAt: string
   searchHistory: {
@@ -18,23 +19,52 @@ interface SharedListData {
   }>
 }
 
-export async function fetchSharedList(uuid: string): Promise<ServiceResult<SharedListData>> {
+export async function fetchSharedList(
+  uuid: string,
+): Promise<ServiceResult<SharedListDetail>> {
   try {
-    const response = await apiFetchPublic<ApiResponse<SharedListData>>(
-      `shared_lists/${uuid}`,
+    const url = new URL(
+      `/api/v1/shared_favorite_lists/${uuid}`,
+      process.env.API_BASE_URL,
     )
 
-    if (!isApiSuccess(response))
-      return { success: false, message: getApiErrorMessage(response), cause: 'REQUEST_FAILED' }
+    const headers = new Headers({
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    })
 
-    return { success: true, data: response.data }
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-cache',
+    })
+
+    if (!response.ok)
+      throw new HttpError(response.status, 'この店舗リストは存在しないか、削除されています')
+
+    const json = await response.json()
+    const data = toCamelDeep(json.data)
+
+    return {
+      success: true,
+      data,
+    }
   }
   catch (error) {
-    return handleApiError(error, {
+    logger(error, {
       component: 'fetchSharedList',
-      defaultMessage: '予期しないエラーが発生しました',
-      notFoundMessage: 'シェアリストが見つかりません',
-      extraContext: { uuid },
+      extra: { uuid },
     })
+
+    const errorInfo = getErrorInfo({
+      error,
+      notFoundErrorMessage: 'シェアリストが見つかりません',
+    })
+
+    return {
+      success: false,
+      message: errorInfo.message,
+      cause: errorInfo.cause,
+    }
   }
 }

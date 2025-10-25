@@ -35,7 +35,7 @@ export default function SignUpForm({ onSuccess }: LoginFormProps) {
         onSuccess()
     }
     catch (error) {
-      logger(error, { tags: { component: 'SignUpForm' } })
+      logger(error, { component: 'SignUpForm' })
     }
   }
 

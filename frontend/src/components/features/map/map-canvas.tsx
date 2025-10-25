@@ -4,6 +4,7 @@ import type { CardPosition, MapData, MapItems } from '~/types/map'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { MapContainer } from 'react-leaflet'
+import { useMediaQuery } from '~/hooks/useMediaQuery'
 import { calculateCardPosition } from '~/utils/calculate-card-position'
 import { createLeafletOptions } from '~/utils/create-leaflet-options'
 import MapContent from './map-content'
@@ -40,7 +41,11 @@ export default function MapCanvas({ apiKey, midpoint, restaurants }: MapItems) {
       : null
   }, [selected, mapData])
 
-  const mapOptions = useMemo(() => createLeafletOptions(midpoint), [midpoint])
+  const isMobile = useMediaQuery('(max-width: 768px)')
+  const mapOptions = useMemo(
+    () => createLeafletOptions(midpoint, isMobile),
+    [midpoint, isMobile],
+  )
 
   const cardStyle = useMemo<React.CSSProperties | undefined>(() => {
     if (!cardPosition)

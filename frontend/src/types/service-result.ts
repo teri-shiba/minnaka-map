@@ -17,11 +17,12 @@ export interface ServiceSuccess<T> {
 export interface ServiceFailure {
   readonly success: false
   readonly message: string
-  readonly cause?: ServiceCause
+  readonly cause: ServiceCause
 }
 
 export type ServiceResult<T> = ServiceSuccess<T> | ServiceFailure
 
+// あとで消す
 export function isServiceSuccess<T>(result: ServiceResult<T>): result is ServiceSuccess<T> {
   return result.success === true
 }

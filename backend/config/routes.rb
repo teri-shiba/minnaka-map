@@ -10,7 +10,7 @@ Rails.application.routes.draw do
       }
 
       resources :stations, only: [:index]
-      resource :midpoint, only: [:create] do
+      resource :midpoint, only: [:show] do
         get :validate
       end
 

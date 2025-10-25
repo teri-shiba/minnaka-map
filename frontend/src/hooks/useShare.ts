@@ -7,22 +7,15 @@ import { logger } from '~/lib/logger'
 export type SharePayload = Pick<ShareData, 'title' | 'text' | 'url'>
 
 type ShareResult
-  = | { readonly ok: true }
-    | { readonly ok: false, readonly reason: 'unsupported' | 'failed' }
+  = | { readonly success: true }
+    | { readonly success: false, readonly reason: 'unsupported' | 'failed' }
 
 interface UseShareReturn {
-  readonly share: (data: SharePayload) => Promise<ShareResult>
-  readonly isMobile: boolean
-  readonly canNativeShare: boolean
+  readonly openNativeShare: (data: SharePayload) => Promise<ShareResult>
 }
 
-function isAbortError(error: unknown): boolean {
-  return !!(
-    error
-    && typeof error === 'object'
-    && 'name' in error
-    && (error as { name?: string }).name === 'AbortError'
-  )
+function isAbortError(error: unknown): error is DOMException {
+  return error instanceof DOMException && error.name === 'AbortError'
 }
 
 export default function useShare(): UseShareReturn {
@@ -30,29 +23,27 @@ export default function useShare(): UseShareReturn {
 
   const canNativeShare = typeof navigator !== 'undefined' && 'share' in navigator
 
-  const share = useCallback(
+  const openNativeShare = useCallback(
     async (data: SharePayload): Promise<ShareResult> => {
-      if (!(canNativeShare && isMobile))
-        return { ok: false, reason: 'unsupported' }
+      if (!canNativeShare || !isMobile)
+        return { success: false, reason: 'unsupported' }
 
       try {
         await navigator.share(data)
-        return { ok: true }
+        return { success: true }
       }
       catch (error: unknown) {
+        // ユーザーキャンセルは成功として扱う
         if (isAbortError(error))
-          return { ok: true }
+          return { success: true }
 
-        logger(error, {
-          message: 'share failed',
-          tags: { component: 'useShare' },
-        })
-
-        return { ok: false, reason: 'failed' }
+        // その他エラーはログに記録して失敗を返す
+        logger(error, { component: 'useShare' })
+        return { success: false, reason: 'failed' }
       }
     },
     [canNativeShare, isMobile],
   )
 
-  return { canNativeShare, share, isMobile }
+  return { openNativeShare }
 }

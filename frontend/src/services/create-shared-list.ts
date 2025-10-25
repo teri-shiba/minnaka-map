@@ -1,37 +1,69 @@
 'use server'
 
-import type { ApiResponse } from '~/types/api-response'
 import type { ServiceResult } from '~/types/service-result'
-import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
-import { apiFetchAuth, handleApiError } from './api-client'
+import type { SharedListData } from '~/types/shared-list'
+import { HttpError } from '~/lib/http-error'
+import { logger } from '~/lib/logger'
+import { toCamelDeep, toSnakeDeep } from '~/utils/case-convert'
+import { getErrorInfo } from '~/utils/get-error-info'
+import { getAuthFromCookie } from './get-auth-from-cookie'
 
-// TODO: 他で使用されているので外に出す
-export interface SharedListData {
-  shareUuid: string
-  title: string
-  isExisting: boolean
-}
-
-export async function createSharedList(searchHistoryId: number): Promise<ServiceResult<SharedListData>> {
+export async function createSharedList(
+  searchHistoryId: number,
+): Promise<ServiceResult<SharedListData>> {
   try {
-    const response = await apiFetchAuth<ApiResponse<SharedListData>>(
-      'shared_favorite_lists',
-      {
-        method: 'POST',
-        body: { searchHistoryId },
-      },
+    const auth = await getAuthFromCookie()
+
+    if (!auth) {
+      return {
+        success: false,
+        message: 'ログインが必要です',
+        cause: 'UNAUTHORIZED',
+      }
+    }
+
+    const url = new URL(
+      '/api/v1/shared_favorite_lists',
+      process.env.API_BASE_URL,
     )
 
-    if (!isApiSuccess(response))
-      return { success: false, message: getApiErrorMessage(response), cause: 'REQUEST_FAILED' }
+    const headers = new Headers({
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'access-token': auth.accessToken,
+      'client': auth.client,
+      'uid': auth.uid,
+    })
 
-    return { success: true, data: response.data }
+    const requestBody = toSnakeDeep({ searchHistoryId })
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(requestBody),
+      cache: 'no-cache',
+    })
+
+    if (!response.ok)
+      throw new HttpError(response.status, 'シェアリストの作成に失敗しました')
+
+    const json = await response.json()
+    const data = toCamelDeep(json.data)
+
+    return { success: true, data }
   }
   catch (error) {
-    return handleApiError(error, {
+    logger(error, {
       component: 'createSharedList',
-      defaultMessage: 'シェアリストの作成に失敗しました',
-      extraContext: { searchHistoryId },
+      extra: { searchHistoryId },
     })
+
+    const errorInfo = getErrorInfo({ error })
+
+    return {
+      success: false,
+      message: errorInfo.message,
+      cause: errorInfo.cause,
+    }
   }
 }

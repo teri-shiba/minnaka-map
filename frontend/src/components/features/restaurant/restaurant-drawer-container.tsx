@@ -8,7 +8,7 @@ interface RefLike<T extends HTMLElement> { current: T | null }
 
 interface Props {
   children: React.ReactNode
-  dragConstraints: { top: number, bottom: number }
+  scrollLimits: { top: number, bottom: number }
   controls: AnimationControls
   contentRef: RefLike<HTMLDivElement>
   className?: string
@@ -16,7 +16,7 @@ interface Props {
 }
 
 export default function RestaurantDrawerContainer({
-  dragConstraints,
+  scrollLimits,
   controls,
   contentRef,
   labelledById,
@@ -26,7 +26,7 @@ export default function RestaurantDrawerContainer({
   return (
     <motion.div
       drag="y"
-      dragConstraints={dragConstraints}
+      dragConstraints={scrollLimits}
       animate={controls}
       className={cn('absolute z-40 bottom-0 h-drawer w-full', className)}
       transition={{ type: 'spring', damping: 25, stiffness: 300 }}

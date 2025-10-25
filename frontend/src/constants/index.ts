@@ -7,34 +7,24 @@ export const DRAWER_DVH = 30 as const // 30dvh
 export const DRAWER_RATIO = DRAWER_DVH / 100 // 0.3
 
 // ===============================================
-// API Paths
+// Error Messages
 // ===============================================
-export const API_PREFIX = '/api/v1' as const
-
-export const API_ENDPOINTS = {
-  STATIONS: '/stations',
-  MIDPOINT: '/midpoint',
-  VALIDATE_COORDINATES: '/midpoint/validate',
-  AUTH: '/auth',
-  PROVIDER: '/provider',
-  CURRENT_USER_STATUS: '/current/user/show_status',
-  AUTH_SIGN_IN: '/auth/sign_in',
-  AUTH_SIGN_OUT: '/auth/sign_out',
-  USER_CONFIRMATIONS: '/user/confirmations',
+export const ERROR_MESSAGE = {
+  missing_params: '検索パラメーターが不足しています',
+  invalid_coordinates: '座標エラー: 無効な位置情報です',
+  outside_japan: '座標エラー: 日本列島の範囲外です',
+  validation_failed: '座標エラー: 検証に失敗しました',
+  validation_error: '座標エラー: 予期しないエラーが発生しました',
+  rate_limit_exceeded: 'アクセスが集中しています。時間をあけてから、再度お試しください。',
+  server_error: 'レストラン検索サービスが一時的に利用できません。時間をあけてから、再度お試しください。',
+  restaurant_fetch_failed: 'レストランデータの取得に失敗しました。時間をあけてから、再度お試しください。',
+  auth_required: 'このページの閲覧にはログインが必要です',
+  link_expired: 'リンクの有効期限が切れました。もう一度検索してください。',
+  network_error: 'ネットワークエラーが発生しました。時間をあけてから、再度お試しください。',
+  search_context_missing: '必要な情報を取得できませんでした。再検索してから、もう一度お試しください。',
 } as const
 
-export const dynamicPaths = {
-  oauthProvider: (provider: string) => `${API_ENDPOINTS.AUTH}/${provider}`,
-}
-
-export type StaticEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS]
-
-// ===============================================
-// EXTERNAL API Paths
-// ===============================================
-export const EXTERNAL_ENDPOINTS = {
-  HOTPEPPER_GOURMET_V1: '/hotpepper/gourmet/v1/',
-} as const
+export type ErrorCode = keyof typeof ERROR_MESSAGE
 
 // ===============================================
 // API Services Configuration
@@ -98,16 +88,11 @@ export const PAGINATION = {
   ELLIPSIS_END_OFFSET: 2,
 } as const
 
-export const FAVORITES_FIRST_PAGE = 1 as const
-export const FAVORITE_GROUPS_PER_PAGE = 3 as const
-
 // ===============================================
-// Cache
+// Favorite Groups
 // ===============================================
-export const CACHE_DURATION = {
-  /* 24H (60 * 60 * 24) */
-  RESTAURANT_INFO: 60 * 60 * 24,
-} as const
+export const FAVORITES_FIRST_PAGE = 1
+export const FAVORITE_GROUPS_PER_PAGE = 3
 
 // ===============================================
 // Restaurant Marker Options

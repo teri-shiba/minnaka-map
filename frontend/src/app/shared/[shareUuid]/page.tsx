@@ -2,7 +2,7 @@ import type { RestaurantListItem } from '~/types/restaurant'
 import { notFound, redirect } from 'next/navigation'
 import RestaurantCard from '~/components/features/restaurant/restaurant-card'
 import Section from '~/components/layout/section'
-import { fetchRestaurantsByIds } from '~/services/fetch-restaurants'
+import { fetchRestaurantsByIds } from '~/services/fetch-restaurants-by-ids'
 import { fetchSharedList } from '~/services/fetch-shared-list'
 
 interface SharedListPageProps {
@@ -12,33 +12,34 @@ interface SharedListPageProps {
 export default async function SharedListPage({ params }: SharedListPageProps) {
   const { shareUuid } = await params
 
-  const sharedListResult = await fetchSharedList(shareUuid)
-  if (!sharedListResult.success)
+  const result = await fetchSharedList(shareUuid)
+
+  if (!result.success)
     notFound()
 
-  const { data: sharedListData } = sharedListResult
-  const favoriteIds = sharedListData.favorites.map(f => f.hotpepperId)
+  const { data: sharedListDetail } = result
+  const favoriteIds = sharedListDetail.favorites.map(f => f.hotpepperId)
 
   let restaurants: RestaurantListItem[] = []
-  if (favoriteIds.length > 0) {
-    const [first, ...rest] = favoriteIds
-    const restaurantIds: [string, ...string[]] = [first, ...rest]
-    const response = await fetchRestaurantsByIds({ restaurantIds })
 
-    if (!response.success)
+  if (favoriteIds.length > 0) {
+    const restaurantIds = favoriteIds as [string, ...string[]]
+    const result = await fetchRestaurantsByIds(restaurantIds)
+
+    if (!result.success)
       redirect('/?error=restaurant_fetch_failed')
 
-    restaurants = response.data
+    restaurants = result.data
   }
 
   return (
     <>
       <header className="flex h-32 flex-col items-center justify-center bg-secondary md:h-48">
         <h1 className="px-5 text-lg font-bold sm:text-2xl">
-          {sharedListData.title}
+          {sharedListDetail.title}
           のまんなかのお店
           {' '}
-          {sharedListData.favorites.length}
+          {sharedListDetail.favorites.length}
           選
         </h1>
       </header>

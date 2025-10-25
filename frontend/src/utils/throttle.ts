@@ -20,7 +20,7 @@ export function throttle<T extends (...args: any[]) => any>(
     }
     catch (error) {
       isThrottling = false
-      logger(error, { tags: { component: 'throttle' } })
+      logger(error, { component: 'throttle' })
       throw error
     }
   }

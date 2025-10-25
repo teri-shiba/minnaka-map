@@ -1,17 +1,10 @@
-'use client'
-
 import Image from 'next/image'
 import GuideCarousel from '~/components/features/guide-carousel/guide-carousel'
 import StationSearchForm from '~/components/features/station/search/station-search-form'
 import Section from '~/components/layout/section'
 import { features } from '~/data/features'
-import useConfirmEmail from '~/hooks/useConfirmEmail'
-import useOAuthCallback from '~/hooks/useOAuthCallback'
 
 export default function Home() {
-  useOAuthCallback()
-  useConfirmEmail()
-
   return (
     <>
       <Section className="bg-secondary py-12 md:py-16">

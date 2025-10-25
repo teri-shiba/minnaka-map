@@ -1,37 +1,65 @@
 'use server'
 
 import type { SupportedService } from '~/constants'
-import type { ApiResponse } from '~/types/api-response'
+import type { ServiceResult } from '~/types/service-result'
 import { API_SERVICES } from '~/constants'
-import { getApiErrorMessage, isApiSuccess } from '~/types/api-response'
-import { apiFetchPublic, handleApiError } from './api-client'
+import { HttpError } from '~/lib/http-error'
+import { logger } from '~/lib/logger'
+import { toCamelDeep } from '~/utils/case-convert'
+import { getErrorInfo } from '~/utils/get-error-info'
 
-export async function getApiKey(service: SupportedService): Promise<string> {
-  const config = API_SERVICES[service]
-  if (!config)
-    throw new Error(`未対応のサービスです: ${service}`)
-
+export async function getApiKey(
+  service: SupportedService,
+): Promise<ServiceResult<string>> {
   try {
-    const response = await apiFetchPublic<ApiResponse<{ apiKey: string }>>(
-      config.endpoint,
-      {
-        extraHeaders: { 'X-Internal-Token': process.env.INTERNAL_API_TOKEN! },
-      },
-    )
+    const config = API_SERVICES[service]
+    if (!config) {
+      return {
+        success: false,
+        message: `未対応のサービスです: ${service}`,
+        cause: 'REQUEST_FAILED',
+      }
+    }
 
-    if (!isApiSuccess(response))
-      throw new Error(`${config.serviceName} APIキー取得失敗: ${getApiErrorMessage(response)}`)
-
-    return response.data.apiKey
-  }
-  catch (error) {
-    const failure = handleApiError(error, {
-      component: 'getApiKey',
-      defaultMessage: `${config.serviceName} APIキー取得に失敗しました`,
-      notFoundMessage: `${config.serviceName} APIキーが見つかりません`,
-      extraContext: { service },
+    const url = new URL(`/api/v1/${config.endpoint}`, process.env.API_BASE_URL)
+    const headers = new Headers({
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'X-Internal-Token': process.env.INTERNAL_API_TOKEN!,
     })
 
-    throw new Error(`${config.serviceName} APIキー取得失敗: ${failure.message}`)
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-cache',
+    })
+
+    if (!response.ok)
+      throw new HttpError(response.status, `${config.serviceName} APIキー取得失敗`)
+
+    const json = await response.json()
+    const apiKey = toCamelDeep(json.data.api_key)
+
+    return {
+      success: true,
+      data: apiKey,
+    }
+  }
+  catch (error) {
+    logger(error, {
+      component: 'getApiKey',
+      extra: { service },
+    })
+
+    const errorInfo = getErrorInfo({
+      error,
+      notFoundErrorMessage: 'APIキーが見つかりません',
+    })
+
+    return {
+      success: false,
+      message: errorInfo.message,
+      cause: errorInfo.cause,
+    }
   }
 }
