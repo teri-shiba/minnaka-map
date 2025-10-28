@@ -190,33 +190,122 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
   end
 
   describe "POST /api/v1/favorites#create" do
-    let!(:history_tokyo_ueno) { create(:search_history, user:) }
+    let!(:history) { create(:search_history, user:) }
+    let!(:token) { "SIGNED_TOKEN" }
 
     context "未認証のとき" do
       it "401 を返す" do
         post api_v1_favorites_path,
-             params: { favorite: { search_history_id: history_tokyo_ueno.id, hotpepper_id: "HP-999" } }
+             params: { favorite_token: token }
 
         expect_unauthorized_json!
       end
     end
 
-    it "お気に入りを作成して 201 を返す" do
-      post api_v1_favorites_path,
-           params: { favorite: { search_history_id: history_tokyo_ueno.id, hotpepper_id: "HP-999" } },
-           headers: auth_headers
+    context "正常" do
+      before do
+        allow(FavoriteToken).to receive(:verify!).with(token).and_return(
+          uid: user.id, sh_id: history.id, res_id: "HP-999",
+        )
+      end
 
-      expect_status_created!
-      expect(data).to include(:id, :hotpepper_id, :search_history_id)
-      expect(data[:hotpepper_id]).to eq("HP-999")
+      it "お気に入りを作成して 201 を返す" do
+        expect {
+          post api_v1_favorites_path,
+               params: { favorite_token: token },
+               headers: auth_headers
+        }.to change { Favorite.count }.by(1)
+
+        expect_status_created!
+        expect(data).to include(:id, :hotpepper_id, :search_history_id)
+        expect(data[:hotpepper_id]).to eq("HP-999")
+        expect(data[:search_history_id]).to eq(history.id)
+      end
+
+      it "重複追加なら 200 で作成しない" do
+        create(:favorite, user:, search_history: history, hotpepper_id: "HP-999")
+
+        expect {
+          post api_v1_favorites_path,
+               params: { favorite_token: token },
+               headers: auth_headers
+        }.to not_change { Favorite.count }
+
+        expect_status_ok!
+      end
     end
 
-    it "必須パラメータが不足していたら 400 を返す" do
-      post api_v1_favorites_path,
-           params: { favorite: { hotpepper_id: "HP-999" } },
-           headers: auth_headers
+    context "異常" do
+      context "トークンの uid が現在のユーザーと異なるとき" do
+        before do
+          allow(FavoriteToken).to receive(:verify!).with(token).and_return(
+            { uid: user.id + 1, sh_id: history.id, res_id: "HP-1" },
+          )
+        end
 
-      expect_bad_request_json!(message: "必須パラメータが不足しています: search_history_id")
+        it "403 を返す" do
+          post api_v1_favorites_path,
+               params: { favorite_token: token },
+               headers: auth_headers
+
+          expect(response).to have_http_status(:forbidden)
+          expect(error[:message]).to eq("forbidden")
+        end
+      end
+
+      context "検索履歴が見つからないとき" do
+        before do
+          allow(FavoriteToken).to receive(:verify!).with(token).and_return(
+            { uid: user.id, sh_id: 9_999_999, res_id: "HP-1" },
+          )
+        end
+
+        it "404 を返す" do
+          post api_v1_favorites_path,
+               params: { favorite_token: token },
+               headers: auth_headers
+
+          expect_not_found_json!(message: "検索履歴が見つかりません")
+        end
+      end
+
+      context "トークンが期限切れのとき" do
+        before do
+          allow(FavoriteToken).to receive(:verify!).with(token).and_raise(FavoriteToken::Expired)
+        end
+
+        it "422 を返す" do
+          post api_v1_favorites_path,
+               params: { favorite_token: token },
+               headers: auth_headers
+
+          expect_unprocessable_json!(message: "token_expired")
+        end
+      end
+
+      context "トークンが不正のとき" do
+        before do
+          allow(FavoriteToken).to receive(:verify!).with(token).and_raise(FavoriteToken::Invalid)
+        end
+
+        it "422 を返す" do
+          post api_v1_favorites_path,
+               params: { favorite_token: token },
+               headers: auth_headers
+
+          expect_unprocessable_json!(message: "invalid_token")
+        end
+      end
+
+      context "必須パラメータが不足しているとき" do
+        it "favorite_token がなければ 400 を返す" do
+          post api_v1_favorites_path,
+               params: {},
+               headers: auth_headers
+
+          expect_bad_request_json!(message: "必須パラメータが不足しています: favorite_token")
+        end
+      end
     end
   end
 
