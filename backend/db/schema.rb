@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_12_090417) do
+ActiveRecord::Schema[7.2].define(version: 2025_10_28_013106) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "uuid-ossp"
@@ -42,6 +42,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_12_090417) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "station_key", null: false
+    t.text "available_restaurant_ids", default: [], array: true
+    t.index ["available_restaurant_ids"], name: "index_search_histories_on_available_restaurant_ids", using: :gin
     t.index ["user_id", "station_key"], name: "index_search_histories_on_user_id_and_station_key", unique: true
     t.index ["user_id"], name: "index_search_histories_on_user_id"
   end
