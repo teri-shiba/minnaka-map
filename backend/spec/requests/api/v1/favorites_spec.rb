@@ -220,6 +220,98 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
     end
   end
 
+  describe "POST /api/v1/favorites#by_search_history" do
+    let!(:history) { create(:search_history, user:) }
+
+    context "未認証のとき" do
+      it "401 を返す" do
+        post by_search_history_api_v1_favorites_path,
+             params: { search_history_id: history.id, hotpepper_id: "HP-OK" }
+
+        expect_unauthorized_json!
+      end
+    end
+
+    context "検索結果に含まれる店舗のとき" do
+      before do
+        allow_any_instance_of(SearchHistory).
+          to receive(:available_restaurant_ids).
+               and_return(%w[HP-OK HP-OTHER])
+      end
+
+      it "作成して 201 を返す" do
+        expect {
+          post by_search_history_api_v1_favorites_path,
+               params: { search_history_id: history.id, hotpepper_id: "HP-OK" },
+               headers: auth_headers
+        }.to change { Favorite.count }.by(1)
+
+        expect_status_created!
+        expect(data).to include(:id, :hotpepper_id, :search_history_id)
+        expect(data[:hotpepper_id]).to eq("HP-OK")
+        expect(data[:search_history_id]).to eq(history.id)
+      end
+
+      it "重複追加なら 200 で作成しない" do
+        create(:favorite, user:, search_history: history, hotpepper_id: "HP-OK")
+
+        expect {
+          post by_search_history_api_v1_favorites_path,
+               params: { search_history_id: history.id, hotpepper_id: "HP-OK" },
+               headers: auth_headers
+        }.to not_change { Favorite.count }
+
+        expect_status_ok!
+      end
+    end
+
+    context "検索結果に含まれない店舗のとき" do
+      before do
+        allow_any_instance_of(SearchHistory).
+          to receive(:available_restaurant_ids).
+               and_return(%w[HP-AVAILABLE])
+      end
+
+      it "422 を返し、作成しない" do
+        expect {
+          post by_search_history_api_v1_favorites_path,
+               params: { search_history_id: history.id, hotpepper_id: "HP-NG" },
+               headers: auth_headers
+        }.to not_change { Favorite.count }
+
+        expect_unprocessable_json!(message: "この店舗はこの検索履歴から追加できません")
+      end
+    end
+
+    context "存在しない検索IDのとき" do
+      it "404 を返す" do
+        post by_search_history_api_v1_favorites_path,
+             params: { search_history_id: 9_999_999, hotpepper_id: "HP-1" },
+             headers: auth_headers
+
+        expect_not_found_json!(message: "検索履歴が見つかりません")
+      end
+    end
+
+    context "必須パラメータが不足しているとき" do
+      it "search_history_id がなければ 400 を返す" do
+        post by_search_history_api_v1_favorites_path,
+             params: { hotpepper_id: "HP-OK" },
+             headers: auth_headers
+
+        expect_bad_request_json!(message: "必須パラメータが不足しています: search_history_id")
+      end
+
+      it "hotpepper_id がなければ 400 を返す" do
+        post by_search_history_api_v1_favorites_path,
+             params: { search_history_id: history.id },
+             headers: auth_headers
+
+        expect_bad_request_json!(message: "必須パラメータが不足しています: hotpepper_id")
+      end
+    end
+  end
+
   describe "DELETE /api/v1/favorites#destroy" do
     let!(:history) { create(:search_history, user:) }
     let!(:favorite) { create(:favorite, user:, search_history: history, hotpepper_id: "HP-DEL") }
