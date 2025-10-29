@@ -204,7 +204,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
 
     context "正常" do
       before do
-        allow(FavoriteToken).to receive(:verify!).with(token).and_return(
+        allow(FavoriteTokenService).to receive(:verify!).with(token).and_return(
           uid: user.id, sh_id: history.id, res_id: "HP-999",
         )
       end
@@ -238,7 +238,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
     context "異常" do
       context "トークンの uid が現在のユーザーと異なるとき" do
         before do
-          allow(FavoriteToken).to receive(:verify!).with(token).and_return(
+          allow(FavoriteTokenService).to receive(:verify!).with(token).and_return(
             { uid: user.id + 1, sh_id: history.id, res_id: "HP-1" },
           )
         end
@@ -255,7 +255,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
 
       context "検索履歴が見つからないとき" do
         before do
-          allow(FavoriteToken).to receive(:verify!).with(token).and_return(
+          allow(FavoriteTokenService).to receive(:verify!).with(token).and_return(
             { uid: user.id, sh_id: 9_999_999, res_id: "HP-1" },
           )
         end
@@ -271,7 +271,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
 
       context "トークンが期限切れのとき" do
         before do
-          allow(FavoriteToken).to receive(:verify!).with(token).and_raise(FavoriteToken::Expired)
+          allow(FavoriteTokenService).to receive(:verify!).with(token).and_raise(FavoriteTokenService::Expired)
         end
 
         it "422 を返す" do
@@ -285,7 +285,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
 
       context "トークンが不正のとき" do
         before do
-          allow(FavoriteToken).to receive(:verify!).with(token).and_raise(FavoriteToken::Invalid)
+          allow(FavoriteTokenService).to receive(:verify!).with(token).and_raise(FavoriteTokenService::Invalid)
         end
 
         it "422 を返す" do

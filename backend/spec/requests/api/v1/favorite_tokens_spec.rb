@@ -13,7 +13,7 @@ RSpec.describe "Api::V1::FavoriteTokensController", type: :request do
   let(:verify_service) { instance_double(VerifyCoordinatesService) }
 
   def verify_favorite_token_issued(user_id, search_history_id, restaurant_id)
-    expect(FavoriteToken).to have_received(:issue).with(
+    expect(FavoriteTokenService).to have_received(:issue).with(
       user_id:,
       restaurant_id:,
       context: { search_history_id: },
@@ -39,7 +39,7 @@ RSpec.describe "Api::V1::FavoriteTokensController", type: :request do
     context "認証ユーザー" do
       before do
         allow(verify_service).to receive(:call).and_return(true)
-        allow(FavoriteToken).to receive(:issue) do |**kwargs|
+        allow(FavoriteTokenService).to receive(:issue) do |**kwargs|
           "token-#{kwargs[:restaurant_id]}"
         end
       end
@@ -92,7 +92,7 @@ RSpec.describe "Api::V1::FavoriteTokensController", type: :request do
           }.not_to change { search_history.reload.available_restaurant_ids }
 
           expect_unprocessable_json!(message: "invalid_search_signature")
-          expect(FavoriteToken).not_to have_received(:issue)
+          expect(FavoriteTokenService).not_to have_received(:issue)
         end
       end
 
@@ -102,7 +102,7 @@ RSpec.describe "Api::V1::FavoriteTokensController", type: :request do
 
         before do
           allow(verify_service).to receive(:call).and_return(true)
-          allow(FavoriteToken).to receive(:issue) do |**kwargs|
+          allow(FavoriteTokenService).to receive(:issue) do |**kwargs|
             "token-#{kwargs[:restaurant_id]}"
           end
         end
@@ -122,7 +122,7 @@ RSpec.describe "Api::V1::FavoriteTokensController", type: :request do
           expect(data[:tokens].map { _1[:restaurant_id] }).to eq(used)
           expect(data[:tokens].map { _1[:favorite_token] }).to eq(used.map {|id| "token-#{id}" })
 
-          expect(FavoriteToken).to have_received(:issue).exactly(100).times
+          expect(FavoriteTokenService).to have_received(:issue).exactly(100).times
         end
       end
 

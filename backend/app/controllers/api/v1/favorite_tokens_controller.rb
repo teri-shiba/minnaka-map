@@ -14,7 +14,7 @@ class Api::V1::FavoriteTokensController < Api::V1::BaseController
     search_history.update!(available_restaurant_ids: restaurant_ids)
 
     tokens = restaurant_ids.map do |restaurant_id|
-      token = FavoriteToken.issue(
+      token = FavoriteTokenService.issue(
         user_id: current_app_user.id,
         restaurant_id: restaurant_id,
         context: { search_history_id: sh_id },
