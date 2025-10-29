@@ -9,11 +9,11 @@ import { getAuthFromCookie } from './get-auth-from-cookie'
 
 interface AddFavoriteData {
   favoriteId: number
+  hotpepperId: string
 }
 
-export async function addFavorite(
-  hotpepperId: string,
-  searchHistoryId: number,
+export async function addFavoriteByToken(
+  favoriteToken: string,
 ): Promise<ServiceResult<AddFavoriteData>> {
   try {
     const auth = await getAuthFromCookie()
@@ -36,9 +36,7 @@ export async function addFavorite(
       'uid': auth.uid,
     })
 
-    const requestBody = toSnakeDeep({
-      favorite: { searchHistoryId, hotpepperId },
-    })
+    const requestBody = toSnakeDeep({ favoriteToken })
 
     const response = await fetch(url, {
       method: 'POST',
@@ -51,17 +49,20 @@ export async function addFavorite(
       throw new HttpError(response.status, 'お気に入りの追加に失敗しました')
 
     const json = await response.json()
-    const { id } = toCamelDeep(json.data)
+    const data = toCamelDeep(json.data)
 
     return {
       success: true,
-      data: { favoriteId: id },
+      data: {
+        favoriteId: data.id,
+        hotpepperId: data.hotpepperId,
+      },
     }
   }
   catch (error) {
     logger(error, {
       component: 'addFavorites',
-      extra: { hotpepperId, searchHistoryId },
+      extra: { favoriteToken },
     })
 
     const errorInfo = getErrorInfo({ error })

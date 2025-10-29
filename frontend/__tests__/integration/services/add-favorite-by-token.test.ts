@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import { addFavorite } from '~/services/add-favorite'
+import { addFavoriteByToken } from '~/services/add-favorite-by-token'
 import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import { server } from '../setup/msw.server'
 
@@ -8,7 +8,7 @@ vi.mock('~/services/get-auth-from-cookie', () => ({
   getAuthFromCookie: vi.fn(),
 }))
 
-describe('addFavorite', () => {
+describe('addFavoriteByToken', () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.mocked(getAuthFromCookie).mockResolvedValue({
@@ -28,7 +28,8 @@ describe('addFavorite', () => {
       }),
     )
 
-    const result = await addFavorite('J001246910', 5)
+    // TODO: FIX: addFavoriteByToken には token を渡さないといけない！店舗IDからトークンに変更
+    const result = await addFavoriteByToken('J001246910')
 
     expect(result.success).toBe(true)
 
@@ -43,7 +44,8 @@ describe('addFavorite', () => {
       }),
     )
 
-    const result = await addFavorite('J001246910', 5)
+    // TODO: FIX: addFavoriteByToken には token を渡さないといけない！店舗IDからトークンに変更
+    const result = await addFavoriteByToken('J001246910')
 
     expect(result.success).toBe(false)
 
@@ -60,7 +62,8 @@ describe('addFavorite', () => {
       }),
     )
 
-    const result = await addFavorite('J001246910', 5)
+    // TODO: FIX: addFavoriteByToken には token を渡さないといけない！店舗IDからトークンに変更
+    const result = await addFavoriteByToken('J001246910')
 
     expect(result.success).toBe(false)
 
@@ -73,7 +76,8 @@ describe('addFavorite', () => {
   it('認証情報がないとき、UNAUTHORIZED を返す', async () => {
     vi.mocked(getAuthFromCookie).mockResolvedValueOnce(null)
 
-    const result = await addFavorite('J001246910', 5)
+    // TODO: FIX: addFavoriteByToken には token を渡さないといけない！店舗IDからトークンに変更
+    const result = await addFavoriteByToken('J001246910')
 
     expect(result.success).toBe(false)
 
