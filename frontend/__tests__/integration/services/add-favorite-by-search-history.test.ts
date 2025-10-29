@@ -55,6 +55,46 @@ describe('addFavoriteBySearchHistory', () => {
     }
   })
 
+  it('検索結果にない店舗のとき、422 エラーを返す', async () => {
+    server.use(
+      http.post('*/favorites/by_search_history', async () => {
+        return HttpResponse.json(
+          { error: 'この店舗は検索結果に含まれていません' },
+          { status: 400 },
+        )
+      }),
+    )
+
+    const result = await addFavoriteBySearchHistory('99999', 'SH99')
+
+    expect(result.success).toBe(false)
+
+    if (!result.success) {
+      expect(result.message).toBe('お気に入りの追加に失敗しました')
+      expect(result.cause).toBe('REQUEST_FAILED')
+    }
+  })
+
+  it('存在しない検索履歴IDのとき、404 エラーを返す', async () => {
+    server.use(
+      http.post('*/favorites/by_search_history', async () => {
+        return HttpResponse.json(
+          { error: '検索履歴が見つかりません' },
+          { status: 404 },
+        )
+      }),
+    )
+
+    const result = await addFavoriteBySearchHistory('J001246910', '99999')
+
+    expect(result.success).toBe(false)
+
+    if (!result.success) {
+      expect(result.message).toBe('お気に入りの追加に失敗しました')
+      expect(result.cause).toBe('NOT_FOUND')
+    }
+  })
+
   it('ネットワークエラーのとき、success: false と NETWORK を返す', async () => {
     server.use(
       http.post('*/favorites/by_search_history', async () => {
