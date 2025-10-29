@@ -78,6 +78,7 @@ export default function StationSearchForm() {
       const params = new URLSearchParams({
         lat: midpoint.lat,
         lng: midpoint.lng,
+        stationIds: stationIds.join('-'),
         ...(sig && { sig }),
         ...(exp && { exp }),
       })
