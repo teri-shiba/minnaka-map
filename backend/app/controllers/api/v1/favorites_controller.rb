@@ -46,7 +46,7 @@ class Api::V1::FavoritesController < Api::V1::BaseController
 
   def create
     token = params.require(:favorite_token)
-    claims = FavoriteToken.verify!(token)
+    claims = FavoriteTokenService.verify!(token)
 
     if claims[:uid].to_i != current_app_user.id
       return render_error("権限がありません", status: :forbidden)
@@ -61,9 +61,9 @@ class Api::V1::FavoritesController < Api::V1::BaseController
     render_success(data: FavoriteSerializer.call(favorite), status: is_new_record ? :created : :ok)
   rescue ActiveRecord::RecordNotFound
     render_error("検索履歴が見つかりません", status: :not_found)
-  rescue FavoriteToken::Expired
+  rescue FavoriteTokenService::Expired
     render_error("トークンが切れています", status: :unprocessable_entity)
-  rescue FavoriteToken::Invalid
+  rescue FavoriteTokenService::Invalid
     render_error("トークンが無効です", status: :unprocessable_entity)
   end
 
