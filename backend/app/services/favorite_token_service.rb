@@ -2,8 +2,13 @@ class FavoriteTokenService
   class Invalid < StandardError; end
   class Expired < StandardError; end
 
-  def self.verifier
-    Rails.application.message_verifier("favorite-token")
+  def self.encryptor
+    @encryptor ||= begin
+      secret = Rails.application.secret_key_base
+      key_generator = ActiveSupport::KeyGenerator.new(secret)
+      secret_key = key_generator.generate_key("favorite-token", ActiveSupport::MessageEncryptor.key_len)
+      ActiveSupport::MessageEncryptor.new(secret_key)
+    end
   end
 
   def self.issue(user_id:, restaurant_id:, context:)
@@ -17,15 +22,15 @@ class FavoriteTokenService
       sh_id:,
       exp: token_exp,
     }
-    verifier.generate(payload)
+    encryptor.encrypt_and_sign(payload)
   end
 
   def self.verify!(token)
-    params = verifier.verify(token).symbolize_keys
+    params = encryptor.decrypt_and_verify(token).symbolize_keys
     raise Expired, "token expired" if Time.zone.at(params[:exp]) < Time.current
 
     params
-  rescue ActiveSupport::MessageVerifier::InvalidSignature
+  rescue ActiveSupport::MessageEncryptor::InvalidMessage
     raise Invalid, "Invalid token"
   end
 end
