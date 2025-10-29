@@ -72,7 +72,10 @@ export async function addFavoriteBySearchHistory(
       },
     })
 
-    const errorInfo = getErrorInfo({ error })
+    const errorInfo = getErrorInfo({
+      error,
+      notFoundErrorMessage: 'お気に入りの追加に失敗しました',
+    })
 
     return {
       success: false,
