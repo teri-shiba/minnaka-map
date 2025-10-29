@@ -1,5 +1,6 @@
 'use client'
 
+import type { TokenInfo } from '~/app/result/page'
 import type { RestaurantListItem } from '~/types/restaurant'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -16,6 +17,7 @@ import FavoriteButton from './favorite-button'
 
 interface RestaurantCardProps {
   restaurant: RestaurantListItem
+  tokenInfo?: TokenInfo
   showFavoriteButton?: boolean
   searchHistoryId?: string
   favoriteId?: number
@@ -23,15 +25,18 @@ interface RestaurantCardProps {
 
 export default function RestaurantCard({
   restaurant,
+  tokenInfo,
   showFavoriteButton = false,
   searchHistoryId,
   favoriteId,
 }: RestaurantCardProps) {
   const { id, name, imageUrl, genreName, station, close } = restaurant
 
-  const href = searchHistoryId && favoriteId !== undefined
-    ? `restaurant/${id}/?historyId=${searchHistoryId}`
-    : `restaurant/${id}`
+  const href = tokenInfo
+    ? `restaurant/${id}?t=${tokenInfo.token}`
+    : searchHistoryId && favoriteId !== undefined
+      ? `restaurant/${id}/?historyId=${searchHistoryId}`
+      : `restaurant/${id}`
 
   const isFromFavorites = Boolean(searchHistoryId && favoriteId !== undefined)
 
@@ -79,11 +84,11 @@ export default function RestaurantCard({
           className="absolute right-0 top-0 [@media(max-width:335px)]:right-1 [@media(max-width:335px)]:top-1"
           onClick={e => e.preventDefault()}
         >
-          {/* // TODO: エラー解消 */}
           <FavoriteButton
             hotpepperId={id}
             compact={true}
-            initialHistoryId={searchHistoryId}
+            token={tokenInfo?.token}
+            initialHistoryId={tokenInfo?.searchHistoryId.toString() || searchHistoryId}
             initialFavoriteId={favoriteId}
             initialIsFavorite={isFromFavorites}
           />
