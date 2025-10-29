@@ -1,5 +1,6 @@
 'use client'
 
+import type { TokenMap } from '~/app/result/page'
 import type { PageInfo } from '~/types/pagination'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { useMemo } from 'react'
@@ -11,15 +12,28 @@ interface Props {
   restaurants: RestaurantListItem[]
   totalCount: number
   pagination: PageInfo
+  tokenMap?: TokenMap
   isMobile: boolean
 }
 
-export default function RestaurantListBody({ restaurants, totalCount, pagination, isMobile }: Props) {
+const EMPTY_TOKEN_MAP: TokenMap = {}
+
+export default function RestaurantListBody({
+  restaurants,
+  totalCount,
+  pagination,
+  tokenMap = EMPTY_TOKEN_MAP,
+  isMobile,
+}: Props) {
   const listItems = useMemo(() => {
     return restaurants.map(restaurant => (
-      <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+      <RestaurantCard
+        key={restaurant.id}
+        restaurant={restaurant}
+        tokenInfo={tokenMap[restaurant.id]}
+      />
     ))
-  }, [restaurants])
+  }, [restaurants, tokenMap])
 
   if (totalCount <= 0)
     return <RestaurantEmpty />

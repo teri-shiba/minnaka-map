@@ -1,5 +1,6 @@
 'use client'
 
+import type { TokenMap } from '~/app/result/page'
 import type { PageInfo } from '~/types/pagination'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { useEffect, useRef } from 'react'
@@ -14,9 +15,16 @@ import RestaurantSidebarContainer from './restaurant-sidebar-container'
 interface Props {
   restaurants: RestaurantListItem[]
   pagination: PageInfo
+  tokenMap?: TokenMap
 }
 
-export default function RestaurantList({ restaurants, pagination }: Props) {
+const EMPTY_TOKEN_MAP: TokenMap = {}
+
+export default function RestaurantList({
+  restaurants,
+  pagination,
+  tokenMap = EMPTY_TOKEN_MAP,
+}: Props) {
   const { currentPage, totalCount } = pagination
 
   const isDesktop = useMediaQuery('(min-width: 768px)')
@@ -51,6 +59,7 @@ export default function RestaurantList({ restaurants, pagination }: Props) {
           restaurants={restaurants}
           totalCount={totalCount}
           pagination={pagination}
+          tokenMap={tokenMap}
           isMobile={false}
         />
       </RestaurantSidebarContainer>
@@ -67,6 +76,7 @@ export default function RestaurantList({ restaurants, pagination }: Props) {
           restaurants={restaurants}
           totalCount={totalCount}
           pagination={pagination}
+          tokenMap={tokenMap}
           isMobile={true}
         />
       </RestaurantDrawerContainer>
