@@ -13,7 +13,7 @@ RSpec.describe FavoriteTokenService do
       travel_to(base_time) do
         token = FavoriteTokenService.issue(user_id:, restaurant_id:, context: { search_history_id: search_history_id })
 
-        raw = FavoriteTokenService.verifier.verify(token).symbolize_keys
+        raw = FavoriteTokenService.verify!(token)
         expect(raw).to include(
           v: 1,
           uid: user_id,
@@ -27,7 +27,7 @@ RSpec.describe FavoriteTokenService do
     it "context の search_history_id を整数化して埋め込む" do
       token = FavoriteTokenService.issue(user_id:, restaurant_id:, context: { search_history_id: search_history_id.to_s })
 
-      raw = FavoriteTokenService.verifier.verify(token).symbolize_keys
+      raw = FavoriteTokenService.verify!(token)
       expect(raw[:sh_id]).to eq(search_history_id)
     end
 
@@ -43,7 +43,7 @@ RSpec.describe FavoriteTokenService do
     let(:restaurant_id) { "HP-456" }
     let(:search_history_id) { 654 }
 
-    it "署名と有効期限を満たすトークンを復号してペイロードを返す" do
+    it "暗号化と有効期限を満たすトークンを復号してペイロードを返す" do
       base_time = Time.zone.local(2023, 1, 1, 9, 0, 0)
       travel_to(base_time) do
         token = FavoriteTokenService.issue(user_id:, restaurant_id:, context: { search_history_id: search_history_id })
@@ -74,7 +74,7 @@ RSpec.describe FavoriteTokenService do
       expect { FavoriteTokenService.verify!(invalid_token) }.to raise_error(FavoriteTokenService::Invalid)
     end
 
-    it "署名改ざんでも FavoriteTokenService::Invalid となる" do
+    it "改ざんされたトークンで FavoriteTokenService::Invalid となる" do
       token = FavoriteTokenService.issue(user_id:, restaurant_id:, context: { search_history_id: search_history_id })
 
       tampered = "#{token}x"
