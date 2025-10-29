@@ -9,6 +9,8 @@ vi.mock('~/services/get-auth-from-cookie', () => ({
 }))
 
 describe('addFavoriteByToken', () => {
+  const token = 'VALID_TOKEN'
+
   beforeEach(() => {
     vi.resetAllMocks()
     vi.mocked(getAuthFromCookie).mockResolvedValue({
@@ -23,18 +25,19 @@ describe('addFavoriteByToken', () => {
       http.post('*/favorites', async () => {
         return HttpResponse.json({
           success: true,
-          data: { id: 101 },
+          data: { id: 101, hotpepper_id: 'J001246910' },
         })
       }),
     )
 
-    // TODO: FIX: addFavoriteByToken には token を渡さないといけない！店舗IDからトークンに変更
-    const result = await addFavoriteByToken('J001246910')
+    const result = await addFavoriteByToken(token)
 
     expect(result.success).toBe(true)
 
-    if (result.success)
+    if (result.success) {
       expect(result.data.favoriteId).toBe(101)
+      expect(result.data.hotpepperId).toBe('J001246910')
+    }
   })
 
   it('API が 400 エラーのとき、success: false を返す', async () => {
@@ -44,8 +47,47 @@ describe('addFavoriteByToken', () => {
       }),
     )
 
-    // TODO: FIX: addFavoriteByToken には token を渡さないといけない！店舗IDからトークンに変更
-    const result = await addFavoriteByToken('J001246910')
+    const result = await addFavoriteByToken(token)
+
+    expect(result.success).toBe(false)
+
+    if (!result.success) {
+      expect(result.message).toBe('お気に入りの追加に失敗しました')
+      expect(result.cause).toBe('REQUEST_FAILED')
+    }
+  })
+
+  it('トークンが無効なとき、422 エラーを返す', async () => {
+    server.use(
+      http.post('*/favorites', async () => {
+        return HttpResponse.json(
+          { error: 'トークンが無効です' },
+          { status: 422 },
+        )
+      }),
+    )
+
+    const result = await addFavoriteByToken('INVALID_TOKEN')
+
+    expect(result.success).toBe(false)
+
+    if (!result.success) {
+      expect(result.message).toBe('お気に入りの追加に失敗しました')
+      expect(result.cause).toBe('REQUEST_FAILED')
+    }
+  })
+
+  it('トークンが期限切れのとき、422 エラーを返す', async () => {
+    server.use(
+      http.post('*/favorites', async () => {
+        return HttpResponse.json(
+          { error: 'トークンの有効期限が切れています' },
+          { status: 422 },
+        )
+      }),
+    )
+
+    const result = await addFavoriteByToken('INVALID_TOKEN')
 
     expect(result.success).toBe(false)
 
@@ -62,8 +104,7 @@ describe('addFavoriteByToken', () => {
       }),
     )
 
-    // TODO: FIX: addFavoriteByToken には token を渡さないといけない！店舗IDからトークンに変更
-    const result = await addFavoriteByToken('J001246910')
+    const result = await addFavoriteByToken(token)
 
     expect(result.success).toBe(false)
 
@@ -76,8 +117,7 @@ describe('addFavoriteByToken', () => {
   it('認証情報がないとき、UNAUTHORIZED を返す', async () => {
     vi.mocked(getAuthFromCookie).mockResolvedValueOnce(null)
 
-    // TODO: FIX: addFavoriteByToken には token を渡さないといけない！店舗IDからトークンに変更
-    const result = await addFavoriteByToken('J001246910')
+    const result = await addFavoriteByToken(token)
 
     expect(result.success).toBe(false)
 
