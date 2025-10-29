@@ -1,0 +1,87 @@
+import { http, HttpResponse } from 'msw'
+import { addFavoriteBySearchHistory } from '~/services/add-favorite-by-search-history'
+import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
+import { server } from '../setup/msw.server'
+
+vi.mock('server-only', () => ({}))
+vi.mock('~/services/get-auth-from-cookie', () => ({
+  getAuthFromCookie: vi.fn(),
+}))
+
+describe('addFavoriteBySearchHistory', () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+    vi.mocked(getAuthFromCookie).mockResolvedValue({
+      accessToken: 'token-123',
+      client: 'client-123',
+      uid: 'uid-123',
+    })
+  })
+
+  it('お気に入り追加に成功したとき、success: true と favoriteId と hotpepperId を返す', async () => {
+    server.use(
+      http.post('*/favorites/by_search_history', async () => {
+        return HttpResponse.json({
+          success: true,
+          data: { id: 101, hotpepper_id: 'J001246910' },
+        })
+      }),
+    )
+
+    const result = await addFavoriteBySearchHistory('J001246910', 'SH99')
+
+    expect(result.success).toBe(true)
+
+    if (result.success) {
+      expect(result.data.favoriteId).toBe(101)
+      expect(result.data.hotpepperId).toBe('J001246910')
+    }
+  })
+
+  it('API が 400 エラーのとき、success: false を返す', async () => {
+    server.use(
+      http.post('*/favorites/by_search_history', async () => {
+        return HttpResponse.json({}, { status: 400 })
+      }),
+    )
+
+    const result = await addFavoriteBySearchHistory('J001246910', 'SH99')
+
+    expect(result.success).toBe(false)
+
+    if (!result.success) {
+      expect(result.message).toBe('お気に入りの追加に失敗しました')
+      expect(result.cause).toBe('REQUEST_FAILED')
+    }
+  })
+
+  it('ネットワークエラーのとき、success: false と NETWORK を返す', async () => {
+    server.use(
+      http.post('*/favorites/by_search_history', async () => {
+        return HttpResponse.error()
+      }),
+    )
+
+    const result = await addFavoriteBySearchHistory('J001246910', 'SH99')
+
+    expect(result.success).toBe(false)
+
+    if (!result.success) {
+      expect(result.message).toBe('ネットワークエラーが発生しました')
+      expect(result.cause).toBe('NETWORK')
+    }
+  })
+
+  it('認証情報がないとき、UNAUTHORIZED を返す', async () => {
+    vi.mocked(getAuthFromCookie).mockResolvedValueOnce(null)
+
+    const result = await addFavoriteBySearchHistory('J001246910', 'SH99')
+
+    expect(result.success).toBe(false)
+
+    if (!result.success) {
+      expect(result.message).toBe('ログインが必要です')
+      expect(result.cause).toBe('UNAUTHORIZED')
+    }
+  })
+})
