@@ -249,7 +249,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
                headers: auth_headers
 
           expect(response).to have_http_status(:forbidden)
-          expect(error[:message]).to eq("forbidden")
+          expect(error[:message]).to eq("権限がありません")
         end
       end
 
@@ -279,7 +279,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
                params: { favorite_token: token },
                headers: auth_headers
 
-          expect_unprocessable_json!(message: "token_expired")
+          expect_unprocessable_json!(message: "トークンが切れています")
         end
       end
 
@@ -293,7 +293,7 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
                params: { favorite_token: token },
                headers: auth_headers
 
-          expect_unprocessable_json!(message: "invalid_token")
+          expect_unprocessable_json!(message: "トークンが無効です")
         end
       end
 
