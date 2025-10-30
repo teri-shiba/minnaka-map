@@ -113,7 +113,7 @@ export default async function Result({ searchParams }: ResultPageProps) {
   })
 
   // TODO: cause からリダイレクトパスに変換する関数を使用する
-  if (!restaurantsResult.success) {
+  if (restaurantsResult.success === false) {
     const key
       = restaurantsResult.cause === 'RATE_LIMIT'
         ? 'rate_limit_exceeded'
@@ -149,23 +149,23 @@ export default async function Result({ searchParams }: ResultPageProps) {
       <div className="h-mobile-map w-full md:h-desktop-map md:w-3/5 md:flex-1">
         {(maptilerApiKey && midpoint)
           ? (
-              <Map
-                apiKey={maptilerApiKey}
-                midpoint={midpoint}
-                restaurants={items}
-              />
-            )
+            <Map
+              apiKey={maptilerApiKey}
+              midpoint={midpoint}
+              restaurants={items}
+            />
+          )
           : (
-              <div className="size-full place-content-center bg-gray-100">
-                <div className="flex flex-col items-center gap-1">
-                  <p>地図の取得に失敗しました。</p>
-                  <p className="pb-4">お手数ですが、トップページから再度お試しください。</p>
-                  <Button>
-                    <Link href="/">トップに戻る</Link>
-                  </Button>
-                </div>
+            <div className="size-full place-content-center bg-gray-100">
+              <div className="flex flex-col items-center gap-1">
+                <p>地図の取得に失敗しました。</p>
+                <p className="pb-4">お手数ですが、トップページから再度お試しください。</p>
+                <Button>
+                  <Link href="/">トップに戻る</Link>
+                </Button>
               </div>
-            )}
+            </div>
+          )}
       </div>
 
       <RestaurantList
