@@ -33,7 +33,7 @@ export default function RestaurantCard({
   const { id, name, imageUrl, genreName, station, close } = restaurant
 
   const href = tokenInfo
-    ? `restaurant/${id}?t=${tokenInfo.token}`
+    ? `restaurant/${id}?t=${encodeURIComponent(tokenInfo.token)}`
     : searchHistoryId && favoriteId !== undefined
       ? `restaurant/${id}/?historyId=${searchHistoryId}`
       : `restaurant/${id}`
