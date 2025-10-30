@@ -48,10 +48,19 @@ export default defineConfig({
       {
         extends: true,
         test: {
-          name: 'integration',
+          name: 'integration-node',
           environment: 'node',
           setupFiles: ['__tests__/integration/setup/msw.server.ts'],
-          include: ['**/__tests__/integration/**/*.{test,spec}.ts?(x)'],
+          include: ['__tests__/integration/services/**/*.{test,spec}.ts?(x)'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'integration-jsdom',
+          environment: 'jsdom',
+          setupFiles: ['__tests__/integration/setup/msw.server.ts'],
+          include: ['__tests__/integration/components/**/*.{test,spec}.ts?(x)'],
         },
       },
     ],
