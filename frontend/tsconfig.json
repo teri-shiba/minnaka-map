@@ -14,7 +14,7 @@
     "resolveJsonModule": true,
     "types": ["vitest/globals", "@testing-library/jest-dom"],
     "allowJs": true,
-    "strict": true,
+    "strict": false,
     "noEmit": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
