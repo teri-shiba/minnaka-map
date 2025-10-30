@@ -9,7 +9,6 @@ import { getAuthFromCookie } from './get-auth-from-cookie'
 
 interface SearchHistory {
   searchHistoryId: number
-  stationNames: string[]
 }
 
 export async function saveSearchHistory(
@@ -51,13 +50,12 @@ export async function saveSearchHistory(
       throw new HttpError(response.status, '検索履歴の保存に失敗しました')
 
     const json = await response.json()
-    const data = toCamelDeep(json.data)
+    const data = toCamelDeep(json.data) as { id: number }
 
     return {
       success: true,
       data: {
         searchHistoryId: data.id,
-        stationNames: data.stationNames || [],
       },
     }
   }
