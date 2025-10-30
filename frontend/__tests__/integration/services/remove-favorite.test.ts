@@ -21,7 +21,7 @@ describe('removeFavorite', () => {
   it('お気に入り削除に成功したとき、success: true を返す', async () => {
     server.use(
       http.delete('*/favorites/:id', async () => {
-        return HttpResponse.json({ success: true })
+        return HttpResponse.json(null, { status: 204 })
       }),
     )
 
@@ -30,7 +30,7 @@ describe('removeFavorite', () => {
     expect(result.success).toBe(true)
 
     if (result.success)
-      expect(result.data).toBeUndefined()
+      expect(result.data).toEqual({ id: 101 })
   })
 
   it('API が 404 エラーのとき、success: false を返す', async () => {
