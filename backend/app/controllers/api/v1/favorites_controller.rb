@@ -88,9 +88,11 @@ class Api::V1::FavoritesController < Api::V1::BaseController
 
   def destroy
     favorite = current_app_user.favorites.find(params[:id])
-    payload  = { id: favorite.id, hotpepper_id: favorite.hotpepper_id }
+    # payload  = { id: favorite.id, hotpepper_id: favorite.hotpepper_id }
     favorite.destroy!
 
-    render_success(data: payload, status: :ok)
+    head :no_content
+
+    # render_success(data: payload, status: :ok)
   end
 end

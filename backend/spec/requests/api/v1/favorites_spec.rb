@@ -413,11 +413,10 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
       end
     end
 
-    it "お気に入りを削除して 200 を返す" do
+    it "お気に入りを削除して 204 を返す" do
       delete api_v1_favorite_path(favorite), headers: auth_headers
 
-      expect_status_ok!
-      expect(data).to eq({ id: favorite.id, hotpepper_id: "HP-DEL" })
+      expect(response).to have_http_status(:no_content)
       expect(Favorite.where(id: favorite.id)).not_to exist
     end
 
