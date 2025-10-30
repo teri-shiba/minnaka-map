@@ -113,7 +113,7 @@ export default async function Result({ searchParams }: ResultPageProps) {
   })
 
   // TODO: cause からリダイレクトパスに変換する関数を使用する
-  if (restaurantsResult.success === false) {
+  if (!restaurantsResult.success) {
     const key
       = restaurantsResult.cause === 'RATE_LIMIT'
         ? 'rate_limit_exceeded'
