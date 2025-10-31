@@ -19,8 +19,8 @@
 
 # Learn more: http://github.com/javan/whenever
 
-set :output, 'log/whenever.log'
-set :environment, ENV.fetch('RAILS_ENV', 'development')
+set :output, "log/whenever.log"
+set :environment, ENV.fetch("RAILS_ENV", "development")
 
 every 1.hour do
   runner "CleanupOrphanedSearchHistoriesService.call"

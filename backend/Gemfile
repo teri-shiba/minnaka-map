@@ -39,7 +39,7 @@ gem "miyabi"
 # ジオコーディング
 gem "geocoder", "~> 1.8", ">= 1.8.5"
 
-gem 'whenever', require: false
+gem "whenever", require: false
 
 group :development, :test do
   gem "factory_bot_rails"
