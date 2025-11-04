@@ -9,15 +9,12 @@ class Api::V1::FavoritesController < Api::V1::BaseController
     search_history_id = params.require(:search_history_id)
     hotpepper_id      = params.require(:hotpepper_id)
 
-    favorite = current_app_user.favorites.find_by(
-      search_history_id: search_history_id,
-      hotpepper_id: hotpepper_id,
-    )
+    id = current_app_user.favorites.where(search_history_id:, hotpepper_id:).pick(:id)
 
     render_success(
       data: {
-        is_favorite: favorite.present?,
-        favorite_id: favorite&.id,
+        is_favorite: id.present?,
+        favorite_id: id,
       },
     )
   end
@@ -35,7 +32,7 @@ class Api::V1::FavoritesController < Api::V1::BaseController
     end
 
     render_success(
-      data: data,
+      data:,
       meta: {
         current_page: page,
         total_groups: total_groups,
@@ -54,11 +51,10 @@ class Api::V1::FavoritesController < Api::V1::BaseController
 
     search_history = current_app_user.search_histories.find(claims[:sh_id])
 
-    favorite = current_app_user.favorites.find_or_initialize_by(search_history:, hotpepper_id: claims[:res_id])
-    is_new_record = favorite.new_record?
-    favorite.save!
+    favorite = current_app_user.favorites.create_or_find_by!(search_history:, hotpepper_id: claims[:res_id])
+    status = favorite.previously_new_record? ? :created : :ok
 
-    render_success(data: FavoriteSerializer.call(favorite), status: is_new_record ? :created : :ok)
+    render_success(data: FavoriteSerializer.call(favorite), status:)
   rescue ActiveRecord::RecordNotFound
     render_error("検索履歴が見つかりません", status: :not_found)
   rescue FavoriteTokenService::Expired
@@ -77,18 +73,19 @@ class Api::V1::FavoritesController < Api::V1::BaseController
       return render_error("この店舗はこの検索履歴から追加できません", status: :unprocessable_entity)
     end
 
-    favorite = current_app_user.favorites.find_or_initialize_by(search_history:, hotpepper_id:)
-    is_new_record = favorite.new_record?
-    favorite.save!
+    favorite = current_app_user.favorites.create_or_find_by!(search_history:, hotpepper_id:)
 
-    render_success(data: FavoriteSerializer.call(favorite), status: is_new_record ? :created : :ok)
+    status = favorite.previously_new_record? ? :created : :ok
+
+    render_success(data: FavoriteSerializer.call(favorite), status:)
   rescue ActiveRecord::RecordNotFound
     render_error("検索履歴が見つかりません", status: :not_found)
   end
 
   def destroy
-    favorite = current_app_user.favorites.find(params[:id])
-    favorite.destroy!
+    if (favorite = current_app_user.favorites.find_by(id: params[:id]))
+      favorite.destroy!
+    end
 
     head :no_content
   end
