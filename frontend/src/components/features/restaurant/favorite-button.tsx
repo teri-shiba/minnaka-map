@@ -85,6 +85,7 @@ export default function FavoriteButton({
         toast.success('お気に入りに追加しました')
       }
       catch {
+        setResponse(response)
         toast.error('処理に失敗しました')
       }
     })
@@ -109,6 +110,7 @@ export default function FavoriteButton({
         toast.success('お気に入りから削除しました')
       }
       catch {
+        setResponse(response)
         toast.error('処理に失敗しました')
       }
     })
