@@ -420,10 +420,13 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
       expect(Favorite.where(id: favorite.id)).not_to exist
     end
 
-    it "存在しない ID なら 404 を返す" do
-      delete api_v1_favorite_path(9_999_999), headers: auth_headers
+    it "存在しない ID でも 204 を返す" do
+      expect {
+        delete api_v1_favorite_path(9_999_999), headers: auth_headers
+      }.not_to change { Favorite.count }
 
-      expect_not_found_json!(message: "リソースが見つかりません")
+      expect(response).to have_http_status(:no_content)
+      expect(response.body).to be_blank
     end
   end
 end
