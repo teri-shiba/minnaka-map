@@ -7,13 +7,14 @@ import { toCamelDeep, toSnakeDeep } from '~/utils/case-convert'
 import { getErrorInfo } from '~/utils/get-error-info'
 import { getAuthFromCookie } from './get-auth-from-cookie'
 
-interface SearchHistory {
-  searchHistoryId: number
+interface AddFavoriteData {
+  favoriteId: number
+  hotpepperId: string
 }
 
-export async function saveSearchHistory(
-  stationIds: number[],
-): Promise<ServiceResult<SearchHistory>> {
+export async function addFavoriteByToken(
+  favoriteToken: string,
+): Promise<ServiceResult<AddFavoriteData>> {
   try {
     const auth = await getAuthFromCookie()
 
@@ -25,7 +26,7 @@ export async function saveSearchHistory(
       }
     }
 
-    const url = new URL('/api/v1/search_histories', process.env.API_BASE_URL)
+    const url = new URL('/api/v1/favorites', process.env.API_BASE_URL)
 
     const headers = new Headers({
       'Content-Type': 'application/json',
@@ -35,9 +36,7 @@ export async function saveSearchHistory(
       'uid': auth.uid,
     })
 
-    const requestBody = toSnakeDeep({
-      searchHistory: { stationIds },
-    })
+    const requestBody = toSnakeDeep({ favoriteToken })
 
     const response = await fetch(url, {
       method: 'POST',
@@ -47,22 +46,23 @@ export async function saveSearchHistory(
     })
 
     if (!response.ok)
-      throw new HttpError(response.status, '検索履歴の保存に失敗しました')
+      throw new HttpError(response.status, 'お気に入りの追加に失敗しました')
 
     const json = await response.json()
-    const data = toCamelDeep(json.data) as { id: number }
+    const data = toCamelDeep(json.data)
 
     return {
       success: true,
       data: {
-        searchHistoryId: data.id,
+        favoriteId: data.id,
+        hotpepperId: data.hotpepperId,
       },
     }
   }
   catch (error) {
     logger(error, {
-      component: 'saveSearchHistory',
-      extra: { stationIds },
+      component: 'addFavorites',
+      extra: { favoriteToken },
     })
 
     const errorInfo = getErrorInfo({ error })

@@ -7,16 +7,16 @@ import { toCamelDeep, toSnakeDeep } from '~/utils/case-convert'
 import { getErrorInfo } from '~/utils/get-error-info'
 import { getAuthFromCookie } from './get-auth-from-cookie'
 
-interface SearchHistory {
-  searchHistoryId: number
+interface DecodeToken {
+  searchHistoryId: string
+  restaurantId: string
 }
 
-export async function saveSearchHistory(
-  stationIds: number[],
-): Promise<ServiceResult<SearchHistory>> {
+export async function decodeToken(
+  token: string,
+): Promise<ServiceResult<DecodeToken>> {
   try {
     const auth = await getAuthFromCookie()
-
     if (!auth) {
       return {
         success: false,
@@ -25,7 +25,7 @@ export async function saveSearchHistory(
       }
     }
 
-    const url = new URL('/api/v1/search_histories', process.env.API_BASE_URL)
+    const url = new URL('/api/v1/favorite_tokens/decode', process.env.API_BASE_URL)
 
     const headers = new Headers({
       'Content-Type': 'application/json',
@@ -35,9 +35,7 @@ export async function saveSearchHistory(
       'uid': auth.uid,
     })
 
-    const requestBody = toSnakeDeep({
-      searchHistory: { stationIds },
-    })
+    const requestBody = toSnakeDeep({ token })
 
     const response = await fetch(url, {
       method: 'POST',
@@ -47,22 +45,25 @@ export async function saveSearchHistory(
     })
 
     if (!response.ok)
-      throw new HttpError(response.status, '検索履歴の保存に失敗しました')
+      throw new HttpError(response.status, 'トークンのでコードに失敗しました')
 
     const json = await response.json()
-    const data = toCamelDeep(json.data) as { id: number }
+    const data = toCamelDeep(json.data)
 
     return {
       success: true,
       data: {
-        searchHistoryId: data.id,
+        searchHistoryId: String(data.searchHistoryId),
+        restaurantId: data.restaurantId,
       },
     }
   }
   catch (error) {
     logger(error, {
-      component: 'saveSearchHistory',
-      extra: { stationIds },
+      component: 'decodeToken',
+      extra: {
+        token: `${token.substring(0, 20)}...`,
+      },
     })
 
     const errorInfo = getErrorInfo({ error })

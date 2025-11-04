@@ -6,12 +6,68 @@ import RestaurantList from '~/components/features/restaurant/restaurant-list'
 import { Button } from '~/components/ui/button'
 import { fetchRestaurantsByCoords } from '~/services/fetch-restaurants-by-coords'
 import { getApiKey } from '~/services/get-api-key'
-import { parseAndValidateCoordinates } from '~/services/parse-and-validate-coords'
+import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
+import { issueFavoriteTokens } from '~/services/issue-favorite-tokens'
+import { parseAndValidateCoords } from '~/services/parse-and-validate-coords'
+import { saveSearchHistory } from '~/services/save-search-history'
 import { verifyCoordsSignature } from '~/services/verify-coords-signature'
 import { isServiceSuccess } from '~/types/service-result'
 
+export interface TokenInfo {
+  token: string
+  restaurantId: string
+  searchHistoryId: number
+}
+
+export type TokenMap = Record<string, TokenInfo>
+
 interface ResultPageProps {
-  searchParams: Promise<SearchParams & { page?: string }>
+  searchParams: Promise<SearchParams & { page?: string, stationIds: string }>
+}
+
+// TODO: 別ファイルに切り出す
+async function generateTokenMap(options: {
+  hasAuth: boolean
+  stationIds?: string
+  sig?: string
+  exp?: string
+  lat: string
+  lng: string
+  restaurantIds: string[]
+}): Promise<TokenMap> {
+  if (!options.hasAuth)
+    return {}
+
+  if (!options.stationIds || !options.sig || !options.exp)
+    return {}
+
+  const stationIds = options.stationIds.split('-').map(Number)
+
+  const historyResult = await saveSearchHistory(stationIds)
+
+  if (!historyResult.success)
+    return {}
+
+  const tokensResult = await issueFavoriteTokens({
+    searchHistoryId: historyResult.data.searchHistoryId,
+    restaurantIds: options.restaurantIds,
+    lat: options.lat,
+    lng: options.lng,
+    sig: options.sig,
+    exp: options.exp,
+  })
+
+  if (!tokensResult.success)
+    return {}
+
+  return tokensResult.data.tokens.reduce((acc, token) => {
+    acc[token.restaurantId] = {
+      token: token.favoriteToken,
+      restaurantId: token.restaurantId,
+      searchHistoryId: historyResult.data.searchHistoryId,
+    }
+    return acc
+  }, {} as TokenMap)
 }
 
 export default async function Result({ searchParams }: ResultPageProps) {
@@ -20,15 +76,16 @@ export default async function Result({ searchParams }: ResultPageProps) {
   if (!params.lat || !params.lng)
     redirect('/?error=missing_params')
 
-  const { lat, lng } = await parseAndValidateCoordinates(params)
+  const { lat, lng } = await parseAndValidateCoords(params)
 
   const verifyResult = await verifyCoordsSignature({
-    latitude: lat,
-    longitude: lng,
-    signature: params.signature,
-    expires_at: params.expires_at,
+    lat,
+    lng,
+    sig: params.sig,
+    exp: params.exp,
   })
 
+  // TODO: cause からリダイレクトパスに変換する関数を使用する
   if (!isServiceSuccess(verifyResult)) {
     const key
       = verifyResult.cause === 'EXPIRED'
@@ -48,13 +105,14 @@ export default async function Result({ searchParams }: ResultPageProps) {
   const genreCode = params.genre
 
   const restaurantsResult = await fetchRestaurantsByCoords({
-    latitude: lat,
-    longitude: lng,
+    lat,
+    lng,
     page: currentPage,
     itemsPerPage: 10,
     genre: genreCode,
   })
 
+  // TODO: cause からリダイレクトパスに変換する関数を使用する
   if (!restaurantsResult.success) {
     const key
       = restaurantsResult.cause === 'RATE_LIMIT'
@@ -67,6 +125,18 @@ export default async function Result({ searchParams }: ResultPageProps) {
   }
 
   const { items, pagination } = restaurantsResult.data
+
+  const auth = await getAuthFromCookie()
+
+  const tokenMap = await generateTokenMap({
+    hasAuth: !!auth,
+    stationIds: params.stationIds,
+    sig: params.sig,
+    exp: params.exp,
+    lat: params.lat,
+    lng: params.lng,
+    restaurantIds: items.map(item => item.id),
+  })
 
   const result = await getApiKey('maptiler')
   if (!result.success)
@@ -101,6 +171,7 @@ export default async function Result({ searchParams }: ResultPageProps) {
       <RestaurantList
         restaurants={items}
         pagination={pagination}
+        tokenMap={tokenMap}
       />
     </div>
   )
