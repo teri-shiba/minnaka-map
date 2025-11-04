@@ -8,7 +8,7 @@ import { getAuthFromCookie } from './get-auth-from-cookie'
 
 export async function removeFavorite(
   favoriteId: number,
-): Promise<ServiceResult<void>> {
+): Promise<ServiceResult<{ id: number }>> {
   try {
     const auth = await getAuthFromCookie()
 
@@ -44,7 +44,7 @@ export async function removeFavorite(
 
     return {
       success: true,
-      data: undefined,
+      data: { id: favoriteId },
     }
   }
   catch (error) {

@@ -7,10 +7,10 @@ import { logger } from '~/lib/logger'
 import { getErrorInfo } from '~/utils/get-error-info'
 
 interface VerifyCoordsOptions {
-  latitude: number
-  longitude: number
-  signature?: string
-  expires_at?: number
+  lat: number
+  lng: number
+  sig: string
+  exp: string | number
 }
 
 interface ValidateResponse {
@@ -24,10 +24,7 @@ export async function verifyCoordsSignature(
     // 有効期限チェック
     const nowSec = Math.floor(Date.now() / 1000)
 
-    if (
-      typeof opts.expires_at === 'number'
-      && opts.expires_at <= nowSec
-    ) {
+    if (typeof opts.exp === 'number' && opts.exp <= nowSec) {
       return {
         success: false,
         message: 'リンクの有効期限が切れました。もう一度検索してください。',
@@ -36,8 +33,8 @@ export async function verifyCoordsSignature(
     }
 
     // キャッシュ利用
-    const remainingSec = typeof opts.expires_at === 'number'
-      ? Math.max(0, opts.expires_at - nowSec)
+    const remainingSec = typeof opts.exp === 'number'
+      ? Math.max(0, opts.exp - nowSec)
       : 60
 
     const secondsToLive = Math.min(remainingSec, 300)
@@ -47,14 +44,12 @@ export async function verifyCoordsSignature(
 
     // リクエスト
     const url = new URL('/api/v1/midpoint/validate', process.env.API_BASE_URL)
-    url.searchParams.set('latitude', opts.latitude.toFixed(5))
-    url.searchParams.set('longitude', opts.longitude.toFixed(5))
-
-    if (opts.signature)
-      url.searchParams.set('signature', opts.signature)
-
-    if (opts.expires_at)
-      url.searchParams.set('expiresAt', opts.expires_at.toString())
+    url.search = new URLSearchParams({
+      lat: opts.lat.toFixed(5),
+      lng: opts.lng.toFixed(5),
+      sig: opts.sig,
+      exp: opts.exp.toString(),
+    }).toString()
 
     const headers = new Headers({
       Accept: 'application/json',
@@ -83,16 +78,16 @@ export async function verifyCoordsSignature(
 
     return {
       success: true,
-      data: [opts.latitude, opts.longitude],
+      data: [opts.lat, opts.lng],
     }
   }
   catch (error) {
     logger(error, {
       component: 'verifyCoordsSignature',
       extra: {
-        latitude: opts.latitude,
-        longitude: opts.longitude,
-        hasSignature: !!opts.signature,
+        lat: opts.lat,
+        lng: opts.lng,
+        sig: opts.sig,
       },
     })
 

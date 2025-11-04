@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import { addFavorite } from '~/services/add-favorite'
+import { addFavoriteByToken } from '~/services/add-favorite-by-token'
 import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import { server } from '../setup/msw.server'
 
@@ -8,7 +8,9 @@ vi.mock('~/services/get-auth-from-cookie', () => ({
   getAuthFromCookie: vi.fn(),
 }))
 
-describe('addFavorite', () => {
+describe('addFavoriteByToken', () => {
+  const token = 'VALID_TOKEN'
+
   beforeEach(() => {
     vi.resetAllMocks()
     vi.mocked(getAuthFromCookie).mockResolvedValue({
@@ -23,17 +25,19 @@ describe('addFavorite', () => {
       http.post('*/favorites', async () => {
         return HttpResponse.json({
           success: true,
-          data: { id: 101 },
+          data: { id: 101, hotpepper_id: 'J001246910' },
         })
       }),
     )
 
-    const result = await addFavorite('J001246910', 5)
+    const result = await addFavoriteByToken(token)
 
     expect(result.success).toBe(true)
 
-    if (result.success)
+    if (result.success) {
       expect(result.data.favoriteId).toBe(101)
+      expect(result.data.hotpepperId).toBe('J001246910')
+    }
   })
 
   it('API が 400 エラーのとき、success: false を返す', async () => {
@@ -43,7 +47,47 @@ describe('addFavorite', () => {
       }),
     )
 
-    const result = await addFavorite('J001246910', 5)
+    const result = await addFavoriteByToken(token)
+
+    expect(result.success).toBe(false)
+
+    if (!result.success) {
+      expect(result.message).toBe('お気に入りの追加に失敗しました')
+      expect(result.cause).toBe('REQUEST_FAILED')
+    }
+  })
+
+  it('トークンが無効なとき、422 エラーを返す', async () => {
+    server.use(
+      http.post('*/favorites', async () => {
+        return HttpResponse.json(
+          { error: 'トークンが無効です' },
+          { status: 422 },
+        )
+      }),
+    )
+
+    const result = await addFavoriteByToken('INVALID_TOKEN')
+
+    expect(result.success).toBe(false)
+
+    if (!result.success) {
+      expect(result.message).toBe('お気に入りの追加に失敗しました')
+      expect(result.cause).toBe('REQUEST_FAILED')
+    }
+  })
+
+  it('トークンが期限切れのとき、422 エラーを返す', async () => {
+    server.use(
+      http.post('*/favorites', async () => {
+        return HttpResponse.json(
+          { error: 'トークンの有効期限が切れています' },
+          { status: 422 },
+        )
+      }),
+    )
+
+    const result = await addFavoriteByToken('INVALID_TOKEN')
 
     expect(result.success).toBe(false)
 
@@ -60,7 +104,7 @@ describe('addFavorite', () => {
       }),
     )
 
-    const result = await addFavorite('J001246910', 5)
+    const result = await addFavoriteByToken(token)
 
     expect(result.success).toBe(false)
 
@@ -73,7 +117,7 @@ describe('addFavorite', () => {
   it('認証情報がないとき、UNAUTHORIZED を返す', async () => {
     vi.mocked(getAuthFromCookie).mockResolvedValueOnce(null)
 
-    const result = await addFavorite('J001246910', 5)
+    const result = await addFavoriteByToken(token)
 
     expect(result.success).toBe(false)
 

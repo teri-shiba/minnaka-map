@@ -12,27 +12,24 @@ class Api::V1::MidpointsController < ApplicationController
     return render_error("not found ids", details: missing, status: :unprocessable_entity) if missing.any?
 
     center = calc_center(stations)
-    sig = SignCoordinatesService.new.call(center[0], center[1])
+    signed = SignCoordinatesService.new.call(center[0], center[1])
 
     data = {
-      midpoint: { latitude: sig[:latitude], longitude: sig[:longitude] },
+      midpoint: { lat: signed[:lat], lng: signed[:lng] },
+      sig: signed[:sig],
+      exp: signed[:exp],
     }
-
-    if Rails.env.production?
-      data[:signature]  = sig[:signature]
-      data[:expires_at] = sig[:expires_at] if sig.has_key?(:expires_at)
-    end
 
     render_success(data:)
   end
 
   def validate
-    lat        = params[:latitude]
-    lng        = params[:longitude]
-    signature  = params[:signature]
-    expires_at = params[:expires_at]
+    lat = params[:lat]
+    lng = params[:lng]
+    sig = params[:sig]
+    exp = params[:exp]
 
-    if VerifyCoordinatesService.new.call(lat, lng, signature, expires_at)
+    if VerifyCoordinatesService.new.call(lat, lng, sig, exp)
       render json: { valid: true }
     else
       render json: { valid: false }, status: :bad_request

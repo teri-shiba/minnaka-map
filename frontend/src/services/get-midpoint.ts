@@ -3,16 +3,15 @@
 import type { ServiceResult } from '~/types/service-result'
 import { HttpError } from '~/lib/http-error'
 import { logger } from '~/lib/logger'
-import { toCamelDeep } from '~/utils/case-convert'
 import { getErrorInfo } from '~/utils/get-error-info'
 
 interface Midpoint {
   readonly midpoint: {
-    readonly latitude: string
-    readonly longitude: string
+    readonly lat: string
+    readonly lng: string
   }
-  readonly signature?: string
-  readonly expiresAt?: string
+  readonly sig: string
+  readonly exp: string
 }
 
 export async function getMidpoint(
@@ -40,11 +39,10 @@ export async function getMidpoint(
       throw new HttpError(response.status, '中間地点の計算に失敗しました')
 
     const json = await response.json()
-    const data = toCamelDeep(json.data)
 
     return {
       success: true,
-      data,
+      data: json.data,
     }
   }
   catch (error) {

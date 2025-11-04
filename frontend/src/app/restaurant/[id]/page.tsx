@@ -7,23 +7,24 @@ import Section from '~/components/layout/section'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '~/components/ui/table'
 import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
 import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
+import { getFavoriteInitialData } from '~/services/get-favorite-initial-data'
 import { getGoogleMapsEmbedUrl } from '~/services/get-google-maps-embed-url'
 
 interface RestaurantDetailPageProps {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ historyId?: string }>
+  searchParams: Promise<{ historyId?: string, t?: string }>
 }
 
 export default async function RestaurantDetailPage({ params, searchParams }: RestaurantDetailPageProps) {
   const { id } = await params
-  const { historyId } = await searchParams
-  const auth = await getAuthFromCookie()
+  const { historyId, t: token } = await searchParams
 
   const result = await fetchRestaurantDetail(id)
   if (!result.success) {
     if (result.cause === 'NOT_FOUND')
       notFound()
 
+    // TODO: cause からリダイレクトパスに変換する関数を使用する
     const error
       = result.cause === 'RATE_LIMIT'
         ? 'rate_limit_exceeded'
@@ -33,6 +34,14 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
 
     redirect(`/?error=${error}`)
   }
+
+  const auth = await getAuthFromCookie()
+  const { resolvedHistoryId, favoriteData } = await getFavoriteInitialData({
+    auth,
+    hotpepperId: id,
+    historyId,
+    token,
+  })
 
   const {
     // 基本情報
@@ -91,9 +100,11 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
             station={station}
           />
           <FavoriteButton
-            isAuthenticated={!!auth}
             hotpepperId={id}
-            initialHistoryId={historyId}
+            initialIsFavorite={favoriteData?.isFavorite ?? false}
+            initialFavoriteId={favoriteData?.favoriteId ?? null}
+            token={token}
+            initialHistoryId={resolvedHistoryId}
           />
         </div>
       </div>

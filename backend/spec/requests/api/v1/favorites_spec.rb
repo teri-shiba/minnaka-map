@@ -190,33 +190,214 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
   end
 
   describe "POST /api/v1/favorites#create" do
-    let!(:history_tokyo_ueno) { create(:search_history, user:) }
+    let!(:history) { create(:search_history, user:) }
+    let!(:token) { "SIGNED_TOKEN" }
 
     context "未認証のとき" do
       it "401 を返す" do
         post api_v1_favorites_path,
-             params: { favorite: { search_history_id: history_tokyo_ueno.id, hotpepper_id: "HP-999" } }
+             params: { favorite_token: token }
 
         expect_unauthorized_json!
       end
     end
 
-    it "お気に入りを作成して 201 を返す" do
-      post api_v1_favorites_path,
-           params: { favorite: { search_history_id: history_tokyo_ueno.id, hotpepper_id: "HP-999" } },
-           headers: auth_headers
+    context "正常" do
+      before do
+        allow(FavoriteTokenService).to receive(:verify!).with(token).and_return(
+          uid: user.id, sh_id: history.id, res_id: "HP-999",
+        )
+      end
 
-      expect_status_created!
-      expect(data).to include(:id, :hotpepper_id, :search_history_id)
-      expect(data[:hotpepper_id]).to eq("HP-999")
+      it "お気に入りを作成して 201 を返す" do
+        expect {
+          post api_v1_favorites_path,
+               params: { favorite_token: token },
+               headers: auth_headers
+        }.to change { Favorite.count }.by(1)
+
+        expect_status_created!
+        expect(data).to include(:id, :hotpepper_id, :search_history_id)
+        expect(data[:hotpepper_id]).to eq("HP-999")
+        expect(data[:search_history_id]).to eq(history.id)
+      end
+
+      it "重複追加なら 200 で作成しない" do
+        create(:favorite, user:, search_history: history, hotpepper_id: "HP-999")
+
+        expect {
+          post api_v1_favorites_path,
+               params: { favorite_token: token },
+               headers: auth_headers
+        }.to not_change { Favorite.count }
+
+        expect_status_ok!
+      end
     end
 
-    it "必須パラメータが不足していたら 400 を返す" do
-      post api_v1_favorites_path,
-           params: { favorite: { hotpepper_id: "HP-999" } },
-           headers: auth_headers
+    context "異常" do
+      context "トークンの uid が現在のユーザーと異なるとき" do
+        before do
+          allow(FavoriteTokenService).to receive(:verify!).with(token).and_return(
+            { uid: user.id + 1, sh_id: history.id, res_id: "HP-1" },
+          )
+        end
 
-      expect_bad_request_json!(message: "必須パラメータが不足しています: search_history_id")
+        it "403 を返す" do
+          post api_v1_favorites_path,
+               params: { favorite_token: token },
+               headers: auth_headers
+
+          expect(response).to have_http_status(:forbidden)
+          expect(error[:message]).to eq("権限がありません")
+        end
+      end
+
+      context "検索履歴が見つからないとき" do
+        before do
+          allow(FavoriteTokenService).to receive(:verify!).with(token).and_return(
+            { uid: user.id, sh_id: 9_999_999, res_id: "HP-1" },
+          )
+        end
+
+        it "404 を返す" do
+          post api_v1_favorites_path,
+               params: { favorite_token: token },
+               headers: auth_headers
+
+          expect_not_found_json!(message: "検索履歴が見つかりません")
+        end
+      end
+
+      context "トークンが期限切れのとき" do
+        before do
+          allow(FavoriteTokenService).to receive(:verify!).with(token).and_raise(FavoriteTokenService::Expired)
+        end
+
+        it "422 を返す" do
+          post api_v1_favorites_path,
+               params: { favorite_token: token },
+               headers: auth_headers
+
+          expect_unprocessable_json!(message: "トークンが切れています")
+        end
+      end
+
+      context "トークンが不正のとき" do
+        before do
+          allow(FavoriteTokenService).to receive(:verify!).with(token).and_raise(FavoriteTokenService::Invalid)
+        end
+
+        it "422 を返す" do
+          post api_v1_favorites_path,
+               params: { favorite_token: token },
+               headers: auth_headers
+
+          expect_unprocessable_json!(message: "トークンが無効です")
+        end
+      end
+
+      context "必須パラメータが不足しているとき" do
+        it "favorite_token がなければ 400 を返す" do
+          post api_v1_favorites_path,
+               params: {},
+               headers: auth_headers
+
+          expect_bad_request_json!(message: "必須パラメータが不足しています: favorite_token")
+        end
+      end
+    end
+  end
+
+  describe "POST /api/v1/favorites#by_search_history" do
+    let!(:history) { create(:search_history, user:) }
+
+    context "未認証のとき" do
+      it "401 を返す" do
+        post by_search_history_api_v1_favorites_path,
+             params: { search_history_id: history.id, hotpepper_id: "HP-OK" }
+
+        expect_unauthorized_json!
+      end
+    end
+
+    context "検索結果に含まれる店舗のとき" do
+      before do
+        allow_any_instance_of(SearchHistory).
+          to receive(:available_restaurant_ids).
+               and_return(%w[HP-OK HP-OTHER])
+      end
+
+      it "作成して 201 を返す" do
+        expect {
+          post by_search_history_api_v1_favorites_path,
+               params: { search_history_id: history.id, hotpepper_id: "HP-OK" },
+               headers: auth_headers
+        }.to change { Favorite.count }.by(1)
+
+        expect_status_created!
+        expect(data).to include(:id, :hotpepper_id, :search_history_id)
+        expect(data[:hotpepper_id]).to eq("HP-OK")
+        expect(data[:search_history_id]).to eq(history.id)
+      end
+
+      it "重複追加なら 200 で作成しない" do
+        create(:favorite, user:, search_history: history, hotpepper_id: "HP-OK")
+
+        expect {
+          post by_search_history_api_v1_favorites_path,
+               params: { search_history_id: history.id, hotpepper_id: "HP-OK" },
+               headers: auth_headers
+        }.to not_change { Favorite.count }
+
+        expect_status_ok!
+      end
+    end
+
+    context "検索結果に含まれない店舗のとき" do
+      before do
+        allow_any_instance_of(SearchHistory).
+          to receive(:available_restaurant_ids).
+               and_return(%w[HP-AVAILABLE])
+      end
+
+      it "422 を返し、作成しない" do
+        expect {
+          post by_search_history_api_v1_favorites_path,
+               params: { search_history_id: history.id, hotpepper_id: "HP-NG" },
+               headers: auth_headers
+        }.to not_change { Favorite.count }
+
+        expect_unprocessable_json!(message: "この店舗はこの検索履歴から追加できません")
+      end
+    end
+
+    context "存在しない検索IDのとき" do
+      it "404 を返す" do
+        post by_search_history_api_v1_favorites_path,
+             params: { search_history_id: 9_999_999, hotpepper_id: "HP-1" },
+             headers: auth_headers
+
+        expect_not_found_json!(message: "検索履歴が見つかりません")
+      end
+    end
+
+    context "必須パラメータが不足しているとき" do
+      it "search_history_id がなければ 400 を返す" do
+        post by_search_history_api_v1_favorites_path,
+             params: { hotpepper_id: "HP-OK" },
+             headers: auth_headers
+
+        expect_bad_request_json!(message: "必須パラメータが不足しています: search_history_id")
+      end
+
+      it "hotpepper_id がなければ 400 を返す" do
+        post by_search_history_api_v1_favorites_path,
+             params: { search_history_id: history.id },
+             headers: auth_headers
+
+        expect_bad_request_json!(message: "必須パラメータが不足しています: hotpepper_id")
+      end
     end
   end
 
@@ -232,18 +413,20 @@ RSpec.describe "Api::V1::FavoritesController", type: :request do
       end
     end
 
-    it "お気に入りを削除して 200 を返す" do
+    it "お気に入りを削除して 204 を返す" do
       delete api_v1_favorite_path(favorite), headers: auth_headers
 
-      expect_status_ok!
-      expect(data).to eq({ id: favorite.id, hotpepper_id: "HP-DEL" })
+      expect(response).to have_http_status(:no_content)
       expect(Favorite.where(id: favorite.id)).not_to exist
     end
 
-    it "存在しない ID なら 404 を返す" do
-      delete api_v1_favorite_path(9_999_999), headers: auth_headers
+    it "存在しない ID でも 204 を返す" do
+      expect {
+        delete api_v1_favorite_path(9_999_999), headers: auth_headers
+      }.not_to change { Favorite.count }
 
-      expect_not_found_json!(message: "リソースが見つかりません")
+      expect(response).to have_http_status(:no_content)
+      expect(response.body).to be_blank
     end
   end
 end

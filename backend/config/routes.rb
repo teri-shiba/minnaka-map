@@ -14,9 +14,19 @@ Rails.application.routes.draw do
         get :validate
       end
 
+      resources :favorite_tokens, only: [] do
+        collection do
+          post :batch
+          post :decode
+        end
+      end
+
       resources :search_histories, only: [:create]
       resources :favorites, only: [:index, :create, :destroy] do
-        collection { get :status }
+        collection do
+          get :status
+          post :by_search_history
+        end
       end
       resources :shared_favorite_lists, only: [:create, :show], param: :share_uuid
 

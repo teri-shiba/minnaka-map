@@ -9,11 +9,12 @@ import { getAuthFromCookie } from './get-auth-from-cookie'
 
 interface AddFavoriteData {
   favoriteId: number
+  hotpepperId: string
 }
 
-export async function addFavorite(
+export async function addFavoriteBySearchHistory(
   hotpepperId: string,
-  searchHistoryId: number,
+  searchHistoryId: string,
 ): Promise<ServiceResult<AddFavoriteData>> {
   try {
     const auth = await getAuthFromCookie()
@@ -26,7 +27,7 @@ export async function addFavorite(
       }
     }
 
-    const url = new URL('/api/v1/favorites', process.env.API_BASE_URL)
+    const url = new URL('/api/v1/favorites/by_search_history', process.env.API_BASE_URL)
 
     const headers = new Headers({
       'Content-Type': 'application/json',
@@ -37,7 +38,8 @@ export async function addFavorite(
     })
 
     const requestBody = toSnakeDeep({
-      favorite: { searchHistoryId, hotpepperId },
+      searchHistoryId,
+      hotpepperId,
     })
 
     const response = await fetch(url, {
@@ -51,20 +53,29 @@ export async function addFavorite(
       throw new HttpError(response.status, 'お気に入りの追加に失敗しました')
 
     const json = await response.json()
-    const { id } = toCamelDeep(json.data)
+    const data = toCamelDeep(json.data)
 
     return {
       success: true,
-      data: { favoriteId: id },
+      data: {
+        favoriteId: data.id,
+        hotpepperId: data.hotpepperId,
+      },
     }
   }
   catch (error) {
     logger(error, {
-      component: 'addFavorites',
-      extra: { hotpepperId, searchHistoryId },
+      component: 'addFavoriteBySearchHistory',
+      extra: {
+        hotpepperId,
+        searchHistoryId,
+      },
     })
 
-    const errorInfo = getErrorInfo({ error })
+    const errorInfo = getErrorInfo({
+      error,
+      notFoundErrorMessage: 'お気に入りの追加に失敗しました',
+    })
 
     return {
       success: false,
