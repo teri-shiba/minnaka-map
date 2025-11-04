@@ -8,7 +8,7 @@ import { fetchRestaurantsByCoords } from '~/services/fetch-restaurants-by-coords
 import { getApiKey } from '~/services/get-api-key'
 import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import { issueFavoriteTokens } from '~/services/issue-favorite-tokens'
-import { parseAndValidateCoordinates } from '~/services/parse-and-validate-coords'
+import { parseAndValidateCoords } from '~/services/parse-and-validate-coords'
 import { saveSearchHistory } from '~/services/save-search-history'
 import { verifyCoordsSignature } from '~/services/verify-coords-signature'
 import { isServiceSuccess } from '~/types/service-result'
@@ -76,7 +76,7 @@ export default async function Result({ searchParams }: ResultPageProps) {
   if (!params.lat || !params.lng)
     redirect('/?error=missing_params')
 
-  const { lat, lng } = await parseAndValidateCoordinates(params)
+  const { lat, lng } = await parseAndValidateCoords(params)
 
   const verifyResult = await verifyCoordsSignature({
     lat,
