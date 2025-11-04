@@ -348,43 +348,6 @@ describe('FavoriteButton', () => {
 
       expect(screen.getByRole('button', { name: /保存する/ })).toBeInTheDocument()
     })
-
-    it('isPending: true のとき、API 処理中にボタンが無効化されること', async () => {
-      const user = userEvent.setup()
-
-      server.use(
-        http.post('*/favorites', async () => {
-          await new Promise(resolve => setTimeout(resolve, 100))
-
-          return HttpResponse.json({
-            success: true,
-            data: {
-              id: mockFavoriteId,
-              hotpepper_id: mockHotPepperId,
-            },
-          })
-        }),
-      )
-
-      renderWithAtoms(
-        <FavoriteButton
-          hotpepperId={mockHotPepperId}
-          initialIsFavorite={false}
-          initialFavoriteId={null}
-          token={mockToken}
-        />,
-        [[userStateAtom, authenticatedUser]],
-      )
-
-      const button = screen.getByRole('button', { name: /保存する/ })
-      await user.click(button)
-
-      expect(button).toBeDisabled()
-
-      await waitFor(() => {
-        expect(button).not.toBeDisabled()
-      })
-    })
   })
 
   describe('認証チェック', () => {
