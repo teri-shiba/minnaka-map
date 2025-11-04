@@ -61,7 +61,7 @@ describe('FavoriteButton', () => {
   })
 
   describe('トークンベースのお気に入り登録', () => {
-    it('addFavoriteByToken を呼び出し成功すること', async () => {
+    it('未登録のとき addFavoriteByToken が呼び出され、成功すること', async () => {
       const user = userEvent.setup()
 
       server.use(
@@ -79,6 +79,8 @@ describe('FavoriteButton', () => {
       renderWithAtoms(
         <FavoriteButton
           hotpepperId={mockHotPepperId}
+          initialIsFavorite={false}
+          initialFavoriteId={null}
           token={mockToken}
         />,
         [[userStateAtom, authenticatedUser]],
@@ -87,11 +89,11 @@ describe('FavoriteButton', () => {
       const button = screen.getByRole('button', { name: /保存する/ })
       await user.click(button)
 
+      expect(screen.getByRole('button', { name: /保存済み/ })).toBeInTheDocument()
+
       await waitFor(() => {
         expect(toast.success).toHaveBeenCalledWith('お気に入りに追加しました')
       })
-
-      expect(screen.getByRole('button', { name: /保存済み/ })).toBeInTheDocument()
     })
 
     it('hotpepperId が一致しないとき、エラーメッセージを返すこと', async () => {
@@ -112,6 +114,8 @@ describe('FavoriteButton', () => {
       renderWithAtoms(
         <FavoriteButton
           hotpepperId={mockHotPepperId}
+          initialIsFavorite={false}
+          initialFavoriteId={null}
           token={mockToken}
         />,
         [[userStateAtom, authenticatedUser]],
@@ -145,8 +149,9 @@ describe('FavoriteButton', () => {
       renderWithAtoms(
         <FavoriteButton
           hotpepperId={mockHotPepperId}
+          initialIsFavorite={false}
+          initialFavoriteId={null}
           initialHistoryId={mockHistoryId}
-          initialFavoriteId={mockFavoriteId}
         />,
         [[userStateAtom, authenticatedUser]],
       )
@@ -176,14 +181,12 @@ describe('FavoriteButton', () => {
       renderWithAtoms(
         <FavoriteButton
           hotpepperId={mockHotPepperId}
+          initialIsFavorite={false}
+          initialFavoriteId={null}
           initialHistoryId={mockHistoryId}
         />,
         [[userStateAtom, authenticatedUser]],
       )
-
-      await waitFor(() => {
-        expect(screen.getByRole('button')).not.toBeDisabled()
-      })
 
       const button = screen.getByRole('button', { name: /保存する/ })
       await user.click(button)
@@ -200,16 +203,16 @@ describe('FavoriteButton', () => {
 
       server.use(
         http.delete(`*/favorites/${mockFavoriteId}`, async () => {
-          return HttpResponse.json({ status: 204 })
+          return HttpResponse.json(null, { status: 204 })
         }),
       )
 
       renderWithAtoms(
         <FavoriteButton
           hotpepperId={mockHotPepperId}
-          initialHistoryId={mockHistoryId}
-          initialFavoriteId={mockFavoriteId}
           initialIsFavorite={true}
+          initialFavoriteId={mockFavoriteId}
+          initialHistoryId={mockHistoryId}
         />,
         [[userStateAtom, authenticatedUser]],
       )
@@ -217,11 +220,11 @@ describe('FavoriteButton', () => {
       const button = screen.getByRole('button', { name: /保存済み/ })
       await user.click(button)
 
+      expect(screen.getByRole('button', { name: /保存する/ })).toBeInTheDocument()
+
       await waitFor(() => {
         expect(toast.success).toHaveBeenCalledWith('お気に入りから削除しました')
       })
-
-      expect(screen.getByRole('button', { name: /保存する/ })).toBeInTheDocument()
     })
 
     it('削除に失敗したとき、エラーメッセージを表示すること', async () => {
@@ -239,9 +242,9 @@ describe('FavoriteButton', () => {
       renderWithAtoms(
         <FavoriteButton
           hotpepperId={mockHotPepperId}
-          initialHistoryId={mockHistoryId}
-          initialFavoriteId={mockFavoriteId}
           initialIsFavorite={true}
+          initialFavoriteId={mockFavoriteId}
+          initialHistoryId={mockHistoryId}
         />,
         [[userStateAtom, authenticatedUser]],
       )
@@ -255,14 +258,14 @@ describe('FavoriteButton', () => {
     })
   })
 
-  describe('お気に入りの状態チェック', () => {
-    it('お気に入り一覧から店舗詳細ページに遷移したとき、状態チェックをスキップすること', async () => {
+  describe('初期状態の表示', () => {
+    it('お気に入り一覧から店舗詳細ページに遷移したとき、登録済み状態で表示されること', () => {
       renderWithAtoms(
         <FavoriteButton
           hotpepperId={mockHotPepperId}
-          initialHistoryId={mockHistoryId}
-          initialFavoriteId={mockFavoriteId}
           initialIsFavorite={true}
+          initialFavoriteId={mockFavoriteId}
+          initialHistoryId={mockHistoryId}
         />,
         [[userStateAtom, authenticatedUser]],
       )
@@ -270,28 +273,34 @@ describe('FavoriteButton', () => {
       expect(screen.getByRole('button', { name: /保存済み/ })).toBeInTheDocument()
     })
 
-    it('未認証のとき、状態チェックをスキップすること', async () => {
+    it('検索結果から遷移したとき、未登録状態で表示されること', () => {
       renderWithAtoms(
         <FavoriteButton
           hotpepperId={mockHotPepperId}
-          initialHistoryId={mockHistoryId}
+          initialIsFavorite={false}
+          initialFavoriteId={null}
+          token={mockToken}
         />,
-        [[userStateAtom, initialUserState]],
+        [[userStateAtom, authenticatedUser]],
       )
 
-      await waitFor(() => {
-        expect(screen.getByRole('button')).toBeInTheDocument()
-      })
+      expect(screen.getByRole('button', { name: /保存する/ })).toBeInTheDocument()
     })
+  })
 
-    it('initialHistoryId があるとき、checkFavoriteStatus を呼び出すこと', async () => {
+  describe('楽観更新', () => {
+    it('追加ボタンをクリックしたとき、API 応答前に即座にUIが更新されること', async () => {
+      const user = userEvent.setup()
+
       server.use(
-        http.get('*/favorites/status', async () => {
+        http.post('*/favorites', async () => {
+          await new Promise(resolve => setTimeout(resolve, 100))
+
           return HttpResponse.json({
             success: true,
             data: {
-              is_favorite: true,
-              favorite_id: mockFavoriteId,
+              id: mockFavoriteId,
+              hotpepper_id: mockHotPepperId,
             },
           })
         }),
@@ -300,13 +309,80 @@ describe('FavoriteButton', () => {
       renderWithAtoms(
         <FavoriteButton
           hotpepperId={mockHotPepperId}
+          initialIsFavorite={false}
+          initialFavoriteId={null}
+          token={mockToken}
+        />,
+        [[userStateAtom, authenticatedUser]],
+      )
+
+      const button = screen.getByRole('button', { name: /保存する/ })
+      await user.click(button)
+
+      expect(screen.getByRole('button', { name: /保存済み/ })).toBeInTheDocument()
+    })
+
+    it('削除ボタンをクリックしたとき、API 応答前に即座にUIが更新されること', async () => {
+      const user = userEvent.setup()
+
+      server.use(
+        http.delete(`*/favorites/${mockFavoriteId}`, async () => {
+          await new Promise(resolve => setTimeout(resolve, 100))
+
+          return HttpResponse.json(null, { status: 204 })
+        }),
+      )
+
+      renderWithAtoms(
+        <FavoriteButton
+          hotpepperId={mockHotPepperId}
+          initialIsFavorite={true}
+          initialFavoriteId={mockFavoriteId}
           initialHistoryId={mockHistoryId}
         />,
         [[userStateAtom, authenticatedUser]],
       )
 
+      const button = screen.getByRole('button', { name: /保存済み/ })
+      await user.click(button)
+
+      expect(screen.getByRole('button', { name: /保存する/ })).toBeInTheDocument()
+    })
+
+    it('isPending: true のとき、API 処理中にボタンが無効化されること', async () => {
+      const user = userEvent.setup()
+
+      server.use(
+        http.post('*/favorites', async () => {
+          await new Promise(resolve => setTimeout(resolve, 100))
+
+          return HttpResponse.json({
+            success: true,
+            data: {
+              id: mockFavoriteId,
+              hotpepper_id: mockHotPepperId,
+            },
+          })
+        }),
+      )
+
+      renderWithAtoms(
+        <FavoriteButton
+          hotpepperId={mockHotPepperId}
+          initialIsFavorite={false}
+          initialFavoriteId={null}
+          token={mockToken}
+        />,
+        [[userStateAtom, authenticatedUser]],
+      )
+
+      const button = screen.getByRole('button', { name: /保存する/ })
+      await user.click(button)
+
+      expect(button).toBeDisabled()
+
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /保存済み/ })).toBeInTheDocument()
+        expect(button).not.toBeDisabled()
       })
     })
   })
@@ -318,6 +394,8 @@ describe('FavoriteButton', () => {
       renderWithAtoms(
         <FavoriteButton
           hotpepperId={mockHotPepperId}
+          initialIsFavorite={false}
+          initialFavoriteId={null}
           token={mockToken}
         />,
         [[userStateAtom, initialUserState]],
