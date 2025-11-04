@@ -15,7 +15,10 @@ Rails.application.routes.draw do
       end
 
       resources :favorite_tokens, only: [] do
-        collection { post :batch }
+        collection do
+          post :batch
+          post :decode
+        end
       end
 
       resources :search_histories, only: [:create]

@@ -162,4 +162,99 @@ RSpec.describe "Api::V1::FavoriteTokensController", type: :request do
       end
     end
   end
+
+  describe "POST /api/v1/favorite_tokens/decode" do
+    context "認証ユーザー" do
+      context "正常なトークンのとき" do
+        before do
+          allow(FavoriteTokenService).to receive(:verify!).and_return({
+            v: 1,
+            uid: user.id,
+            res_id: "J001128359",
+            sh_id: search_history.id,
+            exp: 1.hour.from_now.to_i,
+          })
+        end
+
+        it "search_history_id と restaurant_id を返す" do
+          post decode_api_v1_favorite_tokens_path,
+               params: { token: "TOKEN" },
+               headers: auth_headers
+
+          expect_status_ok!
+          expect(data[:search_history_id]).to eq(search_history.id)
+          expect(data[:restaurant_id]).to eq("J001128359")
+        end
+      end
+
+      context "他のユーザーのトークンのとき" do
+        let!(:other_user) { create(:user) }
+
+        before do
+          allow(FavoriteTokenService).to receive(:verify!).and_return({
+            v: 1,
+            uid: other_user.id,
+            res_id: "J001128359",
+            sh_id: search_history.id,
+            exp: 1.hour.from_now.to_i,
+          })
+        end
+
+        it "403 を返す" do
+          post decode_api_v1_favorite_tokens_path,
+               params: { token: "TOKEN" },
+               headers: auth_headers
+
+          expect_forbidden_json!(message: "権限がありません")
+        end
+      end
+
+      context "トークンの有効期限が切れているとき" do
+        before do
+          allow(FavoriteTokenService).to receive(:verify!).and_raise(FavoriteTokenService::Expired, "token expired")
+        end
+
+        it "422 を返す" do
+          post decode_api_v1_favorite_tokens_path,
+               params: { token: "EXPIRED" },
+               headers: auth_headers
+
+          expect_unprocessable_json!(message: "トークンが切れています")
+        end
+      end
+
+      context "トークンが無効なとき" do
+        before do
+          allow(FavoriteTokenService).to receive(:verify!).and_raise(FavoriteTokenService::Invalid, "Invalid token")
+        end
+
+        it "422 を返す" do
+          post decode_api_v1_favorite_tokens_path,
+               params: { token: "INVALID" },
+               headers: auth_headers
+
+          expect_unprocessable_json!(message: "トークンが無効です")
+        end
+      end
+
+      context "トークンパラメータが欠落しているとき" do
+        it "400 を返す" do
+          post decode_api_v1_favorite_tokens_path,
+               params: {},
+               headers: auth_headers
+
+          expect_bad_request_json!(message: "必須パラメータが不足しています: token")
+        end
+      end
+    end
+
+    context "未認証ユーザー" do
+      it "401 を返す" do
+        post decode_api_v1_favorite_tokens_path,
+             params: { token: "TOKEN" }
+
+        expect_unauthorized_json!
+      end
+    end
+  end
 end

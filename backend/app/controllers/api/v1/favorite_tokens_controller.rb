@@ -26,6 +26,24 @@ class Api::V1::FavoriteTokensController < Api::V1::BaseController
     render_success(data: { tokens: })
   end
 
+  def decode
+    token = params.require(:token)
+    claims = FavoriteTokenService.verify!(token)
+
+    if claims[:uid].to_i != current_app_user.id
+      return render_error("権限がありません", status: :forbidden)
+    end
+
+    render_success(data: {
+      search_history_id: claims[:sh_id],
+      restaurant_id: claims[:res_id],
+    })
+  rescue FavoriteTokenService::Expired
+    render_error("トークンが切れています", status: :unprocessable_entity)
+  rescue FavoriteTokenService::Invalid
+    render_error("トークンが無効です", status: :unprocessable_entity)
+  end
+
   private
 
     def required_params
