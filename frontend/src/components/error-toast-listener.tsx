@@ -1,5 +1,6 @@
 'use client'
 
+import type { ErrorCode } from '~/constants'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
@@ -15,9 +16,8 @@ export default function ErrorToastListener() {
     if (!error)
       return
 
-    // TODO: エラー解消
     const displayMessage = message
-      || ERROR_MESSAGE[error as ErrorType]
+      || (error in ERROR_MESSAGE ? ERROR_MESSAGE[error as ErrorCode] : null)
       || '不明なエラーが発生しました'
 
     toast.error(displayMessage)
