@@ -6,6 +6,8 @@ import ShareRestaurantDialog from '~/components/features/restaurant/share/share-
 import Section from '~/components/layout/section'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '~/components/ui/table'
 import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
+import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
+import { getFavoriteInitialData } from '~/services/get-favorite-initial-data'
 import { getGoogleMapsEmbedUrl } from '~/services/get-google-maps-embed-url'
 
 interface RestaurantDetailPageProps {
@@ -32,6 +34,14 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
 
     redirect(`/?error=${error}`)
   }
+
+  const auth = await getAuthFromCookie()
+  const { resolvedHistoryId, favoriteData } = await getFavoriteInitialData({
+    auth,
+    hotpepperId: id,
+    historyId,
+    token,
+  })
 
   const {
     // 基本情報
@@ -91,8 +101,10 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
           />
           <FavoriteButton
             hotpepperId={id}
+            initialIsFavorite={favoriteData?.isFavorite ?? false}
+            initialFavoriteId={favoriteData?.favoriteId ?? null}
             token={token}
-            initialHistoryId={historyId}
+            initialHistoryId={resolvedHistoryId}
           />
         </div>
       </div>

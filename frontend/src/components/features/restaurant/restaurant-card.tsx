@@ -86,11 +86,11 @@ export default function RestaurantCard({
         >
           <FavoriteButton
             hotpepperId={id}
-            compact={true}
+            initialIsFavorite={isFromFavorites}
+            initialFavoriteId={favoriteId ?? null}
             token={tokenInfo?.token}
             initialHistoryId={tokenInfo?.searchHistoryId.toString() || searchHistoryId}
-            initialFavoriteId={favoriteId}
-            initialIsFavorite={isFromFavorites}
+            compact={true}
           />
         </div>
       )}
