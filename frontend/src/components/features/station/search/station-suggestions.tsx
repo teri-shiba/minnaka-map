@@ -61,7 +61,7 @@ export default function StationSuggestions({
       <CommandEmpty className="p-2 text-center text-sm">
         入力候補がありません
       </CommandEmpty>
-      
+
       {filteredStations.length > 0 && (
         <CommandGroup heading="駅候補">
           {filteredStations.map(station => (

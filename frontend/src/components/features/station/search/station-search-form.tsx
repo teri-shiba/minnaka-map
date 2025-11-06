@@ -18,6 +18,7 @@ import StationAutocomplete from './station-autocomplete'
 const MAX_AREA_FIELDS = 6
 const MAX_REQUIRED_FIELDS = 2
 
+// TODO: 空フォームがある時、送信できないしトーストも発火しない。→空フォームは無視して送信
 export default function StationSearchForm() {
   const router = useRouter()
 
@@ -126,11 +127,9 @@ export default function StationSearchForm() {
 
         <div className="mb-6 md:grid md:grid-flow-col md:grid-cols-2 md:grid-rows-3 md:gap-x-6 md:gap-y-3">
           {fields.map((field, index) => {
-            const currentFieldValue = watchedArea[index]?.areaValue ?? ''
-
-            const excludedStations = watchedArea
-              .map(item => item.areaValue)
-              .filter(name => name !== '' && name !== currentFieldValue)
+            const excludedStationIds = watchedArea
+              .map((item, i) => i === index ? null : item.stationId)
+              .filter((id): id is number => id !== null)
 
             return (
               <div key={field.id} className="mb-2">
@@ -151,7 +150,7 @@ export default function StationSearchForm() {
                             form.setValue(`area.${index}.longitude`, longitude ? Number(longitude) : null)
                           }}
                           placeholder={`${index + 1}人目の出発駅`}
-                          excludedStations={excludedStations}
+                          excludedStationIds={excludedStationIds}
                         />
                       </FormControl>
                       {renderFieldButtons(index, field.value)}
