@@ -19,12 +19,14 @@ export default function useSearchStation(query: string) {
   const { data, error, isLoading } = useSWR(url, fetcher, {
     dedupingInterval: 500,
     revalidateOnFocus: false,
-    errorRetryCount: 2,
+    shouldRetryOnError: false,
+    errorRetryCount: 0,
   })
 
   return {
     stations: data?.stations ?? [],
     isLoading,
-    isError: error,
+    isError: Boolean(error),
+    error,
   }
 }
