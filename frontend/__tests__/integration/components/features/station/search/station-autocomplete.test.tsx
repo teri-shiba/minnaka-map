@@ -13,14 +13,14 @@ vi.mock('~/public/figure_loading_circle.svg', () => ({
 const STORAGE_KEY = 'recentStations'
 const DEBOUNCE_MS = 300
 
-function StationAutocompleteHarness({ excludedStations }: { excludedStations?: string[] } = {}) {
+function StationAutocompleteHarness({ excludedStationIds }: { excludedStationIds?: number[] } = {}) {
   const [value, setValue] = useState('')
   return (
     <StationAutocomplete
       value={value}
       placeholder="駅名を入力"
       onChange={newValue => setValue(newValue)}
-      excludedStations={excludedStations}
+      excludedStationIds={excludedStationIds}
     />
   )
 }
@@ -283,7 +283,7 @@ describe('StationAutocomplete', () => {
   })
 
   describe('駅の除外', () => {
-    it('除外対象の駅は候補に表示しない', async () => {
+    it('除外対象の駅IDは候補に表示しない', async () => {
       server.use(
         http.get('*/api/v1/stations', ({ request }) => {
           const url = new URL(request.url)
@@ -304,7 +304,7 @@ describe('StationAutocomplete', () => {
       const wrapper = createSWRWrapper()
       render(
         <StationAutocompleteHarness
-          excludedStations={['東京']}
+          excludedStationIds={[1]}
         />,
         { wrapper },
       )
@@ -322,7 +322,7 @@ describe('StationAutocomplete', () => {
       expect(screen.queryByText('東京テレポート')).toBeInTheDocument()
     })
 
-    it('除外対象の駅は過去検索履歴にも表示しない', async () => {
+    it('除外対象の駅IDは過去検索履歴にも表示しない', async () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify([
         { id: 1, name: '東京', latitude: '35.12345', longitude: '139.12345' },
         { id: 2, name: '新宿', latitude: '35.54321', longitude: '139.54321' },
@@ -331,7 +331,7 @@ describe('StationAutocomplete', () => {
       const wrapper = createSWRWrapper()
       render(
         <StationAutocompleteHarness
-          excludedStations={['東京']}
+          excludedStationIds={[1]}
         />,
         { wrapper },
       )
