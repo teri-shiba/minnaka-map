@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react'
 import useSearchStation from '~/hooks/useSearchStation'
-import { createSWRCallTracker, createSWRWrapper } from './helpers/swr-test-helpers'
+import { createSWRCallTracker, createSWRWrapper } from '../../helpers/swr-test-helpers'
 
 describe('useSearchStation', () => {
   beforeEach(() => {
