@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [react(), tsconfigPaths()],
   resolve: {
     alias: [
+      { find: /^~\/public\//, replacement: fileURLToPath(new URL('./public/', import.meta.url)) },
       { find: /^~\//, replacement: fileURLToPath(new URL('./src/', import.meta.url)) },
       { find: /^~$/, replacement: fileURLToPath(new URL('./src', import.meta.url)) },
     ],
