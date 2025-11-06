@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 import { useAuth } from '~/hooks/useAuth'
 import api from '~/lib/axios-interceptor'
 import { logger } from '~/lib/logger'
-import { createSWRWrapper } from './helpers/swr-test-helpers'
+import { createSWRWrapper } from '../../helpers/swr-test-helpers'
 
 vi.mock('~/lib/axios-interceptor', () => ({
   default: {
