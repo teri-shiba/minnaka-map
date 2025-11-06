@@ -14,6 +14,7 @@ import { AddFormButton } from './buttons/add-form-button'
 import { RemoveFormButton } from './buttons/remove-form-button'
 import { ResetFormButton } from './buttons/reset-form-button'
 import StationAutocomplete from './station-autocomplete'
+import { useTransition } from 'react'
 
 const MAX_AREA_FIELDS = 6
 const MAX_REQUIRED_FIELDS = 2
@@ -21,6 +22,7 @@ const MAX_REQUIRED_FIELDS = 2
 // TODO: 空フォームがある時、送信できないしトーストも発火しない。→空フォームは無視して送信
 export default function StationSearchForm() {
   const router = useRouter()
+  const [isPending, startTransition] = useTransition()
 
   const form = useForm<AreaFormValues>({
     resolver: zodResolver(stationSearchSchema),
@@ -84,7 +86,11 @@ export default function StationSearchForm() {
         ...(exp && { exp }),
       })
 
-      router.push(`/result?${params}`)
+      // router.push(`/result?${params}`)
+
+      const url = `/result?${params}`
+      router.prefetch(url)
+      startTransition(() => router.push(url))
     }
     catch (error) {
       logger(error, { component: 'StationSearchForm - processValidData' })
@@ -168,12 +174,12 @@ export default function StationSearchForm() {
 
         <Button
           type="submit"
-          disabled={form.formState.isSubmitting}
+          disabled={form.formState.isSubmitting || isPending}
           variant="default"
           size="lg"
           className="block w-full md:inline-block md:w-auto"
         >
-          {form.formState.isSubmitting ? '検索中...' : '検索する'}
+          {(form.formState.isSubmitting || isPending) ? '検索中...' : '検索する'}
         </Button>
       </form>
     </Form>
