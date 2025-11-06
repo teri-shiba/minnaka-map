@@ -3,6 +3,7 @@
 import type { AreaFormValues } from '~/schemas/station-search.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
+import { useTransition } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
@@ -14,7 +15,6 @@ import { AddFormButton } from './buttons/add-form-button'
 import { RemoveFormButton } from './buttons/remove-form-button'
 import { ResetFormButton } from './buttons/reset-form-button'
 import StationAutocomplete from './station-autocomplete'
-import { useTransition } from 'react'
 
 const MAX_AREA_FIELDS = 6
 const MAX_REQUIRED_FIELDS = 2
