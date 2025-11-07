@@ -1,5 +1,5 @@
 class StationIndexSerializer < ActiveModel::Serializer
-  attributes :id, :name, :latitude, :longitude
+  attributes :id, :name
 
   def name
     object.display_name

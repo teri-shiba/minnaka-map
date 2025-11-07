@@ -32,7 +32,7 @@ RSpec.describe "Api::V1::StationsController", type: :request do
         expect(json).to have_key(:stations)
         expect(json[:stations].map {|st| st[:id] }).
           to contain_exactly(s_main.id, s_west.id, s_3rd.id)
-        expect(json[:stations]).to all(include(:id, :name, :latitude, :longitude))
+        expect(json[:stations]).to all(include(:id, :name))
       end
 
       it "一致結果が 0 件なら stations: [] を返す" do
