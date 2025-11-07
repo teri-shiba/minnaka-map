@@ -229,7 +229,6 @@ describe('useAuth', () => {
       vi.mocked(api.delete).mockResolvedValueOnce({ status: 200 })
 
       sessionStorage.setItem('pendingStationIds', '1,2,3')
-      sessionStorage.setItem('pendingSearchHistoryId', '999')
 
       const { result } = renderHook(() => useAuth(), {
         wrapper: createSWRWrapper(),
@@ -247,7 +246,6 @@ describe('useAuth', () => {
       expect(mockMutate).toHaveBeenCalledWith('/current/user/show_status')
       expect(result.current.user.isSignedIn).toBe(false)
       expect(sessionStorage.getItem('pendingStationIds')).toBeNull()
-      expect(sessionStorage.getItem('pendingSearchHistoryId')).toBeNull()
       expect(toast.success).toHaveBeenCalledWith('ログアウトしました')
     })
 
@@ -266,7 +264,6 @@ describe('useAuth', () => {
       )
 
       sessionStorage.setItem('pendingStationIds', '1,2,3')
-      sessionStorage.setItem('pendingSearchHistoryId', '999')
 
       const { result } = renderHook(() => useAuth(), {
         wrapper: createSWRWrapper(),
@@ -281,8 +278,6 @@ describe('useAuth', () => {
       })
 
       expect(result.current.user.isSignedIn).toBe(false)
-      // 失敗でも resetUser() は呼ばれる仕様（セッションは明示削除しない） <- Why
-      // ここでは sessionStorage の削除は保証しない <- Why
     })
   })
 
@@ -300,7 +295,6 @@ describe('useAuth', () => {
       vi.mocked(api.delete).mockResolvedValueOnce({ status: 200 })
 
       sessionStorage.setItem('pendingStationIds', '1,2,3')
-      sessionStorage.setItem('pendingSearchHistoryId', '999')
 
       const { result } = renderHook(() => useAuth(), {
         wrapper: createSWRWrapper(),
@@ -319,7 +313,6 @@ describe('useAuth', () => {
       expect(api.delete).toHaveBeenCalledWith('/auth')
       expect(mockMutate).toHaveBeenCalledWith('/current/user/show_status')
       expect(sessionStorage.getItem('pendingStationIds')).toBeNull()
-      expect(sessionStorage.getItem('pendingSearchHistoryId')).toBeNull()
       expect(toast.success).toHaveBeenCalledWith('アカウントが削除されました')
       expect(returned).toEqual({ success: true })
     })
