@@ -1,16 +1,16 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import type { SavedStation, StationProps } from '~/types/station'
+import type { Station } from '~/types/station'
 import { CommandEmpty, CommandGroup, CommandItem, CommandList } from '~/components/ui/command'
 import Loading from '~/public/figure_loading_circle.svg'
 
 interface StationSuggestionsProps {
   isLoading: boolean
   isError: boolean
-  filteredStations: StationProps[]
-  matchedRecent: SavedStation[]
-  onSelect: (station: StationProps) => void
+  filteredStations: Station[]
+  matchedRecent: Station[]
+  onSelect: (station: Station) => void
 }
 
 function SuggestionsList({ children }: { children: ReactNode }) {
@@ -83,11 +83,7 @@ export default function StationSuggestions({
             <CommandItem
               key={station.id}
               onMouseDown={e => e.preventDefault()}
-              onSelect={() => onSelect({
-                ...station,
-                latitude: Number(station.latitude),
-                longitude: Number(station.longitude),
-              })}
+              onSelect={() => onSelect(station)}
               className="cursor-pointer hover:bg-secondary"
             >
               {station.name}

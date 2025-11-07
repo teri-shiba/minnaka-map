@@ -1,25 +1,49 @@
 import z from 'zod'
 
+// UI制御
 export const stationSearchSchema = z.object({
   area: z.array(
     z.object({
-      areaValue: z.string().trim().min(1, '出発地点を入力してください'),
+      areaValue: z.string().trim().optional().default(''),
       stationId: z.number().nullable(),
-      latitude: z.number().nullable(),
-      longitude: z.number().nullable(),
     }),
-  )
-    .refine(areas => areas.filter(a => a.areaValue.trim() !== '').length >= 2, {
-      message: '出発地点を2つ以上入力してください',
-      path: [],
-    })
-    .refine((areas) => {
-      const values = areas.map(a => a.areaValue.trim()).filter(v => v !== '')
-      return new Set(values).size === values.length
-    }, {
-      message: '同じ出発地点が含まれています',
-      path: [],
-    }),
+  ),
 })
 
-export type AreaFormValues = z.infer<typeof stationSearchSchema>
+export type StationSearchSchema = typeof stationSearchSchema
+export type AreaFormInput = z.input<StationSearchSchema>
+export type AreaFormOutput = z.output<StationSearchSchema>
+
+// フォーム送信
+export const stationSearchSubmitSchema = z.object({
+  area: z.array(
+    z.object({
+      stationId: z.number().nullable(),
+    }),
+  )
+    .superRefine(
+      (data, ctx) => {
+        const stationIds = data
+          .map(item => item.stationId)
+          .filter((id): id is number => id != null)
+
+        if (stationIds.length < 2) {
+          ctx.addIssue({
+            code: 'custom',
+            message: '出発地点を2つ以上入力してください',
+            path: ['area'],
+          })
+        }
+
+        if (new Set(stationIds).size !== stationIds.length) {
+          ctx.addIssue({
+            code: 'custom',
+            message: '同じ出発地点が含まれています',
+            path: ['area'],
+          })
+        }
+      },
+    ),
+})
+
+export type StationSearchSubmit = z.infer<typeof stationSearchSubmitSchema>

@@ -1,6 +1,6 @@
 'use client'
 
-import type { AreaFormValues } from '~/schemas/station-search.schema'
+import type { AreaFormInput, AreaFormOutput } from '~/schemas/station-search.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
 import { Form, FormControl, FormField, FormItem } from '~/components/ui/form'
 import { logger } from '~/lib/logger'
-import { stationSearchSchema } from '~/schemas/station-search.schema'
+import { stationSearchSchema, stationSearchSubmitSchema } from '~/schemas/station-search.schema'
 import { getMidpoint } from '~/services/get-midpoint'
 import { AddFormButton } from './buttons/add-form-button'
 import { RemoveFormButton } from './buttons/remove-form-button'
@@ -19,19 +19,20 @@ import StationAutocomplete from './station-autocomplete'
 const MAX_AREA_FIELDS = 6
 const MAX_REQUIRED_FIELDS = 2
 
-// TODO: 空フォームがある時、送信できないしトーストも発火しない。→空フォームは無視して送信
 export default function StationSearchForm() {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
-  const form = useForm<AreaFormValues>({
+  const defaults: AreaFormInput = {
+    area: [
+      { areaValue: '', stationId: null },
+      { areaValue: '', stationId: null },
+    ],
+  }
+
+  const form = useForm<AreaFormInput, any, AreaFormOutput>({
     resolver: zodResolver(stationSearchSchema),
-    defaultValues: {
-      area: [
-        { areaValue: '', stationId: null, latitude: null, longitude: null },
-        { areaValue: '', stationId: null, latitude: null, longitude: null },
-      ],
-    },
+    defaultValues: defaults,
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
   })
@@ -43,29 +44,26 @@ export default function StationSearchForm() {
 
   const watchedArea = form.watch('area')
 
-  const processValidData = async (data: AreaFormValues) => {
-    const stationIds = data.area
-      .filter(s => s.stationId !== null)
-      .map(s => s.stationId as number)
+  const processValidData = async (data: AreaFormOutput) => {
+    const parsed = stationSearchSubmitSchema.safeParse({ area: data.area })
+    if (!parsed.success) {
+      form.clearErrors('area')
 
-    // sessionStorage 処理
-    if (typeof window !== 'undefined') {
-      const rawPrev = sessionStorage.getItem('pendingStationIds')
-      if (rawPrev) {
-        const prevIds = JSON.parse(rawPrev) as number[]
-        const sortedPrevIds = [...prevIds].sort((a, b) => a - b)
-        const sortedStationIds = [...stationIds].sort((a, b) => a - b)
-
-        const isSameStationIds
-          = sortedPrevIds.length === sortedStationIds.length
-            && sortedPrevIds.every((prevStationId, i) =>
-              prevStationId === sortedStationIds[i])
-
-        if (!isSameStationIds) {
-          sessionStorage.removeItem('pendingSearchHistoryId')
+      for (const issue of parsed.error.issues) {
+        if (issue.path.join('.') === 'area' || issue.path.length === 0) {
+          form.setError('area', { type: 'custom', message: issue.message })
         }
       }
 
+      toast.error(parsed.error.issues[0]?.message ?? '入力内容を確認してください')
+      return
+    }
+
+    const stationIds = data.area
+      .map(s => s.stationId)
+      .filter((id): id is number => id != null)
+
+    if (typeof window !== 'undefined') {
       sessionStorage.setItem('pendingStationIds', JSON.stringify(stationIds))
     }
 
@@ -86,36 +84,22 @@ export default function StationSearchForm() {
         ...(exp && { exp }),
       })
 
-      // router.push(`/result?${params}`)
-
       const url = `/result?${params}`
       router.prefetch(url)
       startTransition(() => router.push(url))
     }
     catch (error) {
-      logger(error, { component: 'StationSearchForm - processValidData' })
-      toast.error('フォームの送信に失敗しました。時間を置いてから、再度お試しください。')
-    }
-  }
-
-  const handleValidationErrors = (errors: any) => {
-    if (errors.area) {
-      if ('root' in errors.area && errors.area.root?.message) {
-        toast.error(errors.area.root.message)
-      }
-      else if (errors.area.message) {
-        toast.error(errors.area.message)
-      }
+      logger(error, {
+        component: 'StationSearchForm',
+        action: 'processValidData',
+      })
+      toast.error('フォームの送信に失敗しました。時間をおいてから、再度お試しください。')
     }
   }
 
   const handleFormEvent = (e: React.FormEvent) => {
     e.preventDefault()
-
-    form.handleSubmit(
-      validData => processValidData(validData),
-      errors => handleValidationErrors(errors),
-    )(e)
+    form.handleSubmit(processValidData)(e)
   }
 
   const renderFieldButtons = (index: number, value: string) => {
@@ -148,18 +132,16 @@ export default function StationSearchForm() {
                       <FormControl>
                         <StationAutocomplete
                           {...field}
-                          value={field.value}
-                          onChange={(value, stationId, latitude, longitude) => {
+                          value={field.value ?? ''}
+                          onChange={(value, stationId) => {
                             field.onChange(value)
                             form.setValue(`area.${index}.stationId`, stationId || null)
-                            form.setValue(`area.${index}.latitude`, latitude ? Number(latitude) : null)
-                            form.setValue(`area.${index}.longitude`, longitude ? Number(longitude) : null)
                           }}
                           placeholder={`${index + 1}人目の出発駅`}
                           excludedStationIds={excludedStationIds}
                         />
                       </FormControl>
-                      {renderFieldButtons(index, field.value)}
+                      {renderFieldButtons(index, field.value ?? '')}
                     </FormItem>
                   )}
                 />
