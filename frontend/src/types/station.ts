@@ -1,13 +1,4 @@
-export interface StationProps {
+export interface Station {
   id: number
   name: string
-  latitude: number
-  longitude: number
-}
-
-export interface SavedStation {
-  id: number
-  name: string
-  latitude: string
-  longitude: string
 }
