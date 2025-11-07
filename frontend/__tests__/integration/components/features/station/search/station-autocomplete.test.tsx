@@ -11,7 +11,7 @@ vi.mock('~/public/figure_loading_circle.svg', () => ({
 }))
 
 const STORAGE_KEY = 'recentStations'
-const DEBOUNCE_MS = 300
+const DEBOUNCE_MS = 500
 
 function StationAutocompleteHarness({ excludedStationIds }: { excludedStationIds?: number[] } = {}) {
   const [value, setValue] = useState('')
@@ -51,8 +51,8 @@ describe('StationAutocomplete', () => {
           if (query === '東京') {
             return HttpResponse.json({
               stations: [
-                { id: 1, name: '東京', latitude: '35.12345', longitude: '139.12345' },
-                { id: 2, name: '東京テレポート', latitude: '35.54321', longitude: '139.54321' },
+                { id: 1, name: '東京' },
+                { id: 2, name: '東京テレポート' },
               ],
             })
           }
@@ -109,8 +109,8 @@ describe('StationAutocomplete', () => {
           if (query === '東京') {
             return HttpResponse.json({
               stations: [
-                { id: 1, name: '東京', latitude: '35.12345', longitude: '139.12345' },
-                { id: 2, name: '東京テレポート', latitude: '35.54321', longitude: '139.54321' },
+                { id: 1, name: '東京' },
+                { id: 2, name: '東京テレポート' },
               ],
             })
           }
@@ -127,7 +127,7 @@ describe('StationAutocomplete', () => {
       fireEvent.input(input, { target: { value: '東京' } })
 
       await act(async () => {
-        await vi.advanceTimersByTimeAsync(300)
+        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
       })
 
       expect(screen.getByText('東京')).toBeInTheDocument()
@@ -141,18 +141,13 @@ describe('StationAutocomplete', () => {
 
       const parsed = JSON.parse(saved!)
       expect(parsed).toHaveLength(1)
-      expect(parsed[0]).toEqual({
-        id: 2,
-        name: '東京テレポート',
-        latitude: '35.54321',
-        longitude: '139.54321',
-      })
+      expect(parsed[0]).toEqual({ id: 2, name: '東京テレポート' })
     })
 
     it('同じ駅を複数回選択したとき、履歴の先頭に移動する', async () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify([
-        { id: 2, name: '東京テレポート', latitude: '35.54321', longitude: '139.54321' },
-        { id: 1, name: '東京', latitude: '35.12345', longitude: '139.12345' },
+        { id: 2, name: '東京テレポート' },
+        { id: 1, name: '東京' },
       ]))
 
       server.use(
@@ -163,8 +158,8 @@ describe('StationAutocomplete', () => {
           if (query === '東京') {
             return HttpResponse.json({
               stations: [
-                { id: 1, name: '東京', latitude: '35.12345', longitude: '139.12345' },
-                { id: 2, name: '東京テレポート', latitude: '35.54321', longitude: '139.54321' },
+                { id: 1, name: '東京' },
+                { id: 2, name: '東京テレポート' },
               ],
             })
           }
@@ -194,11 +189,11 @@ describe('StationAutocomplete', () => {
 
     it('履歴が5件を超えたとき、古い履歴を削除する', async () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify([
-        { id: 2, name: '駅2', latitude: '35.2', longitude: '139.2' },
-        { id: 3, name: '駅3', latitude: '35.3', longitude: '139.3' },
-        { id: 4, name: '駅4', latitude: '35.4', longitude: '139.4' },
-        { id: 5, name: '駅5', latitude: '35.5', longitude: '139.5' },
-        { id: 6, name: '駅6', latitude: '35.6', longitude: '139.6' },
+        { id: 2, name: '駅2' },
+        { id: 3, name: '駅3' },
+        { id: 4, name: '駅4' },
+        { id: 5, name: '駅5' },
+        { id: 6, name: '駅6' },
       ]))
 
       server.use(
@@ -209,7 +204,7 @@ describe('StationAutocomplete', () => {
           if (query === '東京') {
             return HttpResponse.json({
               stations: [
-                { id: 1, name: '東京', latitude: '35.12345', longitude: '139.12345' },
+                { id: 1, name: '東京' },
               ],
             })
           }
@@ -242,8 +237,8 @@ describe('StationAutocomplete', () => {
   describe('検索履歴', () => {
     it('フォーカス時に入力が空のとき、過去検索履歴を表示する', async () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify([
-        { id: 1, name: '東京', latitude: '35.12345', longitude: '139.12345' },
-        { id: 2, name: '新宿', latitude: '35.54321', longitude: '139.54321' },
+        { id: 1, name: '東京' },
+        { id: 2, name: '新宿' },
       ]))
 
       const wrapper = createSWRWrapper()
@@ -263,7 +258,7 @@ describe('StationAutocomplete', () => {
 
     it('過去検索履歴をクリックしたとき、onChange が呼ばれる', async () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify([
-        { id: 1, name: '東京', latitude: '35.12345', longitude: '139.12345' },
+        { id: 1, name: '東京' },
       ]))
 
       const wrapper = createSWRWrapper()
@@ -292,8 +287,8 @@ describe('StationAutocomplete', () => {
           if (query === '東京') {
             return HttpResponse.json({
               stations: [
-                { id: 1, name: '東京', latitude: '35.12345', longitude: '139.12345' },
-                { id: 2, name: '東京テレポート', latitude: '35.54321', longitude: '139.54321' },
+                { id: 1, name: '東京' },
+                { id: 2, name: '東京テレポート' },
               ],
             })
           }
@@ -324,8 +319,8 @@ describe('StationAutocomplete', () => {
 
     it('除外対象の駅IDは過去検索履歴にも表示しない', async () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify([
-        { id: 1, name: '東京', latitude: '35.12345', longitude: '139.12345' },
-        { id: 2, name: '新宿', latitude: '35.54321', longitude: '139.54321' },
+        { id: 1, name: '東京' },
+        { id: 2, name: '新宿' },
       ]))
 
       const wrapper = createSWRWrapper()
