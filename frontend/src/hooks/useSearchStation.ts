@@ -6,7 +6,7 @@ import { useDebounce } from './useDebounce'
 const fetcher = (url: string) => fetch(url).then(response => response.json())
 
 export default function useSearchStation(query: string) {
-  const debouncedQuery = useDebounce(query.trim(), 300)
+  const debouncedQuery = useDebounce(query.trim(), 500)
 
   let url: string | null = null
 
