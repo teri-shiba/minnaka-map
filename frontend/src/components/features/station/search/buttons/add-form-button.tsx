@@ -19,6 +19,7 @@ export function AddFormButton({ fields, append }: AddFormButtonProps) {
 
   return (
     <Button
+      aria-label="追加"
       type="button"
       onClick={handleAddForm}
       variant="link"
