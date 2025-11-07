@@ -13,6 +13,7 @@ interface ResetFormButtonProps {
 export function ResetFormButton({ form, index }: ResetFormButtonProps) {
   return (
     <Button
+      aria-label="リセット"
       type="button"
       size="icon"
       onClick={() => { form.resetField(`area.${index}.areaValue`) }}

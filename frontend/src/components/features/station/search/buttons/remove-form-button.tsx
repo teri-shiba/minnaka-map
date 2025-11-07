@@ -11,6 +11,7 @@ interface FormRemoveButtonProps {
 export function RemoveFormButton({ index, remove }: FormRemoveButtonProps) {
   return (
     <Button
+      aria-label="削除"
       type="button"
       size="icon"
       onClick={() => { remove(index) }}
