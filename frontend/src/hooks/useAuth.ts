@@ -88,7 +88,6 @@ export function useAuth() {
         mutate('/current/user/show_status')
         resetUser()
         sessionStorage.removeItem('pendingStationIds')
-        sessionStorage.removeItem('pendingSearchHistoryId')
         toast.success('ログアウトしました')
       }
       catch {
@@ -104,7 +103,6 @@ export function useAuth() {
       await mutate('/current/user/show_status')
       resetUser()
       sessionStorage.removeItem('pendingStationIds')
-      sessionStorage.removeItem('pendingSearchHistoryId')
 
       toast.success('アカウントが削除されました')
       return { success: true }
