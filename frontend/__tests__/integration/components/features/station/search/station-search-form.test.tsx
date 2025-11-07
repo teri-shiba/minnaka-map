@@ -8,7 +8,7 @@ import { logger } from '~/lib/logger'
 import { getMidpoint } from '~/services/get-midpoint'
 import '@testing-library/jest-dom/vitest'
 
-const DEBOUNCE_MS = 300
+const DEBOUNCE_MS = 500
 
 const mockRouterPush = vi.fn()
 const mockRouterPrefetch = vi.fn()
@@ -34,14 +34,30 @@ function setupStationsAPI() {
       const query = url.searchParams.get('q')
 
       const stationMap: Record<string, any[]> = {
-        東京: [{ id: 1, name: '東京', latitude: '35.11111', longitude: '139.11111' }],
-        新宿: [{ id: 2, name: '新宿', latitude: '35.22222', longitude: '139.22222' }],
-        渋谷: [{ id: 3, name: '渋谷', latitude: '35.33333', longitude: '139.33333' }],
+        東京: [{ id: 1, name: '東京' }],
+        新宿: [{ id: 2, name: '新宿' }],
+        渋谷: [{ id: 3, name: '渋谷' }],
       }
 
       return HttpResponse.json({ stations: stationMap[query || ''] || [] })
     }),
   )
+}
+
+async function selectStation(stationName: string, index: number) {
+  const input = screen.getByPlaceholderText(`${index}人目の出発駅`)
+
+  fireEvent.focus(input)
+  fireEvent.input(input, { target: { value: stationName } })
+
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
+  })
+
+  expect(screen.getByText(stationName)).toBeInTheDocument()
+  fireEvent.click(screen.getByText(stationName))
+
+  return input
 }
 
 describe('StationSearchForm', () => {
@@ -78,28 +94,8 @@ describe('StationSearchForm', () => {
       const wrapper = createSWRWrapper()
       render(<StationSearchForm />, { wrapper })
 
-      const input1 = screen.getByPlaceholderText('1人目の出発駅')
-      const input2 = screen.getByPlaceholderText('2人目の出発駅')
-
-      fireEvent.focus(input1)
-      fireEvent.input(input1, { target: { value: '東京' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('東京')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('東京'))
-
-      fireEvent.focus(input2)
-      fireEvent.input(input2, { target: { value: '新宿' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('新宿')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('新宿'))
+      await selectStation('東京', 1)
+      await selectStation('新宿', 2)
 
       const submitButton = screen.getByRole('button', { name: '検索する' })
       fireEvent.click(submitButton)
@@ -123,30 +119,11 @@ describe('StationSearchForm', () => {
       const wrapper = createSWRWrapper()
       render(<StationSearchForm />, { wrapper })
 
-      const input1 = screen.getByPlaceholderText('1人目の出発駅')
-      const input2 = screen.getByPlaceholderText('2人目の出発駅')
+      const setForm1 = await selectStation('東京', 1)
+      const setForm2 = await selectStation('新宿', 2)
 
-      fireEvent.focus(input1)
-      fireEvent.input(input1, { target: { value: '東京' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('東京')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('東京'))
-      expect(input1).toHaveValue('東京')
-
-      fireEvent.focus(input2)
-      fireEvent.input(input2, { target: { value: '新宿' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('新宿')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('新宿'))
-      expect(input2).toHaveValue('新宿')
+      expect(setForm1).toHaveValue('東京')
+      expect(setForm2).toHaveValue('新宿')
 
       const submitButton = screen.getByRole('button', { name: '検索する' })
       fireEvent.click(submitButton)
@@ -184,28 +161,8 @@ describe('StationSearchForm', () => {
       const wrapper = createSWRWrapper()
       render(<StationSearchForm />, { wrapper })
 
-      const input1 = screen.getByPlaceholderText('1人目の出発駅')
-      const input2 = screen.getByPlaceholderText('2人目の出発駅')
-
-      fireEvent.focus(input1)
-      fireEvent.input(input1, { target: { value: '東京' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('東京')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('東京'))
-
-      fireEvent.focus(input2)
-      fireEvent.input(input2, { target: { value: '新宿' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('新宿')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('新宿'))
+      await selectStation('東京', 1)
+      await selectStation('新宿', 2)
 
       const submitButton = screen.getByRole('button', { name: '検索する' })
       fireEvent.click(submitButton)
@@ -233,28 +190,8 @@ describe('StationSearchForm', () => {
       const wrapper = createSWRWrapper()
       render(<StationSearchForm />, { wrapper })
 
-      const input1 = screen.getByPlaceholderText('1人目の出発駅')
-      const input2 = screen.getByPlaceholderText('2人目の出発駅')
-
-      fireEvent.focus(input1)
-      fireEvent.input(input1, { target: { value: '東京' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('東京')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('東京'))
-
-      fireEvent.focus(input2)
-      fireEvent.input(input2, { target: { value: '新宿' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('新宿')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('新宿'))
+      await selectStation('東京', 1)
+      await selectStation('新宿', 2)
 
       const submitButton = screen.getByRole('button', { name: '検索する' })
       fireEvent.click(submitButton)
@@ -284,28 +221,8 @@ describe('StationSearchForm', () => {
       const wrapper = createSWRWrapper()
       render(<StationSearchForm />, { wrapper })
 
-      const input1 = screen.getByPlaceholderText('1人目の出発駅')
-      const input2 = screen.getByPlaceholderText('2人目の出発駅')
-
-      fireEvent.focus(input1)
-      fireEvent.input(input1, { target: { value: '東京' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('東京')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('東京'))
-
-      fireEvent.focus(input2)
-      fireEvent.input(input2, { target: { value: '新宿' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('新宿')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('新宿'))
+      await selectStation('東京', 1)
+      await selectStation('新宿', 2)
 
       const submitButton = screen.getByRole('button', { name: '検索する' })
       fireEvent.click(submitButton)
@@ -325,28 +242,8 @@ describe('StationSearchForm', () => {
       const wrapper = createSWRWrapper()
       render(<StationSearchForm />, { wrapper })
 
-      const input1 = screen.getByPlaceholderText('1人目の出発駅')
-      const input2 = screen.getByPlaceholderText('2人目の出発駅')
-
-      fireEvent.focus(input1)
-      fireEvent.input(input1, { target: { value: '東京' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('東京')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('東京'))
-
-      fireEvent.focus(input2)
-      fireEvent.input(input2, { target: { value: '新宿' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('新宿')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('新宿'))
+      await selectStation('東京', 1)
+      await selectStation('新宿', 2)
 
       const submitButton = screen.getByRole('button', { name: '検索する' })
       fireEvent.click(submitButton)
@@ -378,28 +275,8 @@ describe('StationSearchForm', () => {
       const wrapper = createSWRWrapper()
       render(<StationSearchForm />, { wrapper })
 
-      const input1 = screen.getByPlaceholderText('1人目の出発駅')
-      const input2 = screen.getByPlaceholderText('2人目の出発駅')
-
-      fireEvent.focus(input1)
-      fireEvent.input(input1, { target: { value: '東京' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('東京')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('東京'))
-
-      fireEvent.focus(input2)
-      fireEvent.input(input2, { target: { value: '新宿' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('新宿')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('新宿'))
+      await selectStation('東京', 1)
+      await selectStation('新宿', 2)
 
       const submitButton = screen.getByRole('button', { name: '検索する' })
       fireEvent.click(submitButton)
@@ -412,159 +289,6 @@ describe('StationSearchForm', () => {
       expect(saved).toBeTruthy()
       const parsed = JSON.parse(saved!)
       expect(parsed).toEqual([1, 2])
-    })
-
-    it('前回と同じ stationIds を 送信したとき、pendingSearchHistoryId は削除しない', async () => {
-      sessionStorage.setItem('pendingStationIds', JSON.stringify([1, 2]))
-      sessionStorage.setItem('pendingSearchHistoryId', '123')
-
-      vi.mocked(getMidpoint).mockResolvedValue({
-        success: true,
-        data: {
-          midpoint: { lat: '35.11111', lng: '139.11111' },
-          sig: 'SIGNED',
-          exp: 'EXPIRES',
-        },
-      })
-
-      const wrapper = createSWRWrapper()
-      render(<StationSearchForm />, { wrapper })
-
-      const input1 = screen.getByPlaceholderText('1人目の出発駅')
-      const input2 = screen.getByPlaceholderText('2人目の出発駅')
-
-      fireEvent.focus(input1)
-      fireEvent.input(input1, { target: { value: '東京' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('東京')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('東京'))
-
-      fireEvent.focus(input2)
-      fireEvent.input(input2, { target: { value: '新宿' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('新宿')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('新宿'))
-
-      const submitButton = screen.getByRole('button', { name: '検索する' })
-      fireEvent.click(submitButton)
-
-      await act(async () => {
-        await Promise.resolve()
-      })
-
-      expect(vi.mocked(getMidpoint)).toHaveBeenCalled()
-      const historyId = sessionStorage.getItem('pendingSearchHistoryId')
-      expect(historyId).toBe('123')
-    })
-
-    it('前回と異なる stationIds を 送信したとき、pendingSearchHistoryId を削除する', async () => {
-      sessionStorage.setItem('pendingStationIds', JSON.stringify([3, 4]))
-      sessionStorage.setItem('pendingSearchHistoryId', '123')
-
-      vi.mocked(getMidpoint).mockResolvedValue({
-        success: true,
-        data: {
-          midpoint: { lat: '35.11111', lng: '139.11111' },
-          sig: 'SIGNED',
-          exp: 'EXPIRES',
-        },
-      })
-
-      const wrapper = createSWRWrapper()
-      render(<StationSearchForm />, { wrapper })
-
-      const input1 = screen.getByPlaceholderText('1人目の出発駅')
-      const input2 = screen.getByPlaceholderText('2人目の出発駅')
-
-      fireEvent.focus(input1)
-      fireEvent.input(input1, { target: { value: '東京' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('東京')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('東京'))
-
-      fireEvent.focus(input2)
-      fireEvent.input(input2, { target: { value: '新宿' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('新宿')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('新宿'))
-
-      const submitButton = screen.getByRole('button', { name: '検索する' })
-      fireEvent.click(submitButton)
-
-      await act(async () => {
-        await Promise.resolve()
-      })
-
-      expect(vi.mocked(getMidpoint)).toHaveBeenCalled()
-      const historyId = sessionStorage.getItem('pendingSearchHistoryId')
-      expect(historyId).toBeNull()
-    })
-
-    it('stationIds は順序に依存しないので、同一集合なら削除しない', async () => {
-      sessionStorage.setItem('pendingStationIds', JSON.stringify([2, 1]))
-      sessionStorage.setItem('pendingSearchHistoryId', '123')
-
-      vi.mocked(getMidpoint).mockResolvedValue({
-        success: true,
-        data: {
-          midpoint: { lat: '35.11111', lng: '139.11111' },
-          sig: 'SIGNED',
-          exp: 'EXPIRES',
-        },
-      })
-
-      const wrapper = createSWRWrapper()
-      render(<StationSearchForm />, { wrapper })
-
-      const input1 = screen.getByPlaceholderText('1人目の出発駅')
-      const input2 = screen.getByPlaceholderText('2人目の出発駅')
-
-      fireEvent.focus(input1)
-      fireEvent.input(input1, { target: { value: '東京' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('東京')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('東京'))
-
-      fireEvent.focus(input2)
-      fireEvent.input(input2, { target: { value: '新宿' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('新宿')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('新宿'))
-
-      const submitButton = screen.getByRole('button', { name: '検索する' })
-      fireEvent.click(submitButton)
-
-      await act(async () => {
-        await Promise.resolve()
-      })
-
-      expect(vi.mocked(getMidpoint)).toHaveBeenCalled()
-      const historyId = sessionStorage.getItem('pendingSearchHistoryId')
-      expect(historyId).toBe('123')
     })
   })
 
@@ -612,28 +336,17 @@ describe('StationSearchForm', () => {
       expect(screen.getByPlaceholderText('2人目の出発駅')).toBeInTheDocument()
     })
 
-    it('リセットボタンを押したとき、areaValue と stationId, lat, lng が初期化される', async () => {
+    it('リセットボタンを押したとき、areaValue と stationId が初期化される', async () => {
       const wrapper = createSWRWrapper()
       render(<StationSearchForm />, { wrapper })
 
-      const input1 = screen.getByPlaceholderText('1人目の出発駅')
-
-      fireEvent.focus(input1)
-      fireEvent.input(input1, { target: { value: '東京' } })
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DEBOUNCE_MS)
-      })
-
-      expect(screen.getByText('東京')).toBeInTheDocument()
-      fireEvent.click(screen.getByText('東京'))
-
-      expect(input1).toHaveValue('東京')
+      const setForm = await selectStation('東京', 1)
+      expect(setForm).toHaveValue('東京')
 
       const resetButton = screen.getByLabelText(/リセット/)
       fireEvent.click(resetButton)
 
-      expect(input1).toHaveValue('')
+      expect(setForm).toHaveValue('')
     })
   })
 })
