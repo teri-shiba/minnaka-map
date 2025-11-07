@@ -1,4 +1,4 @@
-'use clinet'
+'use client'
 
 import { LuMinus } from 'react-icons/lu'
 import { Button } from '~/components/ui/button'
