@@ -20,7 +20,7 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
         }.to change { User.count }.by(1).
                and change { UserAuth.count }.by(1)
 
-        expect(response).to redirect_to("#{front_domain}/?status=success")
+        expect(response).to redirect_to("#{front_domain}/?success=login")
       end
 
       it "作成された User と UserAuth の属性が正しいこと" do
@@ -46,7 +46,7 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
           get "/api/v1/auth/#{provider}/callback"
         }.to not_change { User.count }.and not_change { UserAuth.count }
 
-        expect(response).to redirect_to("#{front_domain}/?status=success")
+        expect(response).to redirect_to("#{front_domain}/?success=login")
       end
     end
 
@@ -64,7 +64,7 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
         uri = URI.parse(response.location)
         params = CGI.parse(uri.query)
 
-        expect(params["status"]).to eq(["error"])
+        expect(params["error"]).to eq(["duplicate_email"])
 
         expected_message = "#{UserAuth.human_attribute_name(:email)}" \
                          "#{I18n.t("activerecord.errors.models.user_auth.attributes.email.taken")}"
@@ -89,7 +89,7 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
           get "/api/v1/auth/#{provider}/callback"
         }.to change { User.count }.by(1).and change { UserAuth.count }.by(1)
 
-        expect(response).to redirect_to("#{front_domain}/?status=success")
+        expect(response).to redirect_to("#{front_domain}/?success=login")
 
         created_user_auth = UserAuth.last
         expect(created_user_auth.provider).to eq(provider)
@@ -106,7 +106,7 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
           get "/api/v1/auth/#{provider}/callback"
         }.to not_change { User.count }.and not_change { UserAuth.count }
 
-        expect(response).to redirect_to("#{front_domain}/?status=success")
+        expect(response).to redirect_to("#{front_domain}/?success=login")
       end
     end
 
@@ -124,7 +124,7 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
         uri = URI.parse(response.location)
         params = CGI.parse(uri.query)
 
-        expect(params["status"]).to eq(["error"])
+        expect(params["error"]).to eq(["duplicate_email"])
 
         expected_message = "#{UserAuth.human_attribute_name(:email)}" \
                          "#{I18n.t("activerecord.errors.models.user_auth.attributes.email.taken")}"
@@ -137,7 +137,7 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
     it "エラーページにリダイレクトすること" do
       get "/api/v1/auth/failure"
 
-      expect(response).to redirect_to("#{front_domain}/?status=error")
+      expect(response).to redirect_to("#{front_domain}/?error=network_error")
     end
   end
 end
