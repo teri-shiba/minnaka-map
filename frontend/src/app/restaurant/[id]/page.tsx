@@ -9,6 +9,7 @@ import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
 import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import { getFavoriteInitialData } from '~/services/get-favorite-initial-data'
 import { getGoogleMapsEmbedUrl } from '~/services/get-google-maps-embed-url'
+import { mapCauseToErrorCode } from '~/utils/map-cause-to-error-code'
 
 interface RestaurantDetailPageProps {
   params: Promise<{ id: string }>
@@ -24,15 +25,8 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
     if (result.cause === 'NOT_FOUND')
       notFound()
 
-    // TODO: cause からリダイレクトパスに変換する関数を使用する
-    const error
-      = result.cause === 'RATE_LIMIT'
-        ? 'rate_limit_exceeded'
-        : result.cause === 'SERVER_ERROR'
-          ? 'server_error'
-          : 'restaurant_fetch_failed'
-
-    redirect(`/?error=${error}`)
+    const errorCode = mapCauseToErrorCode(result.cause)
+    redirect(`/?error=${errorCode}`)
   }
 
   const auth = await getAuthFromCookie()

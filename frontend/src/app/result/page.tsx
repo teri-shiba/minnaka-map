@@ -11,7 +11,7 @@ import { issueFavoriteTokens } from '~/services/issue-favorite-tokens'
 import { parseAndValidateCoords } from '~/services/parse-and-validate-coords'
 import { saveSearchHistory } from '~/services/save-search-history'
 import { verifyCoordsSignature } from '~/services/verify-coords-signature'
-import { isServiceSuccess } from '~/types/service-result'
+import { mapCauseToErrorCode } from '~/utils/map-cause-to-error-code'
 
 export interface TokenInfo {
   token: string
@@ -85,18 +85,9 @@ export default async function Result({ searchParams }: ResultPageProps) {
     exp: params.exp,
   })
 
-  // TODO: cause からリダイレクトパスに変換する関数を使用する
-  if (!isServiceSuccess(verifyResult)) {
-    const key
-      = verifyResult.cause === 'EXPIRED'
-        ? 'link_expired'
-        : verifyResult.cause === 'INVALID_SIGNATURE'
-          ? 'validation_failed'
-          : verifyResult.cause === 'NETWORK'
-            ? 'network_error'
-            : verifyResult.cause === 'SERVER_ERROR' ? 'validation_error' : 'validation_error'
-
-    redirect(`/?error=${key}`)
+  if (!verifyResult.success) {
+    const errorCode = mapCauseToErrorCode(verifyResult.cause)
+    redirect(`/?error=${errorCode}`)
   }
 
   const midpoint = verifyResult.data
@@ -112,16 +103,9 @@ export default async function Result({ searchParams }: ResultPageProps) {
     genre: genreCode,
   })
 
-  // TODO: cause からリダイレクトパスに変換する関数を使用する
   if (!restaurantsResult.success) {
-    const key
-      = restaurantsResult.cause === 'RATE_LIMIT'
-        ? 'rate_limit_exceeded'
-        : restaurantsResult.cause === 'SERVER_ERROR'
-          ? 'server_error'
-          : 'restaurant_fetch_failed'
-
-    redirect(`/?error=${key}`)
+    const errorCode = mapCauseToErrorCode(restaurantsResult.cause)
+    redirect(`/?error=${errorCode}`)
   }
 
   const { items, pagination } = restaurantsResult.data
