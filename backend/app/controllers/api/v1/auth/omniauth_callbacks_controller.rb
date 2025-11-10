@@ -16,11 +16,11 @@ class Api::V1::Auth::OmniauthCallbacksController < DeviseTokenAuth::OmniauthCall
 
     set_token_in_cookie(@resource, @token) if DeviseTokenAuth.cookie_enabled
 
-    redirect_to "#{Settings.front_domain}/?status=success", allow_other_host: true
+    redirect_to "#{Settings.front_domain}/?success=login", allow_other_host: true
   end
 
   def omniauth_failure
-    redirect_to "#{Settings.front_domain}/?status=error", allow_other_host: true
+    redirect_to "#{Settings.front_domain}/?error=network_error", allow_other_host: true
   end
 
   private
@@ -43,7 +43,7 @@ class Api::V1::Auth::OmniauthCallbacksController < DeviseTokenAuth::OmniauthCall
         attr = UserAuth.human_attribute_name(:email)
         suffix = I18n.t("activerecord.errors.models.user_auth.attributes.email.taken")
         message = "#{attr}#{suffix}"
-        query = { status: "error", message: }.to_query
+        query = { error: "duplicate_email", message: }.to_query
         redirect_to "#{Settings.front_domain}/?#{query}", allow_other_host: true
         return true
       end
