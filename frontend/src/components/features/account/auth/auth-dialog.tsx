@@ -2,8 +2,7 @@
 
 import { useAtom } from 'jotai'
 import Image from 'next/image'
-import { usePathname, useSearchParams } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '~/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog'
 import { AUTH_PROVIDERS } from '~/constants'
@@ -15,13 +14,6 @@ import SignUpForm from './forms/signup-form'
 export function AuthDialog() {
   const [open, setOpen] = useAtom(authModalOpenAtom)
   const [isLogin, setIsLogin] = useState(true)
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-
-  const fullPath = useMemo(() => {
-    const params = searchParams.toString()
-    return params ? `${pathname}?${params}` : pathname
-  }, [pathname, searchParams])
 
   const handleClick = () => {
     setIsLogin(!isLogin)
@@ -70,7 +62,7 @@ export function AuthDialog() {
           {AUTH_PROVIDERS.map(item => (
             <a
               key={item.name}
-              href={getOAuthUrl(item.provider, fullPath)}
+              href={getOAuthUrl(item.provider)}
               className="flex h-auto items-center justify-center gap-2 rounded-md border border-input py-3 text-sm font-bold transition-colors hover:bg-accent"
             >
               <Image
