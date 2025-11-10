@@ -7,7 +7,9 @@ let currentQuery = ''
 const routerReplaceSpy = vi.fn()
 
 vi.mock('next/navigation', () => ({
-  useRouter: vi.fn(() => ({ replace: routerReplaceSpy })),
+  useRouter: vi.fn(() => ({
+    replace: routerReplaceSpy,
+  })),
   useSearchParams: vi.fn(() => new URLSearchParams(currentQuery)),
 }))
 
@@ -59,88 +61,55 @@ describe('useOAuthCallback', () => {
     vi.resetAllMocks()
   })
 
-  it('status: success でログイン検証に成功したとき、ユーザー情報を更新しトップページに遷移する', async () => {
-    setSearchParams('status=success')
-    const response = { data: { login: true, user: { id: 1 } } }
-    vi.mocked(api.get).mockResolvedValueOnce(response)
+  it('success=login で login:true なら、ユーザーを再検証して終了', async () => {
+    setSearchParams('success=login')
+    vi.mocked(api.get).mockResolvedValueOnce({ data: { login: true } })
 
     renderHook(() => useOAuthCallback())
 
     await waitFor(() => {
-      expect(api.get).toHaveBeenCalledTimes(1)
       expect(api.get).toHaveBeenCalledWith('/current/user/show_status')
-
-      expect(toast.promise).toHaveBeenCalledTimes(1)
       expect(mockMutate).toHaveBeenCalledWith('/current/user/show_status')
-      expect(routerReplaceSpy).toHaveBeenCalledWith('/', { scroll: false })
     })
   })
 
-  it('status: success でログイン検証に失敗したとき、ユーザー情報をリセットしエラーを表示する', async () => {
-    setSearchParams('status=success')
-    const response = { data: { login: false } }
-    vi.mocked(api.get).mockResolvedValueOnce(response)
+  it('success=login で login:false なら、reset して /?error=... に遷移', async () => {
+    setSearchParams('success=login')
+    vi.mocked(api.get).mockResolvedValueOnce({ data: { login: false } })
 
     renderHook(() => useOAuthCallback())
 
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith('/current/user/show_status')
-
       expect(mockResetUser).toHaveBeenCalledTimes(1)
-      expect(toast.promise).toHaveBeenCalledTimes(1)
-      expect(routerReplaceSpy).toHaveBeenCalledWith('/', { scroll: false })
     })
   })
 
-  it('status: success だがAPI呼び出しに失敗したとき、ユーザー状態をリセットしエラーを表示する', async () => {
-    setSearchParams('status=success')
+  it('success=login だが API 失敗なら reset し /?error=... に遷移', async () => {
+    setSearchParams('success=login')
     vi.mocked(api.get).mockRejectedValueOnce(new Error('ログインに失敗しました'))
 
     renderHook(() => useOAuthCallback())
 
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith('/current/user/show_status')
-
       expect(mockResetUser).toHaveBeenCalledTimes(1)
-      expect(toast.error).toHaveBeenCalledWith('ログインに失敗しました')
       expect(mockMutate).not.toHaveBeenCalled()
+      expect(routerReplaceSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/^\/\?error=/),
+        { scroll: false },
+      )
     })
   })
 
-  it('status: error でメッセージがあるとき、デコードされたメッセージを表示しユーザー状態をリセットする', async () => {
-    const errorMessage = encodeURIComponent('ログインに失敗しました')
-    setSearchParams(`status=error&message=${errorMessage}`)
+  it('error パラメータがあれば、reset のみ実行する', async () => {
+    setSearchParams(`error=network_error`)
 
     renderHook(() => useOAuthCallback())
 
     await waitFor(() => {
       expect(mockResetUser).toHaveBeenCalledTimes(1)
-      expect(toast.error).toHaveBeenCalledWith('ログインに失敗しました')
-      expect(routerReplaceSpy).toHaveBeenCalledWith('/', { scroll: false })
       expect(api.get).not.toHaveBeenCalled()
-    })
-  })
-
-  it('status: error でメッセージがないとき、デフォルトのエラーメッセージを表示する', async () => {
-    setSearchParams(`status=error`)
-
-    renderHook(() => useOAuthCallback())
-
-    await waitFor(() => {
-      expect(mockResetUser).toHaveBeenCalledTimes(1)
-      expect(toast.error).toHaveBeenCalledWith('不正なアクセスです')
-      expect(routerReplaceSpy).toHaveBeenCalledWith('/', { scroll: false })
-    })
-  })
-
-  it('status が不明な値のとき、デフォルトのエラーメッセージを表示する', async () => {
-    setSearchParams(`status=unknown`)
-
-    renderHook(() => useOAuthCallback())
-
-    await waitFor(() => {
-      expect(mockResetUser).toHaveBeenCalledTimes(1)
-      expect(toast.error).toHaveBeenCalledWith('不正なアクセスです')
     })
   })
 
@@ -152,8 +121,6 @@ describe('useOAuthCallback', () => {
     await waitFor(() => {
       expect(api.get).not.toHaveBeenCalled()
       expect(mockResetUser).not.toHaveBeenCalled()
-      expect(toast.error).not.toHaveBeenCalled()
-      expect(routerReplaceSpy).not.toHaveBeenCalled()
     }, { timeout: 100 })
   })
 })
