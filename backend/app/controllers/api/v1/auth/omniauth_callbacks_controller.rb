@@ -16,17 +16,11 @@ class Api::V1::Auth::OmniauthCallbacksController < DeviseTokenAuth::OmniauthCall
 
     set_token_in_cookie(@resource, @token) if DeviseTokenAuth.cookie_enabled
 
-    redirect_path = session.delete("omniauth.redirect_to") || "/"
-
-    separator = redirect_path.include?("?") ? "&" : "?"
-    redirect_to "#{Settings.front_domain}#{redirect_path}#{separator}status=success", allow_other_host: true
+    redirect_to "#{Settings.front_domain}/?status=success", allow_other_host: true
   end
 
   def omniauth_failure
-    redirect_path = session.delete("omniauth.redirect_to") || "/"
-
-    separator = redirect_path.include?("?") ? "&" : "?"
-    redirect_to "#{Settings.front_domain}#{redirect_path}#{separator}status=error", allow_other_host: true
+    redirect_to "#{Settings.front_domain}/?status=error", allow_other_host: true
   end
 
   private
@@ -46,7 +40,6 @@ class Api::V1::Auth::OmniauthCallbacksController < DeviseTokenAuth::OmniauthCall
       email_exists = resource_class.exists?(email: email)
 
       if new_sns_user && email_exists
-
         attr = UserAuth.human_attribute_name(:email)
         suffix = I18n.t("activerecord.errors.models.user_auth.attributes.email.taken")
         message = "#{attr}#{suffix}"
