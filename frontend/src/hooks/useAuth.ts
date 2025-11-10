@@ -1,19 +1,24 @@
 'use client'
 
+import type { ServiceCause } from '~/types/service-result'
 import { useAtom } from 'jotai'
 import { useResetAtom } from 'jotai/utils'
+import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 import useSWR, { useSWRConfig } from 'swr'
+import { SUCCESS_MESSAGE } from '~/constants/toast-messages'
 import api from '~/lib/axios-interceptor'
 import { logger } from '~/lib/logger'
 import { userStateAtom } from '~/state/user-state.atom'
+import { mapCauseToErrorCode } from '~/utils/map-cause-to-error-code'
 
 const appOrigin = process.env.NEXT_PUBLIC_FRONT_BASE_URL
 
 type DeleteAccountResult = { success: true } | { success: false, error: unknown }
 
 export function useAuth() {
+  const router = useRouter()
   const [user, setUser] = useAtom(userStateAtom)
   const resetUser = useResetAtom(userStateAtom)
   const { mutate } = useSWRConfig()
@@ -58,13 +63,16 @@ export function useAuth() {
           password,
           confirm_success_url: appOrigin,
         })
-        toast.success('認証メールをご確認ください')
+        router.replace('/?success=email_sent')
       }
-      catch {
+      catch (error) {
         resetUser()
+        const cause = (error as { cause?: ServiceCause })?.cause ?? 'NETWORK'
+        const errorCode = mapCauseToErrorCode(cause)
+        router.replace(`/?error=${errorCode}`)
       }
     },
-    [resetUser],
+    [resetUser, router],
   )
 
   const login = useCallback(
@@ -72,39 +80,48 @@ export function useAuth() {
       try {
         await api.post('/auth/sign_in', { email, password })
         await mutate('/current/user/show_status')
-        toast.success('ログインに成功しました')
+        router.replace('/?success=login', { scroll: false })
       }
-      catch {
+      catch (error) {
         resetUser()
+        const cause = (error as { cause?: ServiceCause })?.cause ?? 'NETWORK'
+        const errorCode = mapCauseToErrorCode(cause)
+        router.replace(`/?error=${errorCode}`)
       }
     },
-    [mutate, resetUser],
+    [mutate, resetUser, router],
   )
 
   const logout = useCallback(
     async () => {
       try {
         await api.delete('/auth/sign_out')
-        mutate('/current/user/show_status')
-        resetUser()
         sessionStorage.removeItem('pendingStationIds')
-        toast.success('ログアウトしました')
-      }
-      catch {
         resetUser()
+
+        toast.success(SUCCESS_MESSAGE.logout)
+        void mutate('/current/user/show_status')
+
+        router.replace('/')
+      }
+      catch (error) {
+        resetUser()
+        const cause = (error as { cause?: ServiceCause })?.cause ?? 'NETWORK'
+        const errorCode = mapCauseToErrorCode(cause)
+        router.replace(`/?error=${errorCode}`)
       }
     },
-    [mutate, resetUser],
+    [mutate, resetUser, router],
   )
 
   const deleteAccount = useCallback(async (): Promise<DeleteAccountResult> => {
     try {
       await api.delete('/auth')
-      await mutate('/current/user/show_status')
-      resetUser()
       sessionStorage.removeItem('pendingStationIds')
+      resetUser()
 
-      toast.success('アカウントが削除されました')
+      await mutate('/current/user/show_status')
+      router.replace('/?success=account_deleted')
       return { success: true }
     }
     catch (error) {
@@ -116,10 +133,12 @@ export function useAuth() {
           provider: user?.provider ?? 'unknown',
         },
       })
-      toast.error('アカウントの削除に失敗しました')
+      const cause = (error as { cause?: ServiceCause })?.cause ?? 'NETWORK'
+      const errorCode = mapCauseToErrorCode(cause)
+      router.replace(`/?error=${errorCode}`)
       return { success: false, error }
     }
-  }, [mutate, resetUser, user?.id, user?.provider])
+  }, [mutate, resetUser, user?.id, user?.provider, router])
 
   return {
     user,

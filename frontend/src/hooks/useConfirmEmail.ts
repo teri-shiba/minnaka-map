@@ -1,12 +1,13 @@
 'use client'
 
+import type { ServiceCause } from '~/types/service-result'
 import { useSetAtom } from 'jotai'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
-import { toast } from 'sonner'
 import api from '~/lib/axios-interceptor'
 import { logger } from '~/lib/logger'
 import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
+import { mapCauseToErrorCode } from '~/utils/map-cause-to-error-code'
 
 export default function useConfirmEmail() {
   const router = useRouter()
@@ -20,24 +21,18 @@ export default function useConfirmEmail() {
 
     const confirmEmail = async () => {
       try {
-        await toast.promise(
-          api.patch('/user/confirmations', { confirmation_token: token }),
-          {
-            loading: '確認中…',
-            success: 'メールアドレスの確認が完了しました',
-          },
-        )
-
+        await api.patch('/user/confirmations', { confirmation_token: token })
         setModalOpen(true)
+        router.replace('/?success=email_confirmed', { scroll: false })
       }
       catch (error) {
         logger(error, {
           component: 'useConfirmEmail',
           action: 'confirmEmail',
         })
-      }
-      finally {
-        router.replace('/', { scroll: false })
+        const cause = (error as { cause?: ServiceCause })?.cause ?? 'NETWORK'
+        const errorCode = mapCauseToErrorCode(cause)
+        router.replace(`/?error=${errorCode}`)
       }
     }
 
