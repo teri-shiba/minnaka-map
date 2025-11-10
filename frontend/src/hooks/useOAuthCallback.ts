@@ -17,7 +17,6 @@ export default function useOAuthCallback() {
   const resetUser = useResetAtom(userStateAtom)
 
   const status = searchParams.get('status')
-  const redirectTo = searchParams.get('redirect_to') || '/'
   const message = searchParams.get('message')
 
   useEffect(() => {
@@ -33,11 +32,7 @@ export default function useOAuthCallback() {
 
         toast.error(errorMessage)
 
-        const redirectTo = (status === 'error')
-          ? (searchParams.get('redirect_to') || '/')
-          : '/'
-
-        router.replace(redirectTo, { scroll: false })
+        router.replace('/', { scroll: false })
         return
       }
 
@@ -68,15 +63,10 @@ export default function useOAuthCallback() {
           toast.error(error.message)
       }
       finally {
-        const url = new URL(window.location.href)
-        url.searchParams.delete('status')
-        url.searchParams.delete('redirect_to')
-
-        const cleanPath = url.pathname + (url.search || '')
-        router.replace(cleanPath, { scroll: false })
+        router.replace('/', { scroll: false })
       }
     }
 
     processOAuthCallback()
-  }, [status, message, mutate, resetUser, router, redirectTo, searchParams])
+  }, [status, message, mutate, resetUser, router, searchParams])
 }
