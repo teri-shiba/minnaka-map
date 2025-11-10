@@ -19,6 +19,10 @@ vi.mock('next/navigation', () => ({
 }))
 
 describe('AuthDialog', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('ログインボタンを押したとき、ダイアログが開く', async () => {
     const user = userEvent.setup()
     render(<AuthDialog />)
