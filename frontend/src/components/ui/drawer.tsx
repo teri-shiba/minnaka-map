@@ -99,7 +99,7 @@ function DrawerDescription({ ref, className, ...props }: ComponentPropsWithoutRe
   return (
     <DrawerPrimitive.Description
       ref={ref}
-      className={cn('text-sm text-muted-foreground', className)}
+      className={cn('text-sm text-muted-foreground leading-relaxed', className)}
       {...props}
     />
   )
