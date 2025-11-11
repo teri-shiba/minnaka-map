@@ -1,5 +1,4 @@
 import { renderHook, waitFor } from '@testing-library/react'
-import { toast } from 'sonner'
 import useOAuthCallback from '~/hooks/useOAuthCallback'
 import api from '~/lib/axios-interceptor'
 
@@ -15,13 +14,6 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('~/lib/axios-interceptor', () => ({
   default: { get: vi.fn() },
-}))
-
-vi.mock('sonner', () => ({
-  toast: {
-    promise: vi.fn(),
-    error: vi.fn(),
-  },
 }))
 
 const mockMutate = vi.fn()
@@ -54,7 +46,6 @@ describe('useOAuthCallback', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     setSearchParams('')
-    vi.mocked(toast.promise).mockImplementation(promise => promise as any)
   })
 
   afterEach(() => {
