@@ -48,12 +48,12 @@ export default function useOAuthCallback() {
         resetUser()
 
         if (!isAxiosError(error) && error instanceof Error) {
-          router.replace(`/?error=${encodeURIComponent(error.message)}`, { scroll: false })
+          router.replace(`/?error=${encodeURIComponent(error.message)}`)
         }
         else {
           const cause = (error as { cause?: ServiceCause })?.cause ?? 'NETWORK'
           const errorCode = mapCauseToErrorCode(cause)
-          router.replace(`/?error=${errorCode}`, { scroll: false })
+          router.replace(`/?error=${errorCode}`)
         }
       }
     }

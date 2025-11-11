@@ -23,7 +23,7 @@ export default function useConfirmEmail() {
       try {
         await api.patch('/user/confirmations', { confirmation_token: token })
         setModalOpen(true)
-        router.replace('/?success=email_confirmed', { scroll: false })
+        router.replace('/?success=email_confirmed')
       }
       catch (error) {
         logger(error, {

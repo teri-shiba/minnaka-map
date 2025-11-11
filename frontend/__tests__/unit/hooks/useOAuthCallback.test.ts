@@ -88,7 +88,6 @@ describe('useOAuthCallback', () => {
       expect(mockMutate).not.toHaveBeenCalled()
       expect(routerReplaceSpy).toHaveBeenCalledWith(
         expect.stringMatching(/^\/\?error=/),
-        { scroll: false },
       )
     })
   })
