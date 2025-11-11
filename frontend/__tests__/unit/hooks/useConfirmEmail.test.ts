@@ -57,7 +57,7 @@ describe('useConfirmEmail', () => {
         { confirmation_token: 'token-123' },
       )
       expect(setModalOpenSpy).toHaveBeenCalledWith(true)
-      expect(routerReplaceSpy).toHaveBeenCalledWith('/?success=email_confirmed', { scroll: false })
+      expect(routerReplaceSpy).toHaveBeenCalledWith('/?success=email_confirmed')
     })
   })
 

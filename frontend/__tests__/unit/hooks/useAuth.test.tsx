@@ -190,7 +190,7 @@ describe('useAuth', () => {
         password: 'pass123',
       })
       expect(mockMutate).toHaveBeenCalledWith('/current/user/show_status')
-      expect(routerReplaceSpy).toHaveBeenCalledWith('/?success=login', { scroll: false })
+      expect(routerReplaceSpy).toHaveBeenCalledWith('/?success=login')
     })
 
     it('ログイン失敗なら isSignedIn=false', async () => {
