@@ -80,7 +80,7 @@ export default function DeleteAccountForm({ onClose }: DeleteAccountFormProps) {
                       autoComplete="email"
                       id="email"
                       placeholder="登録中のメールアドレスを入力"
-                      className="mb-6 mt-2 h-auto py-3 focus-visible:ring-gray-600 focus-visible:ring-1"
+                      className="mb-6 mt-2 h-auto py-3 focus-visible:ring-1 focus-visible:ring-gray-600"
                       {...field}
                     />
                   </FormControl>
