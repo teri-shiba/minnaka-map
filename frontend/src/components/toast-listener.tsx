@@ -1,39 +1,46 @@
 'use client'
 
 import type { ErrorCode, SuccessCode } from '~/constants/toast-messages'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { ERROR_MESSAGE, SUCCESS_MESSAGE } from '~/constants/toast-messages'
 
 export default function ToastListener() {
-  const searchParams = useSearchParams()
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   const error = searchParams.get('error')
   const success = searchParams.get('success')
   const message = searchParams.get('message')
 
+  const isKnownError = (value: string): value is ErrorCode => value in ERROR_MESSAGE
+  const isKnownSuccess = (value: string): value is SuccessCode => value in SUCCESS_MESSAGE
+
   useEffect(() => {
     if (error) {
-      const displayMessage = message
-        || (error in ERROR_MESSAGE ? ERROR_MESSAGE[error as ErrorCode] : null)
-        || '予期せぬエラーが発生しました'
+      if (!isKnownError(error)) {
+        router.replace('/')
+        return
+      }
 
-      toast.error(displayMessage)
+      toast.error(ERROR_MESSAGE[error])
       router.replace('/')
       return
     }
 
     if (success) {
-      const displayMessage = success in SUCCESS_MESSAGE
-        ? SUCCESS_MESSAGE[success as SuccessCode]
-        : '操作が完了しました'
+      if (!isKnownSuccess(success)) {
+        router.replace('/')
+        return
+      }
 
-      toast.success(displayMessage)
-      router.replace('/')
+      toast.success(SUCCESS_MESSAGE[success])
+      const cleanupURL = success === 'email_sent' ? pathname : '/'
+      router.replace(cleanupURL)
     }
-  }, [error, success, message, router])
+  }, [error, success, message, router, pathname])
 
   return null
 }
