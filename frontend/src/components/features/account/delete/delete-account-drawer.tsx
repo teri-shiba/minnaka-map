@@ -1,15 +1,12 @@
 'use client'
 
-import { useAtomValue } from 'jotai'
 import { useState } from 'react'
 import { Button } from '~/components/ui/button'
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from '~/components/ui/drawer'
-import { userStateAtom } from '~/state/user-state.atom'
 import DeleteAccountForm from './delete-account-form'
 
 export default function DeleteAccountDrawer() {
   const [open, setOpen] = useState(false)
-  const user = useAtomValue(userStateAtom)
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>

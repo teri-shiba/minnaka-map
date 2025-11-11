@@ -1,15 +1,12 @@
 'use client'
 
-import { useAtomValue } from 'jotai'
 import { useState } from 'react'
 import { Button } from '~/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog'
-import { userStateAtom } from '~/state/user-state.atom'
 import DeleteAccountForm from './delete-account-form'
 
 export default function DeleteAccountDialog() {
   const [open, setOpen] = useState(false)
-  const user = useAtomValue(userStateAtom)
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

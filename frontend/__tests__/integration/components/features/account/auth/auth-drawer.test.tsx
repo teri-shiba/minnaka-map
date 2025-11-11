@@ -1,8 +1,8 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { setupDrawerTest } from '__tests__/integration/helpers/drawer-test-setup'
 import { AuthDrawer } from '~/components/features/account/auth/auth-drawer'
 import '@testing-library/jest-dom/vitest'
-import { setupDrawerTest } from '__tests__/integration/helpers/drawer-test-setup'
 
 setupDrawerTest()
 

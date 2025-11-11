@@ -1,9 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { setupDrawerTest } from '__tests__/integration/helpers/drawer-test-setup'
 import { useAtomValue } from 'jotai'
 import DeleteAccountDrawer from '~/components/features/account/delete/delete-account-drawer'
 import '@testing-library/jest-dom/vitest'
-import { setupDrawerTest } from '__tests__/integration/helpers/drawer-test-setup'
 
 setupDrawerTest()
 
