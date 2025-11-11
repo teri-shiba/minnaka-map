@@ -6,11 +6,13 @@ import { logger } from '~/lib/logger'
 import { createSWRWrapper } from '../../helpers/swr-test-helpers'
 
 const routerReplaceSpy = vi.fn()
+const MOCK_PATH = '/result'
 
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(() => ({
     replace: routerReplaceSpy,
   })),
+  usePathname: vi.fn(() => MOCK_PATH),
 }))
 
 vi.mock('~/lib/axios-interceptor', () => ({
@@ -100,7 +102,7 @@ describe('useAuth', () => {
   })
 
   describe('signup', () => {
-    it('登録成功なら /?success=email_sent へ遷移', async () => {
+    it('登録成功なら現在のパスに ?success=email_sent を付与', async () => {
       vi.mocked(api.get).mockResolvedValueOnce({ data: { login: true } })
       vi.mocked(api.post).mockResolvedValueOnce({ status: 200 })
 
@@ -128,7 +130,7 @@ describe('useAuth', () => {
           password: 'pass123',
         }),
       )
-      expect(routerReplaceSpy).toHaveBeenCalledWith('/?success=email_sent')
+      expect(routerReplaceSpy).toHaveBeenCalledWith(`${MOCK_PATH}?success=email_sent`)
     })
 
     it('登録失敗なら isSignedIn=false', async () => {
