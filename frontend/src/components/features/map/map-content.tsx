@@ -1,5 +1,6 @@
 'use client'
 
+import type { LatLngBoundsExpression } from 'leaflet'
 import type { MapData, MapItems } from '~/types/map'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { useCallback } from 'react'
@@ -14,6 +15,7 @@ interface MapContentProps extends MapItems {
   onRestaurantClick: (restaurant: RestaurantListItem) => void
   onRestaurantClose: () => void
   onMarkerPositionChange: (data: MapData) => void
+  maxBounds?: LatLngBoundsExpression
 }
 
 export default function MapContent({
@@ -23,6 +25,7 @@ export default function MapContent({
   onRestaurantClick,
   onRestaurantClose,
   onMarkerPositionChange,
+  maxBounds,
 }: MapContentProps) {
   useMapCoords(
     selectedRestaurant?.lat ?? null,
@@ -58,7 +61,7 @@ export default function MapContent({
 
   return (
     <>
-      <MapTilerLayer />
+      <MapTilerLayer maxBounds={maxBounds} />
       <ZoomControl position="topright" />
       <MidpointMarker position={midpoint} />
       <RestaurantMarker
