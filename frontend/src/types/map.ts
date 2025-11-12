@@ -3,7 +3,6 @@ import type { RestaurantListItem } from './restaurant'
 
 // Map コンポーネントに渡す props
 export interface MapItems {
-  apiKey: string
   midpoint: LatLngExpression
   restaurants: RestaurantListItem[]
 }

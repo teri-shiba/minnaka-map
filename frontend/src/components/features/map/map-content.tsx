@@ -17,7 +17,6 @@ interface MapContentProps extends MapItems {
 }
 
 export default function MapContent({
-  apiKey,
   midpoint,
   restaurants,
   selectedRestaurant,
@@ -59,7 +58,7 @@ export default function MapContent({
 
   return (
     <>
-      <MapTilerLayer apiKey={apiKey} />
+      <MapTilerLayer />
       <ZoomControl position="topright" />
       <MidpointMarker position={midpoint} />
       <RestaurantMarker

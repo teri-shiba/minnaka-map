@@ -5,7 +5,6 @@ import Map from '~/components/features/map/map'
 import RestaurantList from '~/components/features/restaurant/restaurant-list'
 import { Button } from '~/components/ui/button'
 import { fetchRestaurantsByCoords } from '~/services/fetch-restaurants-by-coords'
-import { getApiKey } from '~/services/get-api-key'
 import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import { issueFavoriteTokens } from '~/services/issue-favorite-tokens'
 import { parseAndValidateCoords } from '~/services/parse-and-validate-coords'
@@ -122,19 +121,12 @@ export default async function Result({ searchParams }: ResultPageProps) {
     restaurantIds: items.map(item => item.id),
   })
 
-  const result = await getApiKey('maptiler')
-  if (!result.success)
-    return null
-
-  const maptilerApiKey = result.data
-
   return (
     <div className="relative mx-auto h-[calc(100dvh-4rem)] max-w-screen-2xl overflow-hidden md:flex">
       <div className="h-mobile-map w-full md:h-desktop-map md:w-3/5 md:flex-1">
-        {(maptilerApiKey && midpoint)
+        {midpoint
           ? (
               <Map
-                apiKey={maptilerApiKey}
                 midpoint={midpoint}
                 restaurants={items}
               />

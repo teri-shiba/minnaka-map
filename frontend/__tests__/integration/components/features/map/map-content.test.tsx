@@ -1,11 +1,11 @@
 import type { RestaurantListItem } from '~/types/restaurant'
 import { render } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { setupCanvasTest } from '__tests__/integration/helpers/canvas-test-setup'
 import { MapContainer } from 'react-leaflet'
 import MapContent from '~/components/features/map/map-content'
-import { useMapCoordinates } from '~/hooks/useMapCoordinates'
+import { useMapCoords } from '~/hooks/useMapCoords'
 import '@testing-library/jest-dom/vitest'
-import userEvent from '@testing-library/user-event'
 
 setupCanvasTest()
 
@@ -17,8 +17,8 @@ vi.mock('leaflet', async () => {
   }
 })
 
-vi.mock('~/hooks/useMapCoordinates', () => ({
-  useMapCoordinates: vi.fn(),
+vi.mock('~/hooks/useMapCoords', () => ({
+  useMapCoords: vi.fn(),
 }))
 
 const mockRestaurants: RestaurantListItem[] = [
@@ -75,21 +75,21 @@ describe('MapContent', () => {
     expect(container.querySelector('.leaflet-container')).toBeInTheDocument()
   })
 
-  it('selectedRestaurantの座標がuseMapCoordinatesに渡される', () => {
+  it('selectedRestaurantの座標がuseMapCoordsに渡される', () => {
     const selectedRestaurant = mockRestaurants[0]
     renderMapContent({ selectedRestaurant })
 
-    expect(useMapCoordinates).toHaveBeenCalledWith(
+    expect(useMapCoords).toHaveBeenCalledWith(
       selectedRestaurant.lat,
       selectedRestaurant.lng,
       expect.any(Function),
     )
   })
 
-  it('selectedRestaurantがnullのとき、useMapCoordinatesにnullが渡される', () => {
+  it('selectedRestaurantがnullのとき、useMapCoordsにnullが渡される', () => {
     renderMapContent({ selectedRestaurant: null })
 
-    expect(useMapCoordinates).toHaveBeenCalledWith(
+    expect(useMapCoords).toHaveBeenCalledWith(
       null,
       null,
       expect.any(Function),
@@ -127,7 +127,7 @@ describe('MapContent', () => {
 
     const { container } = renderMapContent({
       selectedRestaurant,
-      onRestaurantClose
+      onRestaurantClose,
     })
 
     const map = container.querySelector('.leaflet-container')
