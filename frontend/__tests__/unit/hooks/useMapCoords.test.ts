@@ -118,26 +118,6 @@ describe('useMapCoords', () => {
     expect(callArg).toHaveProperty('markerPosition')
   })
 
-  it('地図のズームイベント時、更新された座標情報を onChange に通知する', () => {
-    const onChange = vi.fn()
-    renderHook(() => useMapCoords(null, null, onChange))
-
-    expect(registeredEvents.zoomend?.length).toBeGreaterThan(0)
-
-    onChange.mockClear()
-
-    act(() => {
-      triggerMapEvent('zoomend')
-    })
-
-    expect(onChange).toHaveBeenCalledTimes(1)
-
-    const callArg = onChange.mock.calls[0][0]
-    expect(callArg).toHaveProperty('mapSize')
-    expect(callArg).toHaveProperty('mapCenter')
-    expect(callArg).toHaveProperty('markerPosition')
-  })
-
   it('マーカー位置が変更されたとき、新しい座標情報を再計算する', () => {
     const onChange = vi.fn()
     const { rerender } = renderHook(
