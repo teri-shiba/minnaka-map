@@ -1,7 +1,7 @@
 'use client'
 
-import type { TokenInfo } from '~/app/result/page'
 import type { RestaurantListItem } from '~/types/restaurant'
+import type { TokenInfo } from '~/types/token'
 import Image from 'next/image'
 import Link from 'next/link'
 import { LuCalendarX2, LuTramFront } from 'react-icons/lu'

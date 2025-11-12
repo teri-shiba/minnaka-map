@@ -1,11 +1,8 @@
-import type { SearchParams } from '~/types/search-params'
 import { redirect } from 'next/navigation'
 import { JAPAN_BOUNDS } from '~/constants'
 
-type CoordParams = Pick<SearchParams, 'lat' | 'lng'>
-
 export function parseAndValidateCoords(
-  params: CoordParams,
+  params: { lat: string, lng: string },
 ): { lat: number, lng: number } {
   const lat = Number.parseFloat(params.lat)
   const lng = Number.parseFloat(params.lng)
