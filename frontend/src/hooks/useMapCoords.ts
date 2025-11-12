@@ -1,13 +1,10 @@
 'use client'
 
 import type { MapData } from '~/types/map'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useMap, useMapEvents } from 'react-leaflet'
-import { throttle } from '~/utils/throttle'
 
-const THROTTLE_MS = 16
-
-export function useMapCoordinates(
+export function useMapCoords(
   lat: number | null,
   lng: number | null,
   onChange: (data: MapData) => void,
@@ -62,16 +59,9 @@ export function useMapCoordinates(
     })
   }
 
-  const throttledUpdate = useMemo(
-    () => throttle(() => updatePositionRef.current?.(), THROTTLE_MS),
-    [],
-  )
-
   useMapEvents({
     load: () => updatePositionRef.current?.(),
-    zoomend: () => updatePositionRef.current?.(),
     moveend: () => updatePositionRef.current?.(),
-    move: throttledUpdate,
   })
 
   // data が変更されたときのみ onChange を呼ぶ（初期状態はスキップ）

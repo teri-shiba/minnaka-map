@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react'
-import { useMapCoordinates } from '~/hooks/useMapCoordinates'
+import { useMapCoords } from '~/hooks/useMapCoords'
 
 type LeafletEventHandler = (event?: unknown) => void
 type EventHandlers = Record<string, LeafletEventHandler>
@@ -44,7 +44,7 @@ function clearRegisteredEvents() {
   Object.keys(registeredEvents).forEach(key => delete registeredEvents[key])
 }
 
-describe('useMapCoordinates', () => {
+describe('useMapCoords', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     clearRegisteredEvents()
@@ -63,7 +63,7 @@ describe('useMapCoordinates', () => {
   it('初期化時、地図の座標情報を計算して onChange に通知する', () => {
     const onChange = vi.fn()
 
-    renderHook(() => useMapCoordinates(35.0, 139.0, onChange))
+    renderHook(() => useMapCoords(35.0, 139.0, onChange))
 
     expect(onChange).toHaveBeenCalledTimes(1)
 
@@ -79,7 +79,7 @@ describe('useMapCoordinates', () => {
   it('マーカー位置が指定されたとき、そのマーカーの画面座標を含めて通知する', () => {
     const onChange = vi.fn()
 
-    renderHook(() => useMapCoordinates(35.0, 139.0, onChange))
+    renderHook(() => useMapCoords(35.0, 139.0, onChange))
 
     expect(mapStub.latLngToContainerPoint).toHaveBeenCalledWith([35.0, 139.0])
 
@@ -90,7 +90,7 @@ describe('useMapCoordinates', () => {
   it('マーカー位置が null のとき、マーカーの画面座標を null として通知する', () => {
     const onChange = vi.fn()
 
-    renderHook(() => useMapCoordinates(null, null, onChange))
+    renderHook(() => useMapCoords(null, null, onChange))
 
     expect(onChange).toHaveBeenCalled()
 
@@ -100,7 +100,7 @@ describe('useMapCoordinates', () => {
 
   it('地図の移動イベント時、更新された座標情報を onChange に通知する', () => {
     const onChange = vi.fn()
-    renderHook(() => useMapCoordinates(null, null, onChange))
+    renderHook(() => useMapCoords(null, null, onChange))
 
     expect(registeredEvents.moveend?.length).toBeGreaterThan(0)
 
@@ -120,7 +120,7 @@ describe('useMapCoordinates', () => {
 
   it('地図のズームイベント時、更新された座標情報を onChange に通知する', () => {
     const onChange = vi.fn()
-    renderHook(() => useMapCoordinates(null, null, onChange))
+    renderHook(() => useMapCoords(null, null, onChange))
 
     expect(registeredEvents.zoomend?.length).toBeGreaterThan(0)
 
@@ -141,7 +141,7 @@ describe('useMapCoordinates', () => {
   it('マーカー位置が変更されたとき、新しい座標情報を再計算する', () => {
     const onChange = vi.fn()
     const { rerender } = renderHook(
-      ({ lat, lng }: { lat: number | null, lng: number | null }) => useMapCoordinates(lat, lng, onChange),
+      ({ lat, lng }: { lat: number | null, lng: number | null }) => useMapCoords(lat, lng, onChange),
       { initialProps: { lat: 35.0, lng: 139.0 } },
     )
 
@@ -164,7 +164,7 @@ describe('useMapCoordinates', () => {
     const onChange = vi.fn()
     const cancelSpy = vi.mocked(cancelAnimationFrame)
 
-    const { unmount } = renderHook(() => useMapCoordinates(null, null, onChange))
+    const { unmount } = renderHook(() => useMapCoords(null, null, onChange))
 
     unmount()
 
