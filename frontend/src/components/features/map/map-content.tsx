@@ -59,7 +59,7 @@ export default function MapContent({
 
   return (
     <>
-      {apiKey && <MapTilerLayer apiKey={apiKey} />}
+      <MapTilerLayer apiKey={apiKey} />
       <ZoomControl position="topright" />
       <MidpointMarker position={midpoint} />
       <RestaurantMarker
