@@ -8,7 +8,7 @@ import { useMap } from 'react-leaflet'
 import { logger } from '~/lib/logger'
 import { getApiKey } from '~/services/get-api-key'
 
-export default function MapTilerLayer({ maxBounds }: { maxBounds?: LatLngBoundsExpression }) {
+export default function MapTilerLayer({ maxBounds }: { maxBounds: LatLngBoundsExpression }) {
   const map = useMap()
   const [apiKey, setApiKey] = useState<string | null>(null)
 
