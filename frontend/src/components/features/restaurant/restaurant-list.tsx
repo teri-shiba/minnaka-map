@@ -1,8 +1,8 @@
 'use client'
 
-import type { TokenMap } from '~/app/result/page'
 import type { PageInfo } from '~/types/pagination'
 import type { RestaurantListItem } from '~/types/restaurant'
+import type { TokenMap } from '~/types/token'
 import { useEffect, useRef } from 'react'
 import useDrawerController from '~/hooks/useDrawerController'
 import { useMediaQuery } from '~/hooks/useMediaQuery'
