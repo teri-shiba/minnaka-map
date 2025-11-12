@@ -67,7 +67,7 @@ export default function MapCanvas({ midpoint, restaurants }: MapItems) {
           onRestaurantClick={handleRestaurantClick}
           onRestaurantClose={handleRestaurantClose}
           onMarkerPositionChange={handleMarkerPositionChange}
-          maxBounds={mapOptions.maxBounds}
+          maxBounds={mapOptions.maxBounds!}
         />
       </MapContainer>
 

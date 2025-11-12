@@ -15,7 +15,7 @@ interface MapContentProps extends MapItems {
   onRestaurantClick: (restaurant: RestaurantListItem) => void
   onRestaurantClose: () => void
   onMarkerPositionChange: (data: MapData) => void
-  maxBounds?: LatLngBoundsExpression
+  maxBounds: LatLngBoundsExpression
 }
 
 export default function MapContent({
