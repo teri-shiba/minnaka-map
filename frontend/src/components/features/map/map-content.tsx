@@ -1,8 +1,10 @@
+'use client'
+
 import type { MapData, MapItems } from '~/types/map'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { useCallback } from 'react'
 import { useMapEvent, ZoomControl } from 'react-leaflet'
-import { useMapCoordinates } from '~/hooks/useMapCoordinates'
+import { useMapCoords } from '~/hooks/useMapCoords'
 import MapTilerLayer from './map-layer'
 import MidpointMarker from './midpoint-marker'
 import RestaurantMarker from './restaurant-marker'
@@ -23,7 +25,7 @@ export default function MapContent({
   onRestaurantClose,
   onMarkerPositionChange,
 }: MapContentProps) {
-  useMapCoordinates(
+  useMapCoords(
     selectedRestaurant?.lat ?? null,
     selectedRestaurant?.lng ?? null,
     onMarkerPositionChange,
@@ -34,7 +36,26 @@ export default function MapContent({
       onRestaurantClose()
   }, [selectedRestaurant, onRestaurantClose])
 
+  const handleMoveStart = useCallback(() => {
+    if (selectedRestaurant)
+      onRestaurantClose()
+  }, [selectedRestaurant, onRestaurantClose])
+
+  const handleZoomEnd = useCallback(() => {
+    if (selectedRestaurant)
+      onRestaurantClose()
+  }, [selectedRestaurant, onRestaurantClose])
+
+  const handleRestaurantClick = useCallback(
+    (restaurant: RestaurantListItem) => {
+      onRestaurantClick(restaurant)
+    },
+    [onRestaurantClick],
+  )
+
   useMapEvent('click', handleMapClick)
+  useMapEvent('movestart', handleMoveStart)
+  useMapEvent('zoomend', handleZoomEnd)
 
   return (
     <>
@@ -43,7 +64,7 @@ export default function MapContent({
       <MidpointMarker position={midpoint} />
       <RestaurantMarker
         restaurants={restaurants}
-        onRestaurantClick={onRestaurantClick}
+        onRestaurantClick={handleRestaurantClick}
         selectedRestaurantId={selectedRestaurant?.id}
       />
     </>
