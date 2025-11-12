@@ -12,7 +12,7 @@ import MapRestaurantCard from './map-restaurant-card'
 import 'leaflet/dist/leaflet.css'
 import '@maptiler/sdk/dist/maptiler-sdk.css'
 
-export default function MapCanvas({ apiKey, midpoint, restaurants }: MapItems) {
+export default function MapCanvas({ midpoint, restaurants }: MapItems) {
   const [selected, setSelected] = useState<RestaurantListItem | null>(null)
   const [mapData, setMapData] = useState<MapData>({
     markerPosition: null,
@@ -61,7 +61,6 @@ export default function MapCanvas({ apiKey, midpoint, restaurants }: MapItems) {
         className="absolute size-full"
       >
         <MapContent
-          apiKey={apiKey}
           midpoint={midpoint}
           restaurants={restaurants}
           selectedRestaurant={selected}
