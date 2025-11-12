@@ -26,8 +26,8 @@ describe('createLeafletOptions', () => {
 
     // ZOOM
     expect(opts.zoom).toBe(17)
-    expect(opts.minZoom).toBe(14)
-    expect(opts.maxZoom).toBe(18)
+    expect(opts.minZoom).toBe(13)
+    expect(opts.maxZoom).toBe(20)
     expect(opts.zoomSnap).toBe(1)
     expect(opts.zoomDelta).toBe(1)
 

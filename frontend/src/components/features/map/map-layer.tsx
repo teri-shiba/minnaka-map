@@ -1,5 +1,6 @@
 'use client'
 
+import type { LatLngBoundsExpression } from 'leaflet'
 import { MaptilerLayer } from '@maptiler/leaflet-maptilersdk'
 import * as Sentry from '@sentry/nextjs'
 import { useEffect, useState } from 'react'
@@ -7,7 +8,7 @@ import { useMap } from 'react-leaflet'
 import { logger } from '~/lib/logger'
 import { getApiKey } from '~/services/get-api-key'
 
-export default function MapTilerLayer() {
+export default function MapTilerLayer({ maxBounds }: { maxBounds?: LatLngBoundsExpression }) {
   const map = useMap()
   const [apiKey, setApiKey] = useState<string | null>(null)
 
@@ -49,10 +50,17 @@ export default function MapTilerLayer() {
       style: styleUrl,
     }).addTo(map)
 
+    // NOTE: MaptilerLayer は追加時に map.options.maxBounds を Infinity にリセットする
+    // そのため、レイヤー追加後に明示的に maxBounds を再設定する必要がある
+    if (maxBounds) {
+      map.setMaxBounds(maxBounds)
+      map.options.maxBoundsViscosity = 1
+    }
+
     return () => {
       map.removeLayer(layer)
     }
-  }, [map, apiKey])
+  }, [map, apiKey, maxBounds])
 
   return null
 }
