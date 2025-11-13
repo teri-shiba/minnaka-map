@@ -54,6 +54,7 @@ const defaultProps = {
   onRestaurantClick: vi.fn(),
   onRestaurantClose: vi.fn(),
   onMarkerPositionChange: vi.fn(),
+  maxBounds: [[35.11, 139.11], [35.22, 139.22]] as [[number, number], [number, number]],
 }
 
 function renderMapContent(props = {}) {
