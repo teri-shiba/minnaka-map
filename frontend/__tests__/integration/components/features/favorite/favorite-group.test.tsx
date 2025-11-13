@@ -1,6 +1,6 @@
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { mockNavigatorClipboard, mockNavigatorShare, mockWindowLocationHref, mockWindowOpen, overrideMatchMedia, setupBrowserAPIMocks } from '__tests__/integration/helpers/browser-api-mocks'
+import { mockNavigatorClipboard, mockWindowLocationHref, mockWindowOpen, overrideMatchMedia, setupBrowserAPIMocks } from '__tests__/integration/helpers/browser-api-mocks'
 import { buildFavoriteGroup, buildFavoriteRestaurant, buildFavoriteWithDetails } from '__tests__/integration/helpers/favorite-fixtures'
 import { server } from '__tests__/integration/setup/msw.server'
 import { http, HttpResponse } from 'msw'
@@ -57,72 +57,42 @@ const mockGroup = buildFavoriteGroup(
 describe('FavoriteGroup', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-  })
+    overrideMatchMedia(false)
 
-  describe('ネイティブシェアフロー', () => {
-    it('ネイティブシェアに対応しているとき、ダイアログが開かないこと', async () => {
-      const user = userEvent.setup()
-
-      mockNavigatorShare(async () => { })
-      overrideMatchMedia(true)
-
-      server.use(
-        http.post('*/api/v1/shared_favorite_lists', async () => {
-          return HttpResponse.json({
-            success: true,
-            data: {
-              share_uuid: 'uuid-123',
-              title: '東京・神田',
-              is_existing: false,
-            },
-          })
-        }),
-      )
-
-      render(<FavoriteGroup group={mockGroup} />)
-
-      await user.click(screen.getByRole('button', { name: /リストをシェアする/ }))
-
-      await waitFor(() => {
-        expect(navigator.share).toHaveBeenCalledWith({
-          title: '東京・神田のおすすめリスト',
-          text: '東京・神田のおすすめレストランをチェック！',
-          url: 'http://localhost/shared/uuid-123',
+    server.use(
+      http.post('*/api/v1/shared_favorite_lists', async () => {
+        return HttpResponse.json({
+          success: true,
+          data: {
+            share_uuid: 'uuid-123',
+            title: '東京・神田',
+            is_existing: false,
+          },
         })
-      })
-
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-    })
+      }),
+    )
   })
 
   describe('シェアダイアログフロー', () => {
-    beforeEach(() => {
-      mockNavigatorShare(async () => { })
-      overrideMatchMedia(false)
-
-      server.use(
-        http.post('*/api/v1/shared_favorite_lists', async () => {
-          return HttpResponse.json({
-            success: true,
-            data: {
-              share_uuid: 'uuid-123',
-              title: '東京・神田',
-              is_existing: false,
-            },
-          })
-        }),
-      )
-    })
-
-    it('ネイティブシェアに対応していないとき、ダイアログが開くこと', async () => {
+    it('シェアボタンをクリックし、ダイアログが開き、リンクコピーが動作すること', async () => {
       const user = userEvent.setup()
+      mockNavigatorClipboard(async () => { })
 
       render(<FavoriteGroup group={mockGroup} />)
 
-      await user.click(screen.getByRole('button', { name: /リストをシェアする/ }))
+      await user.click(screen.getByRole('button', { name: /このリストをシェアする/ }))
 
       await waitFor(() => {
         expect(screen.getByRole('dialog')).toBeInTheDocument()
+      })
+
+      expect(screen.getByText('お気に入りリストをシェア')).toBeInTheDocument()
+
+      await user.click(screen.getByRole('button', { name: /リンクをコピーする/ }))
+
+      await waitFor(() => {
+        expect(navigator.clipboard.writeText).toHaveBeenCalledWith('http://localhost/shared/uuid-123')
+        expect(toast.success).toHaveBeenCalledWith('リンクをコピーしました')
       })
     })
 
@@ -147,38 +117,36 @@ describe('FavoriteGroup', () => {
       })
     })
 
-    it('ダイアログ内のメールシェアを選択したとき、mailto リンクが開くこと', async () => {
+    it('ダイアログ内でメールシェアを選択すると、mailtoリンクが開かれること', async () => {
       const user = userEvent.setup()
       mockWindowLocationHref()
 
       render(<FavoriteGroup group={mockGroup} />)
 
-      await user.click(screen.getByRole('button', { name: /リストをシェアする/ }))
+      await user.click(screen.getByRole('button', { name: /このリストをシェアする/ }))
 
       await waitFor(() => {
         expect(screen.getByRole('dialog')).toBeInTheDocument()
       })
 
-      expect(screen.getByText('お気に入りリストをシェア')).toBeInTheDocument()
       await user.click(screen.getByRole('button', { name: /メールでシェアする/ }))
 
       expect(window.location.href).toContain('mailto:')
       expect(decodeURIComponent(window.location.href)).toContain('東京・神田のまんなかのお店')
     })
 
-    it('ダイアログ内のXシェアを選択したとき、X投稿ウィンドウが開くこと', async () => {
+    it('ダイアログ内でXシェアを選択すると、X投稿ウィンドウが開かれること', async () => {
       const user = userEvent.setup()
       const openMock = mockWindowOpen()
 
       render(<FavoriteGroup group={mockGroup} />)
 
-      await user.click(screen.getByRole('button', { name: /リストをシェアする/ }))
+      await user.click(screen.getByRole('button', { name: /このリストをシェアする/ }))
 
       await waitFor(() => {
         expect(screen.getByRole('dialog')).toBeInTheDocument()
       })
 
-      expect(screen.getByText('お気に入りリストをシェア')).toBeInTheDocument()
       await user.click(screen.getByRole('button', { name: /X でシェアする/ }))
 
       expect(openMock).toHaveBeenCalledWith(
@@ -190,7 +158,7 @@ describe('FavoriteGroup', () => {
   })
 
   describe('エラーハンドリング', () => {
-    it('リストの生成に失敗したとき、エラートーストが表示されること', async () => {
+    it('API失敗時、エラートーストが表示され、ダイアログが開かないこと', async () => {
       const user = userEvent.setup()
 
       server.use(
@@ -201,7 +169,7 @@ describe('FavoriteGroup', () => {
 
       render(<FavoriteGroup group={mockGroup} />)
 
-      await user.click(screen.getByRole('button', { name: /リストをシェアする/ }))
+      await user.click(screen.getByRole('button', { name: /このリストをシェアする/ }))
 
       await waitFor(() => {
         expect(toast.error).toHaveBeenCalledWith('シェアリストの作成に失敗しました')
@@ -210,22 +178,11 @@ describe('FavoriteGroup', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
 
-    it('リンクコピーに失敗したとき、エラートーストが表示されること', async () => {
+    it('リンクコピー失敗時、エラートーストが表示されること', async () => {
       const user = userEvent.setup()
-      mockNavigatorShare(async () => { })
-      overrideMatchMedia(false)
       mockNavigatorClipboard(async () => {
         throw new Error('Copy Failed')
       })
-
-      server.use(
-        http.post('*/api/v1/shared_favorite_lists', async () => {
-          return HttpResponse.json({
-            success: true,
-            data: { share_uuid: 'test-uuid', title: '東京・神田', is_existing: false },
-          })
-        }),
-      )
 
       render(<FavoriteGroup group={mockGroup} />)
 
@@ -235,7 +192,7 @@ describe('FavoriteGroup', () => {
         expect(screen.getByRole('dialog')).toBeInTheDocument()
       })
 
-      await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: /リンクをコピーする/ }))
+      await user.click(screen.getByRole('button', { name: /リンクをコピーする/ }))
 
       await waitFor(() => {
         expect(toast.error).toHaveBeenCalledWith('リンクのコピーに失敗しました')
