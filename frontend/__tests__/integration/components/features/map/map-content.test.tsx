@@ -1,13 +1,13 @@
 import type { RestaurantListItem } from '~/types/restaurant'
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { setupCanvasTest } from '__tests__/integration/helpers/canvas-test-setup'
+import { setupCanvasMocks } from '__tests__/integration/helpers/canvas-mocks'
 import { MapContainer } from 'react-leaflet'
 import MapContent from '~/components/features/map/map-content'
 import { useMapCoords } from '~/hooks/useMapCoords'
 import '@testing-library/jest-dom/vitest'
 
-setupCanvasTest()
+setupCanvasMocks()
 
 vi.mock('leaflet', async () => {
   const actual = await vi.importActual('leaflet')

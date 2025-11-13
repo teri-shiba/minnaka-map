@@ -1,4 +1,12 @@
-export function setupDrawerTest() {
+/**
+ * コンポーネントのテストで必要な Browser API をモックする
+ *
+ * 以下のエラーが出た場合に使用:
+ * - setPointerCapture is not a function
+ * - matchMedia is not a function
+ */
+
+export function setupBrowserAPIMocks() {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: vi.fn().mockImplementation(query => ({

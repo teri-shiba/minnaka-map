@@ -1,4 +1,4 @@
-export function setupCanvasTest() {
+export function setupCanvasMocks() {
   vi.hoisted(() => {
     globalThis.URL.createObjectURL = vi.fn(() => 'mock-url')
     globalThis.URL.revokeObjectURL = vi.fn()
