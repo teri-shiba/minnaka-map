@@ -6,12 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { LuCalendarX2, LuTramFront } from 'react-icons/lu'
 import { Badge } from '~/components/ui/badge'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from '~/components/ui/card'
+import { Card, CardContent, CardDescription, CardTitle } from '~/components/ui/card'
 import { cn } from '~/utils/cn'
 import FavoriteButton from './favorite-button'
 
@@ -32,13 +27,13 @@ export default function RestaurantCard({
 }: RestaurantCardProps) {
   const { id, name, imageUrl, genreName, station, close } = restaurant
 
+  const fromFavoritePage = Boolean(searchHistoryId && favoriteId !== undefined)
+
   const href = tokenInfo
     ? `restaurant/${id}?t=${encodeURIComponent(tokenInfo.token)}`
-    : searchHistoryId && favoriteId !== undefined
+    : fromFavoritePage
       ? `restaurant/${id}/?historyId=${searchHistoryId}`
       : `restaurant/${id}`
-
-  const isFromFavorites = Boolean(searchHistoryId && favoriteId !== undefined)
 
   return (
     <div className="relative">
@@ -86,7 +81,7 @@ export default function RestaurantCard({
         >
           <FavoriteButton
             hotpepperId={id}
-            initialIsFavorite={isFromFavorites}
+            initialIsFavorite={fromFavoritePage}
             initialFavoriteId={favoriteId ?? null}
             token={tokenInfo?.token}
             initialHistoryId={tokenInfo?.searchHistoryId.toString() || searchHistoryId}
