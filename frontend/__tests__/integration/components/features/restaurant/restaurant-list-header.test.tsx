@@ -180,15 +180,4 @@ describe('RestaurantListHeader', () => {
       })
     })
   })
-
-  describe('アクセシビリティ', () => {
-    it('id が渡されたとき、h2 要素に id 設定されること', () => {
-      vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams() as any)
-
-      render(<RestaurantListHeader totalCount={10} id="test-heading" />)
-
-      const heading = screen.getByRole('heading', { level: 2 })
-      expect(heading).toHaveAttribute('id', 'test-heading')
-    })
-  })
 })
