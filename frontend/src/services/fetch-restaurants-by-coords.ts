@@ -41,7 +41,7 @@ export async function fetchRestaurantsByCoords(
       key: apiKey,
       lat: String(opts.lat),
       lng: String(opts.lng),
-      range: '5', // 3000m
+      range: '3', // 1000m
       start: String(start),
       count: String(itemsPerPage),
       format: 'json',
@@ -61,7 +61,6 @@ export async function fetchRestaurantsByCoords(
           `lat:${opts.lat}`,
           `lng:${opts.lng}`,
           `genre:${opts.genre ?? 'all'}`,
-          `page:${page}`,
         ],
       },
     })
