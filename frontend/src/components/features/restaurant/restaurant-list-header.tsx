@@ -76,7 +76,7 @@ export default function RestaurantListHeader({ totalCount, id }: Props) {
       >
         <div className="flex w-full min-w-max gap-2">
           <Button
-            variant={!validCurrentGenre ? 'default' : 'outline'}
+            variant={validCurrentGenre === 'all' ? 'default' : 'outline'}
             onClick={() => onGenreChange('all')}
             className="whitespace-nowrap"
           >
