@@ -74,7 +74,7 @@ describe('fetchRestaurantsByCoords', () => {
     expect(params.get('lat')).toBe('35')
     expect(params.get('lng')).toBe('139')
     expect(params.get('genre')).toBe('G001')
-    expect(params.get('range')).toBe('5')
+    expect(params.get('range')).toBe('3')
     expect(params.get('start')).toBe(String(start))
     expect(params.get('count')).toBe(String(itemsPerPage))
     expect(params.get('format')).toBe('json')

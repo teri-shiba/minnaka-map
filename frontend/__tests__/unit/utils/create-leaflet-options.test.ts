@@ -11,7 +11,7 @@ function fakeLatLng(expression: LatLngExpression): LatLng {
 }
 
 describe('createLeafletOptions', () => {
-  const RADIUS_METERS = 3000
+  const RADIUS_METERS = 1000
   const METERS_PER_DEG_LAT = 111_000
   const DEG_TO_RAD = Math.PI / 180
 
