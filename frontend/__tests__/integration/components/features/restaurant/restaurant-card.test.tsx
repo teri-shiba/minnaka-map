@@ -13,18 +13,22 @@ vi.mock('~/components/features/restaurant/favorite-button', () => ({
   )),
 }))
 
+const mockRestaurant: RestaurantListItem = {
+  id: 'J001246910',
+  name: 'テスト居酒屋',
+  station: '神田',
+  lat: 35.12345,
+  lng: 139.12345,
+  genreName: '居酒屋',
+  genreCode: 'G001',
+  imageUrl: 'https://example.com/image.jpg',
+  close: '年中無休',
+}
+
 describe('RestaurantCard', () => {
-  const mockRestaurant: RestaurantListItem = {
-    id: 'J001246910',
-    name: 'テスト居酒屋',
-    station: '神田',
-    lat: 35.12345,
-    lng: 139.12345,
-    genreName: '居酒屋',
-    genreCode: 'G001',
-    imageUrl: 'https://example.com/image.jpg',
-    close: '年中無休',
-  }
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
 
   describe('基本表示', () => {
     it('レストランの基本情報が表示されること', () => {

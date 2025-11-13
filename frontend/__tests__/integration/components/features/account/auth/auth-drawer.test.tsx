@@ -1,10 +1,10 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { setupDrawerTest } from '__tests__/integration/helpers/drawer-test-setup'
+import { setupBrowserAPIMocks } from '__tests__/integration/helpers/browser-api-mocks'
 import { AuthDrawer } from '~/components/features/account/auth/auth-drawer'
 import '@testing-library/jest-dom/vitest'
 
-setupDrawerTest()
+setupBrowserAPIMocks()
 
 const loginSpy = vi.fn().mockResolvedValue(undefined)
 const signupSpy = vi.fn().mockResolvedValue(undefined)
