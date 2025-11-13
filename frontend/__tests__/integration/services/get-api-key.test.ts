@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { getApiKey } from '~/services/get-api-key'
 import { server } from '../setup/msw.server'
 
-vi.mock('server-only', () => ({}))
+vi.mock('~/lib/logger', () => ({ logger: vi.fn() }))
 
 describe('getApiKey', () => {
   beforeEach(() => {

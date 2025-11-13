@@ -3,10 +3,11 @@ import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import { removeFavorite } from '~/services/remove-favorite'
 import { server } from '../setup/msw.server'
 
-vi.mock('server-only', () => ({}))
 vi.mock('~/services/get-auth-from-cookie', () => ({
   getAuthFromCookie: vi.fn(),
 }))
+
+vi.mock('~/lib/logger', () => ({ logger: vi.fn() }))
 
 describe('removeFavorite', () => {
   beforeEach(() => {
