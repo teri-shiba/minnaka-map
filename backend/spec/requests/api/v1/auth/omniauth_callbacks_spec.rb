@@ -54,7 +54,7 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
       let!(:existing_user) { create(:user) }
       let!(:existing_user_auth) { create(:user_auth, email:, user: existing_user) }
 
-      it "エラーメッセージと共にエラーページにリダイレクトすること" do
+      it "重複のパラメーターを載せてエラーページにリダイレクトすること" do
         expect {
           get "/api/v1/auth/#{provider}/callback"
         }.to not_change { User.count }.and not_change { UserAuth.count }
@@ -65,10 +65,6 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
         params = CGI.parse(uri.query)
 
         expect(params["error"]).to eq(["duplicate_email"])
-
-        expected_message = "#{UserAuth.human_attribute_name(:email)}" \
-                         "#{I18n.t("activerecord.errors.models.user_auth.attributes.email.taken")}"
-        expect(params["message"].first).to eq(expected_message)
       end
     end
   end
@@ -114,7 +110,7 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
       let!(:existing_user) { create(:user) }
       let!(:existing_user_auth) { create(:user_auth, email:, user: existing_user) }
 
-      it "エラーメッセージと共にエラーページにリダイレクトすること" do
+      it "重複のパラメータを載せてエラーページにリダイレクトすること" do
         expect {
           get "/api/v1/auth/#{provider}/callback"
         }.to not_change { User.count }.and not_change { UserAuth.count }
@@ -125,10 +121,6 @@ RSpec.describe "Api::V1::Auth::OmniauthCallbacksController", type: :request do
         params = CGI.parse(uri.query)
 
         expect(params["error"]).to eq(["duplicate_email"])
-
-        expected_message = "#{UserAuth.human_attribute_name(:email)}" \
-                         "#{I18n.t("activerecord.errors.models.user_auth.attributes.email.taken")}"
-        expect(params["message"].first).to eq(expected_message)
       end
     end
   end

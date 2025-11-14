@@ -13,7 +13,6 @@ export default function ToastListener() {
 
   const error = searchParams.get('error')
   const success = searchParams.get('success')
-  const message = searchParams.get('message')
 
   const isKnownError = (value: string): value is ErrorCode => value in ERROR_MESSAGE
   const isKnownSuccess = (value: string): value is SuccessCode => value in SUCCESS_MESSAGE
@@ -40,7 +39,7 @@ export default function ToastListener() {
       const cleanupURL = success === 'email_sent' ? pathname : '/'
       router.replace(cleanupURL)
     }
-  }, [error, success, message, router, pathname])
+  }, [error, success, router, pathname])
 
   return null
 }

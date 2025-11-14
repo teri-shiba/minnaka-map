@@ -40,11 +40,7 @@ class Api::V1::Auth::OmniauthCallbacksController < DeviseTokenAuth::OmniauthCall
       email_exists = resource_class.exists?(email: email)
 
       if new_sns_user && email_exists
-        attr = UserAuth.human_attribute_name(:email)
-        suffix = I18n.t("activerecord.errors.models.user_auth.attributes.email.taken")
-        message = "#{attr}#{suffix}"
-        query = { error: "duplicate_email", message: }.to_query
-        redirect_to "#{Settings.front_domain}/?#{query}", allow_other_host: true
+        redirect_to "#{Settings.front_domain}/?error=duplicate_email", allow_other_host: true
         return true
       end
       false
