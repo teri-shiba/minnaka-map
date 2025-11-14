@@ -1,10 +1,10 @@
-import '@testing-library/jest-dom/vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createSWRWrapper } from '__tests__/helpers/swr-test-helpers'
 import { server } from '__tests__/integration/setup/msw.server'
 import { http, HttpResponse } from 'msw'
 import Header from '~/components/layout/header'
+import '@testing-library/jest-dom/vitest'
 
 const routerReplaceSpy = vi.fn()
 
@@ -17,12 +17,12 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('sonner', () => ({
   toast: {
-    success: vi.fn()
-  }
+    success: vi.fn(),
+  },
 }))
 
 vi.mock('~/hooks/useMediaQuery', () => ({
-  useMediaQuery: vi.fn(() => true)
+  useMediaQuery: vi.fn(() => true),
 }))
 
 describe('Header', () => {
@@ -33,7 +33,7 @@ describe('Header', () => {
 
   it('ローディング中のとき、スケルトンを表示する', () => {
     server.use(
-      http.get('*/current/user/show_status', () => new Promise(() => { }))
+      http.get('*/current/user/show_status', () => new Promise(() => { })),
     )
 
     const wrapper = createSWRWrapper()
@@ -46,7 +46,7 @@ describe('Header', () => {
     server.use(
       http.get('*/current/user/show_status', () => {
         return HttpResponse.json({ login: false })
-      })
+      }),
     )
 
     const wrapper = createSWRWrapper()
@@ -67,7 +67,7 @@ describe('Header', () => {
           email: 'test@example.com',
           provider: 'email',
         })
-      })
+      }),
     )
 
     const wrapper = createSWRWrapper()
@@ -89,7 +89,7 @@ describe('Header', () => {
         email: 'test@example.com',
         provider: 'email',
       }),
-      HttpResponse.json({ login: false })
+      HttpResponse.json({ login: false }),
     ]
 
     server.use(
@@ -115,7 +115,6 @@ describe('Header', () => {
     expect(routerReplaceSpy).toHaveBeenCalledWith('/')
   })
 
-
   it('ユーザーアイコンをクリックしたとき、ドロップダウンメニューが開く', async () => {
     const user = userEvent.setup()
 
@@ -128,7 +127,7 @@ describe('Header', () => {
           email: 'test@example.com',
           provider: 'email',
         })
-      })
+      }),
     )
 
     const wrapper = createSWRWrapper()
@@ -158,7 +157,7 @@ describe('Header', () => {
           email: 'test@example.com',
           provider: 'email',
         })
-      })
+      }),
     )
 
     const wrapper = createSWRWrapper()
