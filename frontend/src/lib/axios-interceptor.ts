@@ -28,12 +28,22 @@ function getServiceCauseFromStatus(status: number): ServiceCause {
   }
 }
 
+function checkEmailConflict(data: unknown): boolean {
+  if (!data || typeof data !== 'object')
+    return false
+
+  return (data as Record<string, unknown>).error === 'duplicate_email'
+}
+
 api.interceptors.response.use(
   response => response,
   (error: unknown) => {
     if (isAxiosError(error)) {
-      const cause = error.response
-        ? getServiceCauseFromStatus(error.response.status)
+      const emailConflict = error.response?.status === 422
+        && checkEmailConflict(error.response.data)
+
+      const cause: ServiceCause = error.response
+        ? (emailConflict ? 'DUPLICATE_EMAIL' : getServiceCauseFromStatus(error.response.status))
         : 'NETWORK'
 
       Object.assign(error, { cause })

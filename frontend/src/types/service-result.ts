@@ -8,6 +8,7 @@ export type ServiceCause
     | 'INVALID_SIGNATURE'
     | 'EXPIRED'
     | 'RATE_LIMIT'
+    | 'DUPLICATE_EMAIL'
 
 export interface ServiceSuccess<T> {
   readonly success: true
