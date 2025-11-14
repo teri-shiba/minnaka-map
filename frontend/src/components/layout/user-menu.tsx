@@ -10,12 +10,10 @@ import { useAuth } from '~/hooks/useAuth'
 
 export default function UserMenu() {
   const [open, setOpen] = useState(false)
-  const router = useRouter()
   const { logout } = useAuth()
 
   const handleLogout = async () => {
     await logout()
-    router.push('/')
   }
 
   return (
