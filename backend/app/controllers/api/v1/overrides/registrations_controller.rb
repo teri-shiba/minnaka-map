@@ -9,6 +9,12 @@ class Api::V1::Overrides::RegistrationsController < DeviseTokenAuth::Registratio
     super
   end
 
+  def destroy
+    super
+    reset_session
+    cookies.delete(DeviseTokenAuth.cookie_name, domain: DeviseTokenAuth.cookie_attributes[:domain])
+  end
+
   def build_resource
     auth_params = sign_up_params.except(:name)
     @resource = resource_class.new(auth_params)
