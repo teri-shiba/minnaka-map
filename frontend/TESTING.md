@@ -47,5 +47,6 @@
 | components/restaurant/restaurant-list-footer.tsx                  | visual            | 単純なフッター表示                     | `/* c8 ignore start -- 視覚のみ/薄いラッパー */`            |
 | components/restaurant/restaurant-sidebar-container.tsx            | visual            | 単純なコンテナ                       | `/* c8 ignore start -- 視覚のみ/薄いラッパー */`            |
 | components/layout/section.tsx                                     | visual            | 単純なレイアウトラッパー                  | `/* c8 ignore start -- 視覚のみ/薄いラッパー */`            |
+| components/footer/section.tsx                                     | visual            | 条件付きクラス適用のみ（視覚的変化）                  | `/* c8 ignore start -- 視覚のみ/薄いラッパー */`            |
 
 > **注意**: 将来これらのファイルに `if/switch`、配列処理、副作用、外部呼び出し等の**ロジック**が追加された場合は、対象外コメントを削除し、相応のテストを追加すること
