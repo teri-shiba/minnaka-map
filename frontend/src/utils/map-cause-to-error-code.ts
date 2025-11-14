@@ -12,5 +12,6 @@ export function mapCauseToErrorCode(cause: ServiceCause): ErrorCode {
     case 'SERVER_ERROR': return 'server_error'
     case 'NETWORK': return 'network_error'
     case 'REQUEST_FAILED': return 'request_failed'
+    case 'DUPLICATE_EMAIL': return 'duplicate_email'
   }
 }

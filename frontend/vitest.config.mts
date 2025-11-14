@@ -53,7 +53,10 @@ export default defineConfig({
           name: 'integration-node',
           environment: 'node',
           setupFiles: ['__tests__/integration/setup/msw.server.ts'],
-          include: ['__tests__/integration/services/**/*.{test,spec}.ts?(x)'],
+          include: [
+            '__tests__/integration/services/**/*.{test,spec}.ts?(x)',
+            '__tests__/integration/lib/**/*.{test,spec}.ts?(x)',
+          ],
         },
       },
       {
