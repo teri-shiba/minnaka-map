@@ -2,8 +2,6 @@ import { http, HttpResponse } from 'msw'
 import { getMidpoint } from '~/services/get-midpoint'
 import { server } from '../setup/msw.server'
 
-vi.mock('~/lib/logger', () => ({ logger: vi.fn() }))
-
 describe('getMidpoint', () => {
   it('正しい駅IDを渡したとき、中間地点データを返す', async () => {
     server.use(

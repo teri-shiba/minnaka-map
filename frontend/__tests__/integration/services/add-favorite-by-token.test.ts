@@ -7,8 +7,6 @@ vi.mock('~/services/get-auth-from-cookie', () => ({
   getAuthFromCookie: vi.fn(),
 }))
 
-vi.mock('~/lib/logger', () => ({ logger: vi.fn() }))
-
 describe('addFavoriteByToken', () => {
   const token = 'VALID_TOKEN'
 

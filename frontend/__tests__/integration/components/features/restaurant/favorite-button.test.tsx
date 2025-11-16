@@ -22,8 +22,6 @@ vi.mock('sonner', () => ({
   },
 }))
 
-vi.mock('~/lib/logger', () => ({ logger: vi.fn() }))
-
 function HydrateAtoms({ children, initialValues }: any) {
   useHydrateAtoms(initialValues)
   return children

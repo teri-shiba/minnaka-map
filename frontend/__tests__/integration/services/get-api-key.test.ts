@@ -2,8 +2,6 @@ import { http, HttpResponse } from 'msw'
 import { getApiKey } from '~/services/get-api-key'
 import { server } from '../setup/msw.server'
 
-vi.mock('~/lib/logger', () => ({ logger: vi.fn() }))
-
 describe('getApiKey', () => {
   beforeEach(() => {
     vi.stubEnv('INTERNAL_API_TOKEN', 'test-internal-token')

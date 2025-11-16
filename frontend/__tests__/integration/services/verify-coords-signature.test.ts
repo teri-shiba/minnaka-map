@@ -3,8 +3,6 @@ import { logger } from '~/lib/logger'
 import { verifyCoordsSignature } from '~/services/verify-coords-signature'
 import { server } from '../setup/msw.server'
 
-vi.mock('~/lib/logger', () => ({ logger: vi.fn() }))
-
 describe('verifyCoordsSignature', () => {
   const fixedNow = new Date('2025-10-06T00:00:00Z')
   const nowSec = Math.floor(fixedNow.getTime() / 1000)

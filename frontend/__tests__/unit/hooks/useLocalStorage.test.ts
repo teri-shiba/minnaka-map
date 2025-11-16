@@ -2,8 +2,6 @@ import { act, renderHook } from '@testing-library/react'
 import { useLocalStorage } from '~/hooks/useLocalStorage'
 import { logger } from '~/lib/logger'
 
-vi.mock('~/lib/logger', () => ({ logger: vi.fn() }))
-
 const KEY = 'test-key'
 
 function spySetItem() {
