@@ -35,18 +35,46 @@ function checkEmailConflict(data: unknown): boolean {
   return (data as Record<string, unknown>).error === 'duplicate_email'
 }
 
+function checkAlreadyConfirmed(data: unknown): boolean {
+  if (!data || typeof data !== 'object')
+    return false
+  return (data as Record<string, unknown>).error === 'already_confirmed'
+}
+
+function checkInvalidToken(data: unknown): boolean {
+  if (!data || typeof data !== 'object')
+    return false
+  return (data as Record<string, unknown>).error === 'invalid_token'
+}
+
 api.interceptors.response.use(
   response => response,
   (error: unknown) => {
     if (isAxiosError(error)) {
-      const emailConflict = error.response?.status === 422
-        && checkEmailConflict(error.response.data)
+      let cause: ServiceCause = 'NETWORK'
 
-      const cause: ServiceCause = error.response
-        ? (emailConflict ? 'DUPLICATE_EMAIL' : getServiceCauseFromStatus(error.response.status))
-        : 'NETWORK'
+      if (error.response) {
+        const { status, data } = error.response
 
-      Object.assign(error, { cause })
+        if (status === 422 && checkEmailConflict(data)) {
+          cause = 'DUPLICATE_EMAIL'
+        }
+        else if (status === 400 && checkAlreadyConfirmed(data)) {
+          cause = 'ALREADY_CONFIRMED'
+        }
+        else if (status === 404 && checkInvalidToken(data)) {
+          cause = 'INVALID_TOKEN'
+        }
+        else {
+          cause = getServiceCauseFromStatus(status)
+        }
+      }
+
+      Object.defineProperty(error, 'cause', {
+        value: cause,
+        writable: true,
+        configurable: true,
+      })
       return Promise.reject(error)
     }
 

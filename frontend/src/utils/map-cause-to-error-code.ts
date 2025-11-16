@@ -13,5 +13,7 @@ export function mapCauseToErrorCode(cause: ServiceCause): ErrorCode {
     case 'NETWORK': return 'network_error'
     case 'REQUEST_FAILED': return 'request_failed'
     case 'DUPLICATE_EMAIL': return 'duplicate_email'
+    case 'ALREADY_CONFIRMED': return 'already_confirmed'
+    case 'INVALID_TOKEN': return 'link_expired'
   }
 }

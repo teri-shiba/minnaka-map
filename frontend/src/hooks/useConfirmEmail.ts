@@ -26,11 +26,15 @@ export default function useConfirmEmail() {
         router.replace('/?success=email_confirmed')
       }
       catch (error) {
-        logger(error, {
-          component: 'useConfirmEmail',
-          action: 'confirmEmail',
-        })
         const cause = (error as { cause?: ServiceCause })?.cause ?? 'NETWORK'
+
+        if (cause !== 'ALREADY_CONFIRMED' && cause !== 'INVALID_TOKEN') {
+          logger(error, {
+            component: 'useConfirmEmail',
+            action: 'confirmEmail',
+          })
+        }
+
         const errorCode = mapCauseToErrorCode(cause)
         router.replace(`/?error=${errorCode}`)
       }

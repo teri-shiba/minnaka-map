@@ -9,6 +9,8 @@ export type ServiceCause
     | 'EXPIRED'
     | 'RATE_LIMIT'
     | 'DUPLICATE_EMAIL'
+    | 'ALREADY_CONFIRMED'
+    | 'INVALID_TOKEN'
 
 export interface ServiceSuccess<T> {
   readonly success: true

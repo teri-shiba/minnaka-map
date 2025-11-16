@@ -13,6 +13,7 @@ export const ERROR_MESSAGE = {
   search_context_missing: '必要な情報を取得できませんでした。再検索してから、もう一度お試しください。',
   request_failed: '予期せぬエラーが発生しました',
   duplicate_email: 'このメールアドレスはすでに登録されています',
+  already_confirmed: 'メールアドレスはすでに確認済みです',
 } as const
 
 export type ErrorCode = keyof typeof ERROR_MESSAGE
