@@ -35,6 +35,7 @@ export default defineConfig({
       NEXT_PUBLIC_API_BASE_URL: 'http://localhost',
       API_BASE_URL: 'http://localhost',
     },
+    setupFiles: ['__tests__/setup/global-mocks.ts'],
     projects: [
       {
         extends: true,

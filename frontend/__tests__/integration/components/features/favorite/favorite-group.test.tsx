@@ -25,8 +25,6 @@ vi.mock('sonner', () => ({
   },
 }))
 
-vi.mock('~/lib/logger', () => ({ logger: vi.fn() }))
-
 vi.mock('next/image', () => ({
   default: vi.fn(({ src, alt }) => (
     // eslint-disable-next-line next/no-img-element

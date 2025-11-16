@@ -7,8 +7,6 @@ vi.mock('~/services/get-auth-from-cookie', () => ({
   getAuthFromCookie: vi.fn(),
 }))
 
-vi.mock('~/lib/logger', () => ({ logger: vi.fn() }))
-
 describe('addFavoriteBySearchHistory', () => {
   beforeEach(() => {
     vi.resetAllMocks()

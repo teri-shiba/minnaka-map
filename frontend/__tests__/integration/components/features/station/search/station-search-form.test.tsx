@@ -22,7 +22,7 @@ vi.mock('next/navigation', () => ({
 vi.mock('sonner', () => ({ toast: { error: vi.fn() } }))
 
 vi.mock('~/services/get-midpoint', () => ({ getMidpoint: vi.fn() }))
-vi.mock('~/lib/logger', () => ({ logger: vi.fn() }))
+
 vi.mock('~/public/figure_loading_circle.svg', () => ({
   default: () => null,
 }))
