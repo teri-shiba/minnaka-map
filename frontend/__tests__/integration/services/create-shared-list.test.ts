@@ -3,7 +3,6 @@ import { createSharedList } from '~/services/create-shared-list'
 import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import { server } from '../setup/msw.server'
 
-vi.mock('server-only', () => ({}))
 vi.mock('~/lib/logger', () => ({
   logger: vi.fn(),
 }))

@@ -6,7 +6,6 @@ import { fetchRestaurantsByIds } from '~/services/fetch-restaurants-by-ids'
 import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import { server } from '../setup/msw.server'
 
-vi.mock('server-only', () => ({}))
 vi.mock('~/lib/logger', () => ({
   logger: vi.fn(),
 }))
