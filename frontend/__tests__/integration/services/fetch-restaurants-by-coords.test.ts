@@ -3,7 +3,6 @@ import { fetchRestaurantsByCoords } from '~/services/fetch-restaurants-by-coords
 import { buildHotPepperResults, buildHotPepperShop } from '../helpers/hotpepper-fixtures'
 import { server } from '../setup/msw.server'
 
-vi.mock('server-only', () => ({}))
 vi.mock('~/lib/logger', () => ({
   logger: vi.fn(),
 }))
