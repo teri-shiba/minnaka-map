@@ -39,10 +39,6 @@ vi.mock('swr', async (importOriginal) => {
   }
 })
 
-vi.mock('~/lib/logger', () => ({
-  logger: vi.fn(),
-}))
-
 describe('useAuth', () => {
   beforeEach(() => {
     vi.clearAllMocks()

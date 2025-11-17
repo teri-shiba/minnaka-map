@@ -2,10 +2,6 @@ import { http, HttpResponse } from 'msw'
 import { fetchSharedList } from '~/services/fetch-shared-list'
 import { server } from '../setup/msw.server'
 
-vi.mock('~/lib/logger', () => ({
-  logger: vi.fn(),
-}))
-
 describe('fetchSharedList', () => {
   beforeEach(() => {
     vi.resetAllMocks()

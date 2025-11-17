@@ -34,10 +34,6 @@ vi.mock('jotai/utils', async (importOriginal) => {
   }
 })
 
-vi.mock('~/lib/logger', () => ({
-  logger: vi.fn(),
-}))
-
 function setSearchParams(query: string) {
   currentQuery = query
 }
