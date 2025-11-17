@@ -2,8 +2,6 @@ import { http, HttpResponse } from 'msw'
 import { getApiKey } from '~/services/get-api-key'
 import { server } from '../setup/msw.server'
 
-vi.mock('server-only', () => ({}))
-
 describe('getApiKey', () => {
   beforeEach(() => {
     vi.stubEnv('INTERNAL_API_TOKEN', 'test-internal-token')
@@ -14,7 +12,7 @@ describe('getApiKey', () => {
   })
 
   it('Map Tiler のとき、HTTP 200 なら API キーを返す', async () => {
-    server.use(http.get('*/api_keys/maptiler', async () => {
+    server.use(http.get('http://localhost/api/v1/api_keys/maptiler', async () => {
       return HttpResponse.json({
         success: true,
         data: { api_key: 'test_api_key' },
@@ -30,9 +28,9 @@ describe('getApiKey', () => {
   })
 
   it.each([
-    { service: 'hotpepper', endpoint: '*/api_keys/hotpepper' },
-    { service: 'maptiler', endpoint: '*/api_keys/maptiler' },
-    { service: 'googlemaps', endpoint: '*/api_keys/googlemaps' },
+    { service: 'hotpepper', endpoint: 'http://localhost/api/v1/api_keys/hotpepper' },
+    { service: 'maptiler', endpoint: 'http://localhost/api/v1/api_keys/maptiler' },
+    { service: 'googlemaps', endpoint: 'http://localhost/api/v1/api_keys/googlemaps' },
   ] as const)(
     '各サービスのとき、X-Internal-Token ヘッダーを送る（$service）',
     async ({ service, endpoint }) => {
@@ -56,7 +54,7 @@ describe('getApiKey', () => {
   )
 
   it('Google Maps の API キーが存在しないとき、notFoundMessage を含むエラーを投げる', async () => {
-    server.use(http.get('*/api_keys/googlemaps', async () => {
+    server.use(http.get('http://localhost/api/v1/api_keys/googlemaps', async () => {
       return HttpResponse.json({}, { status: 404 })
     }))
 
@@ -69,7 +67,7 @@ describe('getApiKey', () => {
   })
 
   it('サーバーエラーで API キーが取得できないとき、「サーバーエラーが発生しました」のメッセージを投げる', async () => {
-    server.use(http.get('*/api_keys/hotpepper', async () => {
+    server.use(http.get('http://localhost/api/v1/api_keys/hotpepper', async () => {
       return HttpResponse.json({}, { status: 500 })
     }))
 
@@ -82,7 +80,7 @@ describe('getApiKey', () => {
   })
 
   it('ネットワークエラーが発生したとき、「ネットワークエラーが発生しました」のメッセージを投げる', async () => {
-    server.use(http.get('*/api_keys/maptiler', async () => {
+    server.use(http.get('http://localhost/api/v1/api_keys/maptiler', async () => {
       return HttpResponse.error()
     }))
 

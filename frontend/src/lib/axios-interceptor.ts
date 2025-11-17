@@ -1,44 +1,5 @@
-import axios from 'axios'
-import { toast } from 'sonner'
-
-interface ToastConfig {
-  message: string
-  type: 'error' | 'warning' | 'info'
-}
-
-const STATUS_MESSAGE: Record<
-  number,
-  ToastConfig | ((url?: string) => ToastConfig)
-> = {
-  400: (url?: string) => {
-    if (url?.includes('/user/confirmations')) {
-      return {
-        type: 'info',
-        message: 'メールアドレスはすでに確認済みです',
-      }
-    }
-    return {
-      message: 'リクエストが正しくありません',
-      type: 'error',
-    }
-  },
-  401: {
-    type: 'error',
-    message: '認証エラーが発生しました',
-  },
-  404: (url?: string) => {
-    if (url?.includes('/user/confirmations')) {
-      return {
-        type: 'error',
-        message: 'このリンクは無効です',
-      }
-    }
-    return {
-      message: 'ユーザーは見つかりません',
-      type: 'error',
-    }
-  },
-}
+import type { ServiceCause } from '~/types/service-result'
+import axios, { isAxiosError } from 'axios'
 
 const baseURL = new URL('/api/v1', process.env.NEXT_PUBLIC_API_BASE_URL).href
 
@@ -52,40 +13,71 @@ const api = axios.create({
   timeout: 5000,
 })
 
+function getServiceCauseFromStatus(status: number): ServiceCause {
+  switch (status) {
+    case 0: return 'NETWORK'
+    case 401: return 'UNAUTHORIZED'
+    case 403: return 'FORBIDDEN'
+    case 404: return 'NOT_FOUND'
+    case 429: return 'RATE_LIMIT'
+    default:
+      if (status >= 500)
+        return 'SERVER_ERROR'
+
+      return 'REQUEST_FAILED'
+  }
+}
+
+function checkEmailConflict(data: unknown): boolean {
+  if (!data || typeof data !== 'object')
+    return false
+
+  return (data as Record<string, unknown>).error === 'duplicate_email'
+}
+
+function checkAlreadyConfirmed(data: unknown): boolean {
+  if (!data || typeof data !== 'object')
+    return false
+  return (data as Record<string, unknown>).error === 'already_confirmed'
+}
+
+function checkInvalidToken(data: unknown): boolean {
+  if (!data || typeof data !== 'object')
+    return false
+  return (data as Record<string, unknown>).error === 'invalid_token'
+}
+
 api.interceptors.response.use(
   response => response,
   (error: unknown) => {
-    if (axios.isAxiosError(error) && error.response) {
-      const { status, config } = error.response
-      const entry = STATUS_MESSAGE[status]
+    if (isAxiosError(error)) {
+      let cause: ServiceCause = 'NETWORK'
 
-      let toastConfig: ToastConfig
+      if (error.response) {
+        const { status, data } = error.response
 
-      if (typeof entry === 'function') {
-        toastConfig = entry(config?.url)
-      }
-      else if (entry) {
-        toastConfig = entry
-      }
-      else {
-        toastConfig = {
-          message: 'サーバーエラーが発生しました',
-          type: 'error',
+        if (status === 422 && checkEmailConflict(data)) {
+          cause = 'DUPLICATE_EMAIL'
+        }
+        else if (status === 400 && checkAlreadyConfirmed(data)) {
+          cause = 'ALREADY_CONFIRMED'
+        }
+        else if (status === 404 && checkInvalidToken(data)) {
+          cause = 'INVALID_TOKEN'
+        }
+        else {
+          cause = getServiceCauseFromStatus(status)
         }
       }
 
-      switch (toastConfig.type) {
-        case 'error':
-          toast.error(toastConfig.message)
-          break
-        case 'info':
-          toast.info(toastConfig.message)
-          break
-      }
+      Object.defineProperty(error, 'cause', {
+        value: cause,
+        writable: true,
+        configurable: true,
+      })
+      return Promise.reject(error)
     }
-    else {
-      toast.error('予期しないエラーが発生しました')
-    }
+
     return Promise.reject(error)
   },
 )

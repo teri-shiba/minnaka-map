@@ -11,7 +11,7 @@ function fakeLatLng(expression: LatLngExpression): LatLng {
 }
 
 describe('createLeafletOptions', () => {
-  const RADIUS_METERS = 3000
+  const RADIUS_METERS = 1000
   const METERS_PER_DEG_LAT = 111_000
   const DEG_TO_RAD = Math.PI / 180
 
@@ -26,8 +26,8 @@ describe('createLeafletOptions', () => {
 
     // ZOOM
     expect(opts.zoom).toBe(17)
-    expect(opts.minZoom).toBe(14)
-    expect(opts.maxZoom).toBe(18)
+    expect(opts.minZoom).toBe(13)
+    expect(opts.maxZoom).toBe(20)
     expect(opts.zoomSnap).toBe(1)
     expect(opts.zoomDelta).toBe(1)
 

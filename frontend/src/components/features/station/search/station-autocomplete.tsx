@@ -1,8 +1,8 @@
 'use client'
 
 import type { FormEvent } from 'react'
-import type { SavedStation, StationProps } from '~/types/station'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import type { Station } from '~/types/station'
+import { useCallback, useMemo, useState } from 'react'
 import { Command, CommandInput } from '~/components/ui/command'
 import { useLocalStorage } from '~/hooks/useLocalStorage'
 import useSearchStation from '~/hooks/useSearchStation'
@@ -11,88 +11,77 @@ import StationSuggestions from './station-suggestions'
 interface StationAutocompleteProps {
   value: string
   placeholder: string
-  onChange: (value: string, stationId?: number, latitude?: number, longitude?: number) => void
-  excludedStations?: string[]
+  onChange: (value: string, stationId?: number) => void
+  excludedStationIds?: number[]
 }
 
 export default function StationAutocomplete({
   value,
   placeholder,
   onChange,
-  excludedStations,
+  excludedStationIds,
 }: StationAutocompleteProps) {
   const [isFocused, setIsFocused] = useState(false)
   const [isSelected, setIsSelected] = useState(false)
-  const [recentStations, setRecentStations, refreshRecentStations] = useLocalStorage<SavedStation[]>(
+  const [recentStations, setRecentStations, refreshRecentStations] = useLocalStorage<Station[]>(
     'recentStations',
     [],
     { refreshOnFocus: true },
   )
   const { stations, isLoading, isError } = useSearchStation(value)
 
-  const excludedStationNames = useMemo(() => {
-    return excludedStations ?? []
-  }, [excludedStations])
-
-  const prevValueRef = useRef(value)
-  if (prevValueRef.current !== value) {
-    if (value === '') {
-      setIsSelected(false)
-    }
-    prevValueRef.current = value
-  }
+  const idExcludeSet = useMemo(() => new Set(excludedStationIds ?? []), [excludedStationIds])
 
   const handleInputChange = useCallback((e: FormEvent<HTMLInputElement>) => {
     onChange(e.currentTarget.value)
     setIsSelected(false)
   }, [onChange])
 
-  const handleFocus = useCallback(() => {
+  const newHandleFocus = useCallback(() => {
     setIsFocused(true)
+
+    if (value === '')
+      setIsSelected(false)
+
     refreshRecentStations()
-  }, [refreshRecentStations])
+  }, [refreshRecentStations, value])
 
   const handleBlur = useCallback(() => {
-    if (!isSelected && value !== '') {
+    if (!isSelected && value !== '')
       onChange('')
-    }
+
     setIsFocused(false)
   }, [isSelected, onChange, value])
 
-  const handleSelect = useCallback((station: StationProps) => {
+  const handleSelect = useCallback((station: Station) => {
     setIsSelected(true)
-    onChange(station.name, station.id, station.latitude, station.longitude)
+    onChange(station.name, station.id)
 
     setRecentStations((prev) => {
       const filtered = prev.filter(s => s.id !== station.id)
       return [{
         id: station.id,
         name: station.name,
-        latitude: String(station.latitude),
-        longitude: String(station.longitude),
       }, ...filtered].slice(0, 5)
     })
   }, [onChange, setRecentStations])
 
-  const matchedRecent = useMemo(() => {
-    if (!value.trim()) {
-      return recentStations.filter(
-        saved => !excludedStationNames.includes(saved.name),
-      )
-    }
-    return recentStations.filter(saved =>
-      stations.some((station: StationProps) => station.id === saved.id)
-      && !excludedStationNames.includes(saved.name),
-    )
-  }, [value, recentStations, stations, excludedStationNames])
+  const newMatchedRecent = useMemo(() => {
+    const base: Station[] = !value.trim()
+      ? recentStations
+      : recentStations.filter(saved =>
+          stations.some((s: Station) => s.id === saved.id),
+        )
 
-  const filteredStations = useMemo(() => {
-    return stations.filter(
-      (station: StationProps) =>
-        !recentStations.some(s => s.id === station.id)
-        && !excludedStationNames.includes(station.name),
+    return base.filter(saved => !idExcludeSet.has(saved.id))
+  }, [value, recentStations, stations, idExcludeSet])
+
+  const newFilteredStations = useMemo(() => {
+    return stations.filter((station: Station) =>
+      !recentStations.some(s => s.id === station.id)
+      && !idExcludeSet.has(station.id),
     )
-  }, [stations, recentStations, excludedStationNames])
+  }, [stations, recentStations, idExcludeSet])
 
   return (
     <div>
@@ -105,17 +94,19 @@ export default function StationAutocomplete({
           value={value}
           onInput={handleInputChange}
           placeholder={placeholder}
-          onFocus={handleFocus}
+          onFocus={newHandleFocus}
           onBlur={handleBlur}
-          className="h-12"
+          aria-controls="autocomplete-list"
+          aria-expanded={isFocused && !isSelected}
+          className="h-12 pr-5"
         />
 
         {(isFocused && !isSelected) && (
           <StationSuggestions
             isLoading={isLoading}
             isError={isError}
-            filteredStations={filteredStations}
-            matchedRecent={matchedRecent}
+            filteredStations={newFilteredStations}
+            matchedRecent={newMatchedRecent}
             onSelect={handleSelect}
           />
         )}

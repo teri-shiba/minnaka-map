@@ -3,16 +3,9 @@ import { http, HttpResponse } from 'msw'
 import { FAVORITE_GROUPS_PER_PAGE, FAVORITES_FIRST_PAGE } from '~/constants'
 import { fetchFavoriteGroups } from '~/services/fetch-favorite-groups'
 import { fetchRestaurantsByIds } from '~/services/fetch-restaurants-by-ids'
-import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
+import { setupAuthMock, setupUnauthorized } from '../helpers/auth-mock'
 import { server } from '../setup/msw.server'
 
-vi.mock('server-only', () => ({}))
-vi.mock('~/lib/logger', () => ({
-  logger: vi.fn(),
-}))
-vi.mock('~/services/get-auth-from-cookie', () => ({
-  getAuthFromCookie: vi.fn(),
-}))
 vi.mock('~/services/fetch-restaurants-by-ids', () => ({
   fetchRestaurantsByIds: vi.fn(),
 }))
@@ -35,11 +28,7 @@ function makeRestaurant(id: string): RestaurantListItem {
 describe('fetchFavoriteGroups', () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.mocked(getAuthFromCookie).mockResolvedValue({
-      accessToken: 'token-123',
-      client: 'client-123',
-      uid: 'uid-123',
-    })
+    setupAuthMock()
   })
 
   it('成功したとき、レストラン詳細を結合してグループと pagination を返す', async () => {
@@ -55,7 +44,7 @@ describe('fetchFavoriteGroups', () => {
     ]
 
     server.use(
-      http.get('*/favorites', async () => {
+      http.get('http://localhost/api/v1/favorites', async () => {
         return HttpResponse.json({
           success: true,
           data: groupData,
@@ -88,7 +77,7 @@ describe('fetchFavoriteGroups', () => {
 
   it('API が 400 エラーのとき、REQUEST_FAILED で失敗を返す', async () => {
     server.use(
-      http.get('*/favorites', async () => {
+      http.get('http://localhost/api/v1/favorites', async () => {
         return HttpResponse.json({}, { status: 400 })
       }),
     )
@@ -108,7 +97,7 @@ describe('fetchFavoriteGroups', () => {
     let seenLimit: string | null = null
 
     server.use(
-      http.get('*/favorites', async ({ request }) => {
+      http.get('http://localhost/api/v1/favorites', async ({ request }) => {
         const url = new URL(request.url)
         seenPage = url.searchParams.get('page')
         seenLimit = url.searchParams.get('limit')
@@ -138,7 +127,7 @@ describe('fetchFavoriteGroups', () => {
 
   it('ネットワークエラーのとき、NETWORK で失敗を返す', async () => {
     server.use(
-      http.get('*/favorites', async () => {
+      http.get('http://localhost/api/v1/favorites', async () => {
         return HttpResponse.error()
       }),
     )
@@ -153,7 +142,7 @@ describe('fetchFavoriteGroups', () => {
   })
 
   it('認証情報がないとき、UNAUTHORIZED を返す', async () => {
-    vi.mocked(getAuthFromCookie).mockResolvedValueOnce(null)
+    setupUnauthorized()
 
     const result = await fetchFavoriteGroups(1)
 

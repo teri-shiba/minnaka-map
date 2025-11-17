@@ -34,7 +34,6 @@
 | components/features/station/search/buttons/add-form-button.tsx    | ui-wrapper        | 単純ボタン（UI ラッパー）                | `/* c8 ignore start -- UI コンポーネントの薄いラッパー */`          |
 | components/features/station/search/buttons/remove-form-button.tsx | ui-wrapper        | 単純ボタン（UI ラッパー）                | `/* c8 ignore start -- UI コンポーネントの薄いラッパー */`          |
 | components/features/station/search/buttons/reset-form-button.tsx  | ui-wrapper        | 単純ボタン（UI ラッパー）                | `/* c8 ignore start -- UI コンポーネントの薄いラッパー */`          |
-| components/account/delete/delete-account-content.tsx              | visual            | 単純な表示コンポーネント                  | `/* c8 ignore start -- 視覚のみ/薄いラッパー */`            |
 | components/account/delete/delete-account-dialog.tsx               | ui-wrapper        | Dialog UI の薄いラッパー             | `/* c8 ignore start -- UI コンポーネントの薄いラッパー */`          |
 | components/account/delete/delete-account-drawer.tsx               | ui-wrapper        | Drawer UI の薄いラッパー             | `/* c8 ignore start -- UI コンポーネントの薄いラッパー */`          |
 | components/map/map-canvas.tsx                                     | external-renderer | 地図描画（外部レンダラ委譲）                | `/* c8 ignore start -- 外部レンダラ（地図/レイヤ/マーカー等）の委譲 */`    |
@@ -46,9 +45,8 @@
 | components/restaurant/restaurant-empty.tsx                        | visual            | 空状態の静的表示                      | `/* c8 ignore start -- 視覚のみ/薄いラッパー */`            |
 | components/restaurant/restaurant-list-body.tsx                    | visual            | 単純なレンダリングロジック                 | `/* c8 ignore start -- 視覚のみ/薄いラッパー */`            |
 | components/restaurant/restaurant-list-footer.tsx                  | visual            | 単純なフッター表示                     | `/* c8 ignore start -- 視覚のみ/薄いラッパー */`            |
-| components/restaurant/restaurant-list-header.tsx                  | visual            | 単純なヘッダー表示                     | `/* c8 ignore start -- 視覚のみ/薄いラッパー */`            |
-| components/restaurant/restaurant-pagination.tsx                   | visual            | 単純なページング表示                    | `/* c8 ignore start -- 視覚のみ/薄いラッパー */`            |
 | components/restaurant/restaurant-sidebar-container.tsx            | visual            | 単純なコンテナ                       | `/* c8 ignore start -- 視覚のみ/薄いラッパー */`            |
 | components/layout/section.tsx                                     | visual            | 単純なレイアウトラッパー                  | `/* c8 ignore start -- 視覚のみ/薄いラッパー */`            |
+| components/footer/section.tsx                                     | visual            | 条件付きクラス適用のみ（視覚的変化）                  | `/* c8 ignore start -- 視覚のみ/薄いラッパー */`            |
 
 > **注意**: 将来これらのファイルに `if/switch`、配列処理、副作用、外部呼び出し等の**ロジック**が追加された場合は、対象外コメントを削除し、相応のテストを追加すること

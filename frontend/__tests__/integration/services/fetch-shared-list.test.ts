@@ -2,11 +2,6 @@ import { http, HttpResponse } from 'msw'
 import { fetchSharedList } from '~/services/fetch-shared-list'
 import { server } from '../setup/msw.server'
 
-vi.mock('server-only', () => ({}))
-vi.mock('~/lib/logger', () => ({
-  logger: vi.fn(),
-}))
-
 describe('fetchSharedList', () => {
   beforeEach(() => {
     vi.resetAllMocks()
@@ -14,7 +9,7 @@ describe('fetchSharedList', () => {
 
   it('シェアリスト取得に成功したとき、title と favorites を返す', async () => {
     server.use(
-      http.get('*/api/v1/shared_favorite_lists/:uuid', async () => {
+      http.get('http://localhost/api/v1/shared_favorite_lists/:uuid', async () => {
         return HttpResponse.json({
           success: true,
           data: {
@@ -55,7 +50,7 @@ describe('fetchSharedList', () => {
 
   it('存在しない UUID のとき、NOT_FOUND で失敗を返す', async () => {
     server.use(
-      http.get('*/api/v1/shared_favorite_lists/:uuid', async () => {
+      http.get('http://localhost/api/v1/shared_favorite_lists/:uuid', async () => {
         return HttpResponse.json({}, { status: 404 })
       }),
     )
@@ -72,7 +67,7 @@ describe('fetchSharedList', () => {
 
   it('API が 400 エラーのとき、REQUEST_FAILED で失敗を返す', async () => {
     server.use(
-      http.get('*/api/v1/shared_favorite_lists/:uuid', async () => {
+      http.get('http://localhost/api/v1/shared_favorite_lists/:uuid', async () => {
         return HttpResponse.json({}, { status: 400 })
       }),
     )
@@ -89,7 +84,7 @@ describe('fetchSharedList', () => {
 
   it('ネットワークエラーのとき、NETWORK を返す', async () => {
     server.use(
-      http.get('*/api/v1/shared_favorite_lists/:uuid', async () => {
+      http.get('http://localhost/api/v1/shared_favorite_lists/:uuid', async () => {
         return HttpResponse.error()
       }),
     )

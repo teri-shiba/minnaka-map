@@ -85,5 +85,31 @@ RSpec.describe "Overrides::RegistrationsController", type: :request do
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
+
+    context "既に登録済みのメールアドレスで登録しようとした場合" do
+      before do
+        create(:user_auth, email: user_email)
+      end
+
+      it "422 を返す" do
+        post api_v1_user_auth_registration_path,
+             params: valid_params, as: :json
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it "User / UserAuth は作成されない" do
+        expect {
+          post api_v1_user_auth_registration_path,
+               params: valid_params, as: :json
+        }.to not_change { User.count }.
+               and not_change { UserAuth.count }
+      end
+
+      it "duplicate_email エラーを返す" do
+        post api_v1_user_auth_registration_path,
+             params: valid_params, as: :json
+        expect(json[:error]).to eq("duplicate_email")
+      end
+    end
   end
 end

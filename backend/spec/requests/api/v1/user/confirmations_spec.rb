@@ -11,32 +11,28 @@ RSpec.describe "Api::V1::User::ConfirmationsController", type: :request do
         patch path, params: { confirmation_token: "token-123" }
 
         expect(response).to have_http_status(:ok)
-        expect(json[:message]).to eq(I18n.t("devise.confirmations.confirmed"))
+        expect(json[:success]).to be(true)
         expect(user_auth.reload.confirmed_at).to be_present
       end
     end
 
     context "確認トークンに一致するユーザーが存在しないとき" do
-      it "404 と未発見メッセージを返す" do
+      it "404 と invalid_token エラーを返す" do
         patch path, params: { confirmation_token: "not-found" }
 
         expect(response).to have_http_status(:not_found)
-        expect(json[:message]).to eq(
-          I18n.t("activerecord.models.user") + I18n.t("errors.messages.not_found"),
-        )
+        expect(json[:error]).to eq("invalid_token")
       end
     end
 
     context "すでに確認済みのとき" do
       let!(:user_auth) { create(:user_auth, confirmation_token: "already-ok") }
 
-      it "400 と確認済みメッセージを返す" do
+      it "400 と already_confirmed エラーを返す" do
         patch path, params: { confirmation_token: "already-ok" }
 
         expect(response).to have_http_status(:bad_request)
-        expect(json[:message]).to eq(
-          I18n.t("activerecord.attributes.user_auth.email") + I18n.t("errors.messages.already_confirmed"),
-        )
+        expect(json[:error]).to eq("already_confirmed")
       end
     end
   end

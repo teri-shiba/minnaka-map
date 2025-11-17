@@ -100,7 +100,7 @@ function DialogDescription({ ref, className, ...props }: ComponentPropsWithoutRe
   return (
     <DialogPrimitive.Description
       ref={ref}
-      className={cn('text-sm text-muted-foreground', className)}
+      className={cn('text-sm text-muted-foreground leading-relaxed', className)}
       {...props}
     />
   )

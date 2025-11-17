@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react'
 import useSearchStation from '~/hooks/useSearchStation'
-import { createSWRCallTracker, createSWRWrapper } from './helpers/swr-test-helpers'
+import { createSWRCallTracker, createSWRWrapper } from '../../helpers/swr-test-helpers'
 
 describe('useSearchStation', () => {
   beforeEach(() => {
@@ -28,7 +28,7 @@ describe('useSearchStation', () => {
     })
     expect(result.current.stations).toEqual(mockStations)
     expect(result.current.isLoading).toBe(false)
-    expect(result.current.isError).toBeUndefined()
+    expect(result.current.isError).toBe(false)
   })
 
   it('検索クエリが空文字列のとき、API呼び出しを行わず空の配列を返す', () => {
@@ -37,7 +37,7 @@ describe('useSearchStation', () => {
 
     expect(result.current.isLoading).toBe(false)
     expect(result.current.stations).toEqual([])
-    expect(result.current.isError).toBeUndefined()
+    expect(result.current.isError).toBe(false)
   })
 
   it('検索クエリが空白のみのとき、API呼び出しを行わず空の配列を返す', () => {
@@ -46,7 +46,7 @@ describe('useSearchStation', () => {
 
     expect(result.current.isLoading).toBe(false)
     expect(result.current.stations).toEqual([])
-    expect(result.current.isError).toBeUndefined()
+    expect(result.current.isError).toBe(false)
   })
 
   it('検索クエリの前後に空白があるとき、空白を削除してから検索を行う', async () => {
@@ -116,7 +116,7 @@ describe('useSearchStation', () => {
 
     rerender({ query: 'tokyo' })
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(300)
+      await vi.advanceTimersByTimeAsync(500)
     })
 
     expect(result.current.stations).toEqual(mockStations)

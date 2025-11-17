@@ -1,6 +1,7 @@
 class UserAuth < ApplicationRecord
   include DeviseTokenAuth::Concerns::User
   belongs_to :user
+  after_destroy :destroy_user_if_no_auths
 
   # Include default devise modules. Others available are:
   # :lockable, :timeoutable, :trackable
@@ -15,4 +16,10 @@ class UserAuth < ApplicationRecord
   def self.add_permitted_params
     [:name]
   end
+
+  private
+
+    def destroy_user_if_no_auths
+      user.destroy! if user.user_auths.empty?
+    end
 end

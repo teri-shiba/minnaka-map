@@ -2,7 +2,7 @@
 
 import type { RestaurantListItem } from '~/types/restaurant'
 import L from 'leaflet'
-import { useCallback } from 'react'
+import { memo } from 'react'
 import { Marker, Tooltip } from 'react-leaflet'
 import { ICON } from '~/constants'
 
@@ -24,15 +24,11 @@ interface RestaurantMarkerProps {
   selectedRestaurantId?: string | null
 }
 
-export default function RestaurantMarkers({
+function RestaurantMarkers({
   restaurants,
   onRestaurantClick,
   selectedRestaurantId,
 }: RestaurantMarkerProps) {
-  const handleClick = useCallback((restaurant: RestaurantListItem) => {
-    onRestaurantClick(restaurant)
-  }, [onRestaurantClick])
-
   return (
     <>
       {restaurants.map((restaurant) => {
@@ -46,7 +42,7 @@ export default function RestaurantMarkers({
             position={[lat, lng]}
             icon={icon}
             eventHandlers={{
-              click: () => handleClick(restaurant),
+              click: () => onRestaurantClick(restaurant),
             }}
           >
             <Tooltip
@@ -63,3 +59,5 @@ export default function RestaurantMarkers({
     </>
   )
 }
+
+export default memo(RestaurantMarkers)

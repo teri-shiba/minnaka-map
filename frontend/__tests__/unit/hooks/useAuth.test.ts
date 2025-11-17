@@ -3,7 +3,17 @@ import { toast } from 'sonner'
 import { useAuth } from '~/hooks/useAuth'
 import api from '~/lib/axios-interceptor'
 import { logger } from '~/lib/logger'
-import { createSWRWrapper } from './helpers/swr-test-helpers'
+import { createSWRWrapper } from '../../helpers/swr-test-helpers'
+
+const routerReplaceSpy = vi.fn()
+const MOCK_PATH = '/result'
+
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(() => ({
+    replace: routerReplaceSpy,
+  })),
+  usePathname: vi.fn(() => MOCK_PATH),
+}))
 
 vi.mock('~/lib/axios-interceptor', () => ({
   default: {
@@ -29,10 +39,6 @@ vi.mock('swr', async (importOriginal) => {
   }
 })
 
-vi.mock('~/lib/logger', () => ({
-  logger: vi.fn(),
-}))
-
 describe('useAuth', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -40,7 +46,7 @@ describe('useAuth', () => {
   })
 
   describe('/current/user/show_status', () => {
-    it('ログインしていないとき、user.isSignedIn は false である', async () => {
+    it('未ログインなら isSignedIn=false', async () => {
       vi.mocked(api.get).mockResolvedValueOnce({ data: { login: false } })
 
       const { result } = renderHook(() => useAuth(), {
@@ -52,7 +58,7 @@ describe('useAuth', () => {
       })
     })
 
-    it('ログインしているとき、user には API レスポンスのユーザー情報を設定する', async () => {
+    it('ログイン済みならユーザーを設定', async () => {
       vi.mocked(api.get).mockResolvedValueOnce({
         data: {
           login: true,
@@ -78,7 +84,7 @@ describe('useAuth', () => {
       })
     })
 
-    it('ユーザー情報の取得に失敗したとき、user.isSignedIn は false になる', async () => {
+    it('ユーザー情報取得失敗なら isSignedIn=false', async () => {
       vi.mocked(api.get).mockRejectedValueOnce(new Error('ユーザー情報の取得に失敗しました'))
 
       const { result } = renderHook(() => useAuth(), {
@@ -92,7 +98,7 @@ describe('useAuth', () => {
   })
 
   describe('signup', () => {
-    it('登録に成功したとき、認証メール確認のトーストメッセージを表示する', async () => {
+    it('登録成功なら現在のパスに ?success=email_sent を付与', async () => {
       vi.mocked(api.get).mockResolvedValueOnce({ data: { login: true } })
       vi.mocked(api.post).mockResolvedValueOnce({ status: 200 })
 
@@ -112,15 +118,18 @@ describe('useAuth', () => {
         )
       })
 
-      expect(api.post).toHaveBeenCalledWith('/auth', {
-        name: 'Hanako',
-        email: 'hanako@example.com',
-        password: 'pass123',
-      })
-      expect(toast.success).toHaveBeenCalledWith('認証メールをご確認ください')
+      expect(api.post).toHaveBeenCalledWith(
+        '/auth',
+        expect.objectContaining({
+          name: 'Hanako',
+          email: 'hanako@example.com',
+          password: 'pass123',
+        }),
+      )
+      expect(routerReplaceSpy).toHaveBeenCalledWith(`${MOCK_PATH}?success=email_sent`)
     })
 
-    it('登録に失敗したとき、user.isSignedIn は false になる', async () => {
+    it('登録失敗なら isSignedIn=false', async () => {
       vi.mocked(api.get).mockResolvedValueOnce({
         data: {
           login: true,
@@ -155,7 +164,7 @@ describe('useAuth', () => {
   })
 
   describe('login', () => {
-    it('ログインに成功したとき、user.isSignedIn は false になり、sessionStorage はクリアされ、ログアウト成功のトーストメッセージが表示される', async () => {
+    it('ログイン成功なら /?success=login へ遷移', async () => {
       vi.mocked(api.get).mockResolvedValueOnce({ data: { login: true } })
       vi.mocked(api.post).mockResolvedValueOnce({ status: 200 })
 
@@ -179,10 +188,10 @@ describe('useAuth', () => {
         password: 'pass123',
       })
       expect(mockMutate).toHaveBeenCalledWith('/current/user/show_status')
-      expect(toast.success).toHaveBeenCalledWith('ログインに成功しました')
+      expect(routerReplaceSpy).toHaveBeenCalledWith('/?success=login')
     })
 
-    it('ログインに失敗したとき、user.isSignedIn は false になる', async () => {
+    it('ログイン失敗なら isSignedIn=false', async () => {
       vi.mocked(api.get).mockResolvedValueOnce({
         data: {
           login: true,
@@ -216,7 +225,7 @@ describe('useAuth', () => {
   })
 
   describe('logout', () => {
-    it('ログアウトに成功したとき、user.isSignedIn は false になり、sessionStorage がクリアされ、ログアウト成功のトーストメッセージが表示される', async () => {
+    it('ログアウト成功ならトーストしてトップページへ遷移', async () => {
       vi.mocked(api.get).mockResolvedValueOnce({
         data: {
           login: true,
@@ -229,7 +238,6 @@ describe('useAuth', () => {
       vi.mocked(api.delete).mockResolvedValueOnce({ status: 200 })
 
       sessionStorage.setItem('pendingStationIds', '1,2,3')
-      sessionStorage.setItem('pendingSearchHistoryId', '999')
 
       const { result } = renderHook(() => useAuth(), {
         wrapper: createSWRWrapper(),
@@ -247,11 +255,10 @@ describe('useAuth', () => {
       expect(mockMutate).toHaveBeenCalledWith('/current/user/show_status')
       expect(result.current.user.isSignedIn).toBe(false)
       expect(sessionStorage.getItem('pendingStationIds')).toBeNull()
-      expect(sessionStorage.getItem('pendingSearchHistoryId')).toBeNull()
       expect(toast.success).toHaveBeenCalledWith('ログアウトしました')
     })
 
-    it('ログアウトに失敗したとき、user.isSignedIn は false になる', async () => {
+    it('ログアウト失敗なら isSignedIn=false', async () => {
       vi.mocked(api.get).mockResolvedValueOnce({
         data: {
           login: true,
@@ -266,7 +273,6 @@ describe('useAuth', () => {
       )
 
       sessionStorage.setItem('pendingStationIds', '1,2,3')
-      sessionStorage.setItem('pendingSearchHistoryId', '999')
 
       const { result } = renderHook(() => useAuth(), {
         wrapper: createSWRWrapper(),
@@ -281,13 +287,11 @@ describe('useAuth', () => {
       })
 
       expect(result.current.user.isSignedIn).toBe(false)
-      // 失敗でも resetUser() は呼ばれる仕様（セッションは明示削除しない） <- Why
-      // ここでは sessionStorage の削除は保証しない <- Why
     })
   })
 
   describe('deleteAccount', () => {
-    it('アカウント削除に成功したとき、user.isSignedIn は false になり、sessionStorage がクリアされ、削除成功のトーストメッセージが表示され、{ success: true } が返される', async () => {
+    it('削除成功なら /?success=account_deleted へ遷移', async () => {
       vi.mocked(api.get).mockResolvedValueOnce({
         data: {
           login: true,
@@ -300,7 +304,6 @@ describe('useAuth', () => {
       vi.mocked(api.delete).mockResolvedValueOnce({ status: 200 })
 
       sessionStorage.setItem('pendingStationIds', '1,2,3')
-      sessionStorage.setItem('pendingSearchHistoryId', '999')
 
       const { result } = renderHook(() => useAuth(), {
         wrapper: createSWRWrapper(),
@@ -310,21 +313,17 @@ describe('useAuth', () => {
         expect(result.current.user.isSignedIn).toBe(true)
       })
 
-      const returned = await result.current.deleteAccount()
+      const returned = await act(async () => result.current.deleteAccount())
 
-      await waitFor(() => {
-        expect(result.current.user.isSignedIn).toBe(false)
-      })
-
+      expect(result.current.user.isSignedIn).toBe(false)
       expect(api.delete).toHaveBeenCalledWith('/auth')
       expect(mockMutate).toHaveBeenCalledWith('/current/user/show_status')
       expect(sessionStorage.getItem('pendingStationIds')).toBeNull()
-      expect(sessionStorage.getItem('pendingSearchHistoryId')).toBeNull()
-      expect(toast.success).toHaveBeenCalledWith('アカウントが削除されました')
+      expect(routerReplaceSpy).toHaveBeenCalledWith('/?success=account_deleted')
       expect(returned).toEqual({ success: true })
     })
 
-    it('アカウント削除に失敗したとき、エラーが logger に記録され、エラートーストが表示され、{ success: false, error } が返される', async () => {
+    it('削除失敗なら logger 記録と error 遷移', async () => {
       const mockedError = new Error('アカウントが削除に失敗しました')
       vi.mocked(api.get).mockResolvedValueOnce({
         data: {
@@ -355,7 +354,7 @@ describe('useAuth', () => {
           provider: 'email',
         },
       })
-      expect(toast.error).toHaveBeenCalledWith('アカウントの削除に失敗しました')
+      expect(routerReplaceSpy).toHaveBeenCalledWith('/?error=network_error')
       expect(returned).toEqual({ success: false, error: mockedError })
     })
   })

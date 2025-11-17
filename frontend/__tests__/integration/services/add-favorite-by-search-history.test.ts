@@ -1,26 +1,17 @@
 import { http, HttpResponse } from 'msw'
 import { addFavoriteBySearchHistory } from '~/services/add-favorite-by-search-history'
-import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
+import { setupAuthMock, setupUnauthorized } from '../helpers/auth-mock'
 import { server } from '../setup/msw.server'
-
-vi.mock('server-only', () => ({}))
-vi.mock('~/services/get-auth-from-cookie', () => ({
-  getAuthFromCookie: vi.fn(),
-}))
 
 describe('addFavoriteBySearchHistory', () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.mocked(getAuthFromCookie).mockResolvedValue({
-      accessToken: 'token-123',
-      client: 'client-123',
-      uid: 'uid-123',
-    })
+    setupAuthMock()
   })
 
   it('お気に入り追加に成功したとき、success: true と favoriteId と hotpepperId を返す', async () => {
     server.use(
-      http.post('*/favorites/by_search_history', async () => {
+      http.post('http://localhost/api/v1/favorites/by_search_history', async () => {
         return HttpResponse.json({
           success: true,
           data: { id: 101, hotpepper_id: 'J001246910' },
@@ -40,7 +31,7 @@ describe('addFavoriteBySearchHistory', () => {
 
   it('API が 400 エラーのとき、success: false を返す', async () => {
     server.use(
-      http.post('*/favorites/by_search_history', async () => {
+      http.post('http://localhost/api/v1/favorites/by_search_history', async () => {
         return HttpResponse.json({}, { status: 400 })
       }),
     )
@@ -57,7 +48,7 @@ describe('addFavoriteBySearchHistory', () => {
 
   it('検索結果にない店舗のとき、422 エラーを返す', async () => {
     server.use(
-      http.post('*/favorites/by_search_history', async () => {
+      http.post('http://localhost/api/v1/favorites/by_search_history', async () => {
         return HttpResponse.json(
           { error: 'この店舗は検索結果に含まれていません' },
           { status: 400 },
@@ -77,7 +68,7 @@ describe('addFavoriteBySearchHistory', () => {
 
   it('存在しない検索履歴IDのとき、404 エラーを返す', async () => {
     server.use(
-      http.post('*/favorites/by_search_history', async () => {
+      http.post('http://localhost/api/v1/favorites/by_search_history', async () => {
         return HttpResponse.json(
           { error: '検索履歴が見つかりません' },
           { status: 404 },
@@ -97,7 +88,7 @@ describe('addFavoriteBySearchHistory', () => {
 
   it('ネットワークエラーのとき、success: false と NETWORK を返す', async () => {
     server.use(
-      http.post('*/favorites/by_search_history', async () => {
+      http.post('http://localhost/api/v1/favorites/by_search_history', async () => {
         return HttpResponse.error()
       }),
     )
@@ -113,7 +104,7 @@ describe('addFavoriteBySearchHistory', () => {
   })
 
   it('認証情報がないとき、UNAUTHORIZED を返す', async () => {
-    vi.mocked(getAuthFromCookie).mockResolvedValueOnce(null)
+    setupUnauthorized()
 
     const result = await addFavoriteBySearchHistory('J001246910', 'SH99')
 
