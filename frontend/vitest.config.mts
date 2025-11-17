@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [react(), tsconfigPaths()],
   resolve: {
     alias: [
+      { find: /^~\/public\//, replacement: fileURLToPath(new URL('./public/', import.meta.url)) },
       { find: /^~\//, replacement: fileURLToPath(new URL('./src/', import.meta.url)) },
       { find: /^~$/, replacement: fileURLToPath(new URL('./src', import.meta.url)) },
     ],
@@ -30,9 +31,11 @@ export default defineConfig({
       ],
     },
     env: {
+      NEXT_PUBLIC_FRONT_BASE_URL: 'http://localhost',
       NEXT_PUBLIC_API_BASE_URL: 'http://localhost',
       API_BASE_URL: 'http://localhost',
     },
+    setupFiles: ['__tests__/setup/global-mocks.ts'],
     projects: [
       {
         extends: true,
@@ -51,7 +54,10 @@ export default defineConfig({
           name: 'integration-node',
           environment: 'node',
           setupFiles: ['__tests__/integration/setup/msw.server.ts'],
-          include: ['__tests__/integration/services/**/*.{test,spec}.ts?(x)'],
+          include: [
+            '__tests__/integration/services/**/*.{test,spec}.ts?(x)',
+            '__tests__/integration/lib/**/*.{test,spec}.ts?(x)',
+          ],
         },
       },
       {

@@ -1,8 +1,11 @@
+'use client'
+
+import type { LatLngBoundsExpression } from 'leaflet'
 import type { MapData, MapItems } from '~/types/map'
 import type { RestaurantListItem } from '~/types/restaurant'
 import { useCallback } from 'react'
 import { useMapEvent, ZoomControl } from 'react-leaflet'
-import { useMapCoordinates } from '~/hooks/useMapCoordinates'
+import { useMapCoords } from '~/hooks/useMapCoords'
 import MapTilerLayer from './map-layer'
 import MidpointMarker from './midpoint-marker'
 import RestaurantMarker from './restaurant-marker'
@@ -12,18 +15,19 @@ interface MapContentProps extends MapItems {
   onRestaurantClick: (restaurant: RestaurantListItem) => void
   onRestaurantClose: () => void
   onMarkerPositionChange: (data: MapData) => void
+  maxBounds: LatLngBoundsExpression
 }
 
 export default function MapContent({
-  apiKey,
   midpoint,
   restaurants,
   selectedRestaurant,
   onRestaurantClick,
   onRestaurantClose,
   onMarkerPositionChange,
+  maxBounds,
 }: MapContentProps) {
-  useMapCoordinates(
+  useMapCoords(
     selectedRestaurant?.lat ?? null,
     selectedRestaurant?.lng ?? null,
     onMarkerPositionChange,
@@ -34,16 +38,35 @@ export default function MapContent({
       onRestaurantClose()
   }, [selectedRestaurant, onRestaurantClose])
 
+  const handleMoveStart = useCallback(() => {
+    if (selectedRestaurant)
+      onRestaurantClose()
+  }, [selectedRestaurant, onRestaurantClose])
+
+  const handleZoomEnd = useCallback(() => {
+    if (selectedRestaurant)
+      onRestaurantClose()
+  }, [selectedRestaurant, onRestaurantClose])
+
+  const handleRestaurantClick = useCallback(
+    (restaurant: RestaurantListItem) => {
+      onRestaurantClick(restaurant)
+    },
+    [onRestaurantClick],
+  )
+
   useMapEvent('click', handleMapClick)
+  useMapEvent('movestart', handleMoveStart)
+  useMapEvent('zoomend', handleZoomEnd)
 
   return (
     <>
-      {apiKey && <MapTilerLayer apiKey={apiKey} />}
+      <MapTilerLayer maxBounds={maxBounds} />
       <ZoomControl position="topright" />
       <MidpointMarker position={midpoint} />
       <RestaurantMarker
         restaurants={restaurants}
-        onRestaurantClick={onRestaurantClick}
+        onRestaurantClick={handleRestaurantClick}
         selectedRestaurantId={selectedRestaurant?.id}
       />
     </>

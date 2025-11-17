@@ -1,98 +1,159 @@
 import { http, HttpResponse } from 'msw'
 import { server } from '../setup/msw.server'
 
-const mockedToastError = vi.fn()
-const mockedToastInfo = vi.fn()
-
-vi.mock('sonner', () => ({
-  toast: {
-    info: (message: string) => mockedToastInfo(message),
-    error: (message: string) => mockedToastError(message),
-  },
-}))
-
-async function importApi() {
+async function importAPI() {
   vi.resetModules()
   const mod = await import('~/lib/axios-interceptor')
   return mod.default
 }
 
 describe('axios-interceptor', () => {
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks()
   })
 
   it('HTTP 200 のとき、レスポンスをそのまま返す', async () => {
-    server.use(http.get('*/success', () => {
-      return HttpResponse.json({ ok: true })
-    }))
-    const api = await importApi()
-    const response = await api.get('/success')
+    server.use(
+      http.get('http://localhost/api/v1/test', () => {
+        return HttpResponse.json({ ok: true })
+      }),
+    )
+
+    const api = await importAPI()
+    const response = await api.get('test')
+
     expect(response.data).toEqual({ ok: true })
-    expect(mockedToastError).not.toHaveBeenCalled()
   })
 
-  it('HTTP 400（認証メール確認済み）のとき、「メールアドレスはすでに確認済みです」を info として表示する', async () => {
-    server.use(http.patch('*/user/confirmations', () => {
+  it('HTTP 400 で確認済みエラーのとき、cause が ALREADY_CONFIRMED になる', async () => {
+    server.use(http.get('http://localhost/api/v1/test', () => {
+      return HttpResponse.json({ error: 'already_confirmed' }, { status: 400 })
+    }))
+
+    const api = await importAPI()
+    await expect(api.get('test'))
+      .rejects
+      .toMatchObject({ cause: 'ALREADY_CONFIRMED' })
+  })
+
+  it('HTTP 400 （その他）のとき、cause が REQUEST_FAILED になる', async () => {
+    server.use(http.get('http://localhost/api/v1/test', () => {
       return HttpResponse.json({}, { status: 400 })
     }))
-    const api = await importApi()
-    await expect(api.patch('/user/confirmations')).rejects.toThrow()
-    expect(mockedToastInfo).toHaveBeenCalledWith('メールアドレスはすでに確認済みです')
-    expect(mockedToastError).not.toHaveBeenCalled()
+
+    const api = await importAPI()
+    await expect(api.get('test'))
+      .rejects
+      .toMatchObject({ cause: 'REQUEST_FAILED' })
   })
 
-  it('HTTP 400 （その他）のとき、「リクエストが正しくありません」を表示する', async () => {
-    server.use(http.get('*/bad-request', () => {
-      return HttpResponse.json({}, { status: 400 })
-    }))
-    const api = await importApi()
-    await expect(api.get('/bad-request')).rejects.toThrow()
-    expect(mockedToastError).toHaveBeenCalledWith('リクエストが正しくありません')
-  })
-
-  it('HTTP 401 のとき、「認証エラーが発生しました」を表示する', async () => {
-    server.use(http.get('*/unauthorized', () => {
+  it('HTTP 401 のとき、cause が UNAUTHORIZED になる', async () => {
+    server.use(http.get('http://localhost/api/v1/test', () => {
       return HttpResponse.json({}, { status: 401 })
     }))
-    const api = await importApi()
-    await expect(api.get('/unauthorized')).rejects.toThrow()
-    expect(mockedToastError).toHaveBeenCalledWith('認証エラーが発生しました')
+
+    const api = await importAPI()
+    await expect(api.get('test'))
+      .rejects
+      .toMatchObject({ cause: 'UNAUTHORIZED' })
   })
 
-  it('HTTP 404 （メール認証確認リンク）のとき、「このリンクは無効です」を表示する', async () => {
-    server.use(http.get('*/user/confirmations', () => {
+  it('HTTP 403 のとき、cause が FORBIDDEN になる', async () => {
+    server.use(http.get('http://localhost/api/v1/test', () => {
+      return HttpResponse.json({}, { status: 403 })
+    }))
+
+    const api = await importAPI()
+    await expect(api.get('test'))
+      .rejects
+      .toMatchObject({ cause: 'FORBIDDEN' })
+  })
+
+  it('HTTP 404 で無効なトークンのとき、cause が INVALID_TOKEN になる', async () => {
+    server.use(http.get('http://localhost/api/v1/test', () => {
+      return HttpResponse.json({ error: 'invalid_token' }, { status: 404 })
+    }))
+
+    const api = await importAPI()
+    await expect(api.get('test'))
+      .rejects
+      .toMatchObject({ cause: 'INVALID_TOKEN' })
+  })
+
+  it('HTTP 404 （その他）のとき、cause が NOT_FOUND になる', async () => {
+    server.use(http.get('http://localhost/api/v1/test', () => {
       return HttpResponse.json({}, { status: 404 })
     }))
-    const api = await importApi()
-    await expect(api.get('/user/confirmations')).rejects.toThrow()
-    expect(mockedToastError).toHaveBeenCalledWith('このリンクは無効です')
+
+    const api = await importAPI()
+    await expect(api.get('test'))
+      .rejects
+      .toMatchObject({ cause: 'NOT_FOUND' })
   })
 
-  it('HTTP 500 のとき、「サーバーエラーが発生しました」を表示する', async () => {
-    server.use(http.get('*/server-error', () => {
+  it('HTTP 422 でメール重複エラーのとき、cause が DUPLICATE_EMAIL になる', async () => {
+    server.use(http.post('http://localhost/api/v1/test', () => {
+      return HttpResponse.json({ error: 'duplicate_email' }, { status: 422 })
+    }))
+
+    const api = await importAPI()
+    await expect(api.post('test', { email: 'test@example.com' }))
+      .rejects
+      .toMatchObject({ cause: 'DUPLICATE_EMAIL' })
+  })
+
+  it('HTTP 422 （その他）のとき、cause が REQUEST_FAILED になる', async () => {
+    server.use(http.post('http://localhost/api/v1/test', () => {
+      return HttpResponse.json({ error: 'other_error' }, { status: 422 })
+    }))
+
+    const api = await importAPI()
+    await expect(api.post('test', { email: 'test@example.com' }))
+      .rejects
+      .toMatchObject({ cause: 'REQUEST_FAILED' })
+  })
+
+  it('HTTP 429 のとき、cause が RATE_LIMIT になる', async () => {
+    server.use(http.get('http://localhost/api/v1/test', () => {
+      return HttpResponse.json({}, { status: 429 })
+    }))
+
+    const api = await importAPI()
+    await expect(api.get('test'))
+      .rejects
+      .toMatchObject({ cause: 'RATE_LIMIT' })
+  })
+
+  it('HTTP 500 のとき、cause が SERVER_ERROR になる', async () => {
+    server.use(http.get('http://localhost/api/v1/test', () => {
       return HttpResponse.json({}, { status: 500 })
     }))
-    const api = await importApi()
-    await expect(api.get('/server-error')).rejects.toThrow()
-    expect(mockedToastError).toHaveBeenCalledWith('サーバーエラーが発生しました')
+
+    const api = await importAPI()
+    await expect(api.get('test'))
+      .rejects
+      .toMatchObject({ cause: 'SERVER_ERROR' })
   })
 
-  it('未知のステータス（例: 418）のとき、既定の「サーバーエラーが発生しました」を表示する', async () => {
-    server.use(http.get('*/unknown-error', () => {
+  it('未知のステータス（例: 418）のとき、cause が REQUEST_FAILED になる', async () => {
+    server.use(http.get('http://localhost/api/v1/test', () => {
       return HttpResponse.json({}, { status: 418 })
     }))
-    const api = await importApi()
-    await expect(api.get('/unknown-error')).rejects.toThrow()
-    expect(mockedToastError).toHaveBeenCalledWith('サーバーエラーが発生しました')
+
+    const api = await importAPI()
+    await expect(api.get('test'))
+      .rejects
+      .toMatchObject({ cause: 'REQUEST_FAILED' })
   })
 
-  it('ネットワークエラーのとき、「予期しないエラーが発生しました」を表示する', async () => {
-    server.use(http.get('*/network-error', () => {
+  it('ネットワークエラーのとき、cause が NETWORK になる', async () => {
+    server.use(http.get('http://localhost/api/v1/test', () => {
       return HttpResponse.error()
     }))
-    const api = await importApi()
-    await expect(api.get('/network-error')).rejects.toThrow()
-    expect(mockedToastError).toHaveBeenCalledWith('予期しないエラーが発生しました')
+
+    const api = await importAPI()
+    await expect(api.get('test'))
+      .rejects
+      .toMatchObject({ cause: 'NETWORK' })
   })
 })

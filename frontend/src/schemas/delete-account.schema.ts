@@ -1,11 +1,3 @@
-/**
- * TODO: google_oauth2 も requiresEmailCheck に含める（DBにメールがある前提）。
- * - email, google_oauth2: 必須/形式/DB値との厳密一致を適用
- * - line: email 未保有の可能性があるためオプショナルのまま
- * 変更はフォーム/UIと同一コミットで実施すること。
- */
-
-import type { ProviderId } from '~/types/auth-provider'
 import z from 'zod'
 
 export interface DeleteAccountFormValues {
@@ -13,10 +5,10 @@ export interface DeleteAccountFormValues {
 }
 
 export function deleteAccountSchema(
-  provider: ProviderId,
+  requiresEmailCheck: boolean,
   registeredEmail: string,
 ) {
-  if (provider === 'email') {
+  if (requiresEmailCheck) {
     const registered = (registeredEmail ?? '').trim()
 
     const basic = z.string().trim().min(1, 'メールアドレスは必須です')

@@ -1,8 +1,8 @@
 'use client'
 
-import type { TokenMap } from '~/app/result/page'
 import type { PageInfo } from '~/types/pagination'
 import type { RestaurantListItem } from '~/types/restaurant'
+import type { TokenMap } from '~/types/token'
 import { useMemo } from 'react'
 import RestaurantCard from './restaurant-card'
 import RestaurantEmpty from './restaurant-empty'

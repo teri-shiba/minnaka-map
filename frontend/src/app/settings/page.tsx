@@ -1,14 +1,7 @@
-import { redirect } from 'next/navigation'
 import DeleteAccount from '~/components/features/account/delete/delete-account-responsive'
-
 import Section from '~/components/layout/section'
-import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 
 export default async function SettingsPage() {
-  const authData = await getAuthFromCookie()
-  if (!authData)
-    redirect('/?error=auth_required')
-
   return (
     <>
       <header className="flex h-32 flex-col items-center justify-center bg-secondary md:h-48">

@@ -2,7 +2,6 @@
 
 import type { ComponentProps } from 'react'
 import type { DeleteAccountFormValues } from '~/schemas/delete-account.schema'
-import type { ProviderId } from '~/types/auth-provider'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useAtomValue } from 'jotai'
 import { useForm } from 'react-hook-form'
@@ -21,18 +20,11 @@ export default function DeleteAccountForm({ onClose }: DeleteAccountFormProps) {
   const user = useAtomValue(userStateAtom)
   const { deleteAccount } = useAuth()
 
-  // TODO: フォーム工程で ['email','google_oauth2'] をメール確認必須に統一
-  const providerForValidation: ProviderId
-    = user.provider === 'email' ? 'email' : 'google_oauth2'
-
-  // TODO: isEmailProvider → requiresEmailCheck(['email','google_oauth2']) に変更する。
-  const isEmailProvider = providerForValidation === 'email'
+  const requiresEmailCheck = !!user.email
 
   const form = useForm<DeleteAccountFormValues>({
     resolver: zodResolver(
-      // TODO: providerForValidation → 実際の provider を渡す
-      // google_oauth2 も一致検証対象にする
-      deleteAccountSchema(providerForValidation, user.email ?? ''),
+      deleteAccountSchema(!!user.email, user.email || ''),
     ),
     defaultValues: { email: '' },
     mode: 'onSubmit',
@@ -70,7 +62,7 @@ export default function DeleteAccountForm({ onClose }: DeleteAccountFormProps) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <div className="space-y-6">
-          {isEmailProvider && (
+          {requiresEmailCheck && (
             <FormField
               control={form.control}
               name="email"
@@ -88,7 +80,7 @@ export default function DeleteAccountForm({ onClose }: DeleteAccountFormProps) {
                       autoComplete="email"
                       id="email"
                       placeholder="登録中のメールアドレスを入力"
-                      className="mb-6 mt-2 h-auto py-3 focus-visible:ring-gray-500"
+                      className="mb-6 mt-2 h-auto py-3 focus-visible:ring-1 focus-visible:ring-gray-600"
                       {...field}
                     />
                   </FormControl>
@@ -112,7 +104,7 @@ export default function DeleteAccountForm({ onClose }: DeleteAccountFormProps) {
               type="submit"
               variant="destructive"
               className="h-auto py-3"
-              disabled={isSubmitting || disabledByAuth || (isEmailProvider && !form.watch('email'))}
+              disabled={isSubmitting || disabledByAuth || (requiresEmailCheck && !form.watch('email'))}
             >
               {isSubmitting ? '処理中...' : '削除する'}
             </Button>

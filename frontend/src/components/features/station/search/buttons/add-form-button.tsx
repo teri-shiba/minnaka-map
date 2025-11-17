@@ -1,24 +1,25 @@
 'use client'
 
 import type { FieldArrayWithId, UseFieldArrayAppend } from 'react-hook-form'
-import type { AreaFormValues } from '~/schemas/station-search.schema'
+import type { AreaFormInput } from '~/schemas/station-search.schema'
 import { LuPlus } from 'react-icons/lu'
 import { Button } from '~/components/ui/button'
 
 interface AddFormButtonProps {
-  fields: FieldArrayWithId<AreaFormValues>[]
-  append: UseFieldArrayAppend<AreaFormValues>
+  fields: FieldArrayWithId<AreaFormInput, 'area'>[]
+  append: UseFieldArrayAppend<AreaFormInput, 'area'>
 }
 
 export function AddFormButton({ fields, append }: AddFormButtonProps) {
   const handleAddForm = () => {
     if (fields.length < 6) {
-      append({ areaValue: '', stationId: null, latitude: null, longitude: null })
+      append({ areaValue: '', stationId: null })
     }
   }
 
   return (
     <Button
+      aria-label="追加"
       type="button"
       onClick={handleAddForm}
       variant="link"

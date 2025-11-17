@@ -1,19 +1,15 @@
 import type { ReactElement } from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { setupAuthMock } from '__tests__/integration/helpers/auth-mock'
 import { server } from '__tests__/integration/setup/msw.server'
 import { Provider as JotaiProvider } from 'jotai'
 import { useHydrateAtoms } from 'jotai/utils'
 import { http, HttpResponse } from 'msw'
 import { toast } from 'sonner'
 import FavoriteButton from '~/components/features/restaurant/favorite-button'
-import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import { initialUserState, userStateAtom } from '~/state/user-state.atom'
 import '@testing-library/jest-dom/vitest'
-
-vi.mock('~/services/get-auth-from-cookie', () => ({
-  getAuthFromCookie: vi.fn(),
-}))
 
 vi.mock('sonner', () => ({
   toast: {
@@ -53,11 +49,7 @@ describe('FavoriteButton', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(getAuthFromCookie).mockResolvedValue({
-      accessToken: 'token-123',
-      client: 'client-123',
-      uid: 'uid-123',
-    })
+    setupAuthMock()
   })
 
   describe('トークンベースのお気に入り登録', () => {
@@ -65,7 +57,7 @@ describe('FavoriteButton', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.post('*/favorites', async () => {
+        http.post('http://localhost/api/v1/favorites', async () => {
           return HttpResponse.json({
             success: true,
             data: {
@@ -100,7 +92,7 @@ describe('FavoriteButton', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.post('*/favorites', async () => {
+        http.post('http://localhost/api/v1/favorites', async () => {
           return HttpResponse.json({
             success: true,
             data: {
@@ -135,7 +127,7 @@ describe('FavoriteButton', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.post('*/favorites/by_search_history', async () => {
+        http.post('http://localhost/api/v1/favorites/by_search_history', async () => {
           return HttpResponse.json({
             success: true,
             data: {
@@ -170,7 +162,7 @@ describe('FavoriteButton', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.post('*/favorites/by_search_history', async () => {
+        http.post('http://localhost/api/v1/favorites/by_search_history', async () => {
           return HttpResponse.json(
             { error: 'この店舗はこの検索履歴から追加できません' },
             { status: 422 },
@@ -202,7 +194,7 @@ describe('FavoriteButton', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.delete(`*/favorites/${mockFavoriteId}`, async () => {
+        http.delete(`http://localhost/api/v1/favorites/${mockFavoriteId}`, async () => {
           return HttpResponse.json(null, { status: 204 })
         }),
       )
@@ -231,7 +223,7 @@ describe('FavoriteButton', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.delete(`*/favorites/${mockFavoriteId}`, async () => {
+        http.delete(`http://localhost/api/v1/favorites/${mockFavoriteId}`, async () => {
           return HttpResponse.json(
             { error: '削除に失敗しました' },
             { status: 500 },
@@ -293,7 +285,7 @@ describe('FavoriteButton', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.post('*/favorites', async () => {
+        http.post('http://localhost/api/v1/favorites', async () => {
           await new Promise(resolve => setTimeout(resolve, 100))
 
           return HttpResponse.json({
@@ -326,7 +318,7 @@ describe('FavoriteButton', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.delete(`*/favorites/${mockFavoriteId}`, async () => {
+        http.delete(`http://localhost/api/v1/favorites/${mockFavoriteId}`, async () => {
           await new Promise(resolve => setTimeout(resolve, 100))
 
           return HttpResponse.json(null, { status: 204 })

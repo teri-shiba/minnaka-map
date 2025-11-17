@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { HiUser } from 'react-icons/hi2'
 import { LuHeart, LuLogOut, LuSettings } from 'react-icons/lu'
@@ -10,12 +9,10 @@ import { useAuth } from '~/hooks/useAuth'
 
 export default function UserMenu() {
   const [open, setOpen] = useState(false)
-  const router = useRouter()
   const { logout } = useAuth()
 
   const handleLogout = async () => {
     await logout()
-    router.push('/')
   }
 
   return (

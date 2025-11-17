@@ -1,11 +1,14 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { useEffect } from 'react'
 import { DRAWER_RATIO } from '~/constants'
 import useDrawerController from '~/hooks/useDrawerController'
 
-const startAnimationMock = vi.fn()
+const mockStartAnimation = vi.fn()
+
 vi.mock('framer-motion', () => ({
-  useAnimationControls: vi.fn(() => ({ start: startAnimationMock })),
+  useAnimationControls: vi.fn(() => ({
+    start: mockStartAnimation,
+  })),
 }))
 
 function DrawerHarness(props: { enabled: boolean }) {
@@ -44,6 +47,7 @@ function setOffsetHeight(testId: string, px: number) {
 describe('useDrawerController', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+
     // requestAnimationFrame: 直ちにコールバック実行
     vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
       cb(0)
@@ -70,7 +74,9 @@ describe('useDrawerController', () => {
 
     // content = 600、modalViewHeight = 852 * 0.3 = 255.6 → 差分 344.4
     setOffsetHeight('drawer', 600)
-    window.dispatchEvent(new Event('resize'))
+    act(() => {
+      window.dispatchEvent(new Event('resize'))
+    })
 
     const drawer = screen.getByTestId('drawer')
     const expectedTop = -(600 - 852 * DRAWER_RATIO)
@@ -93,7 +99,9 @@ describe('useDrawerController', () => {
 
     // content = 700、modalViewHeight = 800 * 0.3 = 240 → 差分 460
     setOffsetHeight('drawer', 700)
-    window.dispatchEvent(new Event('resize'))
+    act(() => {
+      window.dispatchEvent(new Event('resize'))
+    })
 
     const drawer = screen.getByTestId('drawer')
     const expectedTop = -(700 - 800 * DRAWER_RATIO)
@@ -109,7 +117,9 @@ describe('useDrawerController', () => {
 
     // content = 200、modalViewHeight = 852 * 0.3 = 255.6 → 全体が見える
     setOffsetHeight('drawer', 200)
-    window.dispatchEvent(new Event('resize'))
+    act(() => {
+      window.dispatchEvent(new Event('resize'))
+    })
 
     const drawer = screen.getByTestId('drawer')
     expect(drawer.getAttribute('data-top')).toBe('0')
@@ -119,12 +129,12 @@ describe('useDrawerController', () => {
   it('ドロワーが有効なとき、位置リセット操作で初期位置に戻る', () => {
     render(<DrawerHarness enabled />)
     fireEvent.click(screen.getByText('reset'))
-    expect(startAnimationMock).toHaveBeenCalledWith({ y: 0 })
+    expect(mockStartAnimation).toHaveBeenCalledWith({ y: 0 })
   })
 
   it('ドロワーが無効なとき、位置リセット操作は実行されない', () => {
     render(<DrawerHarness enabled={false} />)
     fireEvent.click(screen.getByText('reset'))
-    expect(startAnimationMock).not.toHaveBeenCalled()
+    expect(mockStartAnimation).not.toHaveBeenCalled()
   })
 })

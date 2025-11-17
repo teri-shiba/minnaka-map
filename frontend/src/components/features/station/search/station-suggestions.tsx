@@ -1,15 +1,27 @@
 'use client'
 
-import type { SavedStation, StationProps } from '~/types/station'
+import type { ReactNode } from 'react'
+import type { Station } from '~/types/station'
 import { CommandEmpty, CommandGroup, CommandItem, CommandList } from '~/components/ui/command'
 import Loading from '~/public/figure_loading_circle.svg'
 
 interface StationSuggestionsProps {
   isLoading: boolean
   isError: boolean
-  filteredStations: StationProps[]
-  matchedRecent: SavedStation[]
-  onSelect: (station: StationProps) => void
+  filteredStations: Station[]
+  matchedRecent: Station[]
+  onSelect: (station: Station) => void
+}
+
+function SuggestionsList({ children }: { children: ReactNode }) {
+  return (
+    <CommandList
+      id="autocomplete-list"
+      className="absolute -left-px top-full z-10 mt-2 box-content w-full rounded-md border border-input bg-white"
+    >
+      {children}
+    </CommandList>
+  )
 }
 
 export default function StationSuggestions({
@@ -21,10 +33,7 @@ export default function StationSuggestions({
 }: StationSuggestionsProps) {
   if (isLoading) {
     return (
-      <CommandList
-        id="autocomplete-list"
-        className="absolute -left-px top-full z-10 mt-2 box-content w-full rounded-md border border-input bg-white"
-      >
+      <SuggestionsList>
         <CommandEmpty className="p-2 text-center text-sm">
           <Loading
             aria-label="ローディング中"
@@ -33,35 +42,29 @@ export default function StationSuggestions({
             className="mx-auto"
           />
         </CommandEmpty>
-      </CommandList>
+      </SuggestionsList>
     )
   }
 
   if (isError) {
     return (
-
-      <CommandList
-        id="autocomplete-list"
-        className="absolute -left-px top-full z-10 mt-2 box-content w-full rounded-md border border-input bg-white"
-      >
+      <SuggestionsList>
         <CommandEmpty className="p-2 text-center text-sm">
           エラーが発生しました
         </CommandEmpty>
-      </CommandList>
+      </SuggestionsList>
     )
   }
 
   return (
-    <CommandList
-      id="autocomplete-list"
-      className="absolute -left-px top-full z-10 mt-2 box-content w-full rounded-md border border-input bg-white"
-    >
+    <SuggestionsList>
       <CommandEmpty className="p-2 text-center text-sm">
         入力候補がありません
       </CommandEmpty>
-      {(filteredStations.length > 0) && (
+
+      {filteredStations.length > 0 && (
         <CommandGroup heading="駅候補">
-          {filteredStations.map((station: StationProps) => (
+          {filteredStations.map(station => (
             <CommandItem
               key={station.id}
               onMouseDown={e => e.preventDefault()}
@@ -80,11 +83,7 @@ export default function StationSuggestions({
             <CommandItem
               key={station.id}
               onMouseDown={e => e.preventDefault()}
-              onSelect={() => onSelect({
-                ...station,
-                latitude: Number(station.latitude),
-                longitude: Number(station.longitude),
-              })}
+              onSelect={() => onSelect(station)}
               className="cursor-pointer hover:bg-secondary"
             >
               {station.name}
@@ -92,6 +91,6 @@ export default function StationSuggestions({
           ))}
         </CommandGroup>
       )}
-    </CommandList>
+    </SuggestionsList>
   )
 }

@@ -3,11 +3,6 @@ import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
 import { buildHotPepperResults, buildHotPepperShop } from '../helpers/hotpepper-fixtures'
 import { server } from '../setup/msw.server'
 
-vi.mock('server-only', () => ({}))
-vi.mock('~/lib/logger', () => ({
-  logger: vi.fn(),
-}))
-
 describe('fetchRestaurantDetail', () => {
   const baseURL = 'https://hotpepper.test.local'
 
@@ -17,7 +12,7 @@ describe('fetchRestaurantDetail', () => {
     vi.stubEnv('HOTPEPPER_API_BASE_URL', baseURL)
 
     server.use(
-      http.get('*/api_keys/hotpepper', async () => {
+      http.get('http://localhost/api/v1/api_keys/hotpepper', async () => {
         return HttpResponse.json({
           success: true,
           data: { api_key: 'API_KEY' },
@@ -36,7 +31,7 @@ describe('fetchRestaurantDetail', () => {
     const shop = buildHotPepperShop(shopId)
 
     server.use(
-      http.get('*/gourmet/v1*', async () => {
+      http.get('https://hotpepper.test.local/hotpepper/gourmet/v1', async () => {
         return HttpResponse.json(buildHotPepperResults([shop], 1))
       }),
     )
@@ -51,7 +46,7 @@ describe('fetchRestaurantDetail', () => {
 
   it('店舗が見つからないとき、NOT_FOUND で失敗を返す', async () => {
     server.use(
-      http.get('*/gourmet/v1*', async () => {
+      http.get('https://hotpepper.test.local/hotpepper/gourmet/v1', async () => {
         return HttpResponse.json(buildHotPepperResults([], 0))
       }),
     )
@@ -68,7 +63,7 @@ describe('fetchRestaurantDetail', () => {
 
   it('サーバーエラー (code: 1000) のとき、SERVER_ERROR で失敗を返す', async () => {
     server.use(
-      http.get('*/gourmet/v1*', async () => {
+      http.get('https://hotpepper.test.local/hotpepper/gourmet/v1', async () => {
         return HttpResponse.json({
           results: {
             api_version: '1.30',
@@ -90,7 +85,7 @@ describe('fetchRestaurantDetail', () => {
 
   it('APIキー認証エラー (code: 2000)のとき、SERVER_ERROR で失敗を返す', async () => {
     server.use(
-      http.get('*/gourmet/v1*', async () => {
+      http.get('https://hotpepper.test.local/hotpepper/gourmet/v1', async () => {
         return HttpResponse.json({
           results: {
             api_version: '1.30',
@@ -112,7 +107,7 @@ describe('fetchRestaurantDetail', () => {
 
   it('パラメータ不正エラー (code: 3000)のとき、REQUEST_FAILED で失敗を返す', async () => {
     server.use(
-      http.get('*/gourmet/v1*', async () => {
+      http.get('https://hotpepper.test.local/hotpepper/gourmet/v1', async () => {
         return HttpResponse.json({
           results: {
             api_version: '1.30',
@@ -134,7 +129,7 @@ describe('fetchRestaurantDetail', () => {
 
   it('ネットワークエラーのとき、NETWORK で失敗を返す', async () => {
     server.use(
-      http.get('*/gourmet/v1*', async () => {
+      http.get('https://hotpepper.test.local/hotpepper/gourmet/v1', async () => {
         return HttpResponse.error()
       }),
     )

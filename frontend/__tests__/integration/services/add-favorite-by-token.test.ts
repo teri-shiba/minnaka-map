@@ -1,28 +1,19 @@
 import { http, HttpResponse } from 'msw'
 import { addFavoriteByToken } from '~/services/add-favorite-by-token'
-import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
+import { setupAuthMock, setupUnauthorized } from '../helpers/auth-mock'
 import { server } from '../setup/msw.server'
-
-vi.mock('server-only', () => ({}))
-vi.mock('~/services/get-auth-from-cookie', () => ({
-  getAuthFromCookie: vi.fn(),
-}))
 
 describe('addFavoriteByToken', () => {
   const token = 'VALID_TOKEN'
 
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.mocked(getAuthFromCookie).mockResolvedValue({
-      accessToken: 'token-123',
-      client: 'client-123',
-      uid: 'uid-123',
-    })
+    setupAuthMock()
   })
 
   it('お気に入り追加に成功したとき、success: true と favoriteId を返す', async () => {
     server.use(
-      http.post('*/favorites', async () => {
+      http.post('http://localhost/api/v1/favorites', async () => {
         return HttpResponse.json({
           success: true,
           data: { id: 101, hotpepper_id: 'J001246910' },
@@ -42,7 +33,7 @@ describe('addFavoriteByToken', () => {
 
   it('API が 400 エラーのとき、success: false を返す', async () => {
     server.use(
-      http.post('*/favorites', async () => {
+      http.post('http://localhost/api/v1/favorites', async () => {
         return HttpResponse.json({}, { status: 400 })
       }),
     )
@@ -59,7 +50,7 @@ describe('addFavoriteByToken', () => {
 
   it('トークンが無効なとき、422 エラーを返す', async () => {
     server.use(
-      http.post('*/favorites', async () => {
+      http.post('http://localhost/api/v1/favorites', async () => {
         return HttpResponse.json(
           { error: 'トークンが無効です' },
           { status: 422 },
@@ -79,7 +70,7 @@ describe('addFavoriteByToken', () => {
 
   it('トークンが期限切れのとき、422 エラーを返す', async () => {
     server.use(
-      http.post('*/favorites', async () => {
+      http.post('http://localhost/api/v1/favorites', async () => {
         return HttpResponse.json(
           { error: 'トークンの有効期限が切れています' },
           { status: 422 },
@@ -99,7 +90,7 @@ describe('addFavoriteByToken', () => {
 
   it('ネットワークエラーのとき、success: false と NETWORK を返す', async () => {
     server.use(
-      http.post('*/favorites', async () => {
+      http.post('http://localhost/api/v1/favorites', async () => {
         return HttpResponse.error()
       }),
     )
@@ -115,7 +106,7 @@ describe('addFavoriteByToken', () => {
   })
 
   it('認証情報がないとき、UNAUTHORIZED を返す', async () => {
-    vi.mocked(getAuthFromCookie).mockResolvedValueOnce(null)
+    setupUnauthorized()
 
     const result = await addFavoriteByToken(token)
 

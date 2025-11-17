@@ -1,7 +1,7 @@
 import type { LatLng, LatLngExpression, MapOptions } from 'leaflet'
 import L from 'leaflet'
 
-const RADIUS_METERS = 3000
+const RADIUS_METERS = 1000
 const METERS_PER_DEG_LAT = 111_000
 const DEG_TO_RAD = Math.PI / 180
 
@@ -27,8 +27,8 @@ export function createLeafletOptions(
   return {
     // ZOOM
     zoom: isMobile ? 15 : 17,
-    minZoom: 14,
-    maxZoom: 18,
+    minZoom: 13,
+    maxZoom: 20,
     zoomSnap: 1,
     zoomDelta: 1,
 

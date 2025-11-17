@@ -3,10 +3,10 @@ import { renderHook } from '@testing-library/react'
 import { usePagination } from '~/hooks/usePagination'
 
 let currentQuery = ''
-const routerPushSpy = vi.fn()
+const mockPush = vi.fn()
 
 vi.mock('next/navigation', () => ({
-  useRouter: vi.fn(() => ({ push: routerPushSpy })),
+  useRouter: vi.fn(() => ({ push: mockPush })),
   useSearchParams: vi.fn(() => new URLSearchParams(currentQuery) as unknown as ReadonlyURLSearchParams),
 }))
 
@@ -16,7 +16,7 @@ function setSearchParams(query: string) {
 
 describe('usePagination', () => {
   beforeEach(() => {
-    routerPushSpy.mockClear()
+    vi.clearAllMocks()
     setSearchParams('')
   })
 
@@ -59,8 +59,8 @@ describe('usePagination', () => {
 
       result.current.navigateToPage(4)
 
-      expect(routerPushSpy).toHaveBeenCalledTimes(1)
-      expect(routerPushSpy).toHaveBeenCalledWith('?page=4')
+      expect(mockPush).toHaveBeenCalledTimes(1)
+      expect(mockPush).toHaveBeenCalledWith('?page=4')
     })
 
     it('既存のクエリパラメータがあるとき、それらを保持したURLに遷移する', () => {
@@ -69,8 +69,8 @@ describe('usePagination', () => {
 
       result.current.navigateToPage(2)
 
-      expect(routerPushSpy).toHaveBeenCalledTimes(1)
-      const calledUrl = routerPushSpy.mock.calls[0][0] as string
+      expect(mockPush).toHaveBeenCalledTimes(1)
+      const calledUrl = mockPush.mock.calls[0][0] as string
       const params = new URLSearchParams(calledUrl.slice(1))
 
       expect(params.get('genre')).toBe('G001')

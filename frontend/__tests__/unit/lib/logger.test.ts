@@ -2,6 +2,8 @@ import * as Sentry from '@sentry/nextjs'
 import { HttpError } from '~/lib/http-error'
 import { logger, shouldLogStatus } from '~/lib/logger'
 
+vi.unmock('~/lib/logger')
+
 vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))
 
 function buildHttpError(status: number, message: string): unknown {
@@ -24,8 +26,7 @@ describe('logger', () => {
   })
 
   afterEach(() => {
-    vi.resetAllMocks()
-    vi.unstubAllEnvs()
+    vi.restoreAllMocks()
   })
 
   describe('logger（基本動作）', () => {

@@ -6,7 +6,19 @@ class Api::V1::Overrides::RegistrationsController < DeviseTokenAuth::Registratio
       render_api_error("Name can't be blank", status: :unprocessable_entity)
       return
     end
+
+    if UserAuth.exists?(email: sign_up_params[:email])
+      render json: { error: "duplicate_email" }, status: :unprocessable_entity
+      return
+    end
+
     super
+  end
+
+  def destroy
+    super
+    reset_session
+    cookies.delete(DeviseTokenAuth.cookie_name, domain: DeviseTokenAuth.cookie_attributes[:domain])
   end
 
   def build_resource
