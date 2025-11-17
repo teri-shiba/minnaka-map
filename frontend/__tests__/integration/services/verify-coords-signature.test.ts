@@ -16,7 +16,6 @@ describe('verifyCoordsSignature', () => {
   afterEach(() => {
     vi.useRealTimers()
     vi.restoreAllMocks()
-    vi.clearAllMocks()
   })
 
   it('閲覧期限が現在時刻以下のとき、EXPIRED を返し API を呼び出さない', async () => {

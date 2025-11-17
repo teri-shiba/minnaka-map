@@ -17,7 +17,7 @@ describe('getFavoriteInitialData', () => {
   const mockToken = 'TOKEN'
 
   beforeEach(() => {
-    vi.clearAllMocks()
+    vi.resetAllMocks()
   })
 
   describe('認証済みのとき', () => {

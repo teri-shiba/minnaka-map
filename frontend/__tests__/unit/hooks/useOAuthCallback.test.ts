@@ -44,10 +44,6 @@ describe('useOAuthCallback', () => {
     setSearchParams('')
   })
 
-  afterEach(() => {
-    vi.resetAllMocks()
-  })
-
   it('success=login で login:true なら、ユーザーを再検証して終了', async () => {
     setSearchParams('success=login')
     vi.mocked(api.get).mockResolvedValueOnce({ data: { login: true } })

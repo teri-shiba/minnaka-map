@@ -36,10 +36,6 @@ describe('useConfirmEmail', () => {
     setSearchParams('')
   })
 
-  afterEach(() => {
-    vi.resetAllMocks()
-  })
-
   it('メール確認トークンが提供されたとき、確認API成功でモーダルを開き /?success=email_confirmed へ遷移する', async () => {
     setSearchParams('confirmation_token=token-123')
     vi.mocked(api.patch).mockResolvedValueOnce({ data: { success: true } })
