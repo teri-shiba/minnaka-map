@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { useEffect } from 'react'
 import { DRAWER_RATIO } from '~/constants'
 import useDrawerController from '~/hooks/useDrawerController'
@@ -74,7 +74,9 @@ describe('useDrawerController', () => {
 
     // content = 600、modalViewHeight = 852 * 0.3 = 255.6 → 差分 344.4
     setOffsetHeight('drawer', 600)
-    window.dispatchEvent(new Event('resize'))
+    act(() => {
+      window.dispatchEvent(new Event('resize'))
+    })
 
     const drawer = screen.getByTestId('drawer')
     const expectedTop = -(600 - 852 * DRAWER_RATIO)
@@ -97,7 +99,9 @@ describe('useDrawerController', () => {
 
     // content = 700、modalViewHeight = 800 * 0.3 = 240 → 差分 460
     setOffsetHeight('drawer', 700)
-    window.dispatchEvent(new Event('resize'))
+    act(() => {
+      window.dispatchEvent(new Event('resize'))
+    })
 
     const drawer = screen.getByTestId('drawer')
     const expectedTop = -(700 - 800 * DRAWER_RATIO)
@@ -113,7 +117,9 @@ describe('useDrawerController', () => {
 
     // content = 200、modalViewHeight = 852 * 0.3 = 255.6 → 全体が見える
     setOffsetHeight('drawer', 200)
-    window.dispatchEvent(new Event('resize'))
+    act(() => {
+      window.dispatchEvent(new Event('resize'))
+    })
 
     const drawer = screen.getByTestId('drawer')
     expect(drawer.getAttribute('data-top')).toBe('0')
