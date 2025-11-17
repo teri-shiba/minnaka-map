@@ -10,10 +10,6 @@ vi.mock('~/hooks/useMediaQuery', () => ({
   }),
 }))
 
-vi.mock('~/lib/logger', () => ({
-  logger: vi.fn(),
-}))
-
 function setIsMobile(value: boolean) {
   mockIsMobile = value
 }

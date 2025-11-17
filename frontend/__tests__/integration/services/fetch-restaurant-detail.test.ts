@@ -3,10 +3,6 @@ import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
 import { buildHotPepperResults, buildHotPepperShop } from '../helpers/hotpepper-fixtures'
 import { server } from '../setup/msw.server'
 
-vi.mock('~/lib/logger', () => ({
-  logger: vi.fn(),
-}))
-
 describe('fetchRestaurantDetail', () => {
   const baseURL = 'https://hotpepper.test.local'
 
