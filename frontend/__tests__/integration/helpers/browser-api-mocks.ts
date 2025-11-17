@@ -98,9 +98,9 @@ export function mockWindowLocationHref() {
  * window.open をモックする
  */
 export function mockWindowOpen() {
-  const openMock = vi.fn()
-  window.open = openMock
-  return openMock
+  const mockOpen = vi.fn()
+  window.open = mockOpen
+  return mockOpen
 }
 
 /**

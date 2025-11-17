@@ -3,9 +3,12 @@ import { useEffect } from 'react'
 import { DRAWER_RATIO } from '~/constants'
 import useDrawerController from '~/hooks/useDrawerController'
 
-const startAnimationMock = vi.fn()
+const mockStartAnimation = vi.fn()
+
 vi.mock('framer-motion', () => ({
-  useAnimationControls: vi.fn(() => ({ start: startAnimationMock })),
+  useAnimationControls: vi.fn(() => ({
+    start: mockStartAnimation
+  })),
 }))
 
 function DrawerHarness(props: { enabled: boolean }) {
@@ -44,6 +47,7 @@ function setOffsetHeight(testId: string, px: number) {
 describe('useDrawerController', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+
     // requestAnimationFrame: 直ちにコールバック実行
     vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
       cb(0)
@@ -119,12 +123,12 @@ describe('useDrawerController', () => {
   it('ドロワーが有効なとき、位置リセット操作で初期位置に戻る', () => {
     render(<DrawerHarness enabled />)
     fireEvent.click(screen.getByText('reset'))
-    expect(startAnimationMock).toHaveBeenCalledWith({ y: 0 })
+    expect(mockStartAnimation).toHaveBeenCalledWith({ y: 0 })
   })
 
   it('ドロワーが無効なとき、位置リセット操作は実行されない', () => {
     render(<DrawerHarness enabled={false} />)
     fireEvent.click(screen.getByText('reset'))
-    expect(startAnimationMock).not.toHaveBeenCalled()
+    expect(mockStartAnimation).not.toHaveBeenCalled()
   })
 })

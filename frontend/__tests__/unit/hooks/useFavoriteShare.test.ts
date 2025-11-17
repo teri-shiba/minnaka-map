@@ -1,7 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { toast } from 'sonner'
 import { useFavoriteShare } from '~/hooks/useFavoriteShare'
-import useShare from '~/hooks/useShare'
 import { createSharedList } from '~/services/create-shared-list'
 
 vi.mock('sonner', () => ({
@@ -14,18 +13,17 @@ vi.mock('~/services/create-shared-list', () => ({
   createSharedList: vi.fn(),
 }))
 
+const mockOpenNativeShare = vi.fn()
+
 vi.mock('~/hooks/useShare', () => ({
-  default: vi.fn(),
+  default: vi.fn(() => ({
+    openNativeShare: mockOpenNativeShare,
+  })),
 }))
 
 describe('useFavoriteShare', () => {
-  const mockOpenNativeShare = vi.fn()
-
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(useShare).mockReturnValue({
-      openNativeShare: mockOpenNativeShare,
-    })
   })
 
   describe('初期状態', () => {
