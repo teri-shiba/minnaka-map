@@ -313,12 +313,9 @@ describe('useAuth', () => {
         expect(result.current.user.isSignedIn).toBe(true)
       })
 
-      const returned = await result.current.deleteAccount()
+      const returned = await act(async () => result.current.deleteAccount())
 
-      await waitFor(() => {
-        expect(result.current.user.isSignedIn).toBe(false)
-      })
-
+      expect(result.current.user.isSignedIn).toBe(false)
       expect(api.delete).toHaveBeenCalledWith('/auth')
       expect(mockMutate).toHaveBeenCalledWith('/current/user/show_status')
       expect(sessionStorage.getItem('pendingStationIds')).toBeNull()
