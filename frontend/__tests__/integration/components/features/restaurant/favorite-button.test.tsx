@@ -57,7 +57,7 @@ describe('FavoriteButton', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.post('*/favorites', async () => {
+        http.post('http://localhost/api/v1/favorites', async () => {
           return HttpResponse.json({
             success: true,
             data: {
@@ -92,7 +92,7 @@ describe('FavoriteButton', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.post('*/favorites', async () => {
+        http.post('http://localhost/api/v1/favorites', async () => {
           return HttpResponse.json({
             success: true,
             data: {
@@ -127,7 +127,7 @@ describe('FavoriteButton', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.post('*/favorites/by_search_history', async () => {
+        http.post('http://localhost/api/v1/favorites/by_search_history', async () => {
           return HttpResponse.json({
             success: true,
             data: {
@@ -162,7 +162,7 @@ describe('FavoriteButton', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.post('*/favorites/by_search_history', async () => {
+        http.post('http://localhost/api/v1/favorites/by_search_history', async () => {
           return HttpResponse.json(
             { error: 'この店舗はこの検索履歴から追加できません' },
             { status: 422 },
@@ -194,7 +194,7 @@ describe('FavoriteButton', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.delete(`*/favorites/${mockFavoriteId}`, async () => {
+        http.delete(`http://localhost/api/v1/favorites/${mockFavoriteId}`, async () => {
           return HttpResponse.json(null, { status: 204 })
         }),
       )
@@ -223,7 +223,7 @@ describe('FavoriteButton', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.delete(`*/favorites/${mockFavoriteId}`, async () => {
+        http.delete(`http://localhost/api/v1/favorites/${mockFavoriteId}`, async () => {
           return HttpResponse.json(
             { error: '削除に失敗しました' },
             { status: 500 },
@@ -285,7 +285,7 @@ describe('FavoriteButton', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.post('*/favorites', async () => {
+        http.post('http://localhost/api/v1/favorites', async () => {
           await new Promise(resolve => setTimeout(resolve, 100))
 
           return HttpResponse.json({
@@ -318,7 +318,7 @@ describe('FavoriteButton', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.delete(`*/favorites/${mockFavoriteId}`, async () => {
+        http.delete(`http://localhost/api/v1/favorites/${mockFavoriteId}`, async () => {
           await new Promise(resolve => setTimeout(resolve, 100))
 
           return HttpResponse.json(null, { status: 204 })

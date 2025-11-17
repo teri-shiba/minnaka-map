@@ -74,7 +74,7 @@ describe('MapContent', () => {
     vi.clearAllMocks()
 
     server.use(
-      http.get('*/api/v1/api_keys/maptiler', () => {
+      http.get('http://localhost/api/v1/api_keys/maptiler', () => {
         return HttpResponse.json({
           data: { api_key: 'test-maptiler-key' },
         })

@@ -44,7 +44,7 @@ describe('fetchFavoriteGroups', () => {
     ]
 
     server.use(
-      http.get('*/favorites', async () => {
+      http.get('http://localhost/api/v1/favorites', async () => {
         return HttpResponse.json({
           success: true,
           data: groupData,
@@ -77,7 +77,7 @@ describe('fetchFavoriteGroups', () => {
 
   it('API が 400 エラーのとき、REQUEST_FAILED で失敗を返す', async () => {
     server.use(
-      http.get('*/favorites', async () => {
+      http.get('http://localhost/api/v1/favorites', async () => {
         return HttpResponse.json({}, { status: 400 })
       }),
     )
@@ -97,7 +97,7 @@ describe('fetchFavoriteGroups', () => {
     let seenLimit: string | null = null
 
     server.use(
-      http.get('*/favorites', async ({ request }) => {
+      http.get('http://localhost/api/v1/favorites', async ({ request }) => {
         const url = new URL(request.url)
         seenPage = url.searchParams.get('page')
         seenLimit = url.searchParams.get('limit')
@@ -127,7 +127,7 @@ describe('fetchFavoriteGroups', () => {
 
   it('ネットワークエラーのとき、NETWORK で失敗を返す', async () => {
     server.use(
-      http.get('*/favorites', async () => {
+      http.get('http://localhost/api/v1/favorites', async () => {
         return HttpResponse.error()
       }),
     )

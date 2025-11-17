@@ -11,7 +11,7 @@ describe('removeFavorite', () => {
 
   it('お気に入り削除に成功したとき、success: true を返す', async () => {
     server.use(
-      http.delete('*/favorites/:id', async () => {
+      http.delete('http://localhost/api/v1/favorites/:id', async () => {
         return HttpResponse.json(null, { status: 204 })
       }),
     )
@@ -26,7 +26,7 @@ describe('removeFavorite', () => {
 
   it('API が 404 エラーのとき、success: false を返す', async () => {
     server.use(
-      http.delete('*/favorites/:id', async () => {
+      http.delete('http://localhost/api/v1/favorites/:id', async () => {
         return HttpResponse.json({}, { status: 404 })
       }),
     )
@@ -43,7 +43,7 @@ describe('removeFavorite', () => {
 
   it('ネットワークエラーのとき、success: false と NETWORK を返す', async () => {
     server.use(
-      http.delete('*/favorites/:id', async () => {
+      http.delete('http://localhost/api/v1/favorites/:id', async () => {
         return HttpResponse.error()
       }),
     )

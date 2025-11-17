@@ -11,7 +11,7 @@ describe('checkFavoriteStatus', () => {
 
   it('お気に入り登録済みのとき、success: true と isFavorite: true を返す', async () => {
     server.use(
-      http.get('*/favorites/status', async () => {
+      http.get('http://localhost/api/v1/favorites/status', async () => {
         return HttpResponse.json({
           success: true,
           data: { is_favorite: true, favorite_id: 30 },
@@ -33,7 +33,7 @@ describe('checkFavoriteStatus', () => {
 
   it('お気に入り未登録のとき、success: true のとき、isFavorite: false を返す', async () => {
     server.use(
-      http.get('*/favorites/status', async () => {
+      http.get('http://localhost/api/v1/favorites/status', async () => {
         return HttpResponse.json({
           success: true,
           data: { is_favorite: false, favorite_id: null },
@@ -55,7 +55,7 @@ describe('checkFavoriteStatus', () => {
 
   it('API が 400 エラーのとき、success: false を返す', async () => {
     server.use(
-      http.get('*/favorites/status', async () => {
+      http.get('http://localhost/api/v1/favorites/status', async () => {
         return HttpResponse.json({}, { status: 400 })
       }),
     )
@@ -72,7 +72,7 @@ describe('checkFavoriteStatus', () => {
 
   it('ネットワークエラーのとき、success: false と NETWORK を返す', async () => {
     server.use(
-      http.get('*/favorites/status', async () => {
+      http.get('http://localhost/api/v1/favorites/status', async () => {
         return HttpResponse.error()
       }),
     )

@@ -44,7 +44,7 @@ describe('StationAutocomplete', () => {
   describe('検索機能', () => {
     it('検索クエリを入力したとき、デバウンス後にAPIを呼び出して候補を表示する', async () => {
       server.use(
-        http.get('*/api/v1/stations', ({ request }) => {
+        http.get('http://localhost/api/v1/stations', ({ request }) => {
           const url = new URL(request.url)
           const query = url.searchParams.get('q')
 
@@ -78,7 +78,7 @@ describe('StationAutocomplete', () => {
 
     it('APIエラーが発生したとき、エラーメッセージを表示する', async () => {
       server.use(
-        http.get('*/api/v1/stations', () => {
+        http.get('http://localhost/api/v1/stations', () => {
           return HttpResponse.error()
         }),
       )
@@ -102,7 +102,7 @@ describe('StationAutocomplete', () => {
   describe('駅の選択', () => {
     it('候補から駅を選択したとき、onChange が呼ばれ localStorage に保存される', async () => {
       server.use(
-        http.get('*/api/v1/stations', ({ request }) => {
+        http.get('http://localhost/api/v1/stations', ({ request }) => {
           const url = new URL(request.url)
           const query = url.searchParams.get('q')
 
@@ -151,7 +151,7 @@ describe('StationAutocomplete', () => {
       ]))
 
       server.use(
-        http.get('*/api/v1/stations', ({ request }) => {
+        http.get('http://localhost/api/v1/stations', ({ request }) => {
           const url = new URL(request.url)
           const query = url.searchParams.get('q')
 
@@ -197,7 +197,7 @@ describe('StationAutocomplete', () => {
       ]))
 
       server.use(
-        http.get('*/api/v1/stations', ({ request }) => {
+        http.get('http://localhost/api/v1/stations', ({ request }) => {
           const url = new URL(request.url)
           const query = url.searchParams.get('q')
 
@@ -280,7 +280,7 @@ describe('StationAutocomplete', () => {
   describe('駅の除外', () => {
     it('除外対象の駅IDは候補に表示しない', async () => {
       server.use(
-        http.get('*/api/v1/stations', ({ request }) => {
+        http.get('http://localhost/api/v1/stations', ({ request }) => {
           const url = new URL(request.url)
           const query = url.searchParams.get('q')
 

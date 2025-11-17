@@ -13,7 +13,7 @@ describe('addFavoriteByToken', () => {
 
   it('お気に入り追加に成功したとき、success: true と favoriteId を返す', async () => {
     server.use(
-      http.post('*/favorites', async () => {
+      http.post('http://localhost/api/v1/favorites', async () => {
         return HttpResponse.json({
           success: true,
           data: { id: 101, hotpepper_id: 'J001246910' },
@@ -33,7 +33,7 @@ describe('addFavoriteByToken', () => {
 
   it('API が 400 エラーのとき、success: false を返す', async () => {
     server.use(
-      http.post('*/favorites', async () => {
+      http.post('http://localhost/api/v1/favorites', async () => {
         return HttpResponse.json({}, { status: 400 })
       }),
     )
@@ -50,7 +50,7 @@ describe('addFavoriteByToken', () => {
 
   it('トークンが無効なとき、422 エラーを返す', async () => {
     server.use(
-      http.post('*/favorites', async () => {
+      http.post('http://localhost/api/v1/favorites', async () => {
         return HttpResponse.json(
           { error: 'トークンが無効です' },
           { status: 422 },
@@ -70,7 +70,7 @@ describe('addFavoriteByToken', () => {
 
   it('トークンが期限切れのとき、422 エラーを返す', async () => {
     server.use(
-      http.post('*/favorites', async () => {
+      http.post('http://localhost/api/v1/favorites', async () => {
         return HttpResponse.json(
           { error: 'トークンの有効期限が切れています' },
           { status: 422 },
@@ -90,7 +90,7 @@ describe('addFavoriteByToken', () => {
 
   it('ネットワークエラーのとき、success: false と NETWORK を返す', async () => {
     server.use(
-      http.post('*/favorites', async () => {
+      http.post('http://localhost/api/v1/favorites', async () => {
         return HttpResponse.error()
       }),
     )

@@ -52,7 +52,7 @@ describe('FavoriteGroup', () => {
     overrideMatchMedia(false)
 
     server.use(
-      http.post('*/api/v1/shared_favorite_lists', async () => {
+      http.post('http://localhost/api/v1/shared_favorite_lists', async () => {
         return HttpResponse.json({
           success: true,
           data: {
@@ -154,7 +154,7 @@ describe('FavoriteGroup', () => {
       const user = userEvent.setup()
 
       server.use(
-        http.post('*/api/v1/shared_favorite_lists', async () => {
+        http.post('http://localhost/api/v1/shared_favorite_lists', async () => {
           return HttpResponse.json({}, { status: 400 })
         }),
       )
