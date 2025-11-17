@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { setupAuthMock } from '__tests__/integration/helpers/auth-mock'
 import { mockNavigatorClipboard, mockWindowLocationHref, mockWindowOpen, overrideMatchMedia, setupBrowserAPIMocks } from '__tests__/integration/helpers/browser-api-mocks'
 import { buildFavoriteGroup, buildFavoriteRestaurant, buildFavoriteWithDetails } from '__tests__/integration/helpers/favorite-fixtures'
 import { server } from '__tests__/integration/setup/msw.server'
@@ -9,14 +10,6 @@ import FavoriteGroup from '~/components/features/favorite/favorite-group'
 import '@testing-library/jest-dom/vitest'
 
 setupBrowserAPIMocks()
-
-vi.mock('~/services/get-auth-from-cookie', () => ({
-  getAuthFromCookie: vi.fn().mockResolvedValue({
-    accessToken: 'token-123',
-    client: 'client-123',
-    uid: 'uid-123',
-  }),
-}))
 
 vi.mock('sonner', () => ({
   toast: {
@@ -55,6 +48,7 @@ const mockGroup = buildFavoriteGroup(
 describe('FavoriteGroup', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    setupAuthMock()
     overrideMatchMedia(false)
 
     server.use(

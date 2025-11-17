@@ -1,11 +1,7 @@
 import { http, HttpResponse } from 'msw'
-import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import { issueFavoriteTokens } from '~/services/issue-favorite-tokens'
+import { setupAuthMock, setupUnauthorized } from '../helpers/auth-mock'
 import { server } from '../setup/msw.server'
-
-vi.mock('~/services/get-auth-from-cookie', () => ({
-  getAuthFromCookie: vi.fn(),
-}))
 
 describe('issueFavoriteTokens', () => {
   const validParams = {
@@ -19,11 +15,7 @@ describe('issueFavoriteTokens', () => {
 
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.mocked(getAuthFromCookie).mockResolvedValue({
-      accessToken: 'token-123',
-      client: 'client-123',
-      uid: 'uid-123',
-    })
+    setupAuthMock()
   })
 
   it('トークン配列を正しく返すとき、success: true と tokens を返す', async () => {
@@ -114,7 +106,7 @@ describe('issueFavoriteTokens', () => {
   })
 
   it('認証情報がないとき、UNAUTHORIZED を返す', async () => {
-    vi.mocked(getAuthFromCookie).mockResolvedValueOnce(null)
+    setupUnauthorized()
 
     const result = await issueFavoriteTokens(validParams)
 

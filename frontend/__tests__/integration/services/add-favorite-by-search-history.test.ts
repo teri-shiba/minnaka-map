@@ -1,20 +1,12 @@
 import { http, HttpResponse } from 'msw'
 import { addFavoriteBySearchHistory } from '~/services/add-favorite-by-search-history'
-import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
+import { setupAuthMock, setupUnauthorized } from '../helpers/auth-mock'
 import { server } from '../setup/msw.server'
-
-vi.mock('~/services/get-auth-from-cookie', () => ({
-  getAuthFromCookie: vi.fn(),
-}))
 
 describe('addFavoriteBySearchHistory', () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.mocked(getAuthFromCookie).mockResolvedValue({
-      accessToken: 'token-123',
-      client: 'client-123',
-      uid: 'uid-123',
-    })
+    setupAuthMock()
   })
 
   it('お気に入り追加に成功したとき、success: true と favoriteId と hotpepperId を返す', async () => {
@@ -112,7 +104,7 @@ describe('addFavoriteBySearchHistory', () => {
   })
 
   it('認証情報がないとき、UNAUTHORIZED を返す', async () => {
-    vi.mocked(getAuthFromCookie).mockResolvedValueOnce(null)
+    setupUnauthorized()
 
     const result = await addFavoriteBySearchHistory('J001246910', 'SH99')
 

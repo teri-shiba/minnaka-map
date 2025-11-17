@@ -1,20 +1,12 @@
 import { http, HttpResponse } from 'msw'
-import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import { removeFavorite } from '~/services/remove-favorite'
+import { setupAuthMock, setupUnauthorized } from '../helpers/auth-mock'
 import { server } from '../setup/msw.server'
-
-vi.mock('~/services/get-auth-from-cookie', () => ({
-  getAuthFromCookie: vi.fn(),
-}))
 
 describe('removeFavorite', () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.mocked(getAuthFromCookie).mockResolvedValue({
-      accessToken: 'token-123',
-      client: 'client-123',
-      uid: 'uid-123',
-    })
+    setupAuthMock()
   })
 
   it('お気に入り削除に成功したとき、success: true を返す', async () => {
@@ -67,7 +59,7 @@ describe('removeFavorite', () => {
   })
 
   it('認証情報がないとき、UNAUTHORIZED を返す', async () => {
-    vi.mocked(getAuthFromCookie).mockResolvedValueOnce(null)
+    setupUnauthorized()
 
     const result = await removeFavorite(101)
 
