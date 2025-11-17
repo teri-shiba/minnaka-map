@@ -29,7 +29,7 @@ vi.mock('~/public/figure_loading_circle.svg', () => ({
 
 function setupStationsAPI() {
   server.use(
-    http.get('*/api/v1/stations', ({ request }) => {
+    http.get('http://localhost/api/v1/stations', ({ request }) => {
       const url = new URL(request.url)
       const query = url.searchParams.get('q')
 

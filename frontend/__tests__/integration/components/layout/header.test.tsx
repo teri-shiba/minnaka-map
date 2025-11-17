@@ -33,7 +33,7 @@ describe('Header', () => {
 
   it('ローディング中のとき、スケルトンを表示する', () => {
     server.use(
-      http.get('*/current/user/show_status', () => new Promise(() => { })),
+      http.get('http://localhost/api/v1/current/user/show_status', () => new Promise(() => { })),
     )
 
     const wrapper = createSWRWrapper()
@@ -44,7 +44,7 @@ describe('Header', () => {
 
   it('未認証のとき、ログインボタンを表示する', async () => {
     server.use(
-      http.get('*/current/user/show_status', () => {
+      http.get('http://localhost/api/v1/current/user/show_status', () => {
         return HttpResponse.json({ login: false })
       }),
     )
@@ -59,7 +59,7 @@ describe('Header', () => {
 
   it('認証済みのとき、UseMenu アイコンを表示する', async () => {
     server.use(
-      http.get('*/current/user/show_status', () => {
+      http.get('http://localhost/api/v1/current/user/show_status', () => {
         return HttpResponse.json({
           login: true,
           id: 1,
@@ -93,8 +93,8 @@ describe('Header', () => {
     ]
 
     server.use(
-      http.get('*/current/user/show_status', () => response.shift()),
-      http.delete('*/auth/sign_out', () => HttpResponse.json()),
+      http.get('http://localhost/api/v1/current/user/show_status', () => response.shift()),
+      http.delete('http://localhost/api/v1/auth/sign_out', () => HttpResponse.json()),
     )
 
     const wrapper = createSWRWrapper()
@@ -119,7 +119,7 @@ describe('Header', () => {
     const user = userEvent.setup()
 
     server.use(
-      http.get('*/current/user/show_status', () => {
+      http.get('http://localhost/api/v1/current/user/show_status', () => {
         return HttpResponse.json({
           login: true,
           id: 1,
@@ -149,7 +149,7 @@ describe('Header', () => {
     const user = userEvent.setup()
 
     server.use(
-      http.get('*/current/user/show_status', () => {
+      http.get('http://localhost/api/v1/current/user/show_status', () => {
         return HttpResponse.json({
           login: true,
           id: 1,

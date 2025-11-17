@@ -12,7 +12,7 @@ describe('fetchRestaurantsByIds', () => {
     vi.stubEnv('HOTPEPPER_API_BASE_URL', baseURL)
 
     server.use(
-      http.get('*/api_keys/hotpepper', async () => {
+      http.get('http://localhost/api/v1/api_keys/hotpepper', async () => {
         return HttpResponse.json({
           success: true,
           data: { api_key: 'API_KEY' },
@@ -31,7 +31,7 @@ describe('fetchRestaurantsByIds', () => {
     const requestedIds = Array.from({ length: 25 }, (_, i) => `S${i + 1}`)
 
     server.use(
-      http.get('*/gourmet/v1*', async ({ request }) => {
+      http.get('https://hotpepper.test.local/hotpepper/gourmet/v1', async ({ request }) => {
         const url = new URL(request.url)
         const ids = (url.searchParams.get('id') ?? '').split(',').filter(Boolean)
         const shops = ids.map(id => buildHotPepperShop(id))
@@ -54,7 +54,7 @@ describe('fetchRestaurantsByIds', () => {
 
   it('サーバーエラー (code: 1000) のとき、SERVER_ERROR で失敗を返す', async () => {
     server.use(
-      http.get('*/gourmet/v1*', async () => {
+      http.get('https://hotpepper.test.local/hotpepper/gourmet/v1', async () => {
         return HttpResponse.json({
           results: {
             api_version: '1.30',
@@ -78,7 +78,7 @@ describe('fetchRestaurantsByIds', () => {
 
   it('APIキー認証エラー (code: 2000)のとき、SERVER_ERROR で失敗を返す', async () => {
     server.use(
-      http.get('*/gourmet/v1*', async () => {
+      http.get('https://hotpepper.test.local/hotpepper/gourmet/v1', async () => {
         return HttpResponse.json({
           results: {
             api_version: '1.30',
@@ -102,7 +102,7 @@ describe('fetchRestaurantsByIds', () => {
 
   it('パラメータ不正エラー (code: 3000)のとき、REQUEST_FAILED で失敗を返す', async () => {
     server.use(
-      http.get('*/gourmet/v1*', async () => {
+      http.get('https://hotpepper.test.local/hotpepper/gourmet/v1', async () => {
         return HttpResponse.json({
           results: {
             api_version: '1.30',
@@ -126,7 +126,7 @@ describe('fetchRestaurantsByIds', () => {
 
   it('ネットワークエラーのとき、NETWORK で失敗を返す', async () => {
     server.use(
-      http.get('*/gourmet/v1*', async () => {
+      http.get('https://hotpepper.test.local/hotpepper/gourmet/v1', async () => {
         return HttpResponse.error()
       }),
     )
@@ -147,7 +147,7 @@ describe('fetchRestaurantsByIds', () => {
     const ids = Array.from({ length: 45 }, (_, i) => `B${i + 1}`) as [string, ...string[]]
 
     server.use(
-      http.get('*/gourmet/v1*', async ({ request }) => {
+      http.get('https://hotpepper.test.local/hotpepper/gourmet/v1', async ({ request }) => {
         const url = new URL(request.url)
         const chunkIds = (url.searchParams.get('id') ?? '').split(',').filter(Boolean)
 

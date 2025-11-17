@@ -19,7 +19,7 @@ describe('decodeToken', () => {
 
     it('トークンのデコードに成功したとき、searchHistoryId と restaurantId を返すこと', async () => {
       server.use(
-        http.post('*/favorite_tokens/decode', async () => {
+        http.post('http://localhost/api/v1/favorite_tokens/decode', async () => {
           return HttpResponse.json({
             success: true,
             data: {
@@ -41,7 +41,7 @@ describe('decodeToken', () => {
 
     it('APIがエラーを返したとき、失敗を返すこと', async () => {
       server.use(
-        http.post('*/favorite_tokens/decode', async () => {
+        http.post('http://localhost/api/v1/favorite_tokens/decode', async () => {
           return HttpResponse.json(
             { error: 'トークンが無効です' },
             { status: 422 },
@@ -56,7 +56,7 @@ describe('decodeToken', () => {
 
     it('トークンの有効期限が切れているとき、失敗を返すこと', async () => {
       server.use(
-        http.post('*/favorite_tokens/decode', async () => {
+        http.post('http://localhost/api/v1/favorite_tokens/decode', async () => {
           return HttpResponse.json(
             { error: 'トークンの有効期限が切れています' },
             { status: 422 },

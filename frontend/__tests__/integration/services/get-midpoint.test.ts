@@ -5,7 +5,7 @@ import { server } from '../setup/msw.server'
 describe('getMidpoint', () => {
   it('正しい駅IDを渡したとき、中間地点データを返す', async () => {
     server.use(
-      http.get('*/api/v1/midpoint', () => {
+      http.get('http://localhost/api/v1/midpoint', () => {
         return HttpResponse.json({
           data: {
             midpoint: {
@@ -34,7 +34,7 @@ describe('getMidpoint', () => {
     let captureUrl = ''
 
     server.use(
-      http.get('*/api/v1/midpoint', ({ request }) => {
+      http.get('http://localhost/api/v1/midpoint', ({ request }) => {
         captureUrl = request.url
         return HttpResponse.json({
           data: {
@@ -57,7 +57,7 @@ describe('getMidpoint', () => {
   })
 
   it('サーバーエラーが発生したとき、「サーバーエラーが発生しました」のメッセージを投げる', async () => {
-    server.use(http.get('*/midpoint', async () => {
+    server.use(http.get('http://localhost/api/v1/midpoint', async () => {
       return HttpResponse.json({}, { status: 500 })
     }))
 
@@ -70,7 +70,7 @@ describe('getMidpoint', () => {
   })
 
   it('ネットワークエラーが発生したとき、「ネットワークエラーが発生しました」のメッセージを投げる', async () => {
-    server.use(http.get('*/midpoint', async () => {
+    server.use(http.get('http://localhost/api/v1/midpoint', async () => {
       return HttpResponse.error()
     }))
 

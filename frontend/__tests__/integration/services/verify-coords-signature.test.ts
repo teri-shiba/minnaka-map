@@ -37,7 +37,7 @@ describe('verifyCoordsSignature', () => {
 
   it('HTTP 200 かつ valid = true のとき、緯度経度配列を返す', async () => {
     server.use(
-      http.get('*/api/v1/midpoint/validate', () => {
+      http.get('http://localhost/api/v1/midpoint/validate', () => {
         return HttpResponse.json({ valid: true }, { status: 200 })
       }),
     )
@@ -71,7 +71,7 @@ describe('verifyCoordsSignature', () => {
 
   it('HTTP 200 かつ valid = false のとき、REQUEST_FAILED を返す', async () => {
     server.use(
-      http.get('*/api/v1/midpoint/validate', () => {
+      http.get('http://localhost/api/v1/midpoint/validate', () => {
         return HttpResponse.json({ valid: false }, { status: 200 })
       }),
     )
@@ -93,7 +93,7 @@ describe('verifyCoordsSignature', () => {
 
   it('HTTP 400 のとき、INVALID_SIGNATURE を返し、logger に記録する', async () => {
     server.use(
-      http.get('*/api/v1/midpoint/validate', () => {
+      http.get('http://localhost/api/v1/midpoint/validate', () => {
         return HttpResponse.json({ error: 'invalid' }, { status: 400 })
       }),
     )
@@ -125,7 +125,7 @@ describe('verifyCoordsSignature', () => {
 
   it('HTTP 4xx のとき、REQUEST_FAILED を返し、logger に記録する', async () => {
     server.use(
-      http.get('*/api/v1/midpoint/validate', () => {
+      http.get('http://localhost/api/v1/midpoint/validate', () => {
         return HttpResponse.json({ error: 'invalid' }, { status: 418 })
       }),
     )
@@ -157,7 +157,7 @@ describe('verifyCoordsSignature', () => {
 
   it('HTTP 500 のとき、SERVER_ERROR を返し、logger に記録する', async () => {
     server.use(
-      http.get('*/api/v1/midpoint/validate', () => {
+      http.get('http://localhost/api/v1/midpoint/validate', () => {
         return HttpResponse.json({ error: 'server-error' }, { status: 500 })
       }),
     )
@@ -189,7 +189,7 @@ describe('verifyCoordsSignature', () => {
 
   it('ネットワークエラーのとき、NETWORK を返し、logger に記録する', async () => {
     server.use(
-      http.get('*/api/v1/midpoint/validate', () => {
+      http.get('http://localhost/api/v1/midpoint/validate', () => {
         return HttpResponse.error()
       }),
     )
@@ -221,7 +221,7 @@ describe('verifyCoordsSignature', () => {
 
   it('expires_at が十分先のとき、revalidate は上限 300 秒に丸められる', async () => {
     server.use(
-      http.get('*/api/v1/midpoint/validate', () => {
+      http.get('http://localhost/api/v1/midpoint/validate', () => {
         return HttpResponse.json({ valid: true }, { status: 200 })
       }),
     )

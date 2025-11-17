@@ -20,7 +20,7 @@ describe('issueFavoriteTokens', () => {
 
   it('トークン配列を正しく返すとき、success: true と tokens を返す', async () => {
     server.use(
-      http.post('*/favorite_tokens/batch', async () => {
+      http.post('http://localhost/api/v1/favorite_tokens/batch', async () => {
         return HttpResponse.json({ data: {
           tokens: [
             { restaurant_id: 'J001246910', favorite_token: 'token1' },
@@ -49,7 +49,7 @@ describe('issueFavoriteTokens', () => {
 
   it('空配列を正しく返すとき、success: true と空の tokens を返す', async () => {
     server.use(
-      http.post('*/favorite_tokens/batch', async () => {
+      http.post('http://localhost/api/v1/favorite_tokens/batch', async () => {
         return HttpResponse.json({ data: {
           tokens: [],
         } })
@@ -68,7 +68,7 @@ describe('issueFavoriteTokens', () => {
 
   it('座標検証に失敗したとき、422 エラーを返す', async () => {
     server.use(
-      http.post('*/favorite_tokens/batch', async () => {
+      http.post('http://localhost/api/v1/favorite_tokens/batch', async () => {
         return HttpResponse.json(
           { error: '座標検証に失敗しました' },
           { status: 422 },
@@ -90,7 +90,7 @@ describe('issueFavoriteTokens', () => {
 
   it('ネットワークエラーのとき、success: false と NETWORK を返す', async () => {
     server.use(
-      http.post('*/favorite_tokens/batch', async () => {
+      http.post('http://localhost/api/v1/favorite_tokens/batch', async () => {
         return HttpResponse.error()
       }),
     )

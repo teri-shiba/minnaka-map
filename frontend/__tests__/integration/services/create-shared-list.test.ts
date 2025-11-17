@@ -11,7 +11,7 @@ describe('createSharedList', () => {
 
   it('シェアリスト作成に成功したとき、shareUuid と title を返す', async () => {
     server.use(
-      http.post('*/api/v1/shared_favorite_lists', async () => {
+      http.post('http://localhost/api/v1/shared_favorite_lists', async () => {
         return HttpResponse.json({
           success: true,
           data: {
@@ -38,7 +38,7 @@ describe('createSharedList', () => {
 
   it('既存のシェアリストがあるとき、isExisting: true を返す', async () => {
     server.use(
-      http.post('*/shared_favorite_lists', async () => {
+      http.post('http://localhost/api/v1/shared_favorite_lists', async () => {
         return HttpResponse.json({
           success: true,
           data: {
@@ -65,7 +65,7 @@ describe('createSharedList', () => {
 
   it('API が 400 エラーのとき、REQUEST_FAILED で失敗を返す', async () => {
     server.use(
-      http.post('*/shared_favorite_lists', async () => {
+      http.post('http://localhost/api/v1/shared_favorite_lists', async () => {
         return HttpResponse.json({}, { status: 400 })
       }),
     )
@@ -82,7 +82,7 @@ describe('createSharedList', () => {
 
   it('ネットワークエラーのとき、NETWORK で失敗を返す', async () => {
     server.use(
-      http.post('*/shared_favorite_lists', async () => {
+      http.post('http://localhost/api/v1/shared_favorite_lists', async () => {
         return HttpResponse.error()
       }),
     )

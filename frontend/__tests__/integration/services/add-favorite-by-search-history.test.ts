@@ -11,7 +11,7 @@ describe('addFavoriteBySearchHistory', () => {
 
   it('お気に入り追加に成功したとき、success: true と favoriteId と hotpepperId を返す', async () => {
     server.use(
-      http.post('*/favorites/by_search_history', async () => {
+      http.post('http://localhost/api/v1/favorites/by_search_history', async () => {
         return HttpResponse.json({
           success: true,
           data: { id: 101, hotpepper_id: 'J001246910' },
@@ -31,7 +31,7 @@ describe('addFavoriteBySearchHistory', () => {
 
   it('API が 400 エラーのとき、success: false を返す', async () => {
     server.use(
-      http.post('*/favorites/by_search_history', async () => {
+      http.post('http://localhost/api/v1/favorites/by_search_history', async () => {
         return HttpResponse.json({}, { status: 400 })
       }),
     )
@@ -48,7 +48,7 @@ describe('addFavoriteBySearchHistory', () => {
 
   it('検索結果にない店舗のとき、422 エラーを返す', async () => {
     server.use(
-      http.post('*/favorites/by_search_history', async () => {
+      http.post('http://localhost/api/v1/favorites/by_search_history', async () => {
         return HttpResponse.json(
           { error: 'この店舗は検索結果に含まれていません' },
           { status: 400 },
@@ -68,7 +68,7 @@ describe('addFavoriteBySearchHistory', () => {
 
   it('存在しない検索履歴IDのとき、404 エラーを返す', async () => {
     server.use(
-      http.post('*/favorites/by_search_history', async () => {
+      http.post('http://localhost/api/v1/favorites/by_search_history', async () => {
         return HttpResponse.json(
           { error: '検索履歴が見つかりません' },
           { status: 404 },
@@ -88,7 +88,7 @@ describe('addFavoriteBySearchHistory', () => {
 
   it('ネットワークエラーのとき、success: false と NETWORK を返す', async () => {
     server.use(
-      http.post('*/favorites/by_search_history', async () => {
+      http.post('http://localhost/api/v1/favorites/by_search_history', async () => {
         return HttpResponse.error()
       }),
     )
