@@ -76,7 +76,15 @@ export function createSWRWrapper(options?: {
   }
 
   return ({ children }: { children: ReactNode }) => (
-    <SWRConfig value={{ provider: () => new Map(), use: middlewares }}>
+    <SWRConfig
+      value={{
+        provider: () => new Map(),
+        use: middlewares,
+        dedupingInterval: 0,
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+      }}
+    >
       {children}
     </SWRConfig>
   )
