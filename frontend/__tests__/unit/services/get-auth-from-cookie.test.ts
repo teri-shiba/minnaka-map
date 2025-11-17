@@ -2,6 +2,8 @@ import { cookies } from 'next/headers'
 import { logger } from '~/lib/logger'
 import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 
+vi.unmock('~/services/get-auth-from-cookie')
+
 vi.mock('next/headers', () => ({ cookies: vi.fn() }))
 
 type CookieStore = Awaited<ReturnType<typeof cookies>>

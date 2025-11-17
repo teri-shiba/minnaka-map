@@ -1,11 +1,7 @@
 import { http, HttpResponse } from 'msw'
 import { decodeToken } from '~/services/decode-token'
-import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
+import { setupAuthMock, setupUnauthorized } from '../helpers/auth-mock'
 import { server } from '../setup/msw.server'
-
-vi.mock('~/services/get-auth-from-cookie', () => ({
-  getAuthFromCookie: vi.fn(),
-}))
 
 describe('decodeToken', () => {
   const mockToken = 'TOKEN'
@@ -18,11 +14,7 @@ describe('decodeToken', () => {
 
   describe('認証済みのとき', () => {
     beforeEach(() => {
-      vi.mocked(getAuthFromCookie).mockResolvedValue({
-        accessToken: 'token-123',
-        client: 'client-123',
-        uid: 'uid-123',
-      })
+      setupAuthMock()
     })
 
     it('トークンのデコードに成功したとき、searchHistoryId と restaurantId を返すこと', async () => {
@@ -80,7 +72,7 @@ describe('decodeToken', () => {
 
   describe('未認証のとき', () => {
     it('UNAUTHORIZED エラーを返すこと', async () => {
-      vi.mocked(getAuthFromCookie).mockResolvedValue(null)
+      setupUnauthorized()
 
       const result = await decodeToken(mockToken)
 

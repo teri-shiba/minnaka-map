@@ -1,11 +1,7 @@
 import { http, HttpResponse } from 'msw'
-import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import { saveSearchHistory } from '~/services/save-search-history'
+import { setupAuthMock, setupUnauthorized } from '../helpers/auth-mock'
 import { server } from '../setup/msw.server'
-
-vi.mock('~/services/get-auth-from-cookie', () => ({
-  getAuthFromCookie: vi.fn(),
-}))
 
 function buildHandlers() {
   const endpoint = '*/search_histories'
@@ -44,12 +40,8 @@ describe('saveSearchHistory', () => {
   const handlers = buildHandlers()
 
   beforeEach(() => {
-    vi.resetAllMocks()
-    vi.mocked(getAuthFromCookie).mockResolvedValue({
-      accessToken: 'token-123',
-      client: 'client-123',
-      uid: 'uid-123',
-    })
+    vi.clearAllMocks()
+    setupAuthMock()
   })
 
   it('API が成功のとき、id を searchHistoryId にして success: true を返す', async () => {
@@ -62,7 +54,8 @@ describe('saveSearchHistory', () => {
   })
 
   it('未認証のとき、UNAUTHORIZEDとメッセージで失敗を返す', async () => {
-    vi.mocked(getAuthFromCookie).mockResolvedValueOnce(null)
+    setupUnauthorized()
+
     const result = await saveSearchHistory([1, 2])
     expect(result).toEqual({
       success: false,

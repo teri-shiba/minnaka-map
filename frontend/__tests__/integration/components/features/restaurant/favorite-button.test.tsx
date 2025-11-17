@@ -1,19 +1,15 @@
 import type { ReactElement } from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { setupAuthMock } from '__tests__/integration/helpers/auth-mock'
 import { server } from '__tests__/integration/setup/msw.server'
 import { Provider as JotaiProvider } from 'jotai'
 import { useHydrateAtoms } from 'jotai/utils'
 import { http, HttpResponse } from 'msw'
 import { toast } from 'sonner'
 import FavoriteButton from '~/components/features/restaurant/favorite-button'
-import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import { initialUserState, userStateAtom } from '~/state/user-state.atom'
 import '@testing-library/jest-dom/vitest'
-
-vi.mock('~/services/get-auth-from-cookie', () => ({
-  getAuthFromCookie: vi.fn(),
-}))
 
 vi.mock('sonner', () => ({
   toast: {
@@ -53,11 +49,7 @@ describe('FavoriteButton', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(getAuthFromCookie).mockResolvedValue({
-      accessToken: 'token-123',
-      client: 'client-123',
-      uid: 'uid-123',
-    })
+    setupAuthMock()
   })
 
   describe('トークンベースのお気に入り登録', () => {

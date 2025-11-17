@@ -3,15 +3,9 @@ import { http, HttpResponse } from 'msw'
 import { FAVORITE_GROUPS_PER_PAGE, FAVORITES_FIRST_PAGE } from '~/constants'
 import { fetchFavoriteGroups } from '~/services/fetch-favorite-groups'
 import { fetchRestaurantsByIds } from '~/services/fetch-restaurants-by-ids'
-import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
+import { setupAuthMock, setupUnauthorized } from '../helpers/auth-mock'
 import { server } from '../setup/msw.server'
 
-vi.mock('~/lib/logger', () => ({
-  logger: vi.fn(),
-}))
-vi.mock('~/services/get-auth-from-cookie', () => ({
-  getAuthFromCookie: vi.fn(),
-}))
 vi.mock('~/services/fetch-restaurants-by-ids', () => ({
   fetchRestaurantsByIds: vi.fn(),
 }))
@@ -34,11 +28,7 @@ function makeRestaurant(id: string): RestaurantListItem {
 describe('fetchFavoriteGroups', () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.mocked(getAuthFromCookie).mockResolvedValue({
-      accessToken: 'token-123',
-      client: 'client-123',
-      uid: 'uid-123',
-    })
+    setupAuthMock()
   })
 
   it('成功したとき、レストラン詳細を結合してグループと pagination を返す', async () => {
@@ -152,7 +142,7 @@ describe('fetchFavoriteGroups', () => {
   })
 
   it('認証情報がないとき、UNAUTHORIZED を返す', async () => {
-    vi.mocked(getAuthFromCookie).mockResolvedValueOnce(null)
+    setupUnauthorized()
 
     const result = await fetchFavoriteGroups(1)
 

@@ -1,23 +1,12 @@
 import { http, HttpResponse } from 'msw'
 import { createSharedList } from '~/services/create-shared-list'
-import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
+import { setupAuthMock, setupUnauthorized } from '../helpers/auth-mock'
 import { server } from '../setup/msw.server'
-
-vi.mock('~/lib/logger', () => ({
-  logger: vi.fn(),
-}))
-vi.mock('~/services/get-auth-from-cookie', () => ({
-  getAuthFromCookie: vi.fn(),
-}))
 
 describe('createSharedList', () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.mocked(getAuthFromCookie).mockResolvedValue({
-      accessToken: 'token-123',
-      client: 'client-123',
-      uid: 'uid-123',
-    })
+    setupAuthMock()
   })
 
   it('シェアリスト作成に成功したとき、shareUuid と title を返す', async () => {
@@ -109,7 +98,7 @@ describe('createSharedList', () => {
   })
 
   it('認証情報がないとき、UNAUTHORIZED を返す', async () => {
-    vi.mocked(getAuthFromCookie).mockResolvedValueOnce(null)
+    setupUnauthorized()
 
     const result = await createSharedList(1)
 
