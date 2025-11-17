@@ -62,6 +62,7 @@ async function selectStation(stationName: string, index: number) {
 
 describe('StationSearchForm', () => {
   beforeEach(() => {
+    vi.clearAllMocks()
     vi.useFakeTimers()
     localStorage.clear()
     sessionStorage.clear()
@@ -77,7 +78,6 @@ describe('StationSearchForm', () => {
 
   afterEach(() => {
     vi.useRealTimers()
-    vi.clearAllMocks()
   })
 
   describe('送信ボタン', () => {

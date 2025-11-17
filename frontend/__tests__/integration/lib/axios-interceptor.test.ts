@@ -8,7 +8,7 @@ async function importAPI() {
 }
 
 describe('axios-interceptor', () => {
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks()
   })
 

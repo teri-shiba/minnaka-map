@@ -7,7 +7,7 @@ const mockStartAnimation = vi.fn()
 
 vi.mock('framer-motion', () => ({
   useAnimationControls: vi.fn(() => ({
-    start: mockStartAnimation
+    start: mockStartAnimation,
   })),
 }))
 

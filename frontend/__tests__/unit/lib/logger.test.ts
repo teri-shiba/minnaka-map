@@ -26,8 +26,7 @@ describe('logger', () => {
   })
 
   afterEach(() => {
-    vi.resetAllMocks()
-    vi.unstubAllEnvs()
+    vi.restoreAllMocks()
   })
 
   describe('logger（基本動作）', () => {
