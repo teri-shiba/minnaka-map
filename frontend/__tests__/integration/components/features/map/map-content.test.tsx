@@ -2,12 +2,16 @@ import type { RestaurantListItem } from '~/types/restaurant'
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { setupCanvasMocks } from '__tests__/integration/helpers/canvas-mocks'
+import { server } from '__tests__/integration/setup/msw.server'
+import { http, HttpResponse } from 'msw'
 import { MapContainer } from 'react-leaflet'
 import MapContent from '~/components/features/map/map-content'
 import { useMapCoords } from '~/hooks/useMapCoords'
 import '@testing-library/jest-dom/vitest'
 
 setupCanvasMocks()
+
+window.scrollTo = vi.fn()
 
 vi.mock('leaflet', async () => {
   const actual = await vi.importActual('leaflet')
@@ -68,6 +72,14 @@ function renderMapContent(props = {}) {
 describe('MapContent', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+
+    server.use(
+      http.get('*/api/v1/api_keys/maptiler', () => {
+        return HttpResponse.json({
+          data: { api_key: 'test-maptiler-key' },
+        })
+      }),
+    )
   })
 
   it('apiKeyが存在するとき、MapTilerLayerがレンダリングされる', () => {
