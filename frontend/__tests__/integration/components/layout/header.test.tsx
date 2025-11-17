@@ -6,11 +6,11 @@ import { http, HttpResponse } from 'msw'
 import Header from '~/components/layout/header'
 import '@testing-library/jest-dom/vitest'
 
-const routerReplaceSpy = vi.fn()
+const mockReplace = vi.fn()
 
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(() => ({
-    replace: routerReplaceSpy,
+    replace: mockReplace,
   })),
   usePathname: vi.fn(() => '/'),
 }))
@@ -112,7 +112,7 @@ describe('Header', () => {
       expect(screen.getByRole('button', { name: 'ログイン' })).toBeInTheDocument()
     })
 
-    expect(routerReplaceSpy).toHaveBeenCalledWith('/')
+    expect(mockReplace).toHaveBeenCalledWith('/')
   })
 
   it('ユーザーアイコンをクリックしたとき、ドロップダウンメニューが開く', async () => {

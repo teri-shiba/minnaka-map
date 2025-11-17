@@ -3,11 +3,11 @@ import useOAuthCallback from '~/hooks/useOAuthCallback'
 import api from '~/lib/axios-interceptor'
 
 let currentQuery = ''
-const routerReplaceSpy = vi.fn()
+const mockReplace = vi.fn()
 
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(() => ({
-    replace: routerReplaceSpy,
+    replace: mockReplace,
   })),
   useSearchParams: vi.fn(() => new URLSearchParams(currentQuery)),
 }))
@@ -82,7 +82,7 @@ describe('useOAuthCallback', () => {
       expect(api.get).toHaveBeenCalledWith('/current/user/show_status')
       expect(mockResetUser).toHaveBeenCalledTimes(1)
       expect(mockMutate).not.toHaveBeenCalled()
-      expect(routerReplaceSpy).toHaveBeenCalledWith(
+      expect(mockReplace).toHaveBeenCalledWith(
         expect.stringMatching(/^\/\?error=/),
       )
     })

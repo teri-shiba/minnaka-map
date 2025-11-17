@@ -3,13 +3,10 @@ import userEvent from '@testing-library/user-event'
 import { AuthDialog } from '~/components/features/account/auth/auth-dialog'
 import '@testing-library/jest-dom/vitest'
 
-const loginSpy = vi.fn().mockResolvedValue(undefined)
-const signupSpy = vi.fn().mockResolvedValue(undefined)
-
 vi.mock('~/hooks/useAuth', () => ({
   useAuth: vi.fn(() => ({
-    login: loginSpy,
-    signup: signupSpy,
+    login: vi.fn().mockResolvedValue(undefined),
+    signup: vi.fn().mockResolvedValue(undefined),
   })),
 }))
 

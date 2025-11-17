@@ -6,13 +6,13 @@ import '@testing-library/jest-dom/vitest'
 
 setupBrowserAPIMocks()
 
-const loginSpy = vi.fn().mockResolvedValue(undefined)
-const signupSpy = vi.fn().mockResolvedValue(undefined)
+const mockLogin = vi.fn().mockResolvedValue(undefined)
+const mockSignup = vi.fn().mockResolvedValue(undefined)
 
 vi.mock('~/hooks/useAuth', () => ({
   useAuth: vi.fn(() => ({
-    login: loginSpy,
-    signup: signupSpy,
+    login: mockLogin,
+    signup: mockSignup,
   })),
 }))
 
@@ -75,7 +75,7 @@ describe('AuthDrawer', () => {
     expect(await screen.findByRole('button', { name: 'ログイン' })).toBeInTheDocument()
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-    expect(loginSpy).toHaveBeenCalledWith('test@example.com', 'Password123@')
+    expect(mockLogin).toHaveBeenCalledWith('test@example.com', 'Password123@')
   })
 
   it('新規登録フォームの送信が成功したとき、ドロワーを閉じる', async () => {

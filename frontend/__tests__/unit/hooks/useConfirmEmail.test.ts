@@ -4,12 +4,12 @@ import api from '~/lib/axios-interceptor'
 import { logger } from '~/lib/logger'
 
 let currentQuery = ''
-const routerReplaceSpy = vi.fn()
-const setModalOpenSpy = vi.fn()
+const mockReplace = vi.fn()
+const mockSetModalOpen = vi.fn()
 
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(() => ({
-    replace: routerReplaceSpy,
+    replace: mockReplace,
   })),
   useSearchParams: vi.fn(() => new URLSearchParams(currentQuery)),
 }))
@@ -22,7 +22,7 @@ vi.mock('jotai', async (importOriginal) => {
   const actual = await importOriginal<typeof import('jotai')>()
   return {
     ...actual,
-    useSetAtom: vi.fn(() => setModalOpenSpy),
+    useSetAtom: vi.fn(() => mockSetModalOpen),
   }
 })
 
@@ -52,8 +52,8 @@ describe('useConfirmEmail', () => {
         expect.any(String),
         { confirmation_token: 'token-123' },
       )
-      expect(setModalOpenSpy).toHaveBeenCalledWith(true)
-      expect(routerReplaceSpy).toHaveBeenCalledWith('/?success=email_confirmed')
+      expect(mockSetModalOpen).toHaveBeenCalledWith(true)
+      expect(mockReplace).toHaveBeenCalledWith('/?success=email_confirmed')
     })
   })
 
@@ -64,8 +64,8 @@ describe('useConfirmEmail', () => {
 
     await waitFor(() => {
       expect(api.patch).not.toHaveBeenCalled()
-      expect(setModalOpenSpy).not.toHaveBeenCalled()
-      expect(routerReplaceSpy).not.toHaveBeenCalled()
+      expect(mockSetModalOpen).not.toHaveBeenCalled()
+      expect(mockReplace).not.toHaveBeenCalled()
     })
   })
 
@@ -85,8 +85,8 @@ describe('useConfirmEmail', () => {
           action: 'confirmEmail',
         },
       )
-      expect(setModalOpenSpy).not.toHaveBeenCalled()
-      expect(routerReplaceSpy).toHaveBeenCalledWith('/?error=network_error')
+      expect(mockSetModalOpen).not.toHaveBeenCalled()
+      expect(mockReplace).toHaveBeenCalledWith('/?error=network_error')
     })
   })
 })

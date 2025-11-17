@@ -9,10 +9,11 @@ setupBrowserAPIMocks()
 
 vi.mock('jotai')
 
-const deleteAccountSpy = vi.fn()
+const mockDeleteAccount = vi.fn()
+
 vi.mock('~/hooks/useAuth', () => ({
   useAuth: vi.fn(() => ({
-    deleteAccount: deleteAccountSpy,
+    deleteAccount: mockDeleteAccount,
   })),
 }))
 
@@ -113,7 +114,7 @@ describe('DeleteAccountDrawer', () => {
 
   it('メールアドレスが登録されているとき、正しいメールアドレスを入力して送信すると、ダイアログが閉じる', async () => {
     const user = userEvent.setup()
-    const mockDeleteAccount = vi.mocked(deleteAccountSpy).mockResolvedValue({ success: true })
+    mockDeleteAccount.mockResolvedValue({ success: true })
     vi.mocked(useAtomValue).mockReturnValue({
       id: 1,
       name: 'test user',
@@ -145,7 +146,7 @@ describe('DeleteAccountDrawer', () => {
 
   it('メールアドレスが登録されているとき、間違ったメールアドレスを入力して送信すると、エラーメッセージが表示される', async () => {
     const user = userEvent.setup()
-    const mockDeleteAccount = vi.mocked(deleteAccountSpy).mockResolvedValue({ success: true })
+    mockDeleteAccount.mockResolvedValue({ success: true })
     vi.mocked(useAtomValue).mockReturnValue({
       id: 1,
       name: 'test user',
@@ -174,7 +175,7 @@ describe('DeleteAccountDrawer', () => {
 
   it('メールアドレスが登録されていないとき、削除ボタンをクリックすると、ダイアログが閉じる', async () => {
     const user = userEvent.setup()
-    const mockDeleteAccount = vi.mocked(deleteAccountSpy).mockResolvedValue({ success: true })
+    mockDeleteAccount.mockResolvedValue({ success: true })
     vi.mocked(useAtomValue).mockReturnValue({
       id: 1,
       name: 'test user',
@@ -227,7 +228,7 @@ describe('DeleteAccountDrawer', () => {
 
   it('API通信に失敗したとき、ダイアログが開いたまま', async () => {
     const user = userEvent.setup()
-    const mockDeleteAccount = vi.mocked(deleteAccountSpy).mockResolvedValue({
+    mockDeleteAccount.mockResolvedValue({
       success: false,
       error: new Error('Failed'),
     })
