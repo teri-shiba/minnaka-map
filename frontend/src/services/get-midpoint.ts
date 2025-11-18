@@ -29,10 +29,7 @@ export async function getMidpoint(
       headers: {
         Accept: 'application/json',
       },
-      next: {
-        revalidate: 86400, // 24時間 (60 * 60 * 24)
-        tags: ['midpoint'],
-      },
+      next: { revalidate: 3600 },
     })
 
     if (!response.ok)
