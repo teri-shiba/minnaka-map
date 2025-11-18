@@ -36,7 +36,7 @@ export default function RestaurantCard({
       : `restaurant/${id}`
 
   return (
-    <div className="relative">
+    <div className="relative" role="article" aria-label={name}>
       <Link href={href} className="group block">
         <Card className="flex-row gap-2 [@media(max-width:335px)]:flex-col">
           <div className="relative aspect-square size-32 shrink-0 overflow-hidden rounded-lg [@media(max-width:335px)]:w-full">

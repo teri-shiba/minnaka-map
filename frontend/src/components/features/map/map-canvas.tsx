@@ -54,7 +54,7 @@ export default function MapCanvas({ midpoint, restaurants }: MapItems) {
   }, [cardPosition])
 
   return (
-    <main className="relative z-40 size-full overflow-hidden">
+    <div className="relative z-40 size-full overflow-hidden">
       <MapContainer
         center={midpoint}
         {...mapOptions}
@@ -91,6 +91,6 @@ export default function MapCanvas({ midpoint, restaurants }: MapItems) {
           />
         </div>
       )}
-    </main>
+    </div>
   )
 }
