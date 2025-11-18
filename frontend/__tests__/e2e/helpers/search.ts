@@ -16,9 +16,29 @@ export async function searchStations(page: Page, stationNames: string[]) {
     const input = page.getByPlaceholder(placeholder)
     await input.fill(stationNames[i])
 
-    const option = page.getByRole('option').first()
-    await option.waitFor({ state: 'visible' })
-    await option.click()
+    // オプションが表示されるまで待機
+    await page.getByRole('option').first().waitFor({ state: 'visible' })
+
+    // 過去の検索から選択を試みる
+    try {
+      const recentOption = page
+        .getByRole('group', { name: '過去に検索した場所' })
+        .getByRole('option')
+        .filter({ hasText: stationNames[i] })
+        .first()
+
+      await recentOption.click({ timeout: 1000 })
+    }
+    catch {
+      // 履歴から選択できなかった場合は駅候補から選択
+      const candidateOption = page
+        .getByRole('group', { name: '駅候補' })
+        .getByRole('option')
+        .filter({ hasText: stationNames[i] })
+        .first()
+
+      await candidateOption.click()
+    }
   }
 
   const searchButton = page.getByRole('button', { name: '検索する' })
@@ -31,6 +51,8 @@ export async function searchStations(page: Page, stationNames: string[]) {
 export async function waitForSearchResults(page: Page) {
   await page.waitForURL(/\/result\?/)
   await page.getByRole('region', { name: '検索結果の地図' }).waitFor({ state: 'visible' })
+
+  await page.waitForTimeout(1000)
 }
 
 /**
