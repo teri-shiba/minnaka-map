@@ -1,3 +1,15 @@
+if Rails.env.test? || (Rails.env.development? && ENV["ENABLE_OMNIAUTH_TEST_MODE"] == "true")
+  OmniAuth.config.test_mode = true
+  OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new({
+    provider: "google_oauth2",
+    uid: "12345678",
+    info: {
+      email: "e2e@test.com",
+      name: "E2E Test User",
+    },
+  })
+end
+
 OMNIAUTH_SETUP_PROC = ->(env) do
   request = Rack::Request.new(env)
   redirect_to = request.params["redirect_to"]
@@ -12,7 +24,7 @@ end
 Rails.application.config.middleware.use OmniAuth::Builder do
   OmniAuth.config.logger = Rails.logger
 
-  if Rails.env.test?
+  if Rails.env.test? || (Rails.env.development? && ENV["ENABLE_OMNIAUTH_TEST_MODE"] == "true")
     require "omniauth/strategies/line"
     provider :line, "dummy_id", "dummy_secret", setup: OMNIAUTH_SETUP_PROC
     provider :google_oauth2, "dummy_id", "dummy_secret", setup: OMNIAUTH_SETUP_PROC
