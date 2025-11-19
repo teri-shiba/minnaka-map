@@ -1,16 +1,12 @@
 import { checkFavoriteStatus } from '~/services/check-favorite-status'
 import { decodeToken } from '~/services/decode-token'
 import { getFavoriteInitialData } from '~/services/get-favorite-initial-data'
+import { setupAuthMock, setupUnauthorized } from '../helpers/auth-mock'
 
 vi.mock('~/services/check-favorite-status')
 vi.mock('~/services/decode-token')
 
 describe('getFavoriteInitialData', () => {
-  const mockAuth = {
-    accessToken: 'token-123',
-    client: 'client-123',
-    uid: 'uid-123',
-  }
   const mockHotPepperId = 'J001246910'
   const mockSearchHistoryId = 'SH-123'
   const mockFavoriteId = 101
@@ -18,6 +14,7 @@ describe('getFavoriteInitialData', () => {
 
   beforeEach(() => {
     vi.resetAllMocks()
+    setupAuthMock()
   })
 
   describe('認証済みのとき', () => {
@@ -40,7 +37,6 @@ describe('getFavoriteInitialData', () => {
         })
 
         const result = await getFavoriteInitialData({
-          auth: mockAuth,
           hotpepperId: mockHotPepperId,
           token: mockToken,
         })
@@ -64,7 +60,6 @@ describe('getFavoriteInitialData', () => {
         })
 
         const result = await getFavoriteInitialData({
-          auth: mockAuth,
           hotpepperId: mockHotPepperId,
           token: mockToken,
         })
@@ -89,7 +84,6 @@ describe('getFavoriteInitialData', () => {
         })
 
         const result = await getFavoriteInitialData({
-          auth: mockAuth,
           hotpepperId: mockHotPepperId,
           historyId: mockSearchHistoryId,
         })
@@ -112,7 +106,6 @@ describe('getFavoriteInitialData', () => {
         })
 
         const result = await getFavoriteInitialData({
-          auth: mockAuth,
           hotpepperId: mockHotPepperId,
           historyId: mockSearchHistoryId,
         })
@@ -128,7 +121,6 @@ describe('getFavoriteInitialData', () => {
   describe('認証済みだが、token も historyId もないとき（直接アクセス）', () => {
     it('favoriteData: null を返すこと', async () => {
       const result = await getFavoriteInitialData({
-        auth: mockAuth,
         hotpepperId: mockHotPepperId,
       })
 
@@ -143,8 +135,9 @@ describe('getFavoriteInitialData', () => {
 
   describe('未認証のとき', () => {
     it('resolvedHistoryId と favoriteData: null を返すこと', async () => {
+      setupUnauthorized()
+
       const result = await getFavoriteInitialData({
-        auth: null,
         hotpepperId: mockHotPepperId,
         historyId: mockSearchHistoryId,
       })

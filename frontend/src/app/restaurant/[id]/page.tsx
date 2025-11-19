@@ -5,8 +5,8 @@ import FavoriteButton from '~/components/features/restaurant/favorite-button'
 import ShareRestaurantDialog from '~/components/features/restaurant/share/share-restaurant-dialog'
 import Section from '~/components/layout/section'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '~/components/ui/table'
+import { basicInfoFields, facilitiesFields, headerMetaFields } from '~/data/restaurant-detail-fields'
 import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
-import { getAuthFromCookie } from '~/services/get-auth-from-cookie'
 import { getFavoriteInitialData } from '~/services/get-favorite-initial-data'
 import { getGoogleMapsEmbedUrl } from '~/services/get-google-maps-embed-url'
 import { mapCauseToErrorCode } from '~/utils/map-cause-to-error-code'
@@ -29,69 +29,42 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
     redirect(`/?error=${errorCode}`)
   }
 
-  const auth = await getAuthFromCookie()
+  const { data } = result
+
   const { resolvedHistoryId, favoriteData } = await getFavoriteInitialData({
-    auth,
     hotpepperId: id,
     historyId,
     token,
   })
 
-  const {
-    // 基本情報
-    name,
-    address,
-    access,
-    station,
-    genreName,
-    budget,
-    imageUrl,
-
-    // 営業情報
-    open,
-    close,
-    card,
-    urls,
-
-    // 設備情報
-    capacity,
-    privateRoom,
-    charter,
-    nonSmoking,
-    wifi,
-    parking,
-  } = result.data
-
   // Google Maps：埋め込みが取れたら iframe、それ以外は検索リンク
-  const mapEmbedUrl = await getGoogleMapsEmbedUrl(`${name} ${address}`)
+  const mapEmbedUrl = await getGoogleMapsEmbedUrl(`${data.name} ${data.address}`)
   const mapSearch = new URL('https://www.google.com/maps/search/')
-  mapSearch.search = new URLSearchParams({ api: '1', query: `${name} ${address}` }).toString()
+  mapSearch.search = new URLSearchParams({ api: '1', query: `${data.name} ${data.address}` }).toString()
 
   return (
     <Section className="mb-6 md:mb-8">
+      {/* ヘッダー */}
       <div className="flex flex-col-reverse py-4 md:items-start md:justify-between md:border-b md:py-6">
         <div className="space-y-2">
-          <h2>{name}</h2>
+          <h1 className="text-xl md:text-2xl">{data.name}</h1>
           <ul className="text-sm md:flex md:flex-row md:gap-3">
-            <li>
-              <span className="font-bold">最寄駅：</span>
-              {station}
-            </li>
-            <li>
-              <span className="font-bold">ジャンル：</span>
-              {genreName}
-            </li>
-            <li>
-              <span className="font-bold">予算：</span>
-              {budget}
-            </li>
+            {headerMetaFields.map(field => (
+              <li key={field.key}>
+                <span className="font-bold">
+                  {field.label}
+                  ：
+                </span>
+                {data[field.key as keyof typeof data] || '-'}
+              </li>
+            ))}
           </ul>
         </div>
         <div className="mb-4 ml-auto flex gap-4">
           <ShareRestaurantDialog
-            restaurantName={name}
-            restaurantAddress={address}
-            station={station}
+            restaurantName={data.name}
+            restaurantAddress={data.address}
+            station={data.station}
           />
           <FavoriteButton
             hotpepperId={id}
@@ -102,101 +75,103 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
           />
         </div>
       </div>
+
+      {/* メインコンテンツ */}
       <div className="md:flex md:flex-row md:justify-between md:gap-6 md:pt-8">
-        <div className="mx-auto mb-6 md:mb-0 md:shrink-0">
-          <div className="relative max-w-96 overflow-hidden rounded-lg bg-gray-100 md:w-[223px]">
+        {/* 画像 */}
+        <div className="mb-6 md:mb-0 md:shrink-0">
+          <div className="relative max-w-96 overflow-hidden rounded-lg md:w-[223px]">
             <Image
-              src={imageUrl || '/placeholder.svg'}
-              alt={name}
+              src={data.imageUrl || '/placeholder.svg'}
+              alt={data.name}
               width={223}
               height={168}
-              className="aspect-3/2 size-full object-cover blur-[0.5px] brightness-105 md:aspect-square"
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background: 'radial-gradient(ellipse 70% 60% at center, transparent 40%, rgba(0,0,0,0.08) 80%)',
-              }}
+              className="aspect-3/2 size-full object-cover md:aspect-square"
             />
           </div>
-          <p className="pt-1.5 text-right text-xs text-muted-foreground">画像提供：ホットペッパー グルメ</p>
+          <p className="pt-1.5 text-xs text-muted-foreground md:text-right">画像提供：ホットペッパー グルメ</p>
         </div>
+
+        {/* テーブル */}
         <div className="md:flex-1">
+          {/* 店舗基本情報 */}
           <div className="pb-6">
-            <h3 className="mb-4 border-l-4 border-primary pl-2">店舗基本情報</h3>
+            <h2 className="mb-4 border-l-4 border-primary pl-2 text-base md:text-lg">店舗基本情報</h2>
             <Table className="text-xs md:text-sm">
               <TableBody>
+                {/* 店舗名 */}
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">店舗名</TableHead>
-                  <TableCell>{name}</TableCell>
+                  <TableCell>{data.name || '-'}</TableCell>
                 </TableRow>
+
+                {/* 住所 */}
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">住所</TableHead>
                   <TableCell>
-                    {address}
-                    <div className="relative mt-4 h-44 w-full md:h-96">
-                      { }
-                      {mapEmbedUrl
-                        ? (
-                          /* eslint-disable-next-line react-dom/no-missing-iframe-sandbox */
-                            <iframe
-                              src={mapEmbedUrl}
-                              width="600"
-                              height="338"
-                              style={{ border: 0 }}
-                              allowFullScreen
-                              referrerPolicy="no-referrer-when-downgrade"
-                              className="absolute left-0 top-0 size-full"
-                            />
-                          )
-                        : (
-                            <a
-                              href={mapSearch.toString()}
-                              aria-label="Google Mapsで場所を開く（新しいタブ）"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-sky-600 hover:underline"
-                            >
-                              Google Maps で場所を開く
-                              <LuArrowUpRight className="inline-block size-4 pl-0.5 align-bottom md:align-text-bottom" />
-                            </a>
-                          )}
-                    </div>
+                    {data.address || '-'}
+                    {data.address && (
+                      <div className="relative mt-4 h-44 w-full md:h-96">
+                        {mapEmbedUrl
+                          ? (
+                            /* eslint-disable-next-line react-dom/no-missing-iframe-sandbox */
+                              <iframe
+                                src={mapEmbedUrl}
+                                width="600"
+                                height="338"
+                                style={{ border: 0 }}
+                                allowFullScreen
+                                referrerPolicy="no-referrer-when-downgrade"
+                                className="absolute left-0 top-0 size-full"
+                              />
+                            )
+                          : (
+                              <a
+                                href={mapSearch.toString()}
+                                aria-label="Google Mapsで場所を開く（新しいタブ）"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sky-600 hover:underline"
+                              >
+                                Google Maps で場所を開く
+                                <LuArrowUpRight className="inline-block size-4 pl-0.5 align-bottom md:align-text-bottom" />
+                              </a>
+                            )}
+                      </div>
+                    )}
                   </TableCell>
                 </TableRow>
-                <TableRow>
-                  <TableHead className="w-24 bg-secondary md:w-36">アクセス</TableHead>
-                  <TableCell>{access}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableHead className="w-24 bg-secondary md:w-36">営業時間</TableHead>
-                  <TableCell>{open}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableHead className="w-24 bg-secondary md:w-36">定休日</TableHead>
-                  <TableCell>{close}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableHead className="w-24 bg-secondary md:w-36">予算</TableHead>
-                  <TableCell>{budget}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableHead className="w-24 bg-secondary md:w-36">クレジットカード</TableHead>
-                  <TableCell>{card}</TableCell>
-                </TableRow>
+
+                {/* 基本情報 */}
+                {basicInfoFields.map(field => (
+                  <TableRow key={field.key}>
+                    <TableHead className="w-24 bg-secondary md:w-36">{field.label}</TableHead>
+                    <TableCell>{data[field.key as keyof typeof data] || '-'}</TableCell>
+                  </TableRow>
+                ))}
+
+                {/* 店舗URL */}
                 <TableRow>
                   <TableHead className="w-24 bg-secondary md:w-36">店舗URL</TableHead>
                   <TableCell>
-                    <a
-                      href={urls}
-                      aria-label="ホットペッパーグルメ店舗ページ（新しいタブ）"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sky-600 hover:underline"
-                    >
-                      ホットペッパーグルメ店舗ページ
-                      <LuArrowUpRight className="inline-block size-4 pl-0.5 align-bottom md:align-text-bottom" />
-                    </a>
+                    {data.urls
+                      ? (
+                          <a
+                            href={data.urls}
+                            aria-label="ホットペッパーグルメ店舗ページ（新しいタブ）"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sky-600 hover:underline"
+                          >
+                            <span>ホットペッパーグルメで予約・詳細を見る</span>
+                            <LuArrowUpRight
+                              className="inline-block size-4 pl-0.5 align-bottom md:align-text-bottom"
+                              aria-hidden="true"
+                            />
+                            <span className="sr-only">（外部サイトが開きます）</span>
+                          </a>
+                        )
+                      : '-'}
                   </TableCell>
                 </TableRow>
               </TableBody>
@@ -204,36 +179,24 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
           </div>
 
           <div>
-            <h3 className="mb-4 border-l-4 border-primary pl-2">席・設備</h3>
+            <h2 className="mb-4 border-l-4 border-primary pl-2 text-base md:text-lg">席・設備</h2>
             <Table className="text-xs md:text-sm">
               <TableBody>
-                <TableRow>
-                  <TableHead className="w-24 bg-secondary md:w-36">総席数</TableHead>
-                  <TableCell>
-                    {capacity}
-                    席
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableHead className="w-24 bg-secondary md:w-36">個室</TableHead>
-                  <TableCell>{privateRoom}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableHead className="w-24 bg-secondary md:w-36">貸切</TableHead>
-                  <TableCell>{charter}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableHead className="w-24 bg-secondary md:w-36">WiFi</TableHead>
-                  <TableCell>{wifi}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableHead className="w-24 bg-secondary md:w-36">禁煙・喫煙</TableHead>
-                  <TableCell>{nonSmoking}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableHead className="w-24 bg-secondary md:w-36">駐車場</TableHead>
-                  <TableCell>{parking}</TableCell>
-                </TableRow>
+                {facilitiesFields.map((field) => {
+                  const value = data[field.key as keyof typeof data]
+                  const displayValue = value
+                    ? (field.suffix ? `${value}${field.suffix}` : value)
+                    : '-'
+
+                  return (
+                    <TableRow key={field.key}>
+                      <TableHead className="w-24 bg-secondary md:w-36">
+                        {field.label}
+                      </TableHead>
+                      <TableCell>{displayValue}</TableCell>
+                    </TableRow>
+                  )
+                })}
               </TableBody>
             </Table>
           </div>
