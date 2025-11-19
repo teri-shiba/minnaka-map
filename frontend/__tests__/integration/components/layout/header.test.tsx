@@ -71,10 +71,10 @@ describe('Header', () => {
     )
 
     const wrapper = createSWRWrapper()
-    const { container } = render(<Header />, { wrapper })
+    render(<Header />, { wrapper })
 
     await waitFor(() => {
-      const menuButton = container.querySelector('.size-10.cursor-pointer')
+      const menuButton = screen.getByRole('button', { name: 'ユーザーメニュー' })
       expect(menuButton).toBeInTheDocument()
     })
   })
@@ -98,13 +98,13 @@ describe('Header', () => {
     )
 
     const wrapper = createSWRWrapper()
-    const { container } = render(<Header />, { wrapper })
+    render(<Header />, { wrapper })
 
     await waitFor(() => {
-      expect(container.querySelector('.size-10.cursor-pointer')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'ユーザーメニュー' })).toBeInTheDocument()
     })
 
-    const menuButton = container.querySelector('.size-10.cursor-pointer') as HTMLElement
+    const menuButton = screen.getByRole('button', { name: 'ユーザーメニュー' })
     await user.click(menuButton)
     await user.click(screen.getByText('ログアウト'))
 
@@ -131,13 +131,13 @@ describe('Header', () => {
     )
 
     const wrapper = createSWRWrapper()
-    const { container } = render(<Header />, { wrapper })
+    render(<Header />, { wrapper })
 
     await waitFor(() => {
-      expect(container.querySelector('.size-10.cursor-pointer')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'ユーザーメニュー' })).toBeInTheDocument()
     })
 
-    const menuButton = container.querySelector('.size-10.cursor-pointer') as HTMLElement
+    const menuButton = screen.getByRole('button', { name: 'ユーザーメニュー' })
     await user.click(menuButton)
 
     expect(screen.getByText('お気に入り一覧')).toBeInTheDocument()
@@ -161,13 +161,13 @@ describe('Header', () => {
     )
 
     const wrapper = createSWRWrapper()
-    const { container } = render(<Header />, { wrapper })
+    render(<Header />, { wrapper })
 
     await waitFor(() => {
-      expect(container.querySelector('.size-10.cursor-pointer')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'ユーザーメニュー' })).toBeInTheDocument()
     })
 
-    const menuButton = container.querySelector('.size-10.cursor-pointer') as HTMLElement
+    const menuButton = screen.getByRole('button', { name: 'ユーザーメニュー' })
     await user.click(menuButton)
 
     const favoritesLink = screen.getByText('お気に入り一覧').closest('a')
