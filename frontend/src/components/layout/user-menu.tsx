@@ -6,6 +6,7 @@ import { HiUser } from 'react-icons/hi2'
 import { LuHeart, LuLogOut, LuSettings } from 'react-icons/lu'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '~/components/ui/dropdown-menu'
 import { useAuth } from '~/hooks/useAuth'
+import { Button } from '../ui/button'
 
 export default function UserMenu() {
   const [open, setOpen] = useState(false)
@@ -18,12 +19,15 @@ export default function UserMenu() {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <div
+        <Button
           onClick={() => setOpen(true)}
-          className="flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-full border bg-muted"
+          variant="outline"
+          size="icon"
+          aria-label="ユーザーメニュー"
+          className="size-10 rounded-full bg-muted hover:bg-muted"
         >
-          <HiUser className="size-5 text-primary" />
-        </div>
+          <HiUser className="text-primary" />
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <Link href="/favorites" onClick={() => setOpen(false)} className="block">
