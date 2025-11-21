@@ -1,15 +1,3 @@
-if Rails.env.test? || (Rails.env.development? && ENV["ENABLE_OMNIAUTH_TEST_MODE"] == "true")
-  OmniAuth.config.test_mode = true
-  OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new({
-    provider: "google_oauth2",
-    uid: "12345678",
-    info: {
-      email: "e2e@test.com",
-      name: "E2E Test User",
-    },
-  })
-end
-
 OMNIAUTH_SETUP_PROC = ->(env) do
   request = Rack::Request.new(env)
   redirect_to = request.params["redirect_to"]
@@ -44,4 +32,25 @@ Rails.application.config.middleware.use OmniAuth::Builder do
 
   OmniAuth.config.allowed_request_methods = %i[get]
   OmniAuth.config.silence_get_warning = true
+end
+
+# テスト環境用のモック認証設定
+if Rails.env.test? || (Rails.env.development? && ENV["ENABLE_OMNIAUTH_TEST_MODE"] == "true")
+  OmniAuth.config.test_mode = true
+  OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new({
+    provider: "google_oauth2",
+    uid: "12345678",
+    info: {
+      email: "e2e@test.com",
+      name: "E2E Test User",
+    },
+  })
+  OmniAuth.config.mock_auth[:line] = OmniAuth::AuthHash.new({
+    provider: "line",
+    uid: "87654321",
+    info: {
+      email: "e2e-line@test.com",
+      name: "E2E LINE User",
+    },
+  })
 end
