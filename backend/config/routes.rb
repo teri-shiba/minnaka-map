@@ -38,6 +38,10 @@ Rails.application.routes.draw do
           get :show_status
         end
       end
+
+      resource :test_helpers, only: [] do
+        post :verification_email
+      end
     end
   end
 end
