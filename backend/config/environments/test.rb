@@ -58,11 +58,24 @@ Rails.application.configure do
   # Tell Action Mailer not to deliver emails to the real world.
   # The :test delivery method accumulates sent emails in the
   # ActionMailer::Base.deliveries array.
-  config.action_mailer.delivery_method = :test
+  # config.action_mailer.delivery_method = :test
 
   # Unlike controllers, the mailer instance doesn't have any context about the
   # incoming request so you'll need to provide the :host parameter yourself.
-  config.action_mailer.default_url_options = { host: "www.example.com" }
+  # config.action_mailer.default_url_options = { host: "www.example.com" }
+
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: "smtp.gmail.com",
+    port: 587,
+    domain: "gmail.com",
+    user_name: Rails.application.credentials.dig(:gmail, :smtp_user),
+    password: Rails.application.credentials.dig(:gmail, :smtp_password),
+    authentication: :plain,
+    enable_starttls_auto: true,
+  }
+  config.action_mailer.default_options = { from: Rails.application.credentials.dig(:gmail, :smtp_user) }
+  config.action_mailer.default_url_options = { host: "localhost", port: 8000 }
 
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
