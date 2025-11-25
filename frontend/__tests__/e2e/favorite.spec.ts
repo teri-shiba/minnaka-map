@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { loginWithGoogle } from './helpers/auth'
+import { cleanupFavorites } from './helpers/favorites'
 import { searchStations } from './helpers/search'
 
 test.describe.configure({ mode: 'serial' })
@@ -33,7 +34,11 @@ test.describe('お気に入り機能フロー', () => {
       await loginWithGoogle(page)
     })
 
-    test('詳細ページでお気に入り追加→削除できる', async ({ page }) => {
+    test.afterEach(async ({ page }) => {
+      await cleanupFavorites(page)
+    })
+
+    test('詳細ページでお気に入り追加 → 削除できる', async ({ page }) => {
       await searchStations(page, ['渋谷', '新宿'])
 
       await page.waitForURL(/\/result\?/)
@@ -111,19 +116,6 @@ test.describe('お気に入り機能フロー', () => {
         await page.goto('/favorites')
         await expect(page.getByRole('article')).toHaveCount(2)
       })
-
-      await test.step('クリーンアップ', async () => {
-        await page.getByRole('article').first().getByRole('button').click()
-        await page.getByText('お気に入りから削除しました').waitFor({ state: 'visible' })
-        await page.reload()
-
-        const remaining = await page.getByRole('article').count()
-        if (remaining > 0) {
-          await page.getByRole('article').first().getByRole('button').click()
-          await page.getByText('お気に入りから削除しました').waitFor({ state: 'visible' })
-          await page.reload()
-        }
-      })
     })
 
     test('駅の順番が違っても同じグループになる', async ({ page }) => {
@@ -158,19 +150,6 @@ test.describe('お気に入り機能フロー', () => {
         await page.goto('/favorites')
         await expect(page.getByRole('heading', { level: 2 })).toHaveCount(1)
         await expect(page.getByRole('article')).toHaveCount(2)
-      })
-
-      await test.step('クリーンアップ', async () => {
-        await page.getByRole('article').first().getByRole('button').click()
-        await page.getByText('お気に入りから削除しました').waitFor({ state: 'visible' })
-        await page.reload()
-
-        const remaining = await page.getByRole('article').count()
-        if (remaining > 0) {
-          await page.getByRole('article').first().getByRole('button').click()
-          await page.getByText('お気に入りから削除しました').waitFor({ state: 'visible' })
-          await page.reload()
-        }
       })
     })
   })
