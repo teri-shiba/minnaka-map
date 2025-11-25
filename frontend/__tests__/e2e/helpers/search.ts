@@ -42,31 +42,3 @@ export async function searchStations(page: Page, stationNames: string[]) {
   const searchButton = page.getByRole('button', { name: '検索する' })
   await searchButton.click()
 }
-
-/**
- * 検索結果ページの表示を待機する
- */
-export async function waitForSearchResults(page: Page) {
-  await page.waitForURL(/\/result\?/)
-  await page.getByRole('region', { name: '検索結果の地図' }).waitFor({ state: 'visible' })
-
-  await page.waitForTimeout(1000)
-}
-
-/**
- * 最初のレストランカードをクリックして詳細ページへ遷移
- */
-export async function clickFirstRestaurant(page: Page) {
-  const restaurantCard = page.getByRole('article').first()
-  await restaurantCard.waitFor({ state: 'visible' })
-  await restaurantCard.click()
-  await page.waitForURL(/\/restaurant\/[^/]+/)
-}
-
-/**
- * お気に入りボタンをクリック
- */
-export async function clickFavoriteButton(page: Page) {
-  const favoriteButton = page.getByRole('button', { name: /保存/ })
-  await favoriteButton.click()
-}
