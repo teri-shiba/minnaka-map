@@ -71,8 +71,7 @@ test.describe('お気に入り機能フロー', () => {
       await restaurantCard.click()
       await expect(page).toHaveURL(/\/restaurant\/[^/]+/)
 
-      const favoriteButton = page.getByRole('button', { name: /保存/ })
-      await favoriteButton.click()
+      await page.getByRole('button', { name: /保存/ }).click()
 
       await page.goto('/favorites')
       const favoriteCompactButton = restaurantCard.getByRole('button')
@@ -87,12 +86,11 @@ test.describe('お気に入り機能フロー', () => {
         await page.waitForURL(/\/result\?/)
       })
 
-      await test.step('レストランAをお気に入り', async () => {
+      await test.step('1件目をお気に入りに追加', async () => {
         await page.getByRole('article').first().click()
         await expect(page).toHaveURL(/\/restaurant\/[^/]+/)
 
-        const favoriteButton = page.getByRole('button', { name: /保存/ })
-        await favoriteButton.click()
+        await page.getByRole('button', { name: /保存/ }).click()
         await page.getByText('お気に入りに追加しました').waitFor({ state: 'visible' })
         await expect(page.getByRole('button', { name: /保存済み/ })).toBeVisible()
       })
@@ -102,12 +100,11 @@ test.describe('お気に入り機能フロー', () => {
         await page.waitForURL(/\/result\?/)
       })
 
-      await test.step('レストランBをお気に入り', async () => {
+      await test.step('2件目をお気に入りに追加', async () => {
         await page.getByRole('article').nth(1).click()
         await expect(page).toHaveURL(/\/restaurant\/[^/]+/)
 
-        const favoriteButton = page.getByRole('button', { name: /保存/ })
-        await favoriteButton.click()
+        await page.getByRole('button', { name: /保存/ }).click()
         await page.getByText('お気に入りに追加しました').waitFor({ state: 'visible' })
         await expect(page.getByRole('button', { name: /保存済み/ })).toBeVisible()
       })
@@ -119,34 +116,36 @@ test.describe('お気に入り機能フロー', () => {
     })
 
     test('駅の順番が違っても同じグループになる', async ({ page }) => {
-      await test.step('1回目: 渋谷・新宿で検索してレストランAをお気に入り', async () => {
+      await test.step('渋谷・新宿で検索', async () => {
         await searchStations(page, ['渋谷', '新宿'])
         await page.waitForURL(/\/result\?/)
+      })
 
+      await test.step('1件目をお気に入りに追加', async () => {
         await page.getByRole('article').first().click()
         await expect(page).toHaveURL(/\/restaurant\/[^/]+/)
 
-        const favoriteButton = page.getByRole('button', { name: /保存/ })
-        await favoriteButton.click()
+        await page.getByRole('button', { name: /保存/ }).click()
         await page.getByText('お気に入りに追加しました').waitFor({ state: 'visible' })
         await expect(page.getByRole('button', { name: /保存済み/ })).toBeVisible()
       })
 
-      await test.step('2回目: 新宿・渋谷で検索してレストランBをお気に入り', async () => {
+      await test.step('新宿・渋谷で検索', async () => {
         await page.goto('/')
         await searchStations(page, ['新宿', '渋谷'])
         await page.waitForURL(/\/result\?/)
+      })
 
+      await test.step('2件目をお気に入りに追加', async () => {
         await page.getByRole('article').nth(1).click()
         await expect(page).toHaveURL(/\/restaurant\/[^/]+/)
 
-        const favoriteButton = page.getByRole('button', { name: /保存/ })
-        await favoriteButton.click()
+        await page.getByRole('button', { name: /保存/ }).click()
         await page.getByText('お気に入りに追加しました').waitFor({ state: 'visible' })
         await expect(page.getByRole('button', { name: /保存済み/ })).toBeVisible()
       })
 
-      await test.step('グルーピング確認: 1つのグループに2件', async () => {
+      await test.step('お気に入り一覧で1つのグループに2件確認', async () => {
         await page.goto('/favorites')
         await expect(page.getByRole('heading', { level: 2 })).toHaveCount(1)
         await expect(page.getByRole('article')).toHaveCount(2)
