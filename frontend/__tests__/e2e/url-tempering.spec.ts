@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { loginWithGoogle } from './helpers/auth'
+import { cleanupFavorites } from './helpers/favorites'
 import { searchStations } from './helpers/search'
 
 test.describe.configure({ mode: 'serial' })
@@ -11,15 +12,7 @@ test.describe('URL改ざん検出', () => {
   })
 
   test.afterEach(async ({ page }) => {
-    await page.bringToFront()
-    await page.goto('/favorites')
-
-    const count = await page.getByRole('article').count()
-    for (let i = 0; i < count; i++) {
-      await page.getByRole('article').first().getByRole('button').click()
-      await page.getByText('お気に入りから削除しました').waitFor({ state: 'visible' })
-      await page.reload()
-    }
+    await cleanupFavorites(page)
   })
 
   test('検索結果外の店舗IDへの改ざんを検出し、保存を拒否する', async ({ page }) => {

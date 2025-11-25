@@ -1,8 +1,13 @@
 import { expect, test } from '@playwright/test'
 import { loginWithGoogle } from './helpers/auth'
+import { cleanupFavorites } from './helpers/favorites'
 import { searchStations } from './helpers/search'
 
 test.describe('リストシェア機能フロー', () => {
+  test.afterEach(async ({ page }) => {
+    await cleanupFavorites(page)
+  })
+
   test('存在しないシェアURLにアクセスしたとき、404ページが表示される', async ({ page }) => {
     const invalidUuid = 'INVALID_UUID'
     await page.goto(`/shared/${invalidUuid}`)
@@ -78,18 +83,6 @@ test.describe('リストシェア機能フロー', () => {
       await expect(restaurantCards).toHaveCount(2)
 
       await incognitoContext.close()
-    })
-
-    await test.step('お気に入りを削除する', async () => {
-      await page.bringToFront()
-      await page.goto('/favorites')
-
-      const count = await page.getByRole('article').count()
-      for (let i = 0; i < count; i++) {
-        await page.getByRole('article').first().getByRole('button').click()
-        await page.getByText('お気に入りから削除しました').waitFor({ state: 'visible' })
-        await page.reload()
-      }
     })
   })
 })
