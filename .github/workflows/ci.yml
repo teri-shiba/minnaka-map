@@ -174,13 +174,17 @@ jobs:
         working-directory: frontend
         run: npx playwright install --with-deps chromium
 
+      - name: Create .env.test
+        working-directory: frontend
+        run: |
+          echo "API_BASE_URL=http://localhost:3000" > .env.test
+          echo "FRONT_BASE_URL=http://localhost:8000" >> .env.test
+          echo "NEXT_PUBLIC_API_BASE_URL=http://localhost:3000" >> .env.test
+          echo "TEST_EMAIL=${{ secrets.TEST_EMAIL }}" >> .env.test
+
       - name: Run Playwright tests
         working-directory: frontend
         run: npx playwright test
-        env:
-          API_BASE_URL: http://localhost:3000
-          FRONT_BASE_URL: http://localhost:8000
-          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
 
   Deploy-Sentry:
     runs-on: ubuntu-latest
