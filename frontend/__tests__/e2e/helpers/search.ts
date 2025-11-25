@@ -6,8 +6,6 @@ import type { Page } from '@playwright/test'
  * @param stationNames - 駅名の配列(2-6個)
  */
 export async function searchStations(page: Page, stationNames: string[]) {
-  await page.goto('/')
-
   if (stationNames.length < 2 || stationNames.length > 6)
     throw new Error('駅名は2個以上6個以下で指定してください')
 
