@@ -152,6 +152,10 @@ jobs:
           bundle exec rails db:create RAILS_ENV=test
           bundle exec rails db:migrate RAILS_ENV=test
 
+      - name: Import station data
+        working-directory: backend
+        run: bundle exec rails stations:import RAILS_ENV=test
+
       - name: Start Rails server
         working-directory: backend
         run: |
