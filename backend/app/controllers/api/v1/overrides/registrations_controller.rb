@@ -2,28 +2,18 @@ class Api::V1::Overrides::RegistrationsController < DeviseTokenAuth::Registratio
   include Api::ResponseHelperWrapper
 
   def create
-    Rails.logger.info("[signup] start email=#{sign_up_params[:email].inspect}")
-
     if sign_up_params[:name].blank?
-      Rails.logger.info("[signup] name_blank email=#{sign_up_params[:email].inspect}")
       render_api_error("Name can't be blank", status: :unprocessable_entity)
       return
     end
 
     normalized = normalized_email(sign_up_params[:email])
     if UserAuth.exists?(email: normalized)
-      Rails.logger.info("[signup] duplicate_email email=#{normalized.inspect}")
       render json: { error: "duplicate_email" }, status: :unprocessable_entity
       return
     end
 
-    super do |resource|
-      Rails.logger.info(
-        "[signup] super finished " \
-        "persisted=#{resource.persisted?} " \
-        "errors=#{resource.errors.full_messages}"
-      )
-    end
+    super
   end
 
   def destroy
