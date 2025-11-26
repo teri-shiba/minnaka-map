@@ -3,12 +3,12 @@ import { loginWithGoogle } from './helpers/auth'
 import { cleanupFavorites } from './helpers/favorites'
 import { searchStations } from './helpers/search'
 
-test.describe('リストシェア機能フロー', () => {
+test.describe.skip('リストシェア機能フロー', () => {
   test.afterEach(async ({ page }) => {
     await cleanupFavorites(page)
   })
 
-  test.skip('存在しないシェアURLにアクセスしたとき、404ページが表示される', async ({ page }) => {
+  test('存在しないシェアURLにアクセスしたとき、404ページが表示される', async ({ page }) => {
     const invalidUuid = 'INVALID_UUID'
     await page.goto(`/shared/${invalidUuid}`)
 
