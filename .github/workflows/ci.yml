@@ -188,6 +188,7 @@ jobs:
           echo "NEXT_PUBLIC_API_BASE_URL=http://localhost:3000" >> .env.test
           echo "TEST_EMAIL=${{ secrets.TEST_EMAIL }}" >> .env.test
           echo "INTERNAL_API_TOKEN=${{ secrets.INTERNAL_API_TOKEN }}" >> .env.test
+          echo "HOTPEPPER_API_BASE_URL=https://webservice.recruit.co.jp" >> .env.test
 
       - name: Run Playwright tests
         working-directory: frontend
