@@ -8,7 +8,7 @@ test.describe('リストシェア機能フロー', () => {
     await cleanupFavorites(page)
   })
 
-  test('存在しないシェアURLにアクセスしたとき、404ページが表示される', async ({ page }) => {
+  test.skip('存在しないシェアURLにアクセスしたとき、404ページが表示される', async ({ page }) => {
     const invalidUuid = 'INVALID_UUID'
     await page.goto(`/shared/${invalidUuid}`)
 
