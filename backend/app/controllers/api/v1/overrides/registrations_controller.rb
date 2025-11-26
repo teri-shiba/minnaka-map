@@ -2,6 +2,10 @@ class Api::V1::Overrides::RegistrationsController < DeviseTokenAuth::Registratio
   include Api::ResponseHelperWrapper
 
   def create
+    Rails.logger.info("[signup] params_confirm_success_url=#{params[:confirm_success_url].inspect}")
+    Rails.logger.info("[signup] default_confirm_success_url=#{DeviseTokenAuth.default_confirm_success_url.inspect}")
+    Rails.logger.info("[signup] redirect_whitelist=#{DeviseTokenAuth.redirect_whitelist.inspect}") if DeviseTokenAuth.respond_to?(:redirect_whitelist)
+
     if sign_up_params[:name].blank?
       render_api_error("Name can't be blank", status: :unprocessable_entity)
       return
