@@ -194,6 +194,23 @@ jobs:
         working-directory: frontend
         run: npx playwright test
 
+      - name: Show Rails logs
+        if: always()
+        working-directory: backend
+        run: |
+          if [ -f log/test.log ]; then
+            echo "=== Rails Test Log ==="
+            tail -n 200 log/test.log
+          fi
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-screenshots
+          path: frontend/test-results/**/*.png
+          retention-days: 7
+
   Deploy-Sentry:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
