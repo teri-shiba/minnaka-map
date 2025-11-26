@@ -3,9 +3,6 @@ require "rails_helper"
 RSpec.describe Station, type: :model do
   let(:operator) { create(:operator, alias_name: "テスト運営会社") }
 
-  let(:ueno) { create(:station, **StationTestData::STATIONS[:ueno], operator: operator) }
-  let(:kaminoge) { create(:station, **StationTestData::STATIONS[:kaminoge], operator: operator) }
-
   def starts_with_search_term?(station, term)
     station.name.start_with?(term) ||
       station.name_hiragana.start_with?(term) ||
@@ -69,47 +66,36 @@ RSpec.describe Station, type: :model do
   end
 
   describe "駅名検索" do
-    def create_station_list
-      ueno
-      kaminoge
-    end
-
     context "漢字で検索する場合" do
-      before { create_station_list }
-
       it "条件に合致する駅を全て返すこと" do
-        results = Station.search_by_name("上野")
+        results = Station.search_by_name("新宿")
 
         aggregate_failures do
           expect(results).not_to be_empty
-          results.each {|st| expect(starts_with_search_term?(st, "上野")).to be true }
-          expect(results.map(&:name)).to include("上野", "上野毛")
+          results.each {|st| expect(starts_with_search_term?(st, "新宿")).to be true }
+          expect(results.map(&:name)).to include("新宿", "新宿西口", "新宿三丁目", "新宿御苑前")
         end
       end
     end
 
     context "ひらがなで検索する場合" do
-      before { ueno }
-
       it "条件に合致する駅を全て返すこと" do
-        results = Station.search_by_name("うえの")
+        results = Station.search_by_name("しんじゅく")
 
         aggregate_failures do
           expect(results).not_to be_empty
-          results.each {|st| expect(starts_with_search_term?(st, "うえの")).to be true }
+          results.each {|st| expect(starts_with_search_term?(st, "しんじゅく")).to be true }
         end
       end
     end
 
     context "ローマ字で検索する場合" do
-      before { ueno }
-
       it "条件に合致する駅を全て返すこと" do
-        results = Station.search_by_name("ueno")
+        results = Station.search_by_name("shinjuku")
 
         aggregate_failures do
           expect(results).not_to be_empty
-          results.each {|st| expect(starts_with_search_term?(st, "ueno")).to be true }
+          results.each {|st| expect(starts_with_search_term?(st, "shinjuku")).to be true }
         end
       end
     end
@@ -122,11 +108,9 @@ RSpec.describe Station, type: :model do
     end
 
     context "検索結果のソート順" do
-      before { create_station_list }
-
       it "完全一致を優先し、次に名前の長さで並べること" do
-        results = Station.search_by_name("上野")
-        expect(results.map(&:name)).to eq(%w[上野 上野毛])
+        results = Station.search_by_name("新宿")
+        expect(results.map(&:name)).to eq(["新宿", "新宿西口", "新宿三丁目", "新宿御苑前"])
       end
     end
   end
