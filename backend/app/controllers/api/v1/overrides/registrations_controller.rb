@@ -2,10 +2,6 @@ class Api::V1::Overrides::RegistrationsController < DeviseTokenAuth::Registratio
   include Api::ResponseHelperWrapper
 
   def create
-    Rails.logger.info("[signup] params_confirm_success_url=#{params[:confirm_success_url].inspect}")
-    Rails.logger.info("[signup] default_confirm_success_url=#{DeviseTokenAuth.default_confirm_success_url.inspect}")
-    Rails.logger.info("[signup] redirect_whitelist=#{DeviseTokenAuth.redirect_whitelist.inspect}") if DeviseTokenAuth.respond_to?(:redirect_whitelist)
-
     if sign_up_params[:name].blank?
       render_api_error("Name can't be blank", status: :unprocessable_entity)
       return
@@ -17,18 +13,7 @@ class Api::V1::Overrides::RegistrationsController < DeviseTokenAuth::Registratio
       return
     end
 
-    build_resource
-    Rails.logger.info("[signup] before_save valid=#{@resource.valid?} errors=#{@resource.errors.full_messages.inspect}")
-
-    super do |resource|
-      Rails.logger.info("[signup] in_super_block persisted=#{resource.persisted?} errors=#{resource.errors.full_messages.inspect}")
-    end
-
-    Rails.logger.info("[signup] after_super resource=#{@resource.inspect}")
-    Rails.logger.info("[signup] after_super user=#{@resource.user.inspect}")
-    Rails.logger.info("[signup] after_super user.valid=#{@resource.user&.valid?}")
-    Rails.logger.info("[signup] after_super user.errors=#{@resource.user&.errors&.full_messages.inspect}")
-    Rails.logger.info("[signup] after_super persisted=#{@resource.persisted?} errors=#{@resource.errors.full_messages.inspect}")
+    super
   end
 
   def destroy
