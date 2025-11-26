@@ -21,6 +21,9 @@ class Api::V1::Overrides::RegistrationsController < DeviseTokenAuth::Registratio
     end
 
     Rails.logger.info("[signup] after_super resource=#{@resource.inspect}")
+    Rails.logger.info("[signup] after_super user=#{@resource.user.inspect}")
+    Rails.logger.info("[signup] after_super user.valid=#{@resource.user&.valid?}")
+    Rails.logger.info("[signup] after_super user.errors=#{@resource.user&.errors&.full_messages.inspect}")
     Rails.logger.info("[signup] after_super persisted=#{@resource.persisted?} errors=#{@resource.errors.full_messages.inspect}")
   end
 
