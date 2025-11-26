@@ -10,14 +10,20 @@ class Api::V1::Overrides::RegistrationsController < DeviseTokenAuth::Registratio
       return
     end
 
-    if UserAuth.exists?(email: sign_up_params[:email])
+    normalized = normalized_email(sign_up_params[:email])
+    if UserAuth.exists?(email: normalized)
       Rails.logger.info("[signup] duplicate_email email=#{normalized.inspect}")
       render json: { error: "duplicate_email" }, status: :unprocessable_entity
       return
     end
 
-    super
-    Rails.logger.info("[signup] super finished persisted=#{resource&.persisted?} errors=#{resource&.errors&.full_messages}")
+    super do |resource|
+      Rails.logger.info(
+        "[signup] super finished " \
+        "persisted=#{resource.persisted?} " \
+        "errors=#{resource.errors.full_messages}"
+      )
+    end
   end
 
   def destroy
