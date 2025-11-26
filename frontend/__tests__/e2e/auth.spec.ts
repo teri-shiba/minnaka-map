@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { expect, test } from '@playwright/test'
 import { getVerificationLink } from './helpers/gmail-api'
 
@@ -10,8 +11,8 @@ test.describe('認証フロー', () => {
 
   test.describe('メール認証', () => {
     test('新規登録・ログインできる', async ({ page }) => {
-      const timestamp = Date.now()
-      const email = `${process.env.TEST_EMAIL!.replace('@', `+${timestamp}@`)}`
+      const uniqueId = randomUUID().slice(0, 8)
+      const email = `${process.env.TEST_EMAIL!.replace('@', `+${uniqueId}@`)}`
 
       await test.step('新規登録', async () => {
         await page.getByRole('button', { name: 'ログイン' }).click()
