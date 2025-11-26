@@ -160,6 +160,8 @@ jobs:
         working-directory: backend
         run: |
           bundle exec rails server -e test -p 3000 &
+        env:
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
 
       - name: Wait for Rails server
         run: |
