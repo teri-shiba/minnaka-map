@@ -13,7 +13,11 @@ class Api::V1::Overrides::RegistrationsController < DeviseTokenAuth::Registratio
       return
     end
 
-    super
+    super do |resource|
+      Rails.logger.info("[signup] in_super_block persisted=#{resource.persisted?} errors=#{resource.errors.full_messages.inspect}")
+    end
+
+    Rails.logger.info("[signup] after_super completed")
   end
 
   def destroy
