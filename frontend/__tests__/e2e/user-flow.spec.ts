@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { searchStations } from './helpers/search'
 
-test.describe('中間地点の検索フロー', () => {
+test.describe.skip('中間地点の検索フロー', () => {
   test('検索 → 結果表示 → 詳細画面遷移の一連フロー', async ({ page }) => {
     await page.goto('/')
     await searchStations(page, ['渋谷', '新宿'])

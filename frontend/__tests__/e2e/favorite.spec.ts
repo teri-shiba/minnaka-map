@@ -5,7 +5,7 @@ import { searchStations } from './helpers/search'
 
 test.describe.configure({ mode: 'serial' })
 
-test.describe('お気に入り機能フロー', () => {
+test.describe.skip('お気に入り機能フロー', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
   })

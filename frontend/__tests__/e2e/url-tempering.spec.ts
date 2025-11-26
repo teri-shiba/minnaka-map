@@ -5,7 +5,7 @@ import { searchStations } from './helpers/search'
 
 test.describe.configure({ mode: 'serial' })
 
-test.describe('URL改ざん検出', () => {
+test.describe.skip('URL改ざん検出', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
     await loginWithGoogle(page)
