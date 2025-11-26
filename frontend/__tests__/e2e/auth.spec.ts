@@ -15,6 +15,9 @@ test.describe('認証フロー', () => {
 
       await test.step('新規登録', async () => {
         await page.getByRole('button', { name: 'ログイン' }).click()
+
+        await expect(page.getByRole('dialog')).toBeVisible()
+
         await page.getByText('新規登録').click()
 
         await page.getByLabel('ユーザー名').fill('テストユーザー')
@@ -22,7 +25,9 @@ test.describe('認証フロー', () => {
         await page.getByLabel('パスワード', { exact: true }).fill('Password123!')
         await page.getByLabel('パスワード（確認用）').fill('Password123!')
 
-        await page.getByRole('button', { name: '登録する' }).click()
+        const registerButton = page.getByRole('button', { name: '登録する' })
+        await expect(registerButton).toBeEnabled()
+        await registerButton.click()
 
         await expect(page.getByText('認証メールをご確認ください')).toBeVisible()
       })
