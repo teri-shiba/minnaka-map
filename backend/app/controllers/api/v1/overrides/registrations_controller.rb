@@ -13,6 +13,9 @@ class Api::V1::Overrides::RegistrationsController < DeviseTokenAuth::Registratio
       return
     end
 
+    build_resource
+    Rails.logger.info("[signup] before_save valid=#{@resource.valid?} errors=#{@resource.errors.full_messages.inspect}")
+
     super do |resource|
       Rails.logger.info("[signup] in_super_block persisted=#{resource.persisted?} errors=#{resource.errors.full_messages.inspect}")
     end
