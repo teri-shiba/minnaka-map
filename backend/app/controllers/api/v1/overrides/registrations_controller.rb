@@ -20,7 +20,8 @@ class Api::V1::Overrides::RegistrationsController < DeviseTokenAuth::Registratio
       Rails.logger.info("[signup] in_super_block persisted=#{resource.persisted?} errors=#{resource.errors.full_messages.inspect}")
     end
 
-    Rails.logger.info("[signup] after_super completed")
+    Rails.logger.info("[signup] after_super resource=#{@resource.inspect}")
+    Rails.logger.info("[signup] after_super persisted=#{@resource.persisted?} errors=#{@resource.errors.full_messages.inspect}")
   end
 
   def destroy
