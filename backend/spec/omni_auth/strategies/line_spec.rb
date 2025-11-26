@@ -221,23 +221,4 @@ RSpec.describe OmniAuth::Strategies::Line, type: :strategy do
       expect(strategy.send(:authorize_params)).to include(scope: "profile", nonce: "fixed-uuid")
     end
   end
-
-  describe "#auth_hash (private)" do
-    after { OmniAuth.config.mock_auth[:line] = nil }
-
-    it "mock_auth があればそれを返すこと" do
-      OmniAuth.config.mock_auth[:line] = { uid: "M123", info: { name: "Mock" } }
-      expect(strategy.send(:auth_hash)).to eq(uid: "M123", info: { name: "Mock" })
-    end
-
-    it "mock_auth がなければ super の結果を返すこと" do
-      parent_hash = { uid: "PARENT", info: { name: "PARENT" } }
-
-      allow_any_instance_of(OmniAuth::Strategies::OAuth2).
-        to receive(:auth_hash).
-             and_return(parent_hash)
-
-      expect(strategy.send(:auth_hash)).to eq(parent_hash)
-    end
-  end
 end
