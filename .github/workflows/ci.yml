@@ -152,6 +152,17 @@ jobs:
           bundle exec rails db:create RAILS_ENV=test
           bundle exec rails db:migrate RAILS_ENV=test
 
+      - name: Start Rails server
+        working-directory: backend
+        run: |
+          bundle exec rails server -e test -p 3000 &
+        env:
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+
+      - name: Wait for Rails server
+        run: |
+          timeout 30 bash -c 'until nc -z localhost 3000; do sleep 1; done'
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
