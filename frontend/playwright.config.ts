@@ -28,6 +28,9 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
+  globalSetup: require.resolve('./__tests__/e2e/setup/global-setup.ts'),
+  globalTeardown: require.resolve('./__tests__/e2e/setup/global-teardown.ts'),
+
   /* Configure projects for major browsers */
   projects: [
     {
