@@ -3,7 +3,7 @@ import { loginWithGoogle } from './helpers/auth'
 import { cleanupFavorites } from './helpers/favorites'
 import { searchStations } from './helpers/search'
 
-test.describe.skip('リストシェア機能フロー', () => {
+test.describe('リストシェア機能フロー', () => {
   test.afterEach(async ({ page }) => {
     await cleanupFavorites(page)
   })
