@@ -48,6 +48,7 @@ jobs:
         run: bundle exec rspec --format documentation
         env:
           RSPEC_DEBUG: "1"
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
 
   RuboCop:
     runs-on: ubuntu-latest
