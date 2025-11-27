@@ -1,22 +1,21 @@
 'use server'
 
-import type { getAuthFromCookie } from './get-auth-from-cookie'
 import { checkFavoriteStatus } from './check-favorite-status'
 import { decodeToken } from './decode-token'
+import { getAuthFromCookie } from './get-auth-from-cookie'
 
 interface FavoriteInitialData {
-  auth: Awaited<ReturnType<typeof getAuthFromCookie>>
   hotpepperId: string
   historyId?: string
   token?: string
 }
 
 export async function getFavoriteInitialData({
-  auth,
   hotpepperId,
   historyId,
   token,
 }: FavoriteInitialData) {
+  const auth = await getAuthFromCookie()
   if (!auth)
     return { resolvedHistoryId: historyId, favoriteData: null }
 

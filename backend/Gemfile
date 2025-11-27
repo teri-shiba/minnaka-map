@@ -41,6 +41,9 @@ gem "geocoder", "~> 1.8", ">= 1.8.5"
 
 gem "whenever", require: false
 
+gem "google-apis-gmail_v1"
+gem "googleauth"
+
 group :development, :test do
   gem "factory_bot_rails"
   gem "faker"

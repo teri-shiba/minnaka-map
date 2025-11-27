@@ -7,7 +7,8 @@ class Api::V1::Overrides::RegistrationsController < DeviseTokenAuth::Registratio
       return
     end
 
-    if UserAuth.exists?(email: sign_up_params[:email])
+    normalized = normalized_email(sign_up_params[:email])
+    if UserAuth.exists?(email: normalized)
       render json: { error: "duplicate_email" }, status: :unprocessable_entity
       return
     end

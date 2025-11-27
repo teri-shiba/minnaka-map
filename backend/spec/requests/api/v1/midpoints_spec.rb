@@ -59,8 +59,8 @@ RSpec.describe "Api::V1::MidpointsController", type: :request do
 
     context "DB に存在しない id が含まれているとき" do
       it "422 を返し、details に欠番が入る" do
-        get api_v1_midpoint_path, params: { station_ids: [9999] }
-        expect_unprocessable_json!(message: "not found ids", details: [9999])
+        get api_v1_midpoint_path, params: { station_ids: [999_999_999] }
+        expect_unprocessable_json!(message: "not found ids", details: [999_999_999])
       end
     end
   end
