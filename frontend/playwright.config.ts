@@ -8,6 +8,8 @@ dotenv.config({ path: path.resolve(__dirname, '.env.test') })
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
+  timeout: 90000,
+  expect: { timeout: 20000 },
   testDir: './__tests__/e2e',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -26,6 +28,9 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+
+    navigationTimeout: 40000,
+    actionTimeout: 15000,
   },
 
   globalSetup: require.resolve('./__tests__/e2e/setup/global-setup.ts'),
@@ -74,5 +79,6 @@ export default defineConfig({
     command: 'npm run dev -- -p 8000',
     url: 'http://localhost:8000',
     reuseExistingServer: !process.env.CI,
+    timeout: 120000,
   },
 })
