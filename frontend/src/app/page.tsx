@@ -12,7 +12,7 @@ export default function Home() {
           <h2 className="order-1 mx-auto mb-6 text-center md:col-span-1 md:row-span-1 md:ml-0 md:mr-auto md:mt-auto md:text-left">
             <span className="mb-1 inline-block text-lg text-secondary-foreground md:mb-2 md:text-xl">みんなのまんなか</span>
             <Image
-              alt="minnaka map"
+              alt="みんなかマップ"
               src="/logo.webp"
               width={224}
               height={29}
@@ -50,7 +50,7 @@ export default function Home() {
         <h2 className="mb-7 text-center text-lg text-secondary-foreground sm:text-2xl md:mb-12">
           <span className="inline-block align-text-bottom">
             <Image
-              alt="minnaka map"
+              alt="みんなかマップ"
               src="/logo.webp"
               width={170}
               height={30}
