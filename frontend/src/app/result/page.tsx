@@ -71,9 +71,9 @@ export default async function Result({ searchParams }: ResultPageProps) {
 
   return (
     <main className="relative mx-auto h-[calc(100dvh-4rem)] max-w-screen-2xl overflow-hidden md:flex">
+      <h1 className="sr-only">中間地点周辺の飲食店検索結果</h1>
       <section
         className="h-mobile-map w-full md:h-desktop-map md:w-3/5 md:flex-1"
-        role="region"
         aria-label="検索結果の地図"
       >
         {midpoint.data

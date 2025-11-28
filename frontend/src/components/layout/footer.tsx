@@ -29,14 +29,14 @@ export default function Footer() {
         <div className="flex flex-col items-center justify-between md:flex-row">
           <Link href="/" className="flex items-center space-x-2">
             <Image
-              alt="minnaka map"
+              alt="みんなかマップ"
               src="/logo.webp"
               width={224}
               height={29}
               className="block"
             />
           </Link>
-          <nav>
+          <nav aria-label="フッターナビゲーション">
             <ul className="mt-3 flex flex-wrap justify-center md:mt-0 md:justify-end">
               {NAV_ITEMS.map((item) => {
                 return (

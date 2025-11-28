@@ -87,6 +87,7 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
               width={223}
               height={168}
               className="aspect-3/2 size-full object-cover md:aspect-square"
+              fetchPriority="high"
             />
           </div>
           <p className="pt-1.5 text-xs text-muted-foreground md:text-right">画像提供：ホットペッパー グルメ</p>
@@ -117,6 +118,7 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
                             /* eslint-disable-next-line react-dom/no-missing-iframe-sandbox */
                               <iframe
                                 src={mapEmbedUrl}
+                                title={`${data.name || '店舗'}の所在地を示す地図`}
                                 width="600"
                                 height="338"
                                 style={{ border: 0 }}

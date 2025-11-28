@@ -32,7 +32,7 @@ describe('GuideCarousel', () => {
 
       const pcLayout = container.querySelector('.md\\:grid-cols-2')
       const pcImage = pcLayout?.querySelector('img[alt="出発地点を入力する"]')
-      const pcLogo = pcLayout?.querySelector('img[alt="minnaka map"]')
+      const pcLogo = pcLayout?.querySelector('img[alt="みんなかマップ"]')
 
       expect(pcImage).toBeInTheDocument()
       expect(pcLogo).toBeInTheDocument()
