@@ -55,7 +55,7 @@ export default function RestaurantCard({
               showFavoriteButton && 'pr-12 [@media(max-width:335px)]:pr-0',
             )}
             >
-              {name}
+              <h3 className="text-sm md:text-base">{name}</h3>
             </CardTitle>
             <CardDescription className="pl-1">
               <ul className="space-y-1 text-xs md:text-sm">
