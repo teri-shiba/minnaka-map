@@ -39,7 +39,7 @@ describe('AuthDrawer', () => {
     render(<AuthDrawer />)
 
     await user.click(screen.getByRole('button', { name: 'ログイン' }))
-    await user.click(screen.getByText('新規登録'))
+    await user.click(screen.getByRole('button', { name: '新規登録' }))
     expect(screen.getByRole('button', { name: '登録する' })).toBeInTheDocument()
   })
 
@@ -48,11 +48,10 @@ describe('AuthDrawer', () => {
     render(<AuthDrawer />)
 
     await user.click(screen.getByRole('button', { name: 'ログイン' }))
-    await user.click(screen.getByText('新規登録'))
+    await user.click(screen.getByRole('button', { name: '新規登録' }))
 
     const dialog = screen.getByRole('dialog')
-    const descriptionElement = within(dialog).getByText(/アカウントをお持ちの方は、/).parentElement
-    const loginLink = within(descriptionElement as HTMLElement).getByText('ログイン')
+    const loginLink = within(dialog).getByRole('button', { name: 'ログイン' })
 
     await user.click(loginLink)
 
@@ -84,7 +83,7 @@ describe('AuthDrawer', () => {
 
     await user.click(screen.getByRole('button', { name: 'ログイン' }))
     const dialog = await screen.findByRole('dialog', { name: /ログイン|新規会員登録/ })
-    await user.click(screen.getByText('新規登録'))
+    await user.click(screen.getByRole('button', { name: '新規登録' }))
 
     await user.type(within(dialog).getByLabelText('ユーザー名'), 'testUser')
     await user.type(within(dialog).getByLabelText('メールアドレス'), 'test@example.com')
@@ -112,7 +111,7 @@ describe('AuthDrawer', () => {
     render(<AuthDrawer />)
 
     await user.click(screen.getByRole('button', { name: 'ログイン' }))
-    await user.click(screen.getByText('新規登録'))
+    await user.click(screen.getByRole('button', { name: '新規登録' }))
 
     expect(screen.getByText('Googleで登録')).toBeInTheDocument()
     expect(screen.getByText('LINEで登録')).toBeInTheDocument()

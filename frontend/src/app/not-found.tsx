@@ -6,7 +6,7 @@ export default function NotFound() {
   return (
     <div className="mx-auto my-14 flex flex-col items-center space-y-4">
       <Image
-        alt="Not Found"
+        alt="ページが見つかりません"
         src="/image_not-found.webp"
         width={240}
         height={200}

@@ -55,7 +55,7 @@ export default function RestaurantCard({
               showFavoriteButton && 'pr-12 [@media(max-width:335px)]:pr-0',
             )}
             >
-              {name}
+              <h3 className="text-sm md:text-base">{name}</h3>
             </CardTitle>
             <CardDescription className="pl-1">
               <ul className="space-y-1 text-xs md:text-sm">
@@ -78,6 +78,8 @@ export default function RestaurantCard({
         <div
           className="absolute right-0 top-0 [@media(max-width:335px)]:right-1 [@media(max-width:335px)]:top-1"
           onClick={e => e.preventDefault()}
+          onKeyDown={e => e.stopPropagation()}
+          role="presentation"
         >
           <FavoriteButton
             hotpepperId={id}

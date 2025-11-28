@@ -47,11 +47,10 @@ export default function Header() {
             <Image
               key={logo.id}
               src={logo.src}
-              alt="logo"
+              alt="みんなかマップ"
               width={logo.width}
               height={logo.height}
               priority
-              aria-label="Go to Home"
               className={logo.customClassName}
             />
           ))}
