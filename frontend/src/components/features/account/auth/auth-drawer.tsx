@@ -35,7 +35,7 @@ export function AuthDrawer() {
           <DrawerTitle className="mx-auto">
             <div className="flex items-center gap-2 py-1">
               <Image
-                alt="mark"
+                alt=""
                 src="/logo_mark.webp"
                 width={24}
                 height={24}
