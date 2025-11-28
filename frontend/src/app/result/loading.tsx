@@ -7,17 +7,13 @@ export default function Loading() {
       aria-busy="true"
       aria-label="検索結果を読み込み中"
     >
-      <p className="sr-only" role="status" aria-live="polite">
-        検索結果を読み込み中です
-      </p>
-
       <div aria-hidden="true" className="flex h-full flex-col md:w-full md:flex-row">
         <Skeleton className="h-mobile-map w-full md:h-desktop-map md:w-3/5 md:flex-1" />
         <div
           className="
             flex-1 overflow-hidden
             rounded-t-[10px] border-x border-t border-border p-6
-            md:w-2/5 md:overflow-visible md:rounded-none md:border-none md:p-6
+            md:w-2/5 md:flex-none md:rounded-none md:border-none md:p-6
           "
         >
           <div className="mx-auto mb-2 h-1 w-9 rounded-full bg-border md:hidden" />
