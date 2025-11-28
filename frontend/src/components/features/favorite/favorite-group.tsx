@@ -27,10 +27,10 @@ export default function FavoriteGroup({ group }: { group: FavoriteGroupWithDetai
 
   return (
     <section>
-      <h2 className="text-center">
+      <h2 className="pb-4 text-center">
         {group.searchHistory.stationNames.join('・')}
       </h2>
-      <div className="mb-6 mt-4 text-center md:mb-10">
+      <div className="mb-6 text-center md:mb-10">
         <ShareFavoriteListDialog
           isOpen={dialogState !== null}
           onClick={handleShare}
