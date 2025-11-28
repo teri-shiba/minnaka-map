@@ -47,9 +47,9 @@ export function AuthDialog() {
           </DialogTitle>
           <DialogDescription className="text-center">
             {messageText}
-            <span onClick={handleClick} className={descClassName}>
+            <button type="button" onClick={handleClick} className={descClassName}>
               {linkText}
-            </span>
+            </button>
           </DialogDescription>
         </DialogHeader>
         {isLogin

@@ -47,9 +47,9 @@ export function AuthDrawer() {
           </DrawerTitle>
           <DrawerDescription className="text-center">
             {messageText}
-            <span onClick={handleClick} className={descClassName}>
+            <button type="button" onClick={handleClick} className={descClassName}>
               {linkText}
-            </span>
+            </button>
           </DrawerDescription>
         </DrawerHeader>
         {isLogin

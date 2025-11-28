@@ -78,6 +78,8 @@ export default function RestaurantCard({
         <div
           className="absolute right-0 top-0 [@media(max-width:335px)]:right-1 [@media(max-width:335px)]:top-1"
           onClick={e => e.preventDefault()}
+          onKeyDown={e => e.stopPropagation()}
+          role="presentation"
         >
           <FavoriteButton
             hotpepperId={id}

@@ -19,7 +19,7 @@ test.describe('認証フロー', () => {
 
         await expect(page.getByRole('dialog')).toBeVisible()
 
-        await page.getByText('新規登録').click()
+        await page.getByRole('button', { name: '新規登録' }).click()
 
         await page.getByLabel('ユーザー名').fill('テストユーザー')
         await page.getByLabel('メールアドレス').fill(email)

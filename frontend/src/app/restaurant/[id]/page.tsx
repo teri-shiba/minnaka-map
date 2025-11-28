@@ -117,6 +117,7 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
                             /* eslint-disable-next-line react-dom/no-missing-iframe-sandbox */
                               <iframe
                                 src={mapEmbedUrl}
+                                title={`${data.name || '店舗'}の所在地を示す地図`}
                                 width="600"
                                 height="338"
                                 style={{ border: 0 }}
