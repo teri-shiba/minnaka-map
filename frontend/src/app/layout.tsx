@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { Suspense } from 'react'
 import { AuthProvider } from '~/components/features/account/auth/auth-provider'
 import Footer from '~/components/layout/footer'
 import Header from '~/components/layout/header'
@@ -26,7 +27,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           {children}
         </main>
         <Toaster richColors />
-        <ToastListener />
+        <Suspense fallback={null}>
+          <ToastListener />
+        </Suspense>
         <AuthProvider />
         <Footer />
       </body>
