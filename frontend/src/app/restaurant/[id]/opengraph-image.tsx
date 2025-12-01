@@ -1,0 +1,83 @@
+import type { Buffer } from 'node:buffer'
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import { ImageResponse } from 'next/og'
+import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
+
+export const runtime = 'nodejs'
+
+async function loadFont(filename: string): Promise<Buffer> {
+  return fs.readFile(path.join(process.cwd(), 'src/fonts', filename))
+}
+
+async function loadImageAsBase64(filename: string): Promise<string> {
+  const data = await fs.readFile(path.join(process.cwd(), 'public', filename))
+  return `data:image/png;base64,${data.toString('base64')}`
+}
+
+export default async function Image({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+
+  const [result, fontData, logo, figure] = await Promise.all([
+    fetchRestaurantDetail(id),
+    loadFont('NotoSansJP-Bold.ttf'),
+    loadImageAsBase64('logo.png'),
+    loadImageAsBase64('figure_ogp.png'),
+  ])
+
+  const name = result.success && result.data.name
+  const genre = result.success && result.data.genreName
+  const address = result.success && result.data.address
+
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-start',
+          alignItems: 'flex-start',
+          height: '100%',
+          width: '100%',
+          padding: '3rem',
+          backgroundColor: '#FF9659',
+          fontFamily: 'NotoSansJP',
+          fontWeight: 700,
+        }}
+      >
+        <div tw="relative m-auto flex h-full w-full rounded-2xl bg-white p-10">
+          <div tw="flex flex-col justify-start items-start text-[#262626] font-bold">
+            <div tw="rounded-full bg-orange-50 mb-5 px-5 pt-4 pb-5 text-3xl leading-none">
+              {genre}
+            </div>
+            <div tw="mb-5 text-5xl">{name}</div>
+            <div tw="text-3xl">{address}</div>
+          </div>
+
+          <div tw="absolute bottom-10 left-10 flex">
+            <img src={logo} width={450} height={58} alt="" />
+          </div>
+
+          <div tw="absolute bottom-0 right-10 flex">
+            <img src={figure} width={350} height={240} alt="" />
+          </div>
+        </div>
+      </div>
+    ),
+    {
+      width: 1200,
+      height: 630,
+      fonts: [
+        {
+          name: 'NotoSansJP',
+          data: fontData,
+          weight: 700,
+          style: 'normal',
+        },
+      ],
+    },
+  )
+}
