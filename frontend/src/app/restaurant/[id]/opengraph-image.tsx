@@ -22,8 +22,9 @@ export default async function Image({
 }) {
   const { id } = await params
 
-  const [result, fontData, logo, figure] = await Promise.all([
+  const [result, fontNoto, fontNotoJP, logo, figure] = await Promise.all([
     fetchRestaurantDetail(id),
+    loadFont('NotoSans-Bold.ttf'),
     loadFont('NotoSansJP-Bold.ttf'),
     loadImageAsBase64('logo.png'),
     loadImageAsBase64('figure_ogp.png'),
@@ -44,16 +45,16 @@ export default async function Image({
           width: '100%',
           padding: '3rem',
           backgroundColor: '#FF9659',
-          fontFamily: 'NotoSansJP',
+          fontFamily: 'NotoSans, NotoSansJP',
           fontWeight: 700,
         }}
       >
         <div tw="relative m-auto flex h-full w-full rounded-2xl bg-white p-10">
           <div tw="flex flex-col justify-start items-start text-[#262626] font-bold">
-            <div tw="rounded-full bg-orange-50 mb-5 px-5 pt-4 pb-5 text-3xl leading-none">
+            <div tw="rounded-full bg-orange-50 mb-6 px-5 pt-4 pb-5 text-3xl leading-none">
               {genre}
             </div>
-            <div tw="mb-5 text-5xl">{name}</div>
+            <div tw="mb-6 text-5xl">{name}</div>
             <div tw="text-3xl">{address}</div>
           </div>
 
@@ -72,8 +73,14 @@ export default async function Image({
       height: 630,
       fonts: [
         {
+          name: 'NotoSans',
+          data: fontNoto,
+          weight: 700,
+          style: 'normal',
+        },
+        {
           name: 'NotoSansJP',
-          data: fontData,
+          data: fontNotoJP,
           weight: 700,
           style: 'normal',
         },
