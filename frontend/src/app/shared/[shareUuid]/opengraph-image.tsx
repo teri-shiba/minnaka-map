@@ -21,7 +21,7 @@ async function loadImageAsBase64(filename: string): Promise<string> {
 export default async function Image({
   params,
 }: {
-  params: { shareUuid: string }
+  params: Promise<{ shareUuid: string }>
 }) {
   const { shareUuid } = await params
 
