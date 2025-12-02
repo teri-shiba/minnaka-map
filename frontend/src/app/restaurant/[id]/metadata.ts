@@ -25,7 +25,7 @@ export async function generateMetadata({
       siteName: 'みんなかマップ',
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title,
       description,
     },
