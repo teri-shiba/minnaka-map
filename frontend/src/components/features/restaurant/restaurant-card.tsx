@@ -16,6 +16,7 @@ interface RestaurantCardProps {
   showFavoriteButton?: boolean
   searchHistoryId?: string
   favoriteId?: number
+  priority?: boolean
 }
 
 export default function RestaurantCard({
@@ -24,6 +25,7 @@ export default function RestaurantCard({
   showFavoriteButton = false,
   searchHistoryId,
   favoriteId,
+  priority = false,
 }: RestaurantCardProps) {
   const { id, name, imageUrl, genreName, station, close } = restaurant
 
@@ -45,6 +47,8 @@ export default function RestaurantCard({
               src={imageUrl}
               fill={true}
               sizes="(max-width: 335px) 100vw, 128px"
+              quality={60}
+              priority={priority}
               className="object-cover"
             />
           </div>

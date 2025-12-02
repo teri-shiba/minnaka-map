@@ -89,7 +89,8 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
               width={223}
               height={168}
               className="aspect-3/2 size-full object-cover md:aspect-square"
-              fetchPriority="high"
+              quality={60}
+              priority={true}
             />
           </div>
           <p className="pt-1.5 text-xs text-muted-foreground md:text-right">画像提供：ホットペッパー グルメ</p>
@@ -127,6 +128,7 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
                                 allowFullScreen
                                 referrerPolicy="no-referrer-when-downgrade"
                                 className="absolute left-0 top-0 size-full"
+                                loading="lazy"
                               />
                             )
                           : (
