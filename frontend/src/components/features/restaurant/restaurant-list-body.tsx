@@ -26,11 +26,12 @@ export default function RestaurantListBody({
   isMobile,
 }: Props) {
   const listItems = useMemo(() => {
-    return restaurants.map(restaurant => (
+    return restaurants.map((restaurant, index) => (
       <RestaurantCard
         key={restaurant.id}
         restaurant={restaurant}
         tokenInfo={tokenMap[restaurant.id]}
+        priority={index === 0}
       />
     ))
   }, [restaurants, tokenMap])
