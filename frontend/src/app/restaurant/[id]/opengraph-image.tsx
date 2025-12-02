@@ -2,8 +2,6 @@ import { ImageResponse } from 'next/og'
 import { createOgOptions, loadDefaultOgImage, loadFont, loadImageAsBase64 } from '~/lib/og-helpers'
 import { fetchRestaurantDetail } from '~/services/fetch-restaurant-detail'
 
-export const runtime = 'nodejs'
-
 export default async function Image({
   params,
 }: {
