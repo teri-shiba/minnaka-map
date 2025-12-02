@@ -1,5 +1,11 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Section from '~/components/layout/section'
+
+export const metadata: Metadata = {
+  title: '利用規約｜みんなかマップ',
+  description: 'みんなかマップの利用規約です。',
+}
 
 export default function Terms() {
   return (

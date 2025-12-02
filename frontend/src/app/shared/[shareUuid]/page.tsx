@@ -5,7 +5,9 @@ import Section from '~/components/layout/section'
 import { fetchRestaurantsByIds } from '~/services/fetch-restaurants-by-ids'
 import { fetchSharedList } from '~/services/fetch-shared-list'
 
-interface SharedListPageProps {
+export { generateMetadata } from './metadata'
+
+export interface SharedListPageProps {
   params: Promise<{ shareUuid: string }>
 }
 
