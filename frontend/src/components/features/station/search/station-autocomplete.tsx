@@ -88,7 +88,6 @@ export default function StationAutocomplete({
       <Command
         className="relative overflow-visible focus-within:border-primary"
         shouldFilter={false}
-        role="combobox"
       >
         <CommandInput
           value={value}

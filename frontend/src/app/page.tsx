@@ -32,6 +32,7 @@ export default function Home() {
               width={424}
               height={533}
               priority
+              fetchPriority="high"
               className="hidden md:block"
             />
             <Image
@@ -40,6 +41,7 @@ export default function Home() {
               width={264}
               height={183}
               priority
+              fetchPriority="high"
               className="block md:hidden"
             />
           </div>
