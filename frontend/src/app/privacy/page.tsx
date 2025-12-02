@@ -1,5 +1,11 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Section from '~/components/layout/section'
+
+export const metadata: Metadata = {
+  title: 'プライバシーポリシー｜みんなかマップ',
+  description: 'みんなかマップのプライバシーポリシーです。',
+}
 
 export default function Privacy() {
   return (

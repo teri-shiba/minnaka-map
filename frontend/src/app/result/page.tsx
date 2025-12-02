@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Map from '~/components/features/map/map'
 import MapError from '~/components/features/map/map-error'
@@ -20,6 +21,14 @@ interface ResultPageSearchParams {
 
 interface ResultPageProps {
   searchParams: Promise<ResultPageSearchParams>
+}
+
+export const metadata: Metadata = {
+  title: '検索結果',
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default async function Result({ searchParams }: ResultPageProps) {

@@ -1,8 +1,17 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import FavoritesList from '~/components/features/favorite/favorite-list'
 import Section from '~/components/layout/section'
 import { Button } from '~/components/ui/button'
 import { fetchFavoriteGroups } from '~/services/fetch-favorite-groups'
+
+export const metadata: Metadata = {
+  title: 'お気に入り一覧',
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 export default async function Favorites() {
   // 初期表示（1ページ目）

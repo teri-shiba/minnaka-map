@@ -1,5 +1,14 @@
+import type { Metadata } from 'next'
 import DeleteAccount from '~/components/features/account/delete/delete-account-responsive'
 import Section from '~/components/layout/section'
+
+export const metadata: Metadata = {
+  title: 'アカウント設定',
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 export default async function SettingsPage() {
   return (

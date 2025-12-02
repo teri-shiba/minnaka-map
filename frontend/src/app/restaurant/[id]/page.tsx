@@ -11,7 +11,9 @@ import { getFavoriteInitialData } from '~/services/get-favorite-initial-data'
 import { getGoogleMapsEmbedUrl } from '~/services/get-google-maps-embed-url'
 import { mapCauseToErrorCode } from '~/utils/map-cause-to-error-code'
 
-interface RestaurantDetailPageProps {
+export { generateMetadata } from './metadata'
+
+export interface RestaurantDetailPageProps {
   params: Promise<{ id: string }>
   searchParams: Promise<{ historyId?: string, t?: string }>
 }
