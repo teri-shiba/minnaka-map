@@ -1,7 +1,9 @@
 namespace :gmail do
-  desc "Gmail API の認証トークンを取得"
+  desc "Obtain Gmail API user refresh token via OAuth flow"
+
   task authenticate: :environment do
     require "googleauth"
+    require "uri"
 
     credentials = Rails.application.credentials.google
     client_id = credentials[:client_id]
@@ -19,20 +21,42 @@ namespace :gmail do
 
     url = auth_client.authorization_uri.to_s
 
-    puts "このURLをブラウザで開いてください:"
+    puts "Open this URL in your browser:"
     puts url
-    puts "\n認証後、ブラウザが localhost:8080 に接続しようとします（失敗します）"
-    puts "アドレスバーの URL 全体をコピーして貼り付けてください"
-    puts "例: http://localhost:8080/?code=4/0AY0e-g7...&scope=..."
-    puts "\nURLを貼り付けてください:"
+    puts
+    puts "After granting access, the browser will try to redirect to #{redirect_uri} (which will fail)."
+    puts "Copy the full URL from the browser address bar and paste it here."
+    puts "Example: http://localhost:8080/?code=4/0AY0e-g7...&scope=..."
+    puts
+    print "Paste the full redirected URL: "
 
-    callback_url = $stdin.gets.chomp
-    code = URI.decode_www_form(URI(callback_url).query).to_h["code"]
+    callback_url = $stdin.gets&.chomp.to_s
 
-    auth_client.code = code
-    auth_client.fetch_access_token!
+    if callback_url.empty?
+      puts "No URL was provided. Aborting."
+      exit 1
+    end
 
-    puts "\nこの refresh_token を rails credentials に保存してください:"
+    begin
+      query_params = URI(callback_url).
+                       yield_self {|uri| uri.query ? URI.decode_www_form(uri.query).to_h : {} }
+
+      code = query_params["code"]
+
+      if code.blank?
+        puts "Authorization code ('code' parameter) could not be found in the URL. Aborting."
+        exit 1
+      end
+
+      auth_client.code = code
+      auth_client.fetch_access_token!
+    rescue => e
+      puts "Failed to exchange authorization code for tokens: #{e.class} - #{e.message}"
+      exit 1
+    end
+
+    puts
+    puts "Save this refresh_token into your Rails encrypted credentials (e.g., config/credentials.yml.enc):"
     puts auth_client.refresh_token
   end
 end

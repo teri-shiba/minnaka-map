@@ -1,6 +1,7 @@
 I18n.locale = :en
 
 require "csv"
+require "securerandom"
 
 namespace :stations do
   desc "Import the latest-dated Operators and Stations CSV by UUID"
@@ -12,12 +13,17 @@ namespace :stations do
     latest_stations_path = Dir[import_station_dir.join("stations_*.csv")].max
 
     if latest_operators_path.nil? || latest_stations_path.nil?
-      puts "インポートファイルが見つかりませんでした。"
+      puts "Import files were not found."
       exit 1
     end
 
-    puts "最新ファイルで Operators をインポート中..."
-    CSV.foreach(latest_operators_path, headers: true) do |row|
+    puts "Using operator file: #{File.basename(latest_operators_path)}"
+    puts "Using station file:  #{File.basename(latest_stations_path)}"
+
+    puts "Importing Operators from the latest CSV..."
+    operator_count = 0
+
+    CSV.foreach(latest_operators_path, headers: true).with_index(1) do |row, i|
       uuid = row["uuid"].presence || SecureRandom.uuid
       operator = Operator.find_or_initialize_by(uuid: uuid)
       operator.assign_attributes(
@@ -26,13 +32,20 @@ namespace :stations do
         uuid: uuid,
       )
       operator.save!
+      operator_count += 1
+
+      puts "Imported #{i} operators..." if (i % 500).zero?
+    rescue => e
+      puts "Error importing operator at row #{i} (uuid: #{row["uuid"]}): #{e.class} - #{e.message}"
     end
 
-    puts "最新ファイルで Stations をインポート中..."
-    CSV.foreach(latest_stations_path, headers: true) do |row|
+    puts "Importing Stations from the latest CSV..."
+    station_count = 0
+
+    CSV.foreach(latest_stations_path, headers: true).with_index(1) do |row, i|
       operator = Operator.find_by(uuid: row["operator_uuid"])
       unless operator
-        puts "Operator UUIDが見つかりません: #{row["operator_uuid"]}（駅: #{row["name"]}）"
+        puts "Operator UUID not found: #{row["operator_uuid"]} (station: #{row["name"]})"
         next
       end
 
@@ -49,9 +62,16 @@ namespace :stations do
         uuid: uuid,
       )
       station.save!
+      station_count += 1
+
+      puts "Imported #{i} stations..." if (i % 500).zero?
+    rescue => e
+      puts "Error importing station at row #{i} (uuid: #{row["uuid"]}, name: #{row["name"]}): #{e.class} - #{e.message}"
     end
 
-    puts "インポートが完了しました"
-    puts "- 使用ファイル: #{File.basename(latest_operators_path)}, #{File.basename(latest_stations_path)}"
+    puts "Import completed."
+    puts "- Operators imported: #{operator_count}"
+    puts "- Stations imported:  #{station_count}"
+    puts "- Source files: #{File.basename(latest_operators_path)}, #{File.basename(latest_stations_path)}"
   end
 end
