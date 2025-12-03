@@ -3,7 +3,7 @@ namespace :e2e do
   task setup: :environment do
     return unless Rails.env.test?
 
-    puts "🔧 Creating E2E test data..."
+    puts "Creating E2E test data..."
 
     Rake::Task["e2e:teardown"].invoke
 
@@ -42,7 +42,7 @@ namespace :e2e do
       )
     end
 
-    puts "✅ E2E test data created: #{test_stations.size} stations"
+    puts "E2E test data created: #{test_stations.size} stations"
   end
 
   desc "Clean up E2E test data"
@@ -58,8 +58,8 @@ namespace :e2e do
     Station.where(group_code: "E2E_TEST").delete_all
     Operator.where(alias_name: "E2E運営").delete_all
 
-    puts "✅ E2E test data cleaned up"
+    puts "E2E test data cleaned up"
   rescue => e
-    puts "⚠️  Cleanup warning: #{e.message}"
+    puts "Cleanup warning: #{e.message}"
   end
 end
