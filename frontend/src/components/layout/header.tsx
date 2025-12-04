@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Skeleton } from '~/components/ui/skeleton'
 import { useAuth } from '~/hooks/useAuth'
-import { Auth } from '../features/account/auth/auth'
+import { Button } from '../ui/button'
 import UserMenu from './user-menu'
 
 interface logoImages {
@@ -59,7 +59,11 @@ export default function Header() {
           ? <Skeleton className="h-10 w-[87px] rounded-full" />
           : user && user.isSignedIn
             ? <UserMenu />
-            : <Auth />}
+            : (
+                <Link href="/login">
+                  <Button variant="round">ログイン</Button>
+                </Link>
+              )}
       </div>
     </header>
   )
