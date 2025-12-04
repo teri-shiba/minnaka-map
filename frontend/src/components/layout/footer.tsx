@@ -21,35 +21,31 @@ export default function Footer() {
 
   return (
     <footer className={cn(
-      'bg-background',
+      'bg-background h-16 flex items-center',
       pathname === '/result' && 'hidden md:block',
     )}
     >
-      <div className="mx-auto max-w-screen-lg px-5 py-6">
-        <div className="flex flex-col items-center justify-between md:flex-row">
-          <Link href="/" className="flex items-center space-x-2">
-            <Image
-              alt="みんなかマップ"
-              src="/logo.webp"
-              width={224}
-              height={29}
-              className="block"
-            />
-          </Link>
-          <nav aria-label="フッターナビゲーション">
-            <ul className="mt-3 flex flex-wrap justify-center md:mt-0 md:justify-end">
-              {NAV_ITEMS.map((item) => {
-                return (
-                  <li key={item.href} className="text-center md:text-left">
-                    <Link href={item.href} className="p-2 text-xs text-muted-foreground transition-colors hover:text-primary md:px-4 md:py-2 md:text-sm">
-                      {item.title}
-                    </Link>
-                  </li>
-                )
-              })}
-            </ul>
-          </nav>
-        </div>
+      <div className="mx-auto flex w-full max-w-screen-lg flex-col items-center justify-between gap-2 px-5 md:flex-row md:gap-0">
+        <Link href="/" className="max-w-44 md:max-w-56">
+          <Image
+            alt="みんなかマップ"
+            src="/logo.webp"
+            width={224}
+            height={29}
+            className="block"
+          />
+        </Link>
+        <nav aria-label="フッターナビゲーション">
+          <div className="flex flex-wrap gap-4">
+            {NAV_ITEMS.map((item) => {
+              return (
+                <Link key={item.href} href={item.href} className="text-xs text-gray-400 hover:text-gray-500">
+                  {item.title}
+                </Link>
+              )
+            })}
+          </div>
+        </nav>
       </div>
     </footer>
   )
