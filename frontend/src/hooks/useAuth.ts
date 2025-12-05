@@ -69,7 +69,7 @@ export function useAuth() {
         resetUser()
         const cause = (error as { cause?: ServiceCause })?.cause ?? 'NETWORK'
         const errorCode = mapCauseToErrorCode(cause)
-        router.replace(`/login?error=${errorCode}`)
+        router.replace(`/signup?error=${errorCode}`)
       }
     },
     [resetUser, router],
@@ -86,7 +86,7 @@ export function useAuth() {
         resetUser()
         const cause = (error as { cause?: ServiceCause })?.cause ?? 'NETWORK'
         const errorCode = mapCauseToErrorCode(cause)
-        router.replace(`/?error=${errorCode}`)
+        router.replace(`/login?error=${errorCode}`)
       }
     },
     [mutate, resetUser, router],
