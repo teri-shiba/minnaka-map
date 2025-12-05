@@ -11,6 +11,7 @@ export type ServiceCause
     | 'DUPLICATE_EMAIL'
     | 'ALREADY_CONFIRMED'
     | 'INVALID_TOKEN'
+    | 'INVALID_CREDENTIALS'
 
 export interface ServiceSuccess<T> {
   readonly success: true
@@ -24,12 +25,3 @@ export interface ServiceFailure {
 }
 
 export type ServiceResult<T> = ServiceSuccess<T> | ServiceFailure
-
-// あとで消す
-export function isServiceSuccess<T>(result: ServiceResult<T>): result is ServiceSuccess<T> {
-  return result.success === true
-}
-
-export function getServiceErrorMessage(result: ServiceFailure): string {
-  return result.message
-}
