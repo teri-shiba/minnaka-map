@@ -3,7 +3,7 @@
 import type { ServiceCause } from '~/types/service-result'
 import { useAtom } from 'jotai'
 import { useResetAtom } from 'jotai/utils'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 import useSWR, { useSWRConfig } from 'swr'
@@ -19,7 +19,6 @@ type DeleteAccountResult = { success: true } | { success: false, error: unknown 
 
 export function useAuth() {
   const router = useRouter()
-  const pathname = usePathname()
 
   const [user, setUser] = useAtom(userStateAtom)
   const resetUser = useResetAtom(userStateAtom)
@@ -63,18 +62,17 @@ export function useAuth() {
           name,
           email,
           password,
-          confirm_success_url: appOrigin,
+          confirm_success_url: `${appOrigin}/login`,
         })
-        router.replace(`${pathname}?success=email_sent`)
       }
       catch (error) {
         resetUser()
         const cause = (error as { cause?: ServiceCause })?.cause ?? 'NETWORK'
         const errorCode = mapCauseToErrorCode(cause)
-        router.replace(`/?error=${errorCode}`)
+        router.replace(`/login?error=${errorCode}`)
       }
     },
-    [resetUser, router, pathname],
+    [resetUser, router],
   )
 
   const login = useCallback(
