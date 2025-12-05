@@ -47,7 +47,7 @@ describe('axios-interceptor', () => {
       .toMatchObject({ cause: 'REQUEST_FAILED' })
   })
 
-  it('HTTP 401 のとき、cause が UNAUTHORIZED になる', async () => {
+  it('HTTP 401 のとき、cause が INVALID_CREDENTIALS になる', async () => {
     server.use(http.get('http://localhost/api/v1/test', () => {
       return HttpResponse.json({}, { status: 401 })
     }))
@@ -55,7 +55,7 @@ describe('axios-interceptor', () => {
     const api = await importAPI()
     await expect(api.get('test'))
       .rejects
-      .toMatchObject({ cause: 'UNAUTHORIZED' })
+      .toMatchObject({ cause: 'INVALID_CREDENTIALS' })
   })
 
   it('HTTP 403 のとき、cause が FORBIDDEN になる', async () => {
