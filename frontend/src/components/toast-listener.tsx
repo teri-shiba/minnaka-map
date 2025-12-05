@@ -25,7 +25,8 @@ export default function ToastListener() {
       }
 
       toast.error(ERROR_MESSAGE[error])
-      router.replace('/')
+      const cleanupURL = error === 'duplicate_email' || error === 'already_confirmed' ? pathname : '/'
+      router.replace(cleanupURL)
       return
     }
 
@@ -36,7 +37,7 @@ export default function ToastListener() {
       }
 
       toast.success(SUCCESS_MESSAGE[success])
-      const cleanupURL = success === 'email_sent' ? pathname : '/'
+      const cleanupURL = success === 'email_sent' || success === 'email_confirmed' ? pathname : '/'
       router.replace(cleanupURL)
     }
   }, [error, success, router, pathname])
