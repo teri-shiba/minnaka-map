@@ -21,9 +21,9 @@ export type ErrorCode = keyof typeof ERROR_MESSAGE
 export const SUCCESS_MESSAGE = {
   login: 'ログインに成功しました',
   logout: 'ログアウトしました',
-  email_confirmed: 'メールアドレスの確認が完了しました',
+  email_confirmed: 'メールアドレスの認証が完了しました',
   account_deleted: 'アカウントが削除されました',
-  email_sent: '認証メールをご確認ください',
+  email_sent: '認証メールを送信しました',
 }
 
 export type SuccessCode = keyof typeof SUCCESS_MESSAGE
