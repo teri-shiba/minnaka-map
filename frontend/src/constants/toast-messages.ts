@@ -14,6 +14,7 @@ export const ERROR_MESSAGE = {
   request_failed: '予期せぬエラーが発生しました',
   duplicate_email: 'このメールアドレスはすでに登録されています',
   already_confirmed: 'このメールアドレスは認証済みです',
+  invalid_credentials: 'メールアドレスまたはパスワードが正しくありません',
 } as const
 
 export type ErrorCode = keyof typeof ERROR_MESSAGE
