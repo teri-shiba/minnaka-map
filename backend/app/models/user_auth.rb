@@ -1,17 +1,14 @@
 class UserAuth < ApplicationRecord
-  include DeviseTokenAuth::Concerns::User
   belongs_to :user
   after_destroy :destroy_user_if_no_auths
 
   # Include default devise modules. Others available are:
   # :lockable, :timeoutable, :trackable
-  devise :database_authenticatable,
-         :registerable,
-         :recoverable,
-         :rememberable,
-         :validatable,
-         :confirmable,
+  devise :database_authenticatable, :registerable, :recoverable,
+         :rememberable, :validatable, :confirmable,
          :omniauthable, omniauth_providers: [:google_oauth2, :line]
+
+  include DeviseTokenAuth::Concerns::User
 
   def self.add_permitted_params
     [:name]
