@@ -38,10 +38,6 @@ Rails.application.routes.draw do
       end
       resources :shared_favorite_lists, only: [:create, :show], param: :share_uuid
 
-      namespace :user do
-        resource :confirmations, only: [:update]
-      end
-
       namespace :current do
         resource :user, only: [:show] do
           get :show_status
