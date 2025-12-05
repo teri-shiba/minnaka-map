@@ -8,14 +8,9 @@ import { Button } from '~/components/ui/button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form'
 import { Input } from '~/components/ui/input'
 import { useAuth } from '~/hooks/useAuth'
-import { logger } from '~/lib/logger'
 import { loginSchema } from '~/schemas/login.schema'
 
-interface LoginFormProps {
-  onSuccess?: () => void
-}
-
-export default function LoginForm({ onSuccess }: LoginFormProps) {
+export default function LoginForm() {
   const { login } = useAuth()
 
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -27,14 +22,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   })
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    try {
-      await login(data.email, data.password)
-      if (onSuccess)
-        onSuccess()
-    }
-    catch (error) {
-      logger(error, { component: 'LoginForm' })
-    }
+    await login(data.email, data.password)
   }
 
   return (
@@ -69,7 +57,13 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit" className="h-auto py-3">ログイン</Button>
+        <Button
+          type="submit"
+          disabled={form.formState.isSubmitting}
+          className="h-auto py-3"
+        >
+          {form.formState.isSubmitting ? '送信中...' : 'ログイン'}
+        </Button>
       </form>
     </Form>
   )
