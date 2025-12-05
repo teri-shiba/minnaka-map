@@ -53,10 +53,20 @@ ja:
       unconfirmed: メールアドレスの本人確認が必要です。
     mailer:
       confirmation_instructions:
+        subject: 【みんなかマップ】メールアドレスの認証のお知らせ
+        greeting: "%{name} 様"
+        instruction: |
+          みんなかマップへのご登録ありがとうございます。
+
+          以下のリンクからメールアドレスを認証してください。
+          確認後、すぐにログインしてサービスをご利用いただけます。
         action: メールアドレスの認証を完了する
-        greeting: ようこそ、%{email}様！
-        instruction: 次のリンクでメールアドレスの確認が完了します。
-        subject: メールアドレス確認メール
+        notice: |
+          ※このメールに心当たりがない場合は、破棄してください。
+          ※このメールは自動送信されています。このメールに返信しても対応できませんので、ご了承ください。
+        footer_service_name: みんなかマップ
+        footer_instruction: お問い合わせは、以下のフォームよりお願いいたします。
+        footer_inquiry: お問い合わせフォームはこちら
       email_changed:
         greeting: こんにちは、%{email}様！
         message: メールアドレスの（%{email}）変更が完了したため、メールを送信しています。

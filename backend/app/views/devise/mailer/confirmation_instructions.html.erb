@@ -1,5 +1,26 @@
-<p><%= t('.greeting', email: @resource.email) %></p>
+<p><%= t('.greeting', name: @resource.user.name) %></p>
 
-<p><%= t('.instruction') %></p>
+<p><%= simple_format(t('.instruction')) %></p>
 
-<p><%= link_to t('.action'), "#{Settings.front_domain}/?confirmation_token=#{@token}", target: :_blank, rel: "noopener noreferrer" %></p>
+<p>
+  <%= link_to t('.action'),
+      "#{Settings.front_domain}/?confirmation_token=#{@token}",
+      target: :_blank,
+      rel: "noopener noreferrer" %>
+</p>
+
+<p>---</p>
+
+<p><%= t('.notice') %></p>
+
+<p>---</p>
+
+<p><%= t('.footer_service_name') %></p>
+
+<p><%= t('.footer_instruction') %></p>
+<p>
+  <%= link_to t('.footer_inquiry'),
+      "https://docs.google.com/forms/d/e/1FAIpQLSc2RQAuvwwu1C29r18xSK6uGicdgVGwrULW8HZHMPqLvSqPSw/viewform",
+      target: :_blank,
+      rel: "noopener noreferrer" %>
+</p>
