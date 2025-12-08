@@ -17,9 +17,11 @@ test.describe('認証フロー', () => {
       await test.step('新規登録', async () => {
         await page.getByRole('button', { name: 'ログイン' }).click()
 
-        await expect(page.getByRole('dialog')).toBeVisible()
+        await page.waitForURL(/\/login/)
 
-        await page.getByRole('button', { name: '新規登録' }).click()
+        await page.getByText('新規登録').click()
+
+        await page.waitForURL(/\/signup/)
 
         await page.getByLabel('ユーザー名').fill('テストユーザー')
         await page.getByLabel('メールアドレス').fill(email)
@@ -30,23 +32,25 @@ test.describe('認証フロー', () => {
         await expect(registerButton).toBeEnabled()
         await registerButton.click()
 
-        await expect(page.getByText('認証メールをご確認ください')).toBeVisible()
+        await expect(page.getByText('認証メールを送信しました')).toBeVisible()
       })
 
       await test.step('メール認証', async () => {
         const confirmationLink = await getVerificationLink(email)
         await page.goto(confirmationLink)
-        await expect(page.getByText('メールアドレスの確認が完了しました')).toBeVisible()
+        await expect(page.getByText('メールアドレスの認証が完了しました')).toBeVisible()
       })
 
       await test.step('ログイン', async () => {
         await page.goto('/')
         await page.getByRole('button', { name: 'ログイン' }).click()
 
+        await page.waitForURL(/\/login/)
+
         await page.getByLabel('メールアドレス').fill(email)
         await page.getByLabel('パスワード', { exact: true }).fill('Password123!')
 
-        await page.getByRole('button', { name: 'ログイン' }).click()
+        await page.locator('form').getByRole('button', { name: 'ログイン' }).click()
 
         await expect(page.getByText('ログインに成功しました')).toBeVisible()
         await expect(page.getByRole('button', { name: 'ユーザーメニュー' })).toBeVisible()
@@ -58,7 +62,7 @@ test.describe('認証フロー', () => {
     test('Googleアカウントでログインできる', async ({ page }) => {
       await page.getByRole('button', { name: 'ログイン' }).click()
 
-      await expect(page.getByRole('dialog')).toBeVisible()
+      await page.waitForURL(/\/login/)
 
       await page.getByRole('link', { name: /Googleでログイン/ }).click()
 
@@ -69,7 +73,7 @@ test.describe('認証フロー', () => {
     test('LINEアカウントでログインできる', async ({ page }) => {
       await page.getByRole('button', { name: 'ログイン' }).click()
 
-      await expect(page.getByRole('dialog')).toBeVisible()
+      await page.waitForURL(/\/login/)
 
       await page.getByRole('link', { name: /LINEでログイン/ }).click()
 
@@ -82,7 +86,7 @@ test.describe('認証フロー', () => {
     const loginButton = page.getByRole('button', { name: 'ログイン' })
     await loginButton.click()
 
-    await expect(page.getByRole('dialog')).toBeVisible()
+    await page.waitForURL(/\/login/)
 
     await page.getByRole('link', { name: /Googleでログイン/ }).click()
 
@@ -103,7 +107,7 @@ test.describe('認証フロー', () => {
     const loginButton = page.getByRole('button', { name: 'ログイン' })
     await loginButton.click()
 
-    await expect(page.getByRole('dialog')).toBeVisible()
+    await page.waitForURL(/\/login/)
 
     await page.getByRole('link', { name: /Googleでログイン/ }).click()
 
