@@ -1,5 +1,22 @@
-<p><%= t('.greeting', email: @resource.email) %></p>
+<p><%= t('.greeting', name: @resource.user.name) %></p>
 
-<p><%= t('.instruction') %></p>
+<p><%= simple_format(t('.instruction')) %></p>
 
-<p><%= link_to t('.action'), "#{Settings.front_domain}/?confirmation_token=#{@token}", target: :_blank, rel: "noopener noreferrer" %></p>
+<p>
+  <%= link_to t('.action'),
+      confirmation_url(@resource, {
+        confirmation_token: @token,
+        config: message['client-config'].to_s,
+        redirect_url: message['redirect-url']
+      }).html_safe,
+      target: :_blank,
+      rel: "noopener noreferrer" %>
+</p>
+
+<p>---</p>
+
+<p><%= simple_format(t('.notice')) %></p>
+
+<p>---</p>
+
+<p><%= t('.footer_service_name') %></p>

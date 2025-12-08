@@ -98,7 +98,7 @@ describe('useAuth', () => {
   })
 
   describe('signup', () => {
-    it('登録成功なら現在のパスに ?success=email_sent を付与', async () => {
+    it('登録成功なら /auth にユーザー情報と confirm_success_url を付けて送信', async () => {
       vi.mocked(api.get).mockResolvedValueOnce({ data: { login: true } })
       vi.mocked(api.post).mockResolvedValueOnce({ status: 200 })
 
@@ -124,9 +124,9 @@ describe('useAuth', () => {
           name: 'Hanako',
           email: 'hanako@example.com',
           password: 'pass123',
+          confirm_success_url: expect.stringContaining('/login'),
         }),
       )
-      expect(routerReplaceSpy).toHaveBeenCalledWith(`${MOCK_PATH}?success=email_sent`)
     })
 
     it('登録失敗なら isSignedIn=false', async () => {

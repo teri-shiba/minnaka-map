@@ -15,5 +15,6 @@ export function mapCauseToErrorCode(cause: ServiceCause): ErrorCode {
     case 'DUPLICATE_EMAIL': return 'duplicate_email'
     case 'ALREADY_CONFIRMED': return 'already_confirmed'
     case 'INVALID_TOKEN': return 'link_expired'
+    case 'INVALID_CREDENTIALS': return 'invalid_credentials'
   }
 }

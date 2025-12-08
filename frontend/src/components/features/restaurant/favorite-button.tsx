@@ -1,6 +1,6 @@
 'use client'
 
-import { useAtomValue, useSetAtom } from 'jotai'
+import { useAtomValue } from 'jotai'
 import { useCallback, useOptimistic, useState, useTransition } from 'react'
 import { LuHeart } from 'react-icons/lu'
 import { toast } from 'sonner'
@@ -8,7 +8,6 @@ import { Button } from '~/components/ui/button'
 import { addFavoriteBySearchHistory } from '~/services/add-favorite-by-search-history'
 import { addFavoriteByToken } from '~/services/add-favorite-by-token'
 import { removeFavorite } from '~/services/remove-favorite'
-import { authModalOpenAtom } from '~/state/auth-modal-open.atom'
 import { userStateAtom } from '~/state/user-state.atom'
 import { cn } from '~/utils/cn'
 
@@ -29,7 +28,6 @@ export default function FavoriteButton({
   initialHistoryId,
   compact = false,
 }: FavoriteButtonProps) {
-  const setModalOpen = useSetAtom(authModalOpenAtom)
   const user = useAtomValue(userStateAtom)
   const auth = user.isSignedIn
 
@@ -46,7 +44,6 @@ export default function FavoriteButton({
 
   const handleAdd = useCallback(async () => {
     if (!auth) {
-      setModalOpen(true)
       toast.error('お気に入りの保存にはログインが必要です')
       return
     }
@@ -86,7 +83,7 @@ export default function FavoriteButton({
         toast.error('処理に失敗しました')
       }
     })
-  }, [auth, token, hotpepperId, initialHistoryId, setModalOpen, setOptimisticResponse, response])
+  }, [auth, token, hotpepperId, initialHistoryId, setOptimisticResponse, response])
 
   const handleRemove = useCallback(async () => {
     startTransition(async () => {

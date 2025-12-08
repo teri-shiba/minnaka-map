@@ -4,6 +4,7 @@ import type { FieldValues, SubmitHandler } from 'react-hook-form'
 import type { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form'
 import { Input } from '~/components/ui/input'
@@ -11,11 +12,7 @@ import { useAuth } from '~/hooks/useAuth'
 import { logger } from '~/lib/logger'
 import { signupSchema } from '~/schemas/signup.schema'
 
-interface LoginFormProps {
-  onSuccess?: () => void
-}
-
-export default function SignUpForm({ onSuccess }: LoginFormProps) {
+export default function SignUpForm() {
   const { signup } = useAuth()
 
   const form = useForm<z.infer<typeof signupSchema>>({
@@ -31,8 +28,8 @@ export default function SignUpForm({ onSuccess }: LoginFormProps) {
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
       await signup(data.name, data.email, data.password)
-      if (onSuccess)
-        onSuccess()
+      toast.success('認証メールを送信しました')
+      form.reset()
     }
     catch (error) {
       logger(error, { component: 'SignUpForm' })
@@ -97,7 +94,13 @@ export default function SignUpForm({ onSuccess }: LoginFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit" className="h-auto py-3">登録する</Button>
+        <Button
+          type="submit"
+          disabled={form.formState.isSubmitting}
+          className="h-auto py-3"
+        >
+          {form.formState.isSubmitting ? '送信中...' : '登録する'}
+        </Button>
       </form>
     </Form>
   )

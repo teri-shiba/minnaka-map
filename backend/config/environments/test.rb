@@ -75,7 +75,7 @@ Rails.application.configure do
     enable_starttls_auto: true,
   }
   config.action_mailer.default_options = { from: Rails.application.credentials.dig(:gmail, :smtp_user) }
-  config.action_mailer.default_url_options = { host: "localhost", port: 8000 }
+  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
@@ -94,4 +94,9 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  config.hosts << "backend"
+  config.hosts << "localhost"
+  config.hosts << "www.example.com"
+  config.action_controller.raise_on_open_redirects = false
 end
