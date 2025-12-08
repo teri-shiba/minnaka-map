@@ -34,6 +34,8 @@ test.describe('URL改ざん検出', () => {
     const temperedURL = legitimateURL.replace(/\/restaurant\/[^?]+/, '/restaurant/J001117579')
     await page.goto(temperedURL)
 
+    await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 15000 })
+
     const favoriteButton = page.getByRole('button', { name: '保存する' })
     await favoriteButton.click()
 
@@ -70,6 +72,8 @@ test.describe('URL改ざん検出', () => {
 
     const tamperedURL = legitimateURL.replace(/\/restaurant\/[^/?]+/, '/restaurant/J001117579')
     await page.goto(tamperedURL)
+
+    await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 15000 })
 
     await page.getByRole('button', { name: '保存する' }).click()
 

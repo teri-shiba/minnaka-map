@@ -21,7 +21,7 @@ export default function Loading() {
                     {field.label}
                     ：
                   </span>
-                  <Skeleton className="inline-block h-5 w-20 align-bottom" />
+                  <Skeleton className="inline-block h-4 w-20 align-bottom md:h-5" />
                 </li>
               ))}
             </ul>
