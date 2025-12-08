@@ -1,4 +1,1 @@
-front_domain:
-  - https://minnaka-map.com
-  - https://www.minnaka-map.com
-  - https://minnaka-map.vercel.app
+front_domain: <%= ENV.fetch('FRONT_DOMAIN') %>
