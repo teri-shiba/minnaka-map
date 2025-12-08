@@ -23,7 +23,8 @@ class Api::V1::Overrides::RegistrationsController < DeviseTokenAuth::Registratio
   end
 
   def build_resource
-    auth_params = sign_up_params.except(:name)
+    auth_params = sign_up_params.except(:name, :confirm_success_url)
+
     @resource = resource_class.new(auth_params)
     @resource.provider = provider
     @resource.email = normalized_email(auth_params[:email])
@@ -33,7 +34,7 @@ class Api::V1::Overrides::RegistrationsController < DeviseTokenAuth::Registratio
   private
 
     def sign_up_params
-      params.permit(:email, :password, :password_confirmation, :name)
+      params.permit(:email, :password, :password_confirmation, :name, :confirm_success_url)
     end
 
     # Devise/モデル側の case_insensitive_keys に合わせる

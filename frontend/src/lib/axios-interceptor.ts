@@ -16,7 +16,7 @@ const api = axios.create({
 function getServiceCauseFromStatus(status: number): ServiceCause {
   switch (status) {
     case 0: return 'NETWORK'
-    case 401: return 'UNAUTHORIZED'
+    case 401: return 'INVALID_CREDENTIALS'
     case 403: return 'FORBIDDEN'
     case 404: return 'NOT_FOUND'
     case 429: return 'RATE_LIMIT'

@@ -11,7 +11,7 @@ test.describe('お気に入り機能フロー', () => {
   })
 
   test.describe('未認証', () => {
-    test('ログインモーダルが表示される', async ({ page }) => {
+    test('ログイントーストが表示される', async ({ page }) => {
       await searchStations(page, ['渋谷', '新宿'])
 
       await page.waitForURL(/\/result\?/)
@@ -24,7 +24,6 @@ test.describe('お気に入り機能フロー', () => {
 
       await page.getByRole('button', { name: /保存/ }).click()
 
-      await expect(page.getByRole('dialog')).toBeVisible()
       await expect(page.getByText('お気に入りの保存にはログインが必要です')).toBeVisible()
     })
   })

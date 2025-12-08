@@ -61,6 +61,7 @@ const config: Config = {
       },
       height: {
         'header': '4rem',
+        'footer': '4rem',
         'drawer': `${DRAWER_DVH}dvh`,
         'mobile-map': 'calc(70dvh - theme(height.header))',
         'desktop-map': 'calc(100dvh - theme(height.header))',

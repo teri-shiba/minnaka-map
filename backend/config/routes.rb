@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       mount_devise_token_auth_for "UserAuth", at: "auth", controllers: {
         omniauth_callbacks: "api/v1/auth/omniauth_callbacks",
         registrations: "api/v1/overrides/registrations",
+        confirmations: "api/v1/overrides/confirmations",
       }
 
       resources :stations, only: [:index]
@@ -36,10 +37,6 @@ Rails.application.routes.draw do
         end
       end
       resources :shared_favorite_lists, only: [:create, :show], param: :share_uuid
-
-      namespace :user do
-        resource :confirmations, only: [:update]
-      end
 
       namespace :current do
         resource :user, only: [:show] do
