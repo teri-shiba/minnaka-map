@@ -41,14 +41,14 @@ class GmailService
     def fetch_messages(gmail, email)
       gmail.list_user_messages(
         "me",
-        q: "to:#{email} subject:メールアドレス確認メール newer_than:1h",
+        q: "to:#{email} subject:メールアドレスの認証 newer_than:1h",
         max_results: 1,
       )
     end
 
     def extract_confirmation_link(body)
-      base_url = Settings.front_domain
-      pattern = %r{#{Regexp.escape(base_url)}/\?confirmation_token=[^\s"]+}
+      base_url = Settings.api_domain
+      pattern = %r{#{Regexp.escape(base_url)}/api/v1/auth/confirmation\?[^\s"]+}
       match = body.match(pattern)
       match&.[](0)
     end
