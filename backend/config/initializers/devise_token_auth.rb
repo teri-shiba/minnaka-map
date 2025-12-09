@@ -70,5 +70,6 @@ DeviseTokenAuth.setup do |config|
     httponly: true,
     secure: Rails.env.production?,
     same_site: :lax,
+    domain: ENV.fetch('COOKIE_DOMAIN', nil),
   }
 end
