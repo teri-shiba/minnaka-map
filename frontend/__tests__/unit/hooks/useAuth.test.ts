@@ -317,7 +317,7 @@ describe('useAuth', () => {
 
       expect(result.current.user.isSignedIn).toBe(false)
       expect(api.delete).toHaveBeenCalledWith('/auth')
-      expect(mockMutate).toHaveBeenCalledWith('/current/user/show_status')
+      expect(mockMutate).toHaveBeenCalledWith('/current/user/show_status', null, { revalidate: false })
       expect(sessionStorage.getItem('pendingStationIds')).toBeNull()
       expect(routerReplaceSpy).toHaveBeenCalledWith('/?success=account_deleted')
       expect(returned).toEqual({ success: true })
