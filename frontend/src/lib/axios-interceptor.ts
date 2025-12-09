@@ -10,7 +10,7 @@ const api = axios.create({
     'Accept': 'application/json',
   },
   withCredentials: true,
-  timeout: 5000,
+  timeout: 10000,
 })
 
 function getServiceCauseFromStatus(status: number): ServiceCause {

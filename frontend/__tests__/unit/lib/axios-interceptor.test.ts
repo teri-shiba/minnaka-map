@@ -29,7 +29,7 @@ describe('api（単体: 設定のみ）', () => {
           'Accept': 'application/json',
         }),
         withCredentials: true,
-        timeout: 5000,
+        timeout: 10000,
       }),
     )
   })
