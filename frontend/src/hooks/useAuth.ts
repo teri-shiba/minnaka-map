@@ -120,7 +120,7 @@ export function useAuth() {
       sessionStorage.removeItem('pendingStationIds')
       resetUser()
 
-      await mutate('/current/user/show_status')
+      await mutate('/current/user/show_status', null, { revalidate: false })
       router.replace('/?success=account_deleted')
       return { success: true }
     }
