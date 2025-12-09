@@ -8,7 +8,7 @@ export default function Loading() {
       aria-label="検索結果を読み込み中"
     >
       <div aria-hidden="true" className="flex h-full flex-col md:w-full md:flex-row">
-        <Skeleton className="h-mobile-map w-full md:h-desktop-map md:w-3/5 md:flex-1" />
+        <Skeleton className="h-mobile-map w-full rounded-none md:h-desktop-map md:w-3/5 md:flex-1" />
         <div
           className="
             flex-1 overflow-hidden
