@@ -45,12 +45,12 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
   mapSearch.search = new URLSearchParams({ api: '1', query: `${data.name} ${data.address}` }).toString()
 
   return (
-    <Section className="mb-6 md:mb-8">
+    <Section className="mb-8">
       {/* ヘッダー */}
       <div className="flex flex-col-reverse py-4 md:items-start md:justify-between md:border-b md:py-6">
         <div className="space-y-2">
           <h1 className="text-xl md:text-2xl">{data.name}</h1>
-          <ul className="text-sm md:flex md:flex-row md:gap-3">
+          <ul className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
             {headerMetaFields.map(field => (
               <li key={field.key}>
                 <span className="font-bold">
@@ -169,7 +169,7 @@ export default async function RestaurantDetailPage({ params, searchParams }: Res
                             rel="noopener noreferrer"
                             className="text-sky-600 hover:underline"
                           >
-                            <span>ホットペッパーグルメで予約・詳細を見る</span>
+                            <span>ホットペッパーグルメで詳細を見る</span>
                             <LuArrowUpRight
                               className="inline-block size-4 pl-0.5 align-bottom md:align-text-bottom"
                               aria-hidden="true"

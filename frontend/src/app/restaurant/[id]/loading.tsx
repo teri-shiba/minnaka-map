@@ -13,15 +13,15 @@ export default function Loading() {
       <div aria-hidden="true">
         <div className="flex flex-col-reverse py-4 md:items-start md:justify-between md:border-b md:py-6">
           <div className="space-y-2">
-            <Skeleton className="h-7 w-full md:h-8 md:w-80" />
-            <ul className="text-sm md:flex md:flex-row md:gap-3">
+            <Skeleton className="h-7 w-full max-w-80 md:h-8" />
+            <ul className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
               {headerMetaFields.map(field => (
                 <li key={field.key}>
                   <span className="font-bold">
                     {field.label}
                     ：
                   </span>
-                  <Skeleton className="inline-block h-4 w-20 align-bottom md:h-5" />
+                  <Skeleton className="inline-block h-4 w-16 align-bottom md:h-5" />
                 </li>
               ))}
             </ul>

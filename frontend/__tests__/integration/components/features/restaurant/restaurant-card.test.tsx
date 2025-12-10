@@ -37,7 +37,7 @@ describe('RestaurantCard', () => {
       expect(screen.getByText('テスト居酒屋')).toBeInTheDocument()
       expect(screen.getByText('居酒屋')).toBeInTheDocument()
       expect(screen.getByText('神田駅')).toBeInTheDocument()
-      expect(screen.getByText('年中無休')).toBeInTheDocument()
+      expect(screen.getByText(/定休日/)).toBeInTheDocument()
     })
 
     it('画像が正しく表示されること', () => {

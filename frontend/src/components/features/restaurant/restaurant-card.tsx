@@ -4,7 +4,7 @@ import type { RestaurantListItem } from '~/types/restaurant'
 import type { TokenInfo } from '~/types/token'
 import Image from 'next/image'
 import Link from 'next/link'
-import { LuCalendarX2, LuTramFront } from 'react-icons/lu'
+import { LuCalendar, LuMapPin } from 'react-icons/lu'
 import { Badge } from '~/components/ui/badge'
 import { Card, CardContent, CardDescription, CardTitle } from '~/components/ui/card'
 import { cn } from '~/utils/cn'
@@ -27,7 +27,7 @@ export default function RestaurantCard({
   favoriteId,
   priority = false,
 }: RestaurantCardProps) {
-  const { id, name, imageUrl, genreName, station, close } = restaurant
+  const { id, name, imageUrl, genreName, subGenreName, station, close } = restaurant
 
   const fromFavoritePage = Boolean(searchHistoryId && favoriteId !== undefined)
 
@@ -52,25 +52,35 @@ export default function RestaurantCard({
               className="object-cover"
             />
           </div>
-          <CardContent className="relative min-w-0 space-y-2 py-0">
-            <Badge>{genreName}</Badge>
+          <CardContent className="relative flex min-w-0 flex-col gap-2 py-0">
+            <div className="flex flex-wrap gap-2">
+              <Badge>{genreName}</Badge>
+              {subGenreName && (
+                <Badge className="bg-secondary text-primary">{subGenreName}</Badge>
+              )}
+            </div>
             <CardTitle className={cn(
-              'line-clamp-2 pl-1 text-sm text-sky-600 group-hover:text-primary group-hover:underline md:text-base',
+              'line-clamp-2 pl-1 text-stone-700 group-hover:underline',
               showFavoriteButton && 'pr-12 [@media(max-width:335px)]:pr-0',
             )}
             >
-              <h3 className="text-sm md:text-base">{name}</h3>
+              <h3 className="text-[15px] leading-normal">{name}</h3>
             </CardTitle>
             <CardDescription className="pl-1">
-              <ul className="space-y-1 text-xs md:text-sm">
-                <li className="truncate">
-                  <LuTramFront className="mb-0.5 mr-1 inline-block size-3.5 text-gray-400" />
-                  {station}
-                  駅
+              <ul className="flex flex-col gap-0.5 text-[13px]">
+                <li className="flex items-center gap-1">
+                  <LuMapPin className="shrink-0 text-gray-400" />
+                  <span className="truncate">
+                    {station}
+                    駅
+                  </span>
                 </li>
-                <li className="truncate">
-                  <LuCalendarX2 className="mb-0.5 mr-1 inline-block size-3.5 text-gray-400" />
-                  {close}
+                <li className="flex items-center gap-1">
+                  <LuCalendar className="shrink-0 text-gray-400" />
+                  <span className="truncate">
+                    定休日:
+                    {close}
+                  </span>
                 </li>
               </ul>
             </CardDescription>
