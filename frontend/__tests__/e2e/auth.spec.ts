@@ -118,6 +118,8 @@ test.describe('認証フロー', () => {
 
     await page.getByRole('menuitem', { name: 'アカウント設定' }).click()
 
+    await page.waitForURL(/\/settings/)
+
     await expect(page).toHaveURL(/\/settings/)
 
     await page.getByRole('button', { name: '削除する' }).click()
