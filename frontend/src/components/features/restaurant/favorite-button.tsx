@@ -117,11 +117,7 @@ export default function FavoriteButton({
           : 'min-[335px]:w-32',
       )}
       onClick={optimisticResponse.isFavorite ? handleRemove : handleAdd}
-      aria-label={
-        optimisticResponse.isFavorite
-          ? 'お気に入りから削除する'
-          : 'お気に入りに保存する'
-      }
+      aria-label={optimisticResponse.isFavorite ? '保存済み' : '保存する'}
     >
       <LuHeart
         className={cn(
