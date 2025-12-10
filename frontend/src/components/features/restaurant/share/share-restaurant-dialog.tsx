@@ -105,9 +105,16 @@ export default function ShareRestaurantDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-32" onClick={handleMainShare}>
+        <Button
+          variant="outline"
+          className="min-[335px]:w-32"
+          onClick={handleMainShare}
+          aria-label="このお店をシェアする"
+        >
           <LuShare />
-          シェアする
+          <span className="max-[335px]:hidden">
+            シェアする
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[calc(100vw-3rem)] sm:max-w-[470px]">

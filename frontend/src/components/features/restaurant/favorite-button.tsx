@@ -114,9 +114,14 @@ export default function FavoriteButton({
       className={cn(
         compact
           ? 'size-9 rounded-full bg-white/90 p-0 shadow-sm hover:bg-white'
-          : 'w-32',
+          : 'min-[335px]:w-32',
       )}
       onClick={optimisticResponse.isFavorite ? handleRemove : handleAdd}
+      aria-label={
+        optimisticResponse.isFavorite
+          ? 'お気に入りから削除する'
+          : 'お気に入りに保存する'
+      }
     >
       <LuHeart
         className={cn(
@@ -125,7 +130,11 @@ export default function FavoriteButton({
           optimisticResponse.isFavorite && 'fill-current text-destructive',
         )}
       />
-      {!compact && (optimisticResponse.isFavorite ? '保存済み' : '保存する')}
+      {!compact && (
+        <span className="max-[335px]:hidden">
+          {optimisticResponse.isFavorite ? '保存済み' : '保存する'}
+        </span>
+      )}
     </Button>
   )
 }
