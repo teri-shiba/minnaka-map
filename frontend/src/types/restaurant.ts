@@ -6,6 +6,8 @@ export interface RestaurantListItem {
   readonly lng: number
   readonly genreName: string
   readonly genreCode: string
+  readonly subGenreName?: string
+  readonly subGenreCode?: string
   readonly imageUrl: string
   readonly close: string
 }
@@ -36,6 +38,10 @@ export interface HotPepperRestaurant {
     readonly code: string
     readonly name: string
   }
+  readonly sub_genre?: {
+    readonly code: string
+    readonly name: string
+  }
   readonly budget: {
     readonly average: string
   }
@@ -61,6 +67,10 @@ export interface HotPepperRestaurant {
 }
 
 export function transformToList(hotpepperData: HotPepperRestaurant): RestaurantListItem {
+  const hasValidSubGenre
+    = hotpepperData.sub_genre
+      && hotpepperData.sub_genre.code !== hotpepperData.genre.code
+
   return {
     id: hotpepperData.id,
     name: hotpepperData.name,
@@ -69,6 +79,8 @@ export function transformToList(hotpepperData: HotPepperRestaurant): RestaurantL
     lng: hotpepperData.lng,
     genreCode: hotpepperData.genre.code,
     genreName: hotpepperData.genre.name,
+    subGenreCode: hasValidSubGenre ? hotpepperData.sub_genre?.code : undefined,
+    subGenreName: hasValidSubGenre ? hotpepperData.sub_genre?.name : undefined,
     imageUrl: hotpepperData.photo.pc.l,
     close: hotpepperData.close,
   }
