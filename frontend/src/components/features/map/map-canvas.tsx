@@ -26,7 +26,10 @@ export default function MapCanvas({ midpoint, restaurants }: MapItems) {
   }, [restaurants])
 
   const handleRestaurantClick = useCallback(
-    (restaurant: RestaurantListItem) => setSelected(restaurant),
+    (restaurant: RestaurantListItem) => {
+      setMapData(prev => ({ ...prev, markerPosition: null }))
+      setSelected(restaurant)
+    },
     [],
   )
 
