@@ -162,6 +162,7 @@ jobs:
           bundle exec rails server -e test -p 3000 &
         env:
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+          USE_SMTP: "true"
 
       - name: Wait for Rails server
         run: |
