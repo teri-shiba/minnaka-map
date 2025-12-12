@@ -60,7 +60,7 @@ describe('RestaurantCard', () => {
       render(<RestaurantCard restaurant={mockRestaurant} tokenInfo={tokenInfo} />)
 
       const link = screen.getByRole('link')
-      expect(link).toHaveAttribute('href', 'restaurant/J001246910?t=token-123')
+      expect(link).toHaveAttribute('href', '/restaurant/J001246910?t=token-123')
     })
 
     it('searchHistoryId と favoriteId があるとき、historyId付きURLが生成されること', () => {
@@ -73,7 +73,7 @@ describe('RestaurantCard', () => {
       )
 
       const link = screen.getByRole('link')
-      expect(link).toHaveAttribute('href', 'restaurant/J001246910/?historyId=123')
+      expect(link).toHaveAttribute('href', '/restaurant/J001246910?historyId=123')
     })
 
     it('searchHistoryId があっても favoriteId が undefined のとき、シンプルなURLが生成されること', () => {
@@ -85,14 +85,14 @@ describe('RestaurantCard', () => {
       )
 
       const link = screen.getByRole('link')
-      expect(link).toHaveAttribute('href', 'restaurant/J001246910')
+      expect(link).toHaveAttribute('href', '/restaurant/J001246910')
     })
 
     it('tokenInfo も searchHistoryId もないとき、シンプルなURLが生成されること', () => {
       render(<RestaurantCard restaurant={mockRestaurant} />)
 
       const link = screen.getByRole('link')
-      expect(link).toHaveAttribute('href', 'restaurant/J001246910')
+      expect(link).toHaveAttribute('href', '/restaurant/J001246910')
     })
 
     it('tokenInfo と searchHistoryId の両方があるとき、tokenInfo が優先されること', () => {
@@ -112,7 +112,7 @@ describe('RestaurantCard', () => {
       )
 
       const link = screen.getByRole('link')
-      expect(link).toHaveAttribute('href', 'restaurant/J001246910?t=priority-token')
+      expect(link).toHaveAttribute('href', '/restaurant/J001246910?t=priority-token')
     })
   })
 

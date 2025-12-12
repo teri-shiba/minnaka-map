@@ -35,7 +35,7 @@ export default function MapRestaurantCard({ restaurant, onClose }: MapRestaurant
 
   return (
     <Link
-      href={`restaurant/${id}`}
+      href={`/restaurant/${id}`}
       className="block cursor-pointer"
       onClick={e => e.stopPropagation()}
     >

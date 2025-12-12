@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Overrides::ConfirmationsController", type: :request do
+RSpec.describe "Api::V1::Overrides::ConfirmationsController", type: :request do
   let(:redirect_url) { "http://localhost:8000/login" }
 
   describe "GET /api/v1/auth/confirmation" do
