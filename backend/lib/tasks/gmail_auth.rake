@@ -19,7 +19,7 @@ namespace :gmail do
       redirect_uri:,
     )
 
-    url = auth_client.authorization_uri(access_type: "offline", prompt: "consent").to_s
+    url = auth_client.authorization_uri.to_s
 
     puts "Open this URL in your browser:"
     puts url
