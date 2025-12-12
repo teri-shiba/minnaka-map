@@ -74,7 +74,7 @@ export default function Home() {
                 alt={feature.title}
                 src={feature.src}
                 width={170}
-                height={149}
+                height={148}
                 className="mb-4"
               />
               <h3 className="mb-2 text-lg text-secondary-foreground">
