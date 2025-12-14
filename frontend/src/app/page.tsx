@@ -29,8 +29,8 @@ export default function Home() {
             <Image
               alt=""
               src="/mv_pc.webp"
-              width={424}
-              height={533}
+              width={420}
+              height={525}
               priority
               fetchPriority="high"
               className="hidden md:block"
