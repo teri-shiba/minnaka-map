@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Overrides::RegistrationsController", type: :request do
+RSpec.describe "Api::V1::Overrides::RegistrationsController", type: :request do
   describe "POST /api/v1/auth" do
     let(:user_name) { Faker::Name.name }
     let(:user_email) { Faker::Internet.unique.email }

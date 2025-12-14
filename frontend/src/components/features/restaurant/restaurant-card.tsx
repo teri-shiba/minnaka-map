@@ -32,10 +32,10 @@ export default function RestaurantCard({
   const fromFavoritePage = Boolean(searchHistoryId && favoriteId !== undefined)
 
   const href = tokenInfo
-    ? `restaurant/${id}?t=${encodeURIComponent(tokenInfo.token)}`
+    ? `/restaurant/${id}?t=${encodeURIComponent(tokenInfo.token)}`
     : fromFavoritePage
-      ? `restaurant/${id}/?historyId=${searchHistoryId}`
-      : `restaurant/${id}`
+      ? `/restaurant/${id}?historyId=${searchHistoryId}`
+      : `/restaurant/${id}`
 
   return (
     <div className="relative" role="article" aria-label={name}>
