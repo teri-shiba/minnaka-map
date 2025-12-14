@@ -14,10 +14,10 @@ export default function Home() {
             <Image
               alt="みんなかマップ"
               src="/logo.webp"
-              width={224}
+              width={230}
               height={29}
               priority
-              className="block"
+              className="block h-auto"
             />
           </h2>
 
@@ -54,7 +54,7 @@ export default function Home() {
             <Image
               alt="みんなかマップ"
               src="/logo.webp"
-              width={170}
+              width={240}
               height={30}
               priority
               className="w-44 sm:w-60"
