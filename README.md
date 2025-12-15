@@ -171,10 +171,6 @@ frontend/src/components
 
 外部リンク ( Figma ): https://figmashort.link/HQEHDF
 
-### インフラ構成図
-
-（画像を添付）
-
 ## 今後の課題
 
 本アプリでは基本的な機能実装を優先して開発しており、
