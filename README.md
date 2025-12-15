@@ -1,106 +1,122 @@
-# minnaka map（ みんなかマップ ）
+![minnaka-map](https://github.com/user-attachments/assets/04d70ded-ef3e-41e8-b508-bac296a5fad0)
 
-みんなかマップは、みんなの出発地点から集まりやすい中間地点と、その周辺の飲食店を提案するアプリです。
+# みんなかマップ
 
-![minnaka-map](https://github.com/user-attachments/assets/e6735103-6dcd-489d-82f8-404f47e603e8)
+公開URL：https://minnaka-map.com
 
-## URL
+複数人の出発駅から「みんなのまんなか」を自動で算出し、周辺店舗の検索・お気に入り・共有までを一貫して行える Web アプリケーションです。
 
-TODO: URL を貼る
+## サービス概要
 
-## 開発背景
+友人や同僚と集まる際、以下のような課題を感じたことから本サービスを開発しました。
 
-## ユーザーが抱える課題
+- 住んでいる場所がバラバラで、集合場所を決めづらい
+- 中間地点を調べるのが手間
+- 候補店舗を複数人に共有するのが面倒
 
-- 友人と遊びに行く予定があるが、場所選びに時間がかかってしまう
-- みんなが集まりやすい場所を選びたいが、最適な場所がわからない
-- 周りに気を遣ってしまい積極的な提案はできないので、集まりやすい場所を提案したい
+みんなかマップでは、複数人の出発駅をもとに中間地点を算出し、その周辺の飲食店を **検索・保存・共有** できます。
 
-## サービスが提供する主な機能
+## デモ（GIF）
 
-### 1. 中間地点の検索
+（画像を添付）
 
-TODO: GIF 画像を貼る
+## 主な機能
 
-### 2. 周辺の店舗情報を表示
+- 複数人の出発駅入力による中間地点の自動算出
+- 中間地点周辺の飲食店検索（地図 + リスト）
+- 条件による絞り込み検索（ジャンル）
+- 店舗のお気に入り登録・管理
+- お気に入りリストのシェア（URL 共有）
 
-TODO: GIF 画像を貼る
+## UI / UX 設計
 
-### 3. 気になる店舗をシェア
+### 画面一覧
 
-TODO: GIF 画像を貼る
+| 画面 | PC | SP | 説明 |
+| --- | --- | --- | --- |
+| トップページ | ![]()（画像を添付） | ![]() | 出発駅を入力し検索を開始 |
+| 検索結果一覧 | ![]()（画像を添付） | ![]() | 地図とリストで候補店舗を表示 |
+| お気に入り一覧 | ![]()（画像を添付） | ![]() | 保存した店舗の管理 |
+| シェアリスト | ![]()（画像を添付） | ![]() | 共有された候補リストの閲覧 |
 
-## その他、機能一覧
+### 設計上の工夫
 
-TODO: 開発完了後、画像を貼る
+- **入力フォームの UX 改善**
+  - 初期表示は 2 人分のみ入力欄を表示
+  - 必要に応じて動的に入力欄を追加できる設計
+  - 初回利用時の視認性と操作性を重視
 
-| トップページ | ログイン画面 |
-| ------------ | ------------ |
-| 画像         | 画像         |
-| 説明         | 説明         |
+- **スマートフォン向け UI 設計**
+  - 検索結果ページではドロワー UI を採用
+  - 地図操作とリスト選択をシームレスに行える構成
+  - PC / SP で役割が異なる UI を意識したレスポンシブ設計
 
-| 検索結果一覧 | 検索詳細画面 |
-| ------------ | ------------ |
-| 画像         | 画像         |
-| 説明         | 説明         |
+- **認証情報の取り扱い**
+  - 認証トークンは LocalStorage ではなく HttpOnly Cookie に保存
+  - JavaScript からトークンにアクセスできないため、XSS によるトークン窃取リスクを低減
 
-| 絞り込み機能 | お気に入り一覧 |
-| ------------ | -------------- |
-| 画像         | 画像           |
-| 説明         | 説明           |
+## 技術スタック
 
-| 個別シェア | 一覧シェア |
-| ---------- | ---------- |
-| 画像       | 画像       |
-| 説明       | 説明       |
+| 領域 | 技術 |
+| --- | --- |
+| フロントエンド | Next.js ( App Router ), React, TypeScript |
+| UI | Tailwind CSS, shadcn/ui |
+| フォーム | react-hook-form, zod |
+| 地図 | Leaflet, MapTiler |
+| データ取得 | SWR, Axios |
+| 監視 | Sentry |
+| バックエンド | Ruby on Rails ( API ) |
+| DB | PostgreSQL |
+| 認証 | Devise, devise_token_auth |
+| テスト | Vitest, Testing Library, Playwright |
+| CI | GitHub Actions |
+| 開発環境 | Docker, Figma |
 
-## 使用技術（予定）
 
-| 領域           | 技術やツール                                                                                                                                          |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| デザイン／設計 | Figma                                                                                                                                    |
-| スタイル       | shadcn/ui                                                                                                                                             |
-| フロントエンド | React v0.0.0<br>Next.js v0.0.0<br>TypeScript v0.0.0                                                                                                   |
-| バックエンド   | Ruby v0.0.0<br>Ruby on Rails API v0.0.0                                                                                                               |
-| データベース   | PostgreSQL                                                                                                                                            |
-| インフラ       | Render.com<br>Vercel                                                                                                                                  |
-| API            | Google Maps JavaScript API<br>Google Places API<br>Google Geolocation API                                                                             |
-| CI / CD        | GithubActions                                                                                                                                         |
-| 開発環境       | Docker                                                                                                                                                |
-| npm            | ESLint<br>Prettier<br>Axios<br>SWR<br>React Hook Form<br>Framer-Motion<br>React Google Maps API                                                       |
-| gem            | <br>Devise<br>devise-i18n<br>Devise Token Auth<br>OmniAuth<br>ActiveHash<br>pry-rails<br>RSpec<br>Factorybot<br>Faker<br>letter_opener_web<br>RuboCop |
+## ディレクトリ構成（Components）
 
-## ER 図
+フロントエンドのコンポーネントは、
+**機能（ドメイン）単位で整理** しています。
 
-![241027_ER](https://github.com/user-attachments/assets/e226dd68-3bed-45a5-bc2e-b7925ae3d7d8)
+```text
+frontend/src/components
+├── features          # 機能・ドメイン単位の UI
+│   ├── account
+│   ├── favorite
+│   ├── guide-carousel
+│   ├── map
+│   ├── restaurant
+│   └── station
+├── layout            # 共通レイアウト
+└── ui                # 汎用 UI コンポーネント
+```
 
-### テーブル一覧
+## 設計資料
 
-| テーブル名            | 定義                     |
-| --------------------- | ------------------------ |
-| users                 | ユーザー情報             |
-| user_auth             | ユーザーの認証情報       |
-| search_histories      | ユーザーのエリア検索履歴 |
-| areas                 | 検索されたエリア         |
-| restaurants           | 店舗情報                 |
-| restaurant_categories | 店舗カテゴリ中間テーブル |
-| categories            | 店舗カテゴリー           |
-| favorites             | お気に入りをした店舗情報 |
+### ER 図
 
-## 画面遷移図
+<img width="800" height="800" alt="241027_ER" src="https://github.com/user-attachments/assets/6097993c-f442-43c0-9cd5-4fd8ad32524f" />
 
-![Screen Transition Diagram](https://github.com/teri-shiba/minnaka-map/assets/155863891/2317317e-4b4b-47c0-9401-fa8a69913cbd)
+### 画面遷移図
 
-外部リンク：[Figma](https://figmashort.link/Zr5rwH)
+<img width="800" height="auto" alt="251215_screen-flow" src="https://github.com/user-attachments/assets/16a249f9-68f6-404b-803e-a11d0c2b9f68" />
 
-## UI 設計
+### UI 設計
 
-外部リンク：[Figma](https://figmashort.link/HQEHDF)
+外部リンク ( Figma ): https://figmashort.link/HQEHDF
 
-## インフラ構成図
+### インフラ構成図
 
-## 工夫した点
+（画像を添付）
 
 ## 今後の課題
 
-- Storybook を導入し、コンポーネントのテストを行う
+本アプリでは基本的な機能実装を優先して開発しており、
+今後は体験品質と保守性の向上に取り組みたいと考えています。
+
+- Storybook を導入し、UI コンポーネント単位でのテスト・可視化を行う
+- 検索実行後、結果ページへ遷移するまでの体感速度改善
+  - 外部 API（地図・店舗情報）リクエストの待ち時間短縮
+  - Skeleton UI をより早い段階で表示する設計への改善
+- 再検索可能な画面の追加
+- 絞り込み条件の拡充による UX 向上
