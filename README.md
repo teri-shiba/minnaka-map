@@ -18,7 +18,7 @@
 
 ## デモ（GIF）
 
-（画像を添付）
+![user-flow](https://github.com/user-attachments/assets/285fa303-ab51-490b-a191-37e16694e81e)
 
 ## 主な機能
 
@@ -32,12 +32,78 @@
 
 ### 画面一覧
 
-| 画面 | PC | SP | 説明 |
-| --- | --- | --- | --- |
-| トップページ | ![]()（画像を添付） | ![]() | 出発駅を入力し検索を開始 |
-| 検索結果一覧 | ![]()（画像を添付） | ![]() | 地図とリストで候補店舗を表示 |
-| お気に入り一覧 | ![]()（画像を添付） | ![]() | 保存した店舗の管理 |
-| シェアリスト | ![]()（画像を添付） | ![]() | 共有された候補リストの閲覧 |
+#### トップページ
+
+| PC | SP |
+| --- | --- |
+| <img width="660" height="auto" alt="home_pc" src="https://github.com/user-attachments/assets/6fab4f7c-2ba2-467d-a20c-0f1679348ab5" /> | <img width="200" height="auto" alt="home_sp" src="https://github.com/user-attachments/assets/f637793c-e9f9-4ebd-b0bd-079860ca7457" /> |
+
+**役割**
+
+複数人の出発駅を入力し、検索を開始する起点画面
+
+**ユーザーの行動**
+- 出発駅を入力する
+- 人数を追加・削除する
+- 検索を実行する
+
+**設計上のポイント**
+- 初期表示は2人分のみとし、初見ユーザーの入力負荷を軽減
+- 必要に応じて入力欄を増やせることで、少人数〜複数人利用に対応
+
+#### 検索結果一覧
+
+| PC | SP |
+| --- | --- |
+| <img width="660" height="auto" alt="result_pc" src="https://github.com/user-attachments/assets/c2a595a9-a260-4e6a-9096-406e9e2017de" /> | <img width="200" height="auto" alt="result_sp" src="https://github.com/user-attachments/assets/3e36614d-5543-45a2-bfd6-721bd02a1c79" /> |
+
+**役割**
+
+中間地点周辺の候補店舗を比較・検討する画面
+
+**ユーザーの行動**
+- 地図上のピンから店舗を確認
+- リストから店舗情報を確認
+- ジャンルによる絞り込み
+
+**設計上のポイント**
+- PC では地図とリストを同時表示し、全体把握を重視
+- SP ではドロワー UI を採用し、地図操作と店舗選択を切り替え可能に
+
+#### お気に入り一覧
+
+| PC | SP |
+| --- | --- |
+| <img width="660" height="auto" alt="favorites_pc" src="https://github.com/user-attachments/assets/346a2b2a-bfe6-47dd-a467-4f81956bab7e" /> | <img width="200" height="auto" alt="favorites_sp" src="https://github.com/user-attachments/assets/4e125801-8e7f-4fd5-833b-9e01f172717b" /> |
+
+**役割**
+
+検討中の店舗を保存し、後から見返すための画面
+
+**ユーザーの行動**
+- 店舗のお気に入り登録・解除
+- 保存した店舗の一覧確認
+
+**設計上のポイント**
+- 検索結果画面と近い UI にすることで、文脈を途切れさせない設計
+- 保存＝次のアクション（共有）への中間地点として位置づけ
+
+#### リストシェア
+
+| PC | SP |
+| --- | --- |
+| <img width="660" height="auto" alt="shared_pc" src="https://github.com/user-attachments/assets/a4037c08-b763-4306-837f-6a73b9f5de53" /> | <img width="200" height="auto" alt="shared_sp" src="https://github.com/user-attachments/assets/51819012-102c-4c3b-80bc-710589696164" /> |
+
+**役割**
+
+共有された候補店舗リストを、ログイン不要で閲覧する画面
+
+**ユーザーの行動**
+- 共有 URL から候補店舗を確認
+
+**設計上のポイント**
+- 認証状態に依存せず閲覧できることで、調整コストを削減
+- 「選定に参加する人全員が使える」体験を優先
 
 ### 設計上の工夫
 
