@@ -240,6 +240,6 @@ jobs:
         run: curl -fsSL https://raw.githubusercontent.com/koyeb/koyeb-cli/main/install.sh | sh
 
       - name: Deploy to Koyeb
-        run: koyeb service redeploy minnaka-map/minnaka-map
+        run: ~/.koyeb/bin/koyeb service redeploy minnaka-map/minnaka-map
         env:
           KOYEB_TOKEN: ${{ secrets.KOYEB_TOKEN }}
