@@ -236,15 +236,10 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: [RSpec, RuboCop, ESLint, Vitest, Playwright]
     steps:
-      - name: Install Koyeb CLI
-        run: |
-          curl -fsSL https://raw.githubusercontent.com/koyeb/koyeb-cli/main/install.sh | sh
-          echo "=== Checking installation ==="
-          which koyeb || true
-          ls -la ~/.koyeb/bin/ || true
-          ls -la /usr/local/bin/koyeb || true
+      - name: Install and configure the Koyeb CLI
+        uses: koyeb-community/install-koyeb-cli@v2
+        with:
+          api_token: "${{ secrets.KOYEB_TOKEN }}"
 
       - name: Deploy to Koyeb
-        run: echo "skip for now"
-        env:
-          KOYEB_TOKEN: ${{ secrets.KOYEB_TOKEN }}
+        run: koyeb service redeploy minnaka-map/minnaka-map
