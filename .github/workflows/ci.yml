@@ -113,7 +113,7 @@ jobs:
         run: npm ci
 
       - name: Run Vitest test
-        run: npm run test --reporter=github-actions --project unit --project integration
+        run: npm run test -- --reporter=github-actions --project unit --project integration
 
   Playwright:
     runs-on: ubuntu-latest
@@ -230,3 +230,16 @@ jobs:
           npx @sentry/cli releases new ${{ github.sha }}
           npx @sentry/cli releases files ${{ github.sha }} upload-sourcemaps .next/static/
           npx @sentry/cli releases finalize ${{ github.sha }}
+
+  Deploy-Koyeb:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: [RSpec, RuboCop, ESLint, Vitest, Playwright]
+    steps:
+      - name: Install and configure the Koyeb CLI
+        uses: koyeb-community/install-koyeb-cli@v2
+        with:
+          api_token: "${{ secrets.KOYEB_TOKEN }}"
+
+      - name: Deploy to Koyeb
+        run: koyeb service redeploy minnaka-map/minnaka-map
