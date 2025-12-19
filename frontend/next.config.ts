@@ -50,7 +50,7 @@ const nextConfig: NextConfig = {
               'img-src \'self\' data: blob: https://imgfp.hotp.jp https://api.maptiler.com https://*.google.com https://*.googleapis.com',
               'font-src \'self\' data:',
               'frame-src https://www.google.com',
-              'connect-src \'self\' http://localhost:3000 https://api.maptiler.com https://*.sentry.io https://accounts.google.com https://www.google-analytics.com',
+              'connect-src \'self\' http://localhost:3000 https://api.minnaka-map.com https://api.maptiler.com https://*.sentry.io https://accounts.google.com https://www.google-analytics.com',
               'worker-src \'self\' blob:',
             ].join('; '),
           },
