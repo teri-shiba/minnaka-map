@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { GoogleAnalytics } from '@next/third-parties/google'
 import { Suspense } from 'react'
 import { AuthProvider } from '~/components/features/account/auth/auth-provider'
 import Footer from '~/components/layout/footer'
@@ -39,6 +40,8 @@ export const viewport: Viewport = {
 }
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const gaId = process.env.NEXT_PUBLIC_GA_ID!
+
   return (
     <html lang="ja">
       <body>
@@ -53,6 +56,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <AuthProvider />
         <Footer />
       </body>
+      <GoogleAnalytics gaId={gaId} />
     </html>
   )
 }

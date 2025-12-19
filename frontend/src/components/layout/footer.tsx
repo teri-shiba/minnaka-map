@@ -30,9 +30,9 @@ export default function Footer() {
           <Image
             alt="みんなかマップ"
             src="/logo.webp"
-            width={224}
+            width={230}
             height={29}
-            className="block"
+            className="block h-auto"
           />
         </Link>
         <nav aria-label="フッターナビゲーション">

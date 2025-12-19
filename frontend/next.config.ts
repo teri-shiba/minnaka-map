@@ -19,6 +19,45 @@ const nextConfig: NextConfig = {
 
     return config
   },
+
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              'default-src \'self\'',
+              'script-src \'self\' \'unsafe-inline\' \'unsafe-eval\' https://*.sentry.io https://www.googletagmanager.com',
+              'style-src \'self\' \'unsafe-inline\'',
+              'img-src \'self\' data: blob: https://imgfp.hotp.jp https://api.maptiler.com https://*.google.com https://*.googleapis.com',
+              'font-src \'self\' data:',
+              'frame-src https://www.google.com',
+              'connect-src \'self\' http://localhost:3000 https://api.maptiler.com https://*.sentry.io https://accounts.google.com https://www.google-analytics.com',
+              'worker-src \'self\' blob:',
+            ].join('; '),
+          },
+        ],
+      },
+    ]
+  },
 }
 
 export default withSentryConfig(nextConfig, {

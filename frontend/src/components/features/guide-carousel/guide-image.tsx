@@ -20,15 +20,15 @@ export default function GuideImage({ activeIndex, current }: Props) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="inline-block drop-shadow-lg md:drop-shadow-xl"
+          className="relative inline-block aspect-[2/3] w-full max-w-[280px] overflow-hidden drop-shadow-lg md:aspect-[1/2] md:drop-shadow-xl"
         >
           <Image
             alt={current.title || ''}
             src={current.imageUrl || ''}
-            width={280}
-            height={560}
-            loading="lazy"
-            className="relative aspect-[2/3] object-cover object-top md:aspect-auto md:object-none"
+            fill
+            sizes="(max-width: 767px) 100vw, 280px"
+            priority={activeIndex === 0}
+            className="object-cover object-top"
           />
         </motion.div>
       </AnimatePresence>

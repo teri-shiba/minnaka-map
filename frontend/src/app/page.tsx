@@ -14,10 +14,10 @@ export default function Home() {
             <Image
               alt="みんなかマップ"
               src="/logo.webp"
-              width={224}
+              width={230}
               height={29}
               priority
-              className="block"
+              className="block h-auto"
             />
           </h2>
 
@@ -29,8 +29,8 @@ export default function Home() {
             <Image
               alt=""
               src="/mv_pc.webp"
-              width={424}
-              height={533}
+              width={420}
+              height={525}
               priority
               fetchPriority="high"
               className="hidden md:block"
@@ -38,8 +38,8 @@ export default function Home() {
             <Image
               alt=""
               src="/mv_sp.webp"
-              width={264}
-              height={183}
+              width={270}
+              height={180}
               priority
               fetchPriority="high"
               className="block md:hidden"
@@ -54,7 +54,7 @@ export default function Home() {
             <Image
               alt="みんなかマップ"
               src="/logo.webp"
-              width={170}
+              width={240}
               height={30}
               priority
               className="w-44 sm:w-60"
@@ -74,7 +74,7 @@ export default function Home() {
                 alt={feature.title}
                 src={feature.src}
                 width={170}
-                height={149}
+                height={148}
                 className="mb-4"
               />
               <h3 className="mb-2 text-lg text-secondary-foreground">

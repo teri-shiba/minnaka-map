@@ -26,7 +26,7 @@ export default function Header() {
     {
       id: 0,
       src: '/logo.webp',
-      width: 224,
+      width: 230,
       height: 29,
       customClassName: 'hidden md:block',
     },
@@ -51,7 +51,7 @@ export default function Header() {
               width={logo.width}
               height={logo.height}
               priority
-              className={logo.customClassName}
+              className={`h-auto ${logo.customClassName}`}
             />
           ))}
         </Link>
