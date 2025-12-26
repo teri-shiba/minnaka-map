@@ -20,6 +20,13 @@ RSpec.describe "Api::V1::Overrides::RegistrationsController", type: :request do
       it "200 を返す" do
         post api_v1_user_auth_registration_path,
              params: valid_params, as: :json
+        puts "=== DEBUG ==="
+        puts "Status: #{response.status}"
+        puts "Body: #{response.body}"
+        puts "User count: #{User.count}"
+        puts "UserAuth count: #{UserAuth.count}"
+        puts "Last user: #{User.last&.attributes}"
+        puts "============="
         expect(response).to have_http_status(:ok)
       end
 
