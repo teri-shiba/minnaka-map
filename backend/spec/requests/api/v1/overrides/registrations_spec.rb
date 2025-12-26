@@ -18,14 +18,15 @@ RSpec.describe "Api::V1::Overrides::RegistrationsController", type: :request do
 
     context "正常なパラメータを送信した場合" do
       it "200 を返す" do
+        puts "=== WHITELIST DEBUG ==="
+        puts "Settings.front_domain: #{Settings.front_domain}"
+        puts "redirect_whitelist: #{DeviseTokenAuth.redirect_whitelist.inspect}"
+        puts "========================"
         post api_v1_user_auth_registration_path,
              params: valid_params, as: :json
         puts "=== DEBUG ==="
         puts "Status: #{response.status}"
         puts "Body: #{response.body}"
-        puts "User count: #{User.count}"
-        puts "UserAuth count: #{UserAuth.count}"
-        puts "Last user: #{User.last&.attributes}"
         puts "============="
         expect(response).to have_http_status(:ok)
       end
