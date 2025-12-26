@@ -74,5 +74,10 @@ DeviseTokenAuth.setup do |config|
   }
 
   # redirect whitelist
-  config.redirect_whitelist = ["http://localhost:8000", Settings.front_domain]
+  config.redirect_whitelist = -> {
+    [
+      Settings.front_domain,
+      "http://localhost:8000",
+    ].compact
+  }
 end
