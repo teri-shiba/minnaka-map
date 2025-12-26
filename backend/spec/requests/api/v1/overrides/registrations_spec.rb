@@ -12,7 +12,7 @@ RSpec.describe "Api::V1::Overrides::RegistrationsController", type: :request do
         email: user_email,
         password: user_password,
         password_confirmation: user_password,
-        confirm_success_url: "http://example.com/confirmed",
+        confirm_success_url: "http://localhost:8000/confirmed",
       }
     end
 
