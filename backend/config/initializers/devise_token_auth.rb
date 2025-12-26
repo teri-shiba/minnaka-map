@@ -72,4 +72,7 @@ DeviseTokenAuth.setup do |config|
     same_site: :lax,
     domain: ENV.fetch("COOKIE_DOMAIN", nil),
   }
+
+  # redirect whitelist
+  config.redirect_whitelist = [Settings.front_domain]
 end
