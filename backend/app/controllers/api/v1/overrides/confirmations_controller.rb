@@ -2,7 +2,7 @@ class Api::V1::Overrides::ConfirmationsController < DeviseTokenAuth::Confirmatio
   def show
     @resource = resource_class.confirm_by_token(resource_params[:confirmation_token])
 
-    redirect_url = self.redirect_url
+    redirect_url = get_redirect_url
 
     if @resource.errors.empty?
       redirect_to DeviseTokenAuth::Url.generate(
@@ -26,4 +26,14 @@ class Api::V1::Overrides::ConfirmationsController < DeviseTokenAuth::Confirmatio
       )
     end
   end
+
+  private
+
+    def get_redirect_url
+      url = params[:redirect_url]
+      return nil if url.blank?
+      return nil unless DeviseTokenAuth::Url.whitelisted?(url)
+
+      url
+    end
 end
