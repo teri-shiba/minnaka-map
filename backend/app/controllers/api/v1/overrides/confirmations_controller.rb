@@ -2,13 +2,13 @@ class Api::V1::Overrides::ConfirmationsController < DeviseTokenAuth::Confirmatio
   def show
     @resource = resource_class.confirm_by_token(resource_params[:confirmation_token])
 
-    redirect_url = fetch_redirect_url
+    redirect_url = self.redirect_url
 
     if @resource.errors.empty?
       redirect_to DeviseTokenAuth::Url.generate(
         redirect_url,
         success: "email_confirmed",
-      )
+      ), allow_other_host: true
     else
 
       email_errors = @resource.errors.details[:email] || []
@@ -23,17 +23,7 @@ class Api::V1::Overrides::ConfirmationsController < DeviseTokenAuth::Confirmatio
       redirect_to DeviseTokenAuth::Url.generate(
         redirect_url,
         error: error_code,
-      )
+      ), allow_other_host: true
     end
   end
-
-  private
-
-    def fetch_redirect_url
-      url = params[:redirect_url]
-      return nil if url.blank?
-      return nil unless DeviseTokenAuth::Url.whitelisted?(url)
-
-      url
-    end
 end
